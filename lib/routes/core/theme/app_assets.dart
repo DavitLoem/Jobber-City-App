@@ -5,4 +5,6 @@ class AppAssets {
   static const String logo = 'assets/logos/jbc.png';
   static const String email = 'assets/icons/email.png';
   static const String lock = 'assets/icons/lock.png';
+  static const String imageOtp = 'assets/images/image_otp.png';
+  static const String imageForgotPass = 'assets/images/image_forgot_pass.png';
 }

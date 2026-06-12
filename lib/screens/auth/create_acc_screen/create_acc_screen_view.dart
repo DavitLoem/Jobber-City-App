@@ -1,10 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/routes/app_routes.dart';
+import 'package:jobber_city/routes/core/api/services/auth_services.dart';
 import 'package:jobber_city/routes/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/core/theme/app_assets.dart';
 import 'package:jobber_city/screens/auth/widget/custom_animated_checkbox.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
+import 'package:jobber_city/screens/auth/widget/social_login.dart';
 import 'package:jobber_city/screens/auth/widget/tab_bar.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
@@ -19,41 +22,41 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: AppColors.lightBackground, 
+      backgroundColor: AppColors.lightBackground,
       body: SafeArea(
         child: Column(
           children: [
-            // 1. Fixed Header Area
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 23),
               child: _buildHeader(),
             ),
-            const SizedBox(height: 20),
-            
-            // 2. Fixed Tab Bar Selector
+
+            const SizedBox(height: 16),
+
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 23),
               child: AnimatedTabBar(controller: controller),
             ),
-            const SizedBox(height: 20),
-            
-            // 3. Scrollable Input Fields Area
+
+            const SizedBox(height: 16),
+
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Obx(() {
-                  return AnimatedSwitcher(
+                clipBehavior: Clip.none,
+                physics: const BouncingScrollPhysics(
+                  parent: NeverScrollableScrollPhysics(),
+                ),
+                padding: const EdgeInsets.fromLTRB(23, 0, 23, 30),
+                child: Obx(
+                  () => AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: controller.selectedIndex.value == 0
-                        ? _buildLoginEmployer()
-                        : _buildLoginSeeker(),
-                  );
-                }),
+                        ? _buildRegisterForm(isEmployer: true)
+                        : _buildRegisterForm(isEmployer: false),
+                  ),
+                ),
               ),
             ),
-            
-            // 4. Fixed Sticky Register Button at the very bottom
-           
           ],
         ),
       ),
@@ -62,11 +65,12 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
   Widget _buildHeader() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(height: 20),
-        Logo(size: 120),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
+
+        const Logo(size: 120),
+
+        const SizedBox(height: 12),
 
         Text(
           'Create Account',
@@ -76,278 +80,157 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
             color: AppColors.textPrimary,
           ),
         ),
+
+        const SizedBox(height: 4),
+
         Text(
           'Fill in your details to get started',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.normal,
-            color: AppColors.textSecondary,
-          ),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
         ),
       ],
     );
   }
 
- 
-
-Widget _buildLoginEmployer() {
+  Widget _buildRegisterForm({required bool isEmployer}) {
     return Column(
-      key: const ValueKey('Employer'),
+      key: ValueKey(isEmployer),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomTextfield(hintText: 'Full Name', prefixIcon: Icons.person),
-        const SizedBox(height: 16),
-       
-        CustomTextfield(hintText: 'Email', prefixIcon: Icons.email), 
-        const SizedBox(height: 16),
-        CustomTextfield(hintText: 'Password', prefixIcon: Icons.lock, suffixIcon: Icons.visibility, isPasswordField: true), 
-        const SizedBox(height: 16),
-        CustomTextfield(hintText: 'Confirm Password', prefixIcon: Icons.lock, suffixIcon: Icons.visibility, isPasswordField: true), 
-        const SizedBox(height: 30),
-        
-       Obx(() => CustomAnimatedCheckbox(
-             value: controller.agreeToTermsEmployer.value, // Bind to true boolean state
-              onTap: () => controller.toggleTermsEmployer(), //
-              label: "I agree to the ",
-              linkText: "Terms of Service",
-              labelText: " and",
-              linkText2: " Privacy Policy",
-              onLinkTap: () {
-                // Handle opening your Terms & Conditions page here
-              },
-              onLinkTap2: () {
-                // Handle opening your Privacy Policy page here
-              },
-            )),
-            const SizedBox(height: 20),
-            CustomButton(onPressed: (){}, text: 'Create Account'),
-            const SizedBox(height: 30),
+        const SizedBox(height: 8),
+
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 8,
+          spacing: 12,
           children: [
-            Expanded(child: Divider(
-              thickness: 1.4,
-              color: AppColors.line,
-            )),
-            Text(
-              'Or',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.textSecondary,
+            Expanded(
+              child: CustomTextfield(
+                controller: controller.firstNameCtrl,
+                hintText: 'First Name',
+                prefixIcon: Icons.person,
               ),
             ),
-            Expanded(child: Divider(
-              thickness: 1.4,
-              color: AppColors.line,
-            )),
-          ],
-
-
-        ),
-        SizedBox(height: 20),
-        Row(
-          spacing: 30,
-          children: [
-           
-            _buildContinueWith(text: 'Continue with Google', iconPath: AppAssets.google),
-           
-            
-          ],
-        ),
-        SizedBox(height: 20),
-        Row(
-          spacing: 3,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Already have an account? ',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.textSecondary,
+            Expanded(
+              child: CustomTextfield(
+                controller: controller.lastNameCtrl,
+                hintText: 'Last Name',
+                prefixIcon: Icons.person,
               ),
             ),
-             GestureDetector(
-              onTap: (){
-                Get.toNamed(AppRoutes.login);
-              },
-          child: Text(
-            'Sign In',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-              decoration: TextDecoration.underline,
-              decorationColor: AppColors.primary,
-              decorationThickness: 1.4,
-            ),
+          ],
+        ),
+
+        const SizedBox(height: 16),
+
+        CustomTextfield(
+          controller: controller.emailCtrl,
+
+          hintText: 'Email',
+          prefixIcon: Icons.email,
+        ),
+
+        const SizedBox(height: 16),
+
+        CustomTextfield(
+          controller: controller.passwordCtrl,
+          hintText: 'Password',
+          prefixIcon: Icons.lock,
+          suffixIcon: Icons.visibility,
+          isPasswordField: true,
+        ),
+
+        const SizedBox(height: 24),
+
+        Obx(
+          () => CustomAnimatedCheckbox(
+            value: isEmployer
+                ? controller.agreeToTermsEmployer.value
+                : controller.agreeToTermsSeeker.value,
+            onTap: () {
+              if (isEmployer) {
+                controller.toggleTermsEmployer();
+              } else {
+                controller.toggleTermsSeeker();
+              }
+            },
+            label: 'I agree to the ',
+            linkText: 'Terms of Service',
+            labelText: ' and ',
+            linkText2: 'Privacy Policy',
+            onLinkTap: () {},
+            onLinkTap2: () {},
           ),
         ),
+
+        const SizedBox(height: 24),
+
+        CustomButton(
+          onPressed: () {
+            controller.register();
+          },
+          text: 'Create Account',
+        ),
+
+        const SizedBox(height: 24),
+
+        Row(
+          children: [
+            Expanded(child: Divider(thickness: 1, color: AppColors.line)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                'OR',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Expanded(child: Divider(thickness: 1, color: AppColors.line)),
           ],
         ),
-        SizedBox(height: 20,)
-       
-      ],
-    );
-  }
 
-  Widget _buildContinueWith({
-  required String text,
-  required String iconPath,
-  VoidCallback? onPressed,
-  bool isLoading = false,
-}) {
-  return Expanded(
-    child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: isLoading ? null : onPressed,
-        borderRadius: BorderRadius.circular(12),
-        splashColor: AppColors.primary.withValues(alpha: 0.1),
-        highlightColor: AppColors.primary.withValues(alpha: 0.05),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: AppColors.white,
-            border: Border.all(
-              color: AppColors.line,
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.badgeBackground.withValues(alpha: 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
+        const SizedBox(height: 24),
+
+        SizedBox(
+          width: double.infinity,
+          child: SocialLogin(
+            onPressed: () {},
+            text: 'Continue with Google',
+            iconPath: AppAssets.google,
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                'Already have an account? ',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Get.toNamed(AppRoutes.login);
+                },
+                child: Text(
+                  'Sign In',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.primary,
+                  ),
+                ),
               ),
             ],
           ),
-          child:Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      iconPath,
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      text,
-                      style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                            fontSize: 16,
-                          ),
-                    ),
-                  ],
-                ),
         ),
-      ),
-    ),
-  );
-}
-  Widget _buildLoginSeeker() {
-     return Column(
-      key: const ValueKey('Seeker'),
-      children: [
-        CustomTextfield(hintText: 'Full Name', prefixIcon: Icons.person),
-        const SizedBox(height: 16),
-     
-        CustomTextfield(hintText: 'Email', prefixIcon: Icons.email), 
-        const SizedBox(height: 16),
-        CustomTextfield(hintText: 'Password', prefixIcon: Icons.lock, suffixIcon: Icons.visibility, isPasswordField: true), 
-        const SizedBox(height: 16),
-        CustomTextfield(hintText: 'Confirm Password', prefixIcon: Icons.lock, suffixIcon: Icons.visibility, isPasswordField: true), 
-        const SizedBox(height: 40),
-        
-       Obx(() => CustomAnimatedCheckbox(
-             value: controller.agreeToTermsSeeker.value, // Bind to true boolean state
-              onTap: () => controller.toggleTermsSeeker(), //
-              label: "I agree to the ",
-              linkText: "Terms of Service",
-              labelText: " and",
-              linkText2: " Privacy Policy",
-              onLinkTap: () {
-                // Handle opening your Terms & Conditions page here
-              },
-              onLinkTap2: () {
-                // Handle opening your Privacy Policy page here
-              },
-            )),
-        const SizedBox(height: 30),
-        CustomButton(onPressed: (){}, text: 'Create Account'),
+
         const SizedBox(height: 20),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 8,
-          children: [
-            Expanded(child: Divider(
-              thickness: 1.4,
-              color: AppColors.line,
-            )),
-            Text(
-              'Or',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            Expanded(child: Divider(
-              thickness: 1.4,
-              color: AppColors.line,
-            )),
-          ],
-
-
-        ),
-        SizedBox(height: 20),
-        Row(
-          spacing: 30,
-          children: [
-           
-            _buildContinueWith(text: 'Google', iconPath: AppAssets.google),
-         
-            
-          ],
-        ),
-        SizedBox(height: 20),
-         Row(
-          spacing: 3,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Already have an account? ',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: AppColors.textSecondary,
-              ),
-            ),
-             GestureDetector(
-              onTap: (){
-                Get.toNamed(AppRoutes.login);
-              },
-          child: Text(
-            'Sign In',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-              decoration: TextDecoration.underline,
-              decorationColor: AppColors.primary,
-              decorationThickness: 1.4,
-            ),
-          ),
-        ),
-          ],
-        ),
-        SizedBox(height: 20,)
       ],
     );
   }

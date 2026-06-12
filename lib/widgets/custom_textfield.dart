@@ -7,13 +7,16 @@ class CustomTextfield extends StatefulWidget {
     required this.hintText,
     required this.prefixIcon,
     this.suffixIcon,
-    this.isPasswordField = false, // 1. Added flag to determine if this is a password field
+    this.isPasswordField =
+        false, // 1. Added flag to determine if this is a password field
+    required this.controller,
   });
 
   final String hintText;
   final IconData prefixIcon;
   final IconData? suffixIcon;
-  final bool isPasswordField; 
+  final bool isPasswordField;
+  final TextEditingController controller;
 
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
@@ -28,8 +31,8 @@ class _CustomTextfieldState extends State<CustomTextfield> {
   void initState() {
     super.initState();
     // Initially hide text if it's a password field
-    _obscureText = widget.isPasswordField; 
-    
+    _obscureText = widget.isPasswordField;
+
     _focusNode.addListener(() {
       setState(() {
         _isFocused = _focusNode.hasFocus;
@@ -46,14 +49,20 @@ class _CustomTextfieldState extends State<CustomTextfield> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       focusNode: _focusNode,
       obscureText: _obscureText,
       style: const TextStyle(color: AppColors.inputText),
       decoration: InputDecoration(
         filled: true,
-        fillColor: _isFocused ? AppColors.inputFocusedBackground : AppColors.inputBackground,
+        fillColor: _isFocused
+            ? AppColors.inputFocusedBackground
+            : AppColors.inputBackground,
 
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(color: AppColors.inputBorder),
@@ -63,20 +72,19 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           borderSide: BorderSide(color: AppColors.inputFocusedBorder),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.all(Radius.circular(15)),
           borderSide: BorderSide(color: AppColors.inputErrorBorder),
         ),
-        
-        prefixIconConstraints: const BoxConstraints(
-          minWidth: 40, 
-          minHeight: 0,
-        ),
-        
+
+        prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 0),
+
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 8.0),
           child: Icon(
-            widget.prefixIcon, 
-            color: _isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText,
+            widget.prefixIcon,
+            color: _isFocused
+                ? AppColors.inputFocusedBorder
+                : AppColors.inputIconText,
           ),
         ),
 
@@ -86,7 +94,9 @@ class _CustomTextfieldState extends State<CustomTextfield> {
                 padding: const EdgeInsets.only(right: 10.0),
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: _isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText,
+                  color: _isFocused
+                      ? AppColors.inputFocusedBorder
+                      : AppColors.inputIconText,
                 ),
                 onPressed: () {
                   setState(() {
@@ -95,17 +105,23 @@ class _CustomTextfieldState extends State<CustomTextfield> {
                 },
               )
             : widget.suffixIcon != null
-                ? Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Icon(
-                      widget.suffixIcon,
-                      color: _isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText,
-                    ),
-                  )
-                : null, 
-        
+            ? Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: Icon(
+                  widget.suffixIcon,
+                  color: _isFocused
+                      ? AppColors.inputFocusedBorder
+                      : AppColors.inputIconText,
+                ),
+              )
+            : null,
+
         hintText: widget.hintText,
-        hintStyle: TextStyle(color: _isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText),
+        hintStyle: TextStyle(
+          color: _isFocused
+              ? AppColors.inputFocusedBorder
+              : AppColors.inputIconText,
+        ),
       ),
     );
   }

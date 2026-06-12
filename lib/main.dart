@@ -16,13 +16,10 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-       scaffoldBackgroundColor: AppColors.lightBackground,
-       appBarTheme: AppBarTheme(
-         backgroundColor: AppColors.lightBackground,
-       ),
-       
+        scaffoldBackgroundColor: AppColors.lightBackground,
+        appBarTheme: AppBarTheme(backgroundColor: AppColors.lightBackground),
       ),
-      initialRoute: AppRoutes.createAccount,
+      initialRoute: AppRoutes.login,
       getPages: AppPages.routes,
       // home: const LoginScreen(),
     );
