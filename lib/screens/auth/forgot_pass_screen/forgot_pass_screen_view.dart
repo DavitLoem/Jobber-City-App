@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/routes/core/api/services/auth_services.dart';
-import 'package:jobber_city/routes/core/theme/app_assets.dart';
+import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/theme/app_assets.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
 

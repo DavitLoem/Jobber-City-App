@@ -23,56 +23,45 @@ class CreateAccScreenViewController extends GetxController {
   }
 
   void register() async {
-    // ពិនិត្យលក្ខខណ្ឌថាតើបានយល់ព្រមតាម Terms ហើយឬនៅ
     bool hasAgreed = selectedIndex.value == 0
         ? agreeToTermsEmployer.value
         : agreeToTermsSeeker.value;
+
     if (!hasAgreed) {
       Get.snackbar("Warning", "Please agree to the Terms and Conditions");
       return;
     }
 
-    if (firstNameCtrl.text.isEmpty ||
-        lastNameCtrl.text.isEmpty ||
-        emailCtrl.text.isEmpty ||
+    if (firstNameCtrl.text.trim().isEmpty ||
+        lastNameCtrl.text.trim().isEmpty ||
+        emailCtrl.text.trim().isEmpty ||
         passwordCtrl.text.isEmpty) {
       Get.snackbar("Error", "Please fill all fields");
       return;
     }
 
     isLoading.value = true;
+
     try {
-      var response = await authServices.register(
-        firstName: firstNameCtrl.text,
-        lastName: lastNameCtrl.text,
-        email: emailCtrl.text,
+      final requestModel = RegisterRequestModel(
+        firstName: firstNameCtrl.text.trim(),
+        lastName: lastNameCtrl.text.trim(),
+        email: emailCtrl.text.trim(),
         password: passwordCtrl.text,
         role: selectedIndex.value == 0 ? "employer" : "seeker",
       );
 
-      // ✅ កែប្រែពី response.success មកជា response["success"] វិញ
-      if (response != null && response["success"] == true) {
-        Get.snackbar(
-          "Success",
-          response["message"] ?? "Account created successfully",
-        );
-        Get.offAllNamed(AppRoutes.verifyOtp, arguments: emailCtrl.text.trim());
-      } else {
-        // ✅ កែប្រែពី response.detail មកជា response["message"] ឬ "detail" ទៅតាម key របស់ Backend
-        Get.snackbar(
-          "Error",
-          response["message"] ?? "Failed to create account",
-        );
-      }
-    } catch (e) {
-      if (e is DioException) {
-        Get.snackbar(
-          "Error",
-          e.response?.data["detail"] ?? "Something went wrong",
-        );
-      } else {
-        Get.snackbar("Error", "Something went wrong");
-      }
+      final response = await authServices.register(requestModel);
+
+      AppLogger.i("Register Success: $response");
+
+      Get.toNamed(AppRoutes.verifyOtp, arguments: emailCtrl.text.trim());
+    } on ApiException catch (e) {
+      AppLogger.w("Register Failed (API): ${e.message}");
+      Get.snackbar("Error", e.message);
+    } catch (e, stackTrace) {
+      AppLogger.e("Register Failed (System)", e, stackTrace);
+      Get.snackbar("Error", "An unexpected error occurred. Please try again.");
     } finally {
       isLoading.value = false;
     }
