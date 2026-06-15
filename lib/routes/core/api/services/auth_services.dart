@@ -1,4 +1,6 @@
 import 'package:jobber_city/routes/core/api/services/base_api_services.dart';
+import 'package:dio/dio.dart';
+import 'base_api_services.dart';
 
 class AuthServices {
   static final BaseApiServices baseApi = BaseApiServices();
@@ -24,13 +26,18 @@ class AuthServices {
     return response;
   }
 
+  // 🟢 FIXED: Match JSON format and keys with your FastAPI OpenAPI spec
   Future<dynamic> login({
     required String email,
     required String password,
   }) async {
     var response = await baseApi.post(
       endpoint: '/api/auth/login',
-      data: {'email': email, 'password': password},
+      data: {
+        'email': email, // Changed from 'username' to 'email' to match API Docs
+        'password': password, // Matches 'password'
+      },
+      // Removed formUrlEncodedContentType option so it defaults to application/json
     );
 
     return response;

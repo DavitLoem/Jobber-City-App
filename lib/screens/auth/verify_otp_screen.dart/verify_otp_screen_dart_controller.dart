@@ -6,8 +6,9 @@ class VerifyOtpScreenDartViewController extends GetxController {
   var isLoading = false.obs;
   String userEmail = '';
   String maskedEmail = '';
+  String fromScreen = ''; // 🟢 Track where the navigation came from
 
-  // សម្រាប់គ្រប់គ្រងការរាប់ថយក្រោយ (៣០ វិនាទី)
+  // Countdown timer setup
   var remainingSeconds = 30.obs;
   Timer? _timer;
 
@@ -20,17 +21,25 @@ class VerifyOtpScreenDartViewController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // ចាប់យកអ៊ីមែលពី arguments ដែលបញ្ជូនមកពីផ្ទាំងមុន
-    if (Get.arguments != null && Get.arguments is String) {
-      userEmail = Get.arguments;
-      maskedEmail = _maskEmail(userEmail);
+
+    if (Get.arguments != null) {
+      if (Get.arguments is String) {
+        userEmail = Get.arguments as String;
+      } else if (Get.arguments is Map) {
+        final Map argsMap = Get.arguments as Map;
+        userEmail = argsMap['email']?.toString() ?? '';
+        fromScreen =
+            argsMap['from']?.toString() ?? ''; // 🟢 Extract the 'from' argument
+      }
+
+      if (userEmail.isNotEmpty) {
+        maskedEmail = _maskEmail(userEmail);
+      }
     }
 
-    // ចាប់ផ្តើមរាប់ថយក្រោយភ្លាមៗនៅពេលបើកអេក្រង់នេះ
     startTimer();
   }
 
-  // មុខងារលាក់ខ្ទង់អ៊ីមែល (e.g., sample.user@gmail.com -> sa***@gmail.com)
   String _maskEmail(String email) {
     final parts = email.split('@');
     if (parts.length != 2) return email;
@@ -45,10 +54,9 @@ class VerifyOtpScreenDartViewController extends GetxController {
     }
   }
 
-  // មុខងាររាប់ថយក្រោយពេលផ្ញើ OTP
   void startTimer() {
-    remainingSeconds.value = 30; // រាប់ថយក្រោយពី ៣០ វិនាទី
-    _timer?.cancel(); // បញ្ឈប់ timer ចាស់ (បើមាន)
+    remainingSeconds.value = 30;
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (remainingSeconds.value > 0) {
         remainingSeconds.value--;
@@ -58,56 +66,71 @@ class VerifyOtpScreenDartViewController extends GetxController {
     });
   }
 
-  // ប្រមូលផ្តុំលេខកូដពីប្រឡោះទាំង ៤ មកជា String តែមួយ
   String get completeOtp => controllers.map((c) => c.text).join();
 
-  // មុខងារផ្ទៀងផ្ទាត់ OTP ជាមួយ Backend API
   void verifyOtp() async {
     String otp = completeOtp;
 
     if (otp.length != 4) {
-      Get.snackbar(
-        'Error',
-        'Please enter a complete 4-digit code',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Please enter a complete 4-digit code');
       return;
     }
 
     try {
       isLoading.value = true;
 
-      var response = await _authServices.verifyOtp(email: userEmail, otp: otp);
-
-      if (response != null && response["success"] == true) {
-        Get.snackbar(
-          'Success',
-          response["message"] ?? 'OTP Verified successfully!',
-          snackPosition: SnackPosition.BOTTOM,
+      // 🟢 Check if the user came from the forgot password screen
+      if (fromScreen == 'forgot_password') {
+        // Skip the registration OTP API check. Take them straight to your Reset Password Screen
+        // and pass both the email and the entered OTP so it can be submitted with the new password.
+        // This controller will be automatically cleaned up when navigating away
+        Get.toNamed(
+          AppRoutes.resetPassword,
+          arguments: {'email': userEmail, 'otp': otp},
         );
-        Get.toNamed(AppRoutes.home);
       } else {
-        Get.snackbar(
-          'Error',
-          response["message"] ?? 'Invalid OTP code. Please try again.',
-          snackPosition: SnackPosition.BOTTOM,
+        // 🔵 Account Creation Flow (Normal behavior)
+        var response = await _authServices.verifyOtp(
+          email: userEmail,
+          otp: otp,
         );
+
+        if (response != null && response["success"] == true) {
+          Get.snackbar(
+            'Success',
+            response["message"] ?? 'OTP Verified successfully!',
+          );
+          // Clean navigation to home - login binding with fenix: true handles recreation if needed
+          Get.offAllNamed(AppRoutes.home);
+        } else {
+          Get.snackbar(
+            'Error',
+            response["message"] ?? 'Invalid OTP code. Please try again.',
+          );
+        }
       }
     } catch (e) {
       print("Verify OTP Crash Log: $e");
-      Get.snackbar(
-        'Error',
-        'Something went wrong. Please check your connection.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+
+      // 🟢 Better Error Handling: Show exact error from backend instead of hiding it
+      if (e is DioException) {
+        String backendMessage =
+            e.response?.data["message"] ??
+            e.response?.data["detail"] ??
+            'Server returned an error.';
+        Get.snackbar('Error', backendMessage);
+      } else {
+        Get.snackbar(
+          'Error',
+          'Something went wrong. Please check your connection.',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
-  // ✅ មុខងារផ្ញើលេខកូដ OTP ម្តងទៀត (ដោះស្រាយកំហុស undefined_method)
   void resendOtp() async {
-    // បើកំពុងរាប់ថយក្រោយ មិនអនុញ្ញាតឱ្យចុចផ្ញើឡើងវិញឡើយ
     if (remainingSeconds.value > 0) return;
 
     try {
@@ -118,23 +141,15 @@ class VerifyOtpScreenDartViewController extends GetxController {
         Get.snackbar(
           'Success',
           response["message"] ?? 'OTP has been resent to your email.',
-          snackPosition: SnackPosition.BOTTOM,
         );
-        // បើផ្ញើជោគជ័យ ចាប់ផ្តើមរាប់ថយក្រោយសារជាថ្មី
         startTimer();
       } else {
-        Get.snackbar(
-          'Error',
-          response["message"] ?? 'Failed to resend OTP.',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        Get.snackbar('Error', response["message"] ?? 'Failed to resend OTP.');
       }
     } catch (e) {
-      print("Resend OTP Crash Log: $e");
       Get.snackbar(
         'Error',
         'Something went wrong. Please check your connection.',
-        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isLoading.value = false;
@@ -143,7 +158,6 @@ class VerifyOtpScreenDartViewController extends GetxController {
 
   @override
   void onClose() {
-    // បិទ Timer ពេលចាកចេញពីអេក្រង់ដើម្បីការពារ Memory Leak
     _timer?.cancel();
     for (var controller in controllers) {
       controller.dispose();

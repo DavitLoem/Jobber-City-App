@@ -4,11 +4,11 @@ import 'package:jobber_city/routes/core/constants/app_colors.dart';
 class CustomButton extends StatefulWidget {
   const CustomButton({
     super.key,
-    required this.onPressed,
+    this.onPressed, // 1. Remove 'required' so it can accept null
     required this.text,
   });
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // 2. Add '?' to make it nullable
   final String text;
 
   @override
@@ -41,13 +41,13 @@ class _CustomButtonState extends State<CustomButton>
   }
 
   void _onButtonPressed() {
-    // Animate down
+    // 3. Guard against null calls
+    if (widget.onPressed == null) return;
+
     _animationController.forward();
 
-    // Call the callback
-    widget.onPressed();
+    widget.onPressed!(); // 4. Call with '!' since we checked for null above
 
-    // Animate back up
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) {
         _animationController.reverse();
@@ -66,23 +66,17 @@ class _CustomButtonState extends State<CustomButton>
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.buttonPrimaryText,
-            shadowColor:
-             AppColors.buttonPrimary.withValues(alpha: 0.7),
+            shadowColor: AppColors.buttonPrimary.withValues(alpha: 0.7),
             elevation: 3,
-
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
-              
             ),
           ),
-          onPressed: _onButtonPressed,
+          // 5. Pass null to ElevatedButton if no callback is supplied to disable it visually
+          onPressed: widget.onPressed == null ? null : _onButtonPressed,
           child: Text(
             widget.text,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white, // or AppColors.buttonPrimaryText
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
       ),
