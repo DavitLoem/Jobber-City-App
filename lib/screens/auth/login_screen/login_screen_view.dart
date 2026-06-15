@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
@@ -9,6 +10,7 @@ import 'package:jobber_city/screens/auth/widget/logo.dart';
 import 'package:jobber_city/screens/auth/widget/social_login.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'login_screen_controller.dart';
 
@@ -36,7 +38,19 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 const SizedBox(height: 5),
                 _buildForgotPassword(),
                 const SizedBox(height: 20),
-                CustomButton(onPressed: () {}, text: 'Login'),
+                Obx(() {
+                  return CustomButton(
+                    onPressed: () {
+                      // Prevent clicking if it is already loading
+                      if (!controller.isLoading.value) {
+                        controller.login();
+                      }
+                    },
+                    text: controller.isLoading.value
+                        ? "Logging in..."
+                        : "Login",
+                  );
+                }),
                 const SizedBox(height: 25),
                 _buildDivider(),
                 const SizedBox(height: 25),
@@ -116,16 +130,17 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // នៅក្នុង login_screen_view.dart
           Expanded(
             child: Obx(
               () => CustomAnimatedCheckbox(
                 value: controller.rememberMe.value,
-                onTap: controller.toggleRememberMe,
+                // ប្រើ () => ដើម្បីបញ្ជូនទៅជា VoidCallback ដែល CustomAnimatedCheckbox ត្រូវការ
+                onTap: () => controller.toggleRememberMe(),
                 label: 'Remember me',
               ),
             ),
           ),
-
           TextButton(
             onPressed: () {
               Get.toNamed(AppRoutes.forgotPassword);
@@ -150,12 +165,15 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     return Column(
       children: [
         CustomTextfield(
+          // Use the controller's hashCode to force a new widget if the controller changes
+          key: ValueKey('email_field_${controller.hashCode}'),
           controller: controller.emailCtrl,
           hintText: 'Email',
           prefixIcon: Icons.email,
         ),
         SizedBox(height: 16),
         CustomTextfield(
+          key: ValueKey('password_field_${controller.hashCode}'),
           controller: controller.passwordCtrl,
           hintText: 'Password',
           prefixIcon: Icons.lock,

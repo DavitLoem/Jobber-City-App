@@ -3,9 +3,11 @@ import 'package:jobber_city/core/api/network/api_client.dart';
 import '../../../models/auth_model/register_request_model.dart';
 
 class AuthServices {
-final ApiClient _apiClient = ApiClient();
+  final ApiClient _apiClient = ApiClient();
 
-  Future<Map<String, dynamic>> register(RegisterRequestModel requestModel) async {
+  Future<Map<String, dynamic>> register(
+    RegisterRequestModel requestModel,
+  ) async {
     try {
       final response = await _apiClient.post(
         '/auth/register',

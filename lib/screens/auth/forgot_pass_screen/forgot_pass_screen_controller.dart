@@ -29,6 +29,8 @@ class ForgotPassScreenViewController extends GetxController {
           response["message"] ??
               "Verification code has been sent to your email.",
         );
+        // Navigate to OTP verification screen
+        // Controller will be automatically cleaned up when leaving this screen
         Get.toNamed(
           AppRoutes.verifyOtp,
           arguments: {'email': email, 'from': 'forgot_password'},
