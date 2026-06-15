@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:jobber_city/routes/app_pages.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/routes/core/constants/app_colors.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 
 void main() {
   runApp(const MyApp());

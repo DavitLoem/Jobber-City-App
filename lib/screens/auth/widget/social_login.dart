@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/routes/core/constants/app_colors.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 
 class SocialLogin extends StatelessWidget {
   const SocialLogin({super.key, required this.text, required this.iconPath, required this.onPressed, this.isLoading = false});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/routes/core/theme/app_assets.dart';
+import 'package:jobber_city/core/theme/app_assets.dart';
 
 class Logo extends StatelessWidget {
   const Logo({super.key, required this.size});

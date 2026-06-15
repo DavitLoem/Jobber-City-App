@@ -1,16 +1,19 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/api/network/api_exception.dart';
+import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/core/theme/app_assets.dart';
+import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/routes/core/api/services/auth_services.dart';
-import 'package:jobber_city/routes/core/constants/app_colors.dart';
-import 'package:jobber_city/routes/core/theme/app_assets.dart';
 import 'package:jobber_city/screens/auth/widget/custom_animated_checkbox.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
 import 'package:jobber_city/screens/auth/widget/social_login.dart';
 import 'package:jobber_city/screens/auth/widget/tab_bar.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
+
+import '../../../models/auth_model/register_request_model.dart';
 
 part 'create_acc_screen_binding.dart';
 part 'create_acc_screen_controller.dart';
@@ -163,11 +166,17 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
         const SizedBox(height: 24),
 
-        CustomButton(
-          onPressed: () {
-            controller.register();
-          },
-          text: 'Create Account',
+        Obx(
+          () => CustomButton(
+            onPressed: () {
+              controller.register();
+            },
+            text: isEmployer
+                ? 'Register as Employer'
+                : 'Register as Job Seeker',
+            isLoading:
+                controller.isLoading.value, // បោះតម្លៃនេះទៅដើម្បីប្តូររាង
+          ),
         ),
 
         const SizedBox(height: 24),

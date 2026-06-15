@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:jobber_city/routes/core/constants/app_colors.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 
 class CustomAnimatedCheckbox extends StatefulWidget {
   final bool value;

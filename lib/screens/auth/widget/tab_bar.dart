@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/routes/core/constants/app_colors.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/auth/create_acc_screen/create_acc_screen_view.dart';
 
 class AnimatedTabBar extends StatelessWidget {
