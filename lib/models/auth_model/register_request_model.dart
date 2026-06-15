@@ -1,9 +1,11 @@
+enum UserRole { seeker, employer }
+
 class RegisterRequestModel {
   final String firstName;
   final String lastName;
   final String email;
   final String password;
-  final String role;
+  final UserRole role;
 
   // 1. Constructor (រក្សាទុក)
   RegisterRequestModel({
@@ -17,10 +19,10 @@ class RegisterRequestModel {
   Map<String, dynamic> toJson() {
     return {
       'first_name': firstName,
-      'last_name': lastName, 
+      'last_name': lastName,
       'email': email,
       'password': password,
-      'role': role,
+      'role': role.name,
     };
   }
 }

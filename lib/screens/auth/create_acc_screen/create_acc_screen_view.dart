@@ -5,6 +5,7 @@ import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/theme/app_assets.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
+import 'package:jobber_city/core/utils/auth_validator.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/auth/widget/custom_animated_checkbox.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
@@ -54,8 +55,8 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
                   () => AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: controller.selectedIndex.value == 0
-                        ? _buildRegisterForm(isEmployer: true)
-                        : _buildRegisterForm(isEmployer: false),
+                        ? _buildRegisterForm(isEmployer: false)
+                        : _buildRegisterForm(isEmployer: true),
                   ),
                 ),
               ),
