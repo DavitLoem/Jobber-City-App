@@ -23,32 +23,39 @@ class CreateAccScreenViewController extends GetxController {
   }
 
   void register() async {
+    String firstName = firstNameCtrl.text.trim();
+    String lastName = lastNameCtrl.text.trim();
+    String email = emailCtrl.text.trim();
+    String password = passwordCtrl.text;
     bool hasAgreed = selectedIndex.value == 0
-        ? agreeToTermsEmployer.value
-        : agreeToTermsSeeker.value;
+        ? agreeToTermsSeeker.value
+        : agreeToTermsEmployer.value;
 
-    if (!hasAgreed) {
-      Get.snackbar("Warning", "Please agree to the Terms and Conditions");
+    String? validationError = AuthValidator.validateRegister(
+      hasAgreedTerms: hasAgreed,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+    );
+
+    if (validationError != null) {
+      Get.snackbar("Validation Error", validationError);
       return;
     }
-
-    if (firstNameCtrl.text.trim().isEmpty ||
-        lastNameCtrl.text.trim().isEmpty ||
-        emailCtrl.text.trim().isEmpty ||
-        passwordCtrl.text.isEmpty) {
-      Get.snackbar("Error", "Please fill all fields");
-      return;
-    }
-
     isLoading.value = true;
+
+    UserRole selectedRoleEnum = selectedIndex.value == 0
+        ? UserRole.seeker
+        : UserRole.employer;
 
     try {
       final requestModel = RegisterRequestModel(
-        firstName: firstNameCtrl.text.trim(),
-        lastName: lastNameCtrl.text.trim(),
-        email: emailCtrl.text.trim(),
-        password: passwordCtrl.text,
-        role: selectedIndex.value == 0 ? "employer" : "seeker",
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        role: selectedRoleEnum,
       );
 
       final response = await authServices.register(requestModel);
