@@ -1,21 +1,22 @@
 import 'dart:async';
-import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/routes/app_routes.dart';
+import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/theme/app_assets.dart';
+import 'package:jobber_city/core/utils/auth_validator.dart';
+import 'package:jobber_city/core/utils/token_storage.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 
-part 'verify_otp_screen_dart_binding.dart';
-part 'verify_otp_screen_dart_controller.dart';
+part 'verify_otp_binding.dart';
+part 'verify_otp_controller.dart';
 
-class VerifyOtpScreenDartView
-    extends GetView<VerifyOtpScreenDartViewController> {
-  const VerifyOtpScreenDartView({super.key});
+class VerifyOtpView extends GetView<VerifyOtpController> {
+  const VerifyOtpView({super.key});
 
   @override
   Widget build(BuildContext context) {

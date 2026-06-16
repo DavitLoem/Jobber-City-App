@@ -66,6 +66,7 @@ class AuthInterceptor extends Interceptor {
       await TokenStorage.saveTokens(
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
+        role: response.data['role'],
       );
 
       // ធ្វើបច្ចុប្បន្នភាព Request ចាស់ដែលបាន Fail នោះ ជាមួយនឹង Token ថ្មី

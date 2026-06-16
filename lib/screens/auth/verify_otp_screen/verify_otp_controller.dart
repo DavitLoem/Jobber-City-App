@@ -1,6 +1,6 @@
-part of 'verify_otp_screen_dart_view.dart';
+part of 'verify_otp_view.dart';
 
-class VerifyOtpScreenDartViewController extends GetxController {
+class VerifyOtpController extends GetxController {
   final AuthServices _authServices = AuthServices();
 
   var isLoading = false.obs;
@@ -71,60 +71,53 @@ class VerifyOtpScreenDartViewController extends GetxController {
   void verifyOtp() async {
     String otp = completeOtp;
 
-    if (otp.length != 4) {
-      Get.snackbar('Error', 'Please enter a complete 4-digit code');
+    // ១. ពិនិត្យភាពត្រឹមត្រូវ (Validation) តាមរយៈ AuthValidator
+    String? validationError = AuthValidator.validateOtp(otpCode: otp);
+    if (validationError != null) {
+      Get.snackbar('Error', validationError);
       return;
     }
 
-    try {
-      isLoading.value = true;
+    isLoading.value = true;
 
-      // 🟢 Check if the user came from the forgot password screen
+    try {
+      // ផ្លូវទី ១៖ សម្រាប់អ្នកភ្លេចលេខសម្ងាត់ (Forgot Password Flow)
       if (fromScreen == 'forgot_password') {
-        // Skip the registration OTP API check. Take them straight to your Reset Password Screen
-        // and pass both the email and the entered OTP so it can be submitted with the new password.
-        // This controller will be automatically cleaned up when navigating away
         Get.toNamed(
           AppRoutes.resetPassword,
           arguments: {'email': userEmail, 'otp': otp},
         );
-      } else {
-        // 🔵 Account Creation Flow (Normal behavior)
-        var response = await _authServices.verifyOtp(
+      }
+      // ផ្លូវទី ២៖ សម្រាប់អ្នកចុះឈ្មោះគណនីថ្មី (Register Flow)
+      else {
+        final response = await _authServices.verifyOtp(
           email: userEmail,
           otp: otp,
         );
 
-        if (response != null && response["success"] == true) {
-          Get.snackbar(
-            'Success',
-            response["message"] ?? 'OTP Verified successfully!',
-          );
-          // Clean navigation to home - login binding with fenix: true handles recreation if needed
-          Get.offAllNamed(AppRoutes.home);
+        // ក. រក្សាទុកសោ (Tokens) ចូលក្នុង Secure Storage
+        await TokenStorage.saveTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          role: response.user.role,
+        );
+
+        Get.snackbar('Success', 'Your account has been verified successfully!');
+
+        if (response.user.role == 'employer') {
+          Get.offAllNamed(AppRoutes.homeEmployer);
         } else {
-          Get.snackbar(
-            'Error',
-            response["message"] ?? 'Invalid OTP code. Please try again.',
-          );
+          Get.offAllNamed(AppRoutes.homeSeeker);
         }
       }
+    } on ApiException catch (e) {
+      Get.snackbar('Error', e.message);
     } catch (e) {
-      print("Verify OTP Crash Log: $e");
-
-      // 🟢 Better Error Handling: Show exact error from backend instead of hiding it
-      if (e is DioException) {
-        String backendMessage =
-            e.response?.data["message"] ??
-            e.response?.data["detail"] ??
-            'Server returned an error.';
-        Get.snackbar('Error', backendMessage);
-      } else {
-        Get.snackbar(
-          'Error',
-          'Something went wrong. Please check your connection.',
-        );
-      }
+      debugPrint("Verify OTP Crash Log: $e");
+      Get.snackbar(
+        'Error',
+        'There is a system error. Please check your internet connection.',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -135,21 +128,27 @@ class VerifyOtpScreenDartViewController extends GetxController {
 
     try {
       isLoading.value = true;
-      var response = await _authServices.resendOtp(email: userEmail);
+      dynamic response;
 
-      if (response != null && response["success"] == true) {
-        Get.snackbar(
-          'Success',
-          response["message"] ?? 'OTP has been resent to your email.',
-        );
-        startTimer();
+      if (fromScreen == 'forgot_password') {
+        response = await _authServices.forgotPassword(email: userEmail);
       } else {
-        Get.snackbar('Error', response["message"] ?? 'Failed to resend OTP.');
+        response = await _authServices.resendOtp(email: userEmail);
       }
+
+      Get.snackbar(
+        'Success',
+        response["message"] ?? 'OTP has been resent to your email.',
+      );
+
+      startTimer();
+    } on ApiException catch (e) {
+      // ៤. ចាប់ Error ដែលបោះមកពី Backend
+      Get.snackbar('Error', e.message);
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Something went wrong. Please check your connection.',
+        'There is a system error. Please check your internet connection.',
       );
     } finally {
       isLoading.value = false;

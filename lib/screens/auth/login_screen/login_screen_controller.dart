@@ -95,7 +95,7 @@ class LoginScreenViewController extends GetxController {
         Get.snackbar('Success', message ?? 'Login Successfully');
 
         clearFields();
-        Get.offAllNamed(AppRoutes.home);
+        //Get.offAllNamed(AppRoutes.home);
       } else {
         Get.snackbar(
           'Error',

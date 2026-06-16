@@ -44,8 +44,7 @@ class AuthValidator {
   /// ៣. Validation សម្រាប់ Verify OTP (និង Resend OTP)
   static String? validateOtp({
     required String otpCode,
-    int requiredLength =
-        6, // ឧបមាថា OTP មាន ៦ ខ្ទង់ (អាចប្តូរតាម Backend ជាក់ស្តែង)
+    int requiredLength = 4,
   }) {
     if (otpCode.isEmpty) {
       return "Please enter the OTP code";
