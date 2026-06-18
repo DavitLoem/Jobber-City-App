@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/theme/app_assets.dart';
-import 'package:jobber_city/screens/auth/widget/custom_animated_checkbox.dart';
+import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
 import 'package:jobber_city/screens/auth/widget/social_login.dart';
 import 'package:jobber_city/widgets/custom_button.dart';

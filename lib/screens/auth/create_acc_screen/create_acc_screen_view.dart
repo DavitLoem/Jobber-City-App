@@ -6,15 +6,14 @@ import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/theme/app_assets.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/auth_validator.dart';
+import 'package:jobber_city/models/auth_model/register_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/screens/auth/widget/custom_animated_checkbox.dart';
+import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
 import 'package:jobber_city/screens/auth/widget/social_login.dart';
 import 'package:jobber_city/screens/auth/widget/tab_bar.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
-
-import '../../../models/auth_model/register_request_model.dart';
 
 part 'create_acc_screen_binding.dart';
 part 'create_acc_screen_controller.dart';

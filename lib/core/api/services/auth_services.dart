@@ -1,6 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
-
-import '../../../models/auth_model/register_request_model.dart';
+import 'package:jobber_city/models/auth_model/register_model.dart';
+import 'package:jobber_city/models/category_model.dart';
 
 class AuthServices {
   final ApiClient _apiClient = ApiClient();
@@ -10,7 +11,7 @@ class AuthServices {
   ) async {
     try {
       final response = await _apiClient.post(
-        '/auth/register',
+        '/api/auth/register',
         data: requestModel.toJson(),
       );
 
@@ -25,7 +26,7 @@ class AuthServices {
     required String password,
   }) async {
     var response = await _apiClient.post(
-      '/auth/login',
+      '/api/auth/login',
       data: {'email': email, 'password': password},
     );
 
@@ -37,7 +38,7 @@ class AuthServices {
     required String otp,
   }) async {
     var response = await _apiClient.post(
-      '/auth/verify-otp',
+      '/api/auth/verify-otp',
       data: {
         'email': email,
         'otp_code': otp, // បញ្ជូនទៅតាមតម្រូវការរបស់ Backend API
@@ -49,7 +50,7 @@ class AuthServices {
 
   Future<dynamic> resendOtp({required String email}) async {
     var response = await _apiClient.post(
-      '/auth/resend-otp',
+      '/api/auth/resend-otp',
       data: {'email': email},
     );
 
@@ -58,7 +59,7 @@ class AuthServices {
 
   Future<dynamic> forgotPassword({required String email}) async {
     var response = await _apiClient.post(
-      '/auth/forgot-password',
+      '/api/auth/forgot-password',
       data: {'email': email},
     );
 
@@ -72,7 +73,7 @@ class AuthServices {
     required String confirmpassword,
   }) async {
     var response = await _apiClient.post(
-      '/auth/reset-password',
+      '/api/auth/reset-password',
       data: {
         "email": email,
         "otp_code": otp,

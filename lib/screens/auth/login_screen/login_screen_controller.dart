@@ -23,7 +23,6 @@ class LoginScreenViewController extends GetxController {
     super.onClose();
   }
 
-  // Clear input fields manually
   void clearFields() {
     emailCtrl.clear();
     passwordCtrl.clear();
@@ -34,7 +33,6 @@ class LoginScreenViewController extends GetxController {
   }
 
   void login() async {
-    // 1. Validate user input
     if (emailCtrl.text.isEmpty || passwordCtrl.text.isEmpty) {
       Get.snackbar("Error", "Please fill all fields");
       return;
@@ -42,18 +40,15 @@ class LoginScreenViewController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 2. Call Auth API Service
       var response = await authServices.login(
         email: emailCtrl.text.trim(),
         password: passwordCtrl.text.trim(),
       );
 
-      // DEBUG PRINT
       print("=================== BACKEND RESPONSE ===================");
       print("Response content: $response");
       print("========================================================");
 
-      // 3. Normalize Response into a Map
       Map<String, dynamic> responseMap = {};
       if (response is Map) {
         responseMap = Map<String, dynamic>.from(response);
@@ -64,7 +59,7 @@ class LoginScreenViewController extends GetxController {
       String? message;
       bool isSuccess = false;
 
-      // Extract tokens from data layer
+      // 🟢 កែសម្រួលត្រង់នេះ៖ រក្សារចនាសម្ព័ន្ធទាញយក Token ដើមរបស់អ្នក ដើម្បីកុំឱ្យបាត់បង់ទិន្នន័យពី "data"
       if (responseMap["data"] is Map) {
         var dataMap = responseMap["data"];
         accessToken = (dataMap["access_token"] ?? dataMap["token"])?.toString();
@@ -76,26 +71,24 @@ class LoginScreenViewController extends GetxController {
         isSuccess = true;
       }
 
-      // 🟢 FIX: Extract success message carefully from response root
       if (responseMap["message"] != null) {
         message = responseMap["message"].toString();
       }
 
-      // 4. Handle Navigation or fallback error
       if (isSuccess || accessToken != null) {
+        // 🟢 រក្សាទុកចូលទៅក្នុង TokenStorage ឱ្យបានត្រឹមត្រូវសម្រាប់ការហៅ API បន្ទាប់
         if (accessToken != null) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('access_token', accessToken);
-          if (refreshToken != null) {
-            await prefs.setString('refresh_token', refreshToken);
-          }
+          await TokenStorage.saveTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken ?? '',
+          );
         }
 
-        // Display the clean success message from the backend ("Login successful")
         Get.snackbar('Success', message ?? 'Login Successfully');
-
         clearFields();
-        Get.offAllNamed(AppRoutes.home);
+
+        // ធ្វើដំណើរទៅកាន់ទំព័រ Categories
+        Get.offAllNamed(AppRoutes.location);
       } else {
         Get.snackbar(
           'Error',
@@ -110,18 +103,14 @@ class LoginScreenViewController extends GetxController {
         dynamic errorData = e.response?.data;
         String errorMessage = "Login failed. Please check your credentials.";
 
-        // 🟢 FIX: Parse nested error structures or array-lists from FastAPI (422 Content)
         if (errorData is Map) {
           if (errorData["message"] != null) {
             errorMessage = errorData["message"].toString();
           } else if (errorData["detail"] != null) {
             var detail = errorData["detail"];
-
-            // Checking if FastAPI returned an array error list
             if (detail is List && detail.isNotEmpty) {
               var firstError = detail[0];
               if (firstError is Map && firstError["msg"] != null) {
-                // Grabs clean error string like: "String should have at least 8 characters"
                 errorMessage = firstError["msg"].toString();
               }
             } else {

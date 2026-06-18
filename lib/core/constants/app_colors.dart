@@ -65,8 +65,7 @@ class AppColors {
   static const Color darkHeroPanelBackground = Color(0xFF1A2140);
 
   /// Light border color for dark mode
-  static const Color line = Color(0xFFE9E9F0);
-
+  static const Color line = Color(0xFFF5F5F5);
 
   // ─────────────────────────────────────────────
   // 04  TEXT  —  LIGHT MODE
@@ -124,7 +123,7 @@ class AppColors {
 
   /// Idle border — soft grey
   static const Color inputBorder = Color(0xFFFAFAFA);
-  
+
   /// Icon text color
   static const Color inputIconText = Color(0xFF9E9E9E);
 

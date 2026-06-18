@@ -6,7 +6,7 @@ class CustomAnimatedCheckbox extends StatefulWidget {
   final bool value;
   final VoidCallback onTap;
   final String label;
-  
+
   // Made optional with "?" so it works seamlessly for simple text rows too
   final String? linkText;
   final String? labelText;
@@ -30,7 +30,8 @@ class CustomAnimatedCheckbox extends StatefulWidget {
   State<CustomAnimatedCheckbox> createState() => _CustomAnimatedCheckboxState();
 }
 
-class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox> with SingleTickerProviderStateMixin {
+class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
   @override
@@ -79,10 +80,14 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox> with Si
               height: 19,
               margin: const EdgeInsets.only(top: 2),
               decoration: BoxDecoration(
-                color: widget.value ? AppColors.buttonPrimary : Colors.transparent,
+                color: widget.value
+                    ? AppColors.buttonPrimary
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: widget.value ? AppColors.buttonPrimary : Colors.grey.shade400,
+                  color: widget.value
+                      ? AppColors.buttonPrimary
+                      : Colors.grey.shade400,
                   width: 2,
                 ),
               ),
@@ -90,11 +95,7 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox> with Si
                 scale: widget.value ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutBack,
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 14,
-                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 14),
               ),
             ),
             const SizedBox(width: 12),
