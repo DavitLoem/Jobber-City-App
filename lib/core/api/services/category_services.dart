@@ -8,7 +8,7 @@ class CategoryServices {
 
   Future<List<CategoryModel>> getCategories() async {
     try {
-      final response = await _apiClient.get('/api/categories/');
+      final response = await _apiClient.get('/categories/');
 
       if (response != null) {
         if (response is List) {

@@ -11,7 +11,7 @@ class AuthServices {
   ) async {
     try {
       final response = await _apiClient.post(
-        '/api/auth/register',
+        '/auth/register',
         data: requestModel.toJson(),
       );
 
@@ -26,7 +26,7 @@ class AuthServices {
     required String password,
   }) async {
     var response = await _apiClient.post(
-      '/api/auth/login',
+      '/auth/login',
       data: {'email': email, 'password': password},
     );
 
@@ -38,7 +38,7 @@ class AuthServices {
     required String otp,
   }) async {
     var response = await _apiClient.post(
-      '/api/auth/verify-otp',
+      '/auth/verify-otp',
       data: {
         'email': email,
         'otp_code': otp, // បញ្ជូនទៅតាមតម្រូវការរបស់ Backend API
@@ -50,7 +50,7 @@ class AuthServices {
 
   Future<dynamic> resendOtp({required String email}) async {
     var response = await _apiClient.post(
-      '/api/auth/resend-otp',
+      '/auth/resend-otp',
       data: {'email': email},
     );
 
@@ -59,7 +59,7 @@ class AuthServices {
 
   Future<dynamic> forgotPassword({required String email}) async {
     var response = await _apiClient.post(
-      '/api/auth/forgot-password',
+      '/auth/forgot-password',
       data: {'email': email},
     );
 
@@ -73,7 +73,7 @@ class AuthServices {
     required String confirmpassword,
   }) async {
     var response = await _apiClient.post(
-      '/api/auth/reset-password',
+      '/auth/reset-password',
       data: {
         "email": email,
         "otp_code": otp,

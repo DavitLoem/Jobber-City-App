@@ -5,7 +5,6 @@ import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/category_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/widgets/arrow_key_back.dart';
-import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 
 part 'category_screen_binding.dart';

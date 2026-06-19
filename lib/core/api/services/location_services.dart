@@ -7,7 +7,7 @@ class LocationServices {
   final ApiClient _apiClient = ApiClient();
 
   Future<List<LocationModel>> getLocation() async {
-    final response = await _apiClient.get('/api/locations/provinces');
+    final response = await _apiClient.get('/locations/provinces');
     try {
       if (response != null) {
         if (response is List) {
