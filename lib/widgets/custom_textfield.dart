@@ -7,9 +7,13 @@ class CustomTextfield extends StatefulWidget {
     required this.hintText,
     required this.prefixIcon,
     this.suffixIcon,
-    this.isPasswordField =
-        false, // 1. Added flag to determine if this is a password field
+    this.isPasswordField = false,
     required this.controller,
+
+    // 🎯 បន្ថែម Properties ថ្មីៗសម្រាប់ TextFormField
+    this.validator,
+    this.keyboardType,
+    this.textInputAction,
   });
 
   final String hintText;
@@ -18,6 +22,10 @@ class CustomTextfield extends StatefulWidget {
   final bool isPasswordField;
   final TextEditingController controller;
 
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
 }
@@ -25,12 +33,11 @@ class CustomTextfield extends StatefulWidget {
 class _CustomTextfieldState extends State<CustomTextfield> {
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
-  late bool _obscureText; // 2. State to track hidden/visible status
+  late bool _obscureText;
 
   @override
   void initState() {
     super.initState();
-    // Initially hide text if it's a password field
     _obscureText = widget.isPasswordField;
 
     _focusNode.addListener(() {
@@ -48,11 +55,17 @@ class _CustomTextfieldState extends State<CustomTextfield> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    // 🎯 ប្តូរពី TextField ទៅ TextFormField
+    return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
       obscureText: _obscureText,
       style: const TextStyle(color: AppColors.inputText),
+
+      validator: widget.validator,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction ?? TextInputAction.next,
+
       decoration: InputDecoration(
         filled: true,
         fillColor: _isFocused
@@ -72,12 +85,16 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           borderSide: BorderSide(color: AppColors.inputFocusedBorder),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
           borderSide: BorderSide(color: AppColors.inputErrorBorder),
+        ),
+        // 🎯 ពេលមាន Error ឱ្យវានៅតែមានរាងកោងស្អាត
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+          borderSide: BorderSide(color: AppColors.inputErrorBorder, width: 2),
         ),
 
         prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 0),
-
         prefixIcon: Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 8.0),
           child: Icon(
@@ -88,7 +105,6 @@ class _CustomTextfieldState extends State<CustomTextfield> {
           ),
         ),
 
-        // 4. Dynamically render suffix icon based on whether it is a password field
         suffixIcon: widget.isPasswordField
             ? IconButton(
                 padding: const EdgeInsets.only(right: 10.0),

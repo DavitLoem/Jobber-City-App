@@ -40,10 +40,14 @@ class ResetPassScreenViewController extends GetxController {
       isLoading.value = true;
 
       var response = await _authServices.resetPassword(
-        email: email,
-        otp: otp,
-        newpassword: newPassword,
-        confirmpassword: confirmPassword,
+        ResetPasswordRequestModel(
+          email: email,
+          otpCode: otp,
+          newPassword: newPassword,
+          confirmPassword: confirmPassword,
+          password: '',
+          otp: '',
+        ),
       );
 
       if (response != null && response["success"] == true) {

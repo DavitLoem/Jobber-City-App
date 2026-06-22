@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:jobber_city/core/api/network/auth_interceptor.dart';
+import 'package:jobber_city/core/api/network/interceptors/auth_interceptor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import '../config/api_config.dart';
+
+import '../../config/api_config.dart';
 
 class DioClient {
   // ការបង្កើត Singleton Pattern
@@ -27,13 +28,14 @@ class DioClient {
       ),
     );
 
-    if(kDebugMode) {
+    if (kDebugMode) {
       dio.interceptors.addAll([
         AuthInterceptor(dio),
         PrettyDioLogger(
           requestHeader: true,
-          requestBody: true, // បើចង់លាក់ Password សូម្បីតែពេល Dev អាចប្តូរទៅ false
-          responseBody: true, 
+          requestBody:
+              true, // បើចង់លាក់ Password សូម្បីតែពេល Dev អាចប្តូរទៅ false
+          responseBody: true,
           responseHeader: false,
           error: true,
           compact: true,

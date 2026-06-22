@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
+
 import 'api_exception.dart';
-import 'dio_client.dart';
+import 'interceptors/dio_client.dart';
 
 class ApiClient {
   // ទាញយក Single Instance របស់ DioClient មកប្រើ
@@ -111,8 +112,19 @@ class ApiClient {
           }
 
           if (statusCode == 404) {
+            // ឆែកមើលថាតើ Backend ពិតជាបានភ្ជាប់សារអ្វីមួយមកជាមួយដែរឬទេ?
+            bool hasServerMessage =
+                data != null &&
+                (data['detail'] != null ||
+                    data['message'] != null ||
+                    data['errors'] != null);
+
+            // បើមានសារពី Backend (ឧ. "Email not found") យកវាមកបង្ហាញ។
+            // បើអត់ទេ បង្ហាញសារ Professional ជាភាសាអង់គ្លេសទូទៅ
             return ApiException(
-              "Data not found (404).",
+              hasServerMessage
+                  ? serverMessage
+                  : "We couldn't find the requested information.",
               statusCode: statusCode,
             );
           } else if (statusCode == 500) {

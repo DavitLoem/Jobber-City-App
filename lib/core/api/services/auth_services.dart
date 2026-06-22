@@ -1,4 +1,7 @@
 import 'package:jobber_city/core/api/network/api_client.dart';
+import 'package:jobber_city/core/utils/token_storage.dart';
+import 'package:jobber_city/models/auth_model/auth_response_model.dart';
+import 'package:jobber_city/models/auth_model/reset_password_request_model.dart';
 
 import '../../../models/auth_model/register_request_model.dart';
 
@@ -24,62 +27,91 @@ class AuthServices {
     required String email,
     required String password,
   }) async {
-    var response = await _apiClient.post(
-      '/auth/login',
-      data: {'email': email, 'password': password},
-    );
+    try {
+      var response = await _apiClient.post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
 
-    return response;
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<dynamic> verifyOtp({
+  Future<AuthResponseModel> verifyOtp({
     required String email,
     required String otp,
   }) async {
-    var response = await _apiClient.post(
-      '/auth/verify-otp',
-      data: {
-        'email': email,
-        'otp_code': otp, // បញ្ជូនទៅតាមតម្រូវការរបស់ Backend API
-      },
-    );
-
-    return response;
+    try {
+      var response = await _apiClient.post(
+        '/auth/verify-otp',
+        data: {'email': email, 'otp_code': otp},
+      );
+      return AuthResponseModel.fromJson(response['data']);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<dynamic> resendOtp({required String email}) async {
-    var response = await _apiClient.post(
-      '/auth/resend-otp',
-      data: {'email': email},
-    );
+    try {
+      var response = await _apiClient.post(
+        '/auth/resend-otp',
+        data: {'email': email},
+      );
 
-    return response;
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<dynamic> forgotPassword({required String email}) async {
-    var response = await _apiClient.post(
-      '/auth/forgot-password',
-      data: {'email': email},
-    );
+    try {
+      var response = await _apiClient.post(
+        '/auth/forgot-password',
+        data: {'email': email},
+      );
 
-    return response;
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<dynamic> resetPassword({
-    required String email,
-    required String otp,
-    required String newpassword,
-    required String confirmpassword,
-  }) async {
-    var response = await _apiClient.post(
-      '/auth/reset-password',
-      data: {
-        "email": email,
-        "otp_code": otp,
-        "new_password": newpassword,
-        "confirm_password": confirmpassword,
-      },
-    );
-    return response;
+  Future<dynamic> resetPassword(ResetPasswordRequestModel data) async {
+    try {
+      var response = await _apiClient.post(
+        '/auth/reset-password',
+        data: data.toJson(),
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> logout() async {
+    try {
+      String? refreshToken = await TokenStorage.getRefreshToken();
+      var response = await _apiClient.post(
+        '/auth/logout',
+        data: {'refresh_token': refreshToken ?? " "},
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> getRawProfile() async {
+    try {
+      // បាញ់ API ទៅយកទិន្នន័យ (ApiClient នឹងញាត់ Token ចូលដោយស្វ័យប្រវត្តិ)
+      var response = await _apiClient.get('/seeker/profile/');
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 }
