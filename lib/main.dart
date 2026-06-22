@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:jobber_city/bindings/initial_binding.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_pages.dart';
 import 'package:jobber_city/routes/app_routes.dart';
@@ -20,9 +21,9 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.lightBackground,
         appBarTheme: AppBarTheme(backgroundColor: AppColors.lightBackground),
       ),
+      initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
-      // home: const LoginScreen(),
     );
   }
 }

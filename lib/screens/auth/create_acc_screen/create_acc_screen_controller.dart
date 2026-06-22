@@ -8,6 +8,8 @@ class CreateAccScreenViewController extends GetxController {
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+
   var isLoading = false.obs;
   var selectedIndex = 0.obs;
   var agreeToTermsEmployer = false.obs;
@@ -27,22 +29,24 @@ class CreateAccScreenViewController extends GetxController {
     String lastName = lastNameCtrl.text.trim();
     String email = emailCtrl.text.trim();
     String password = passwordCtrl.text;
+
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+
     bool hasAgreed = selectedIndex.value == 0
         ? agreeToTermsSeeker.value
         : agreeToTermsEmployer.value;
 
-    String? validationError = AuthValidator.validateRegister(
-      hasAgreedTerms: hasAgreed,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-    );
-
-    if (validationError != null) {
-      Get.snackbar("Validation Error", validationError);
+    if (!hasAgreed) {
+      Get.snackbar(
+        "Notice",
+        "Please agree to the Terms and Conditions",
+        backgroundColor: Colors.orangeAccent,
+      );
       return;
     }
+
     isLoading.value = true;
 
     UserRole selectedRoleEnum = selectedIndex.value == 0
@@ -58,13 +62,10 @@ class CreateAccScreenViewController extends GetxController {
         role: selectedRoleEnum,
       );
 
-      final response = await authServices.register(requestModel);
-
-      AppLogger.i("Register Success: $response");
+      await authServices.register(requestModel);
 
       Get.toNamed(AppRoutes.verifyOtp, arguments: emailCtrl.text.trim());
     } on ApiException catch (e) {
-      AppLogger.w("Register Failed (API): ${e.message}");
       Get.snackbar("Error", e.message);
     } catch (e, stackTrace) {
       AppLogger.e("Register Failed (System)", e, stackTrace);

@@ -28,8 +28,7 @@ class VerifyOtpController extends GetxController {
       } else if (Get.arguments is Map) {
         final Map argsMap = Get.arguments as Map;
         userEmail = argsMap['email']?.toString() ?? '';
-        fromScreen =
-            argsMap['from']?.toString() ?? ''; // 🟢 Extract the 'from' argument
+        fromScreen = argsMap['from']?.toString() ?? '';
       }
 
       if (userEmail.isNotEmpty) {
@@ -71,8 +70,8 @@ class VerifyOtpController extends GetxController {
   void verifyOtp() async {
     String otp = completeOtp;
 
-    // ១. ពិនិត្យភាពត្រឹមត្រូវ (Validation) តាមរយៈ AuthValidator
-    String? validationError = AuthValidator.validateOtp(otpCode: otp);
+    //១. ពិនិត្យភាពត្រឹមត្រូវ (Validation) តាមរយៈ AuthValidator
+    String? validationError = AuthValidator.validateOTP(otpCode: otp);
     if (validationError != null) {
       Get.snackbar('Error', validationError);
       return;
@@ -143,7 +142,6 @@ class VerifyOtpController extends GetxController {
 
       startTimer();
     } on ApiException catch (e) {
-      // ៤. ចាប់ Error ដែលបោះមកពី Backend
       Get.snackbar('Error', e.message);
     } catch (e) {
       Get.snackbar(

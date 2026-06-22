@@ -124,8 +124,6 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
 
                 const Spacer(),
 
-                // ប៊ូតុង Submit សម្រាប់ផ្ទៀងផ្ទាត់
-                // ស្វែងរកប្លុកកូដនេះ រួចជំនួសដោយកូដខាងក្រោម
                 Obx(() {
                   return CustomButton(
                     onPressed: () {

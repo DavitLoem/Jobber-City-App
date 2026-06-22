@@ -51,36 +51,43 @@ class AuthInterceptor extends Interceptor {
     }
 
     try {
-      // ប្រើប្រាស់ Dio ថ្មីមួយទៀត (មិនមែន dio ចាស់) ដើម្បីហៅ API Refresh Token
-      // ការពារកុំឱ្យវាចូលមកក្នុង Interceptor នេះម្តងទៀត (Infinite Loop)
       final refreshDio = Dio();
       final response = await refreshDio.post(
         '${ApiConfig.baseUrl}/auth/refresh',
         data: {'refresh_token': refreshToken},
       );
 
-      // ទាញយក Token ថ្មី ហើយរក្សាទុក
-      final newAccessToken = response.data['access_token'];
-      final newRefreshToken = response.data['refresh_token'];
+      // ១. ឆែកមើលក្រែងលោ Backend ខ្ចប់ទិន្នន័យក្នុង key "data"
+      // (បើអត់មាន key "data" ទេ យើងយក response.data ធម្មតា)
+      final responseData = response.data['data'] ?? response.data;
 
+      final newAccessToken = responseData['access_token'];
+      final newRefreshToken = responseData['refresh_token'];
+
+      // ២. ទាញយក Role ចាស់មកប្រើវិញ ការពារកុំឱ្យ Error ដោយសារ API មិនបោះ Role ថ្មីមក
+      final oldRole = await TokenStorage.getUserRole() ?? 'seeker';
+
+      // ៣. រក្សាទុក Token ថ្មី
       await TokenStorage.saveTokens(
         accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-        role: response.data['role'],
+        refreshToken:
+            newRefreshToken ??
+            refreshToken, // បើ API អត់បោះ Refresh ថ្មីមកទេ ប្រើអាចាស់សិន
+        role: responseData['role'] ?? oldRole,
       );
 
-      // ធ្វើបច្ចុប្បន្នភាព Request ចាស់ដែលបាន Fail នោះ ជាមួយនឹង Token ថ្មី
+      // ៤. ធ្វើបច្ចុប្បន្នភាព Request ចាស់ដែលបាន Fail នោះ ជាមួយនឹង Token ថ្មី
       err.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
 
-      // បាញ់ Request ចាស់នោះម្តងទៀត (Retry)
+      // ៥. បាញ់ Request ចាស់នោះម្តងទៀត (Retry)
       final cloneRequest = await dio.fetch(err.requestOptions);
 
       _isRefreshing = false;
-      return handler.resolve(
-        cloneRequest,
-      ); // បញ្ជូនលទ្ធផលជោគជ័យត្រឡប់ទៅ UI វិញ (អ្នកប្រើមិនដឹងខ្លួនថាមាន Error ទេ)
+      return handler.resolve(cloneRequest);
     } catch (e) {
-      // ប្រសិនបើការហៅ Refresh Token ទទួលបរាជ័យ (ឧទាហរណ៍: Refresh Token ក៏ផុតកំណត់ដែរ)
+      // 6. Most important point: print this error to know exactly why refresh failed
+      debugPrint("❌ Error calling refresh token API: $e");
+
       _isRefreshing = false;
       _performLogout();
       return handler.next(err);
