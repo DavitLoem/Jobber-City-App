@@ -4,15 +4,14 @@ import 'package:jobber_city/core/constants/app_colors.dart';
 class CustomButton extends StatefulWidget {
   const CustomButton({
     super.key,
-    this.onPressed, // 1. Remove 'required' so it can accept null
+    this.onPressed,
     required this.text,
-    this.isLoading =
-        false, // 🎯 1. បន្ថែម Parameter isLoading (លំនាំដើមគឺ false)
+    this.isLoading = false,
   });
 
-  final VoidCallback? onPressed; // 2. Add '?' to make it nullable
+  final VoidCallback? onPressed;
   final String text;
-  final bool isLoading; // ប្រកាសអថេរ
+  final bool isLoading;
 
   @override
   State<CustomButton> createState() => _CustomButtonState();

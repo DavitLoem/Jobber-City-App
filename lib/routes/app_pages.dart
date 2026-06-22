@@ -5,17 +5,29 @@ import 'package:jobber_city/screens/auth/forgot_pass_screen/forgot_pass_screen_v
 import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart';
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
-import 'package:jobber_city/screens/auth/verify_otp_screen.dart/verify_otp_screen_dart_view.dart';
+import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
 import 'package:jobber_city/screens/category_screen/category_screen_view.dart';
-import 'package:jobber_city/screens/home_screen/home_screen_view.dart';
+import 'package:jobber_city/screens/employer/home_employer/home_employer_view.dart';
 import 'package:jobber_city/screens/location_screen/location_screen_view.dart';
+import 'package:jobber_city/screens/seeker/home_seeker/home_seeker_view.dart';
+import 'package:jobber_city/screens/splash/splash_view.dart';
 
 class AppPages {
   static final routes = [
     GetPage(
-      name: AppRoutes.home,
-      page: () => HomeScreenView(),
-      binding: HomeScreenViewBinding(),
+      name: AppRoutes.splash,
+      page: () => SplashView(),
+      binding: SplashViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.homeSeeker,
+      page: () => HomeSeekerView(),
+      binding: HomeSeekerViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.homeEmployer,
+      page: () => HomeEmployerView(),
+      binding: HomeEmployerViewBinding(),
     ),
     GetPage(
       name: AppRoutes.login,
@@ -29,8 +41,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.verifyOtp,
-      page: () => VerifyOtpScreenDartView(),
-      binding: VerifyOtpScreenDartViewBinding(),
+      page: () => VerifyOtpView(),
+      binding: VerifyOtpBinding(),
     ),
     GetPage(
       name: AppRoutes.forgotPassword,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/theme/app_assets.dart';
+import 'package:jobber_city/models/auth_model/reset_password_request_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/widgets/custom_button.dart';

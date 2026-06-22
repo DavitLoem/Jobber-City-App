@@ -50,12 +50,15 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
                   parent: NeverScrollableScrollPhysics(),
                 ),
                 padding: const EdgeInsets.fromLTRB(23, 0, 23, 30),
-                child: Obx(
-                  () => AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: controller.selectedIndex.value == 0
-                        ? _buildRegisterForm(isEmployer: false)
-                        : _buildRegisterForm(isEmployer: true),
+                child: Form(
+                  key: controller.formKey,
+                  child: Obx(
+                    () => AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: controller.selectedIndex.value == 0
+                          ? _buildRegisterForm(isEmployer: false)
+                          : _buildRegisterForm(isEmployer: true),
+                    ),
                   ),
                 ),
               ),
@@ -110,6 +113,8 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
                 controller: controller.firstNameCtrl,
                 hintText: 'First Name',
                 prefixIcon: Icons.person,
+                validator: AuthValidator.validateName,
+                textInputAction: TextInputAction.next,
               ),
             ),
             Expanded(
@@ -117,6 +122,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
                 controller: controller.lastNameCtrl,
                 hintText: 'Last Name',
                 prefixIcon: Icons.person,
+                validator: AuthValidator.validateName,
               ),
             ),
           ],
@@ -126,9 +132,10 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
         CustomTextfield(
           controller: controller.emailCtrl,
-
           hintText: 'Email',
           prefixIcon: Icons.email,
+          validator: AuthValidator.validateEmail,
+          textInputAction: TextInputAction.next,
         ),
 
         const SizedBox(height: 16),
@@ -139,6 +146,8 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           prefixIcon: Icons.lock,
           suffixIcon: Icons.visibility,
           isPasswordField: true,
+          validator: AuthValidator.validatePassword,
+          textInputAction: TextInputAction.done,
         ),
 
         const SizedBox(height: 24),

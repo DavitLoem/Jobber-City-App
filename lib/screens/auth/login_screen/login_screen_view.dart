@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/utils/token_storage.dart';
-import 'package:jobber_city/routes/app_routes.dart';
+import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/theme/app_assets.dart';
-import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
+import 'package:jobber_city/core/utils/auth_validator.dart';
+import 'package:jobber_city/core/utils/token_storage.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
 import 'package:jobber_city/screens/auth/widget/social_login.dart';
+import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'login_screen_controller.dart';
 
@@ -30,39 +30,42 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height - 80,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 32),
-                _buildLoginForm(),
-                const SizedBox(height: 5),
-                _buildForgotPassword(),
-                const SizedBox(height: 20),
-                Obx(() {
-                  return CustomButton(
-                    onPressed: () {
-                      // Prevent clicking if it is already loading
-                      if (!controller.isLoading.value) {
-                        controller.login();
-                      }
-                    },
-                    text: controller.isLoading.value
-                        ? "Logging in..."
-                        : "Login",
-                  );
-                }),
-                const SizedBox(height: 25),
-                _buildDivider(),
-                const SizedBox(height: 25),
-                SocialLogin(
-                  onPressed: () {},
-                  text: 'Continue with Google',
-                  iconPath: AppAssets.google,
-                ),
-                const SizedBox(height: 20),
-                _buildSignUpLink(),
-              ],
+            child: Form(
+              key: controller.formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 32),
+                  _buildLoginForm(),
+                  const SizedBox(height: 5),
+                  _buildForgotPassword(),
+                  const SizedBox(height: 20),
+                  Obx(() {
+                    return CustomButton(
+                      onPressed: () {
+                        // Prevent clicking if it is already loading
+                        if (!controller.isLoading.value) {
+                          controller.login();
+                        }
+                      },
+                      text: controller.isLoading.value
+                          ? "Logging in..."
+                          : "Login",
+                    );
+                  }),
+                  const SizedBox(height: 25),
+                  _buildDivider(),
+                  const SizedBox(height: 25),
+                  SocialLogin(
+                    onPressed: () {},
+                    text: 'Continue with Google',
+                    iconPath: AppAssets.google,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildSignUpLink(),
+                ],
+              ),
             ),
           ),
         ),
@@ -171,6 +174,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           controller: controller.emailCtrl,
           hintText: 'Email',
           prefixIcon: Icons.email,
+          validator: AuthValidator.validateEmail,
         ),
         SizedBox(height: 16),
         CustomTextfield(
@@ -179,6 +183,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           hintText: 'Password',
           prefixIcon: Icons.lock,
           isPasswordField: true,
+          validator: AuthValidator.validateLoginPassword,
         ),
       ],
     );
