@@ -61,6 +61,8 @@ class LoginScreenViewController extends GetxController {
           refreshToken: refreshToken ?? "",
           role: role ?? 'seeker',
         );
+
+        await Get.find<AuthController>().checkLoginStatus();
       }
 
       Get.snackbar("Success", message);
@@ -79,7 +81,7 @@ class LoginScreenViewController extends GetxController {
 
       Get.snackbar("Error", "Something went wrong. Please try again.");
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isLoading.value = false;
     }
   }
 }

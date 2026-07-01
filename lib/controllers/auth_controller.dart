@@ -6,41 +6,70 @@ import 'package:jobber_city/core/utils/token_storage.dart';
 
 import '../routes/app_routes.dart';
 
-class AuthController {
+class AuthController extends GetxController {
   final _authService = AuthServices();
+
+  var isLoggedIn = false.obs;
+  var userRole = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // ពេល App បើកភ្លាម ឱ្យវាឆែកមើល Token ភ្លាម
+    checkLoginStatus();
+  }
+
+  Future<void> checkLoginStatus() async {
+    String? token = await TokenStorage.getAccessToken();
+    String? role = await TokenStorage.getUserRole();
+
+    if (token != null && token.isNotEmpty) {
+      isLoggedIn.value = true;
+      userRole.value = role ?? 'seeker';
+      debugPrint("✅ Status: Login as ${userRole.value}");
+    } else {
+      isLoggedIn.value = false;
+      userRole.value = '';
+      debugPrint("❌ Status: Not Logged In");
+    }
+  }
 
   void _executeLogout() async {
     try {
       await _authService.logout();
-
-      await TokenStorage.clearTokens();
-      Get.offAllNamed(AppRoutes.login);
-      Get.snackbar(
-        "Logout Successful",
+      _clearStateAndLogout(
         "You have been logged out successfully.",
+        "Logout Successful",
       );
     } on ApiException catch (e) {
-      await TokenStorage.clearTokens();
-      Get.offAllNamed(AppRoutes.login);
-
       if (e.statusCode == 401) {
-        Get.snackbar(
-          "Session Expired",
+        _clearStateAndLogout(
           "Your session was already expired. Logged out.",
+          "Session Expired",
         );
       } else {
-        Get.snackbar(
-          "Notice",
+        _clearStateAndLogout(
           "Logged out locally. Server issue: ${e.message}",
+          "Notice",
         );
       }
     } catch (e) {
-      await TokenStorage.clearTokens();
-
-      Get.offAllNamed(AppRoutes.login);
-
-      Get.snackbar("Offline Logout", "You have been logged out locally.");
+      _clearStateAndLogout(
+        "You have been logged out locally.",
+        "Offline Logout",
+      );
     }
+  }
+
+  void _clearStateAndLogout(String message, String title) async {
+    await TokenStorage.clearTokens();
+
+    // Reset
+    isLoggedIn.value = false;
+    userRole.value = '';
+
+    Get.offAllNamed(AppRoutes.login);
+    Get.snackbar(title, message);
   }
 
   void logout() {

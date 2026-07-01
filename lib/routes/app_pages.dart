@@ -66,3 +66,41 @@ class AppPages {
     ),
   ];
 }
+
+// class AppPages {
+//   static final pages = [
+//     // --- Public Routes (អត់ពាក់អាវក្រោះការពារទេ) ---
+//     GetPage(
+//       name: AppRoutes.login,
+//       page: () => const LoginScreenView(),
+//       binding: LoginScreenBinding(),
+//     ),
+//     GetPage(
+//       name: AppRoutes.register,
+//       page: () => const CreateAccScreenView(),
+//       binding: CreateAccScreenBinding(),
+//     ),
+
+//     // --- Seeker Routes (ត្រូវការពាក់អាវក្រោះ Auth និង Role 'seeker') ---
+//     GetPage(
+//       name: AppRoutes.homeSeeker,
+//       page: () => const HomeSeekerView(),
+//       binding: HomeSeekerBinding(),
+//       middlewares: [
+//         AuthMiddleware(), // ឆែក Login
+//         RoleMiddleware(requiredRole: 'seeker'), // ឆែក Role
+//       ],
+//     ),
+
+//     // --- Employer Routes (ត្រូវការពាក់អាវក្រោះ Auth និង Role 'employer') ---
+//     GetPage(
+//       name: AppRoutes.homeEmployer,
+//       page: () => const HomeEmployerView(),
+//       binding: HomeEmployerBinding(),
+//       middlewares: [
+//         AuthMiddleware(), // ឆែក Login
+//         RoleMiddleware(requiredRole: 'employer'), // ឆែក Role
+//       ],
+//     ),
+//   ];
+// }

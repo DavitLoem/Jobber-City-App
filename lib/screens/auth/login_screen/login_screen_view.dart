@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';

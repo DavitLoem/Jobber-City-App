@@ -12,6 +12,8 @@ import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 
+import '../../../controllers/auth_controller.dart';
+
 part 'verify_otp_binding.dart';
 part 'verify_otp_controller.dart';
 

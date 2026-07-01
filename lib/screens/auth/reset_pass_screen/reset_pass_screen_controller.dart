@@ -3,8 +3,10 @@ part of 'reset_pass_screen_view.dart';
 class ResetPassScreenViewController extends GetxController {
   final AuthServices _authServices = AuthServices();
 
-  final newPasswordCtrl = TextEditingController();
-  final confirmPasswordCtrl = TextEditingController();
+  late final TextEditingController newPasswordCtrl;
+  late final TextEditingController confirmPasswordCtrl;
+
+  final formKey = GlobalKey<FormState>();
 
   var isLoading = false.obs;
   var isObscureNew = true.obs;
@@ -14,9 +16,12 @@ class ResetPassScreenViewController extends GetxController {
   String otp = '';
 
   @override
+  @override
   void onInit() {
     super.onInit();
-    // Get email and OTP passed from the previous screen
+    newPasswordCtrl = TextEditingController();
+    confirmPasswordCtrl = TextEditingController();
+
     if (Get.arguments != null && Get.arguments is Map) {
       email = Get.arguments['email'] ?? '';
       otp = Get.arguments['otp'] ?? '';
@@ -24,64 +29,57 @@ class ResetPassScreenViewController extends GetxController {
   }
 
   void resetPassword() async {
+    // 🎯 ២. បញ្ជាឱ្យ Form ឆែកមើលប្រអប់ Password តាមរយៈ Validator
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
+
     String newPassword = newPasswordCtrl.text.trim();
     String confirmPassword = confirmPasswordCtrl.text.trim();
 
-    if (newPassword.isEmpty || confirmPassword.isEmpty) {
-      Get.snackbar("Error", "Please fill all fields.");
-      return;
-    }
+    // 🎯 ៣. ការឆែក Confirm Password អាចដាក់នៅទីនេះ ឬក្នុង AuthValidator ខាង UI ក៏បាន
     if (newPassword != confirmPassword) {
-      Get.snackbar("Error", "Passwords do not match.");
+      Get.snackbar(
+        "Notice",
+        "Passwords do not match.",
+        backgroundColor: Colors.orangeAccent,
+      );
       return;
     }
 
     try {
       isLoading.value = true;
 
+      // ៤. បាញ់ API ដោយប្រើប្រាស់ Model ត្រឹមត្រូវ (ត្រូវប្រាកដថា Model របស់អ្នកមាន Parameter ត្រូវគ្នា)
       var response = await _authServices.resetPassword(
         ResetPasswordRequestModel(
           email: email,
-          otpCode: otp,
+          otpCode: otp, // ⚠️ បើ Backend ទាមទារឈ្មោះ key ខុសពីនេះ សូមកែនៅ Model
           newPassword: newPassword,
           confirmPassword: confirmPassword,
-          password: '',
-          otp: '',
         ),
       );
 
-      if (response != null && response["success"] == true) {
-        Get.snackbar(
-          "Success",
-          response["message"] ?? "Password reset successfully.",
-        );
+      // ៥. បើឆ្លងកាត់ការបាញ់ API ខាងលើបានដោយមិនធ្លាក់ចូល catch គឺជោគជ័យ
+      Get.snackbar(
+        "Success",
+        response["message"] ?? "Password reset successfully.",
+      );
 
-        // 🟢 ទី១៖ សម្អាត Email និង Password ចាស់ចោលពី LoginScreen
-        if (Get.isRegistered<LoginScreenViewController>()) {
-          Get.find<LoginScreenViewController>().clearFields();
-        }
-
-        // 🟢 ទី២៖ ប្រើ Get.until ដើម្បីថយក្រោយរហូតដល់ជួបផ្ទាំង Login ដែលមានស្រាប់
-        // វិធីនេះមិនធ្វើឱ្យ LoginController ត្រូវ Dispose ខុសពេលទេ (លែង Crash 100%)
-        Get.until((route) => route.settings.name == AppRoutes.login);
-      } else {
-        Get.snackbar(
-          "Error",
-          response["message"] ?? "Failed to reset password.",
-        );
+      // ៦. សម្អាត Email និង Password ចាស់ចោលពី LoginScreen មុននឹងថយក្រោយ
+      if (Get.isRegistered<LoginScreenViewController>()) {
+        Get.find<LoginScreenViewController>().clearFields();
       }
+
+      // ៧. ថយក្រោយរហូតដល់ជួបផ្ទាំង Login (ល្អបំផុតដើម្បីការពារ Memory Leak)
+      Get.until((route) => route.settings.name == AppRoutes.login);
+    } on ApiException catch (e) {
+      // 🎯 ៨. ចាប់យក Error ពិតប្រាកដពី Server មកបង្ហាញយ៉ាងស្អាត
+      Get.snackbar("Error", e.message);
     } catch (e) {
-      print("Reset Password Error Log: $e");
-
-      if (e is DioException) {
-        String backendMessage =
-            e.response?.data["message"] ??
-            e.response?.data["detail"] ??
-            "Server error occurred.";
-        Get.snackbar("Error", backendMessage);
-      } else {
-        Get.snackbar("Error", "Something went wrong. Please try again.");
-      }
+      // ករណីគាំងទូទៅ (ឧ. ដាច់អ៊ីនធឺណិត)
+      print("Reset Password Crash Log: $e");
+      Get.snackbar("Error", "Something went wrong. Please try again.");
     } finally {
       isLoading.value = false;
     }

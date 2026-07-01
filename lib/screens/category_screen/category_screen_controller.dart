@@ -56,8 +56,8 @@ class CategoryScreenViewController extends GetxController {
         snackPosition: SnackPosition.TOP,
       );
     } else {
-      print('Selected Categories: ${selectedCategoryIds}');
-      Get.offAllNamed(AppRoutes.home);
+      debugPrint('Selected Categories: $selectedCategoryIds');
+      Get.offAllNamed(AppRoutes.homeSeeker);
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:jobber_city/routes/app_pages.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

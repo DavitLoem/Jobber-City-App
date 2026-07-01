@@ -30,8 +30,13 @@ class AuthInterceptor extends Interceptor {
   // ២. ដំណើរការនៅពេលមាន Error ត្រឡប់ពី Server មកវិញ
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // បង្កើតលក្ខខណ្ឌឆែកមើលថាតើកំពុងបាញ់ API Login ឬ Register ដែរឬទេ?
+    final isAuthRoute =
+        err.requestOptions.path.contains('/auth/login') ||
+        err.requestOptions.path.contains('/auth/register');
+
     // បើ Error មិនមែន 401 (Unauthorized) ទេ, បោះ Error ទៅធម្មតា
-    if (err.response?.statusCode != 401) {
+    if (err.response?.statusCode != 401 || isAuthRoute) {
       return handler.next(err);
     }
 

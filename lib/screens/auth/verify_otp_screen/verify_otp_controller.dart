@@ -101,6 +101,8 @@ class VerifyOtpController extends GetxController {
           role: response.user.role,
         );
 
+        await Get.find<AuthController>().checkLoginStatus();
+
         Get.snackbar('Success', 'Your account has been verified successfully!');
 
         if (response.user.role == 'employer') {

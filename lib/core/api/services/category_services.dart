@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/models/category_model.dart';

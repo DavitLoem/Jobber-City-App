@@ -9,8 +9,6 @@ class ResetPasswordRequestModel {
     required this.otpCode,
     required this.newPassword,
     required this.confirmPassword,
-    required String password,
-    required String otp,
   });
 
   Map<String, dynamic> toJson() {

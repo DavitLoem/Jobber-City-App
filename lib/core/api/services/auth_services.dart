@@ -1,10 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/auth_model/auth_response_model.dart';
+import 'package:jobber_city/models/auth_model/register_model.dart';
 import 'package:jobber_city/models/auth_model/reset_password_request_model.dart';
-
-import '../../../models/auth_model/register_request_model.dart';
 
 class AuthServices {
   final ApiClient _apiClient = ApiClient();
