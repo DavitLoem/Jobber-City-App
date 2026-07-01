@@ -42,6 +42,9 @@ dependencies:
   logger: ^2.7.0
   google_sign_in: ^7.2.0
   shared_preferences: ^2.5.5
+  get_storage: ^2.1.1
+  image_picker: ^1.2.2
+  cuberto_bottom_bar: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -53,11 +56,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

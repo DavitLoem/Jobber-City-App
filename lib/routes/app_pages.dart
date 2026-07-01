@@ -6,10 +6,8 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
-import 'package:jobber_city/screens/category_screen/category_screen_view.dart';
-import 'package:jobber_city/screens/employer/home_employer/home_employer_view.dart';
-import 'package:jobber_city/screens/location_screen/location_screen_view.dart';
-import 'package:jobber_city/screens/seeker/home_seeker/home_seeker_view.dart';
+import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
+import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
 import 'package:jobber_city/screens/splash/splash_view.dart';
 
 class AppPages {
@@ -53,16 +51,6 @@ class AppPages {
       name: AppRoutes.resetPassword,
       page: () => ResetPassScreenView(),
       binding: ResetPassScreenViewBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.category,
-      page: () => CategoryScreenView(),
-      binding: CategoryScreenViewBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.location,
-      page: () => LocationScreenView(),
-      binding: LocationScreenViewBinding(),
     ),
   ];
 }

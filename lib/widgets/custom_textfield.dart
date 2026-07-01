@@ -5,22 +5,24 @@ class CustomTextfield extends StatefulWidget {
   const CustomTextfield({
     super.key,
     required this.hintText,
-    required this.prefixIcon,
+    this.prefixIcon,
     this.suffixIcon,
     this.isPasswordField = false,
     required this.controller,
-
-    // 🎯 បន្ថែម Properties ថ្មីៗសម្រាប់ TextFormField
+    this.readOnly = false,
+    this.onTap,
     this.validator,
     this.keyboardType,
     this.textInputAction,
   });
 
   final String hintText;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final IconData? suffixIcon;
   final bool isPasswordField;
   final TextEditingController controller;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
@@ -39,7 +41,6 @@ class _CustomTextfieldState extends State<CustomTextfield> {
   void initState() {
     super.initState();
     _obscureText = widget.isPasswordField;
-
     _focusNode.addListener(() {
       setState(() {
         _isFocused = _focusNode.hasFocus;
@@ -55,56 +56,48 @@ class _CustomTextfieldState extends State<CustomTextfield> {
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 ប្តូរពី TextField ទៅ TextFormField
     return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
       obscureText: _obscureText,
-      style: const TextStyle(color: AppColors.inputText),
-
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
       validator: widget.validator,
       keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction ?? TextInputAction.next,
-
+      textInputAction: widget.textInputAction,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: AppColors.inputIconText,
+      ),
       decoration: InputDecoration(
         filled: true,
         fillColor: _isFocused
             ? AppColors.inputFocusedBackground
             : AppColors.inputBackground,
-
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 15,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.inputBorder),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.inputFocusedBorder),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(15)),
-          borderSide: BorderSide(color: AppColors.inputErrorBorder),
-        ),
-        // 🎯 ពេលមាន Error ឱ្យវានៅតែមានរាងកោងស្អាត
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(15)),
-          borderSide: BorderSide(color: AppColors.inputErrorBorder, width: 2),
-        ),
-
-        prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 0),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-          child: Icon(
-            widget.prefixIcon,
-            color: _isFocused
-                ? AppColors.inputFocusedBorder
-                : AppColors.inputIconText,
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: const BorderSide(
+            color: AppColors.inputFocusedBorder,
+            width: 1.5,
           ),
         ),
-
+        prefixIcon: widget.prefixIcon != null
+            ? Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 8.0),
+                child: Icon(
+                  widget.prefixIcon,
+                  color: _isFocused
+                      ? AppColors.inputFocusedBorder
+                      : AppColors.inputIconText,
+                ),
+              )
+            : null,
         suffixIcon: widget.isPasswordField
             ? IconButton(
                 padding: const EdgeInsets.only(right: 10.0),
@@ -131,12 +124,13 @@ class _CustomTextfieldState extends State<CustomTextfield> {
                 ),
               )
             : null,
-
         hintText: widget.hintText,
         hintStyle: TextStyle(
           color: _isFocused
               ? AppColors.inputFocusedBorder
               : AppColors.inputIconText,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );
