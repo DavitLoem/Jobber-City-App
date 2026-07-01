@@ -104,9 +104,9 @@ class VerifyOtpController extends GetxController {
         Get.snackbar('Success', 'Your account has been verified successfully!');
 
         if (response.user.role == 'employer') {
-          Get.offAllNamed(AppRoutes.homeEmployer);
+          Get.offAllNamed(AppRoutes.login);
         } else {
-          Get.offAllNamed(AppRoutes.homeSeeker);
+          Get.offAllNamed(AppRoutes.login);
         }
       }
     } on ApiException catch (e) {

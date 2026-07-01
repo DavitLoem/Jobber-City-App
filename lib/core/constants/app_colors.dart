@@ -67,7 +67,6 @@ class AppColors {
   /// Light border color for dark mode
   static const Color line = Color(0xFFE9E9F0);
 
-
   // ─────────────────────────────────────────────
   // 04  TEXT  —  LIGHT MODE
   // ─────────────────────────────────────────────
@@ -122,9 +121,11 @@ class AppColors {
 
   static const Color inputFocusedBackground = Color(0xFFEEF4FF);
 
+  static const Color inputDisabledBackground = Color(0xFFF8F8F8);
+
   /// Idle border — soft grey
   static const Color inputBorder = Color(0xFFFAFAFA);
-  
+
   /// Icon text color
   static const Color inputIconText = Color(0xFF9E9E9E);
 
@@ -204,7 +205,7 @@ class AppColors {
   static const Color darkIconSecondary = Color(0xFF6B7A99);
 
   /// Disabled icon
-  static const Color iconDisabled = Color(0xFFD1D5DB);
+  static const Color iconDisabled = Color(0xFFCDCDCD);
 
   /// Icon on coloured surface (e.g. white on blue card)
   static const Color iconOnColor = Color(0xFFFFFFFF);

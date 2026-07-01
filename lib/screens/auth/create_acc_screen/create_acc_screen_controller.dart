@@ -64,7 +64,20 @@ class CreateAccScreenViewController extends GetxController {
 
       await authServices.register(requestModel);
 
-      Get.toNamed(AppRoutes.verifyOtp, arguments: emailCtrl.text.trim());
+      // Store user data in GetStorage for later use
+      final storage = GetStorage();
+      storage.write('temp_firstName', firstName);
+      storage.write('temp_lastName', lastName);
+      storage.write('temp_email', email);
+
+      Get.toNamed(
+        AppRoutes.verifyOtp,
+        arguments: {
+          'email': email,
+          'firstName': firstName,
+          'lastName': lastName,
+        },
+      );
     } on ApiException catch (e) {
       Get.snackbar("Error", e.message);
     } catch (e, stackTrace) {

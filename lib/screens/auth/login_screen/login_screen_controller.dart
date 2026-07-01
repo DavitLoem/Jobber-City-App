@@ -14,8 +14,8 @@ class LoginScreenViewController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    emailCtrl = TextEditingController(text: "slesrofath2203@gmail.com");
-    passwordCtrl = TextEditingController(text: "Rofath123");
+    emailCtrl = TextEditingController();
+    passwordCtrl = TextEditingController();
   }
 
   @override
@@ -66,20 +66,30 @@ class LoginScreenViewController extends GetxController {
       }
 
       Get.snackbar("Success", message);
+
+      // 🟢 ត្រូវប្រាកដថាអ្នកមានបន្ទាត់នេះ! (វាជាអ្នកបង្កើតអថេរ userEmail)
+      String userEmail = emailCtrl.text.trim();
+
+      // បន្ទាប់ពីចាប់ Email ទុកហើយ ទើបយើងលុបវាចេញពីប្រអប់
       clearFields();
 
+      // 🟢 បំបែកផ្លូវ
       if (role == 'employer') {
-        Get.offAllNamed(AppRoutes.homeEmployer);
+        Get.offAllNamed(
+          AppRoutes.companyProfile,
+          arguments: {'email': userEmail}, // ប្រើអថេរដែលទើបបង្កើត
+        );
       } else {
-        Get.offAllNamed(AppRoutes.homeSeeker);
+        Get.offAllNamed(
+          AppRoutes.location,
+          arguments: {'email': userEmail},
+        ); // ប្រើអថេរដែលទើបបង្កើត
       }
     } on ApiException catch (e) {
       Get.snackbar("Error", e.message);
     } catch (e, stacktrace) {
-      debugPrint("❌ Login Runtime Crash Log: $e");
-      debugPrint("❌ Stacktrace: $stacktrace");
-
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      debugPrint("❌ Login Runtime Crash Log: $e\n$stacktrace");
+      Get.snackbar("Error", "An unexpected error occurred");
     } finally {
       isLoading.value = false;
     }
