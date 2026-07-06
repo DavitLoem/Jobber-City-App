@@ -91,23 +91,6 @@ class LocationScreenController extends GetxController {
     });
   }
 
-  // Looks up the full model for whatever id is currently selected, so the
-  // "Selected: xxx" chip can show its name without a second API call.
-  LocationModel? get selectedLocation {
-    for (final loc in locationList) {
-      if (loc.id == selectedLocationId.value) return loc;
-    }
-    return null;
-  }
-
-  void selectLocation(String id) {
-    selectedLocationId.value = id;
-  }
-
-  void clearSelection() {
-    selectedLocationId.value = '';
-  }
-
   void continueToNextScreen() {
     if (currentPage.value == 0) {
       if (selectedProvinceId.value.isNotEmpty) {
