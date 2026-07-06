@@ -2,6 +2,7 @@ part of 'create_acc_screen_view.dart';
 
 class CreateAccScreenViewController extends GetxController {
   final AuthServices authServices = AuthServices();
+  final _storage = const FlutterSecureStorage();
 
   final firstNameCtrl = TextEditingController();
   final lastNameCtrl = TextEditingController();
@@ -64,11 +65,10 @@ class CreateAccScreenViewController extends GetxController {
 
       await authServices.register(requestModel);
 
-      // Store user data in GetStorage for later use
-      final storage = GetStorage();
-      storage.write('temp_firstName', firstName);
-      storage.write('temp_lastName', lastName);
-      storage.write('temp_email', email);
+      // Store user data in FlutterSecureStorage for later use
+      await _storage.write(key: 'temp_firstName', value: firstName);
+      await _storage.write(key: 'temp_lastName', value: lastName);
+      await _storage.write(key: 'temp_email', value: email);
 
       Get.toNamed(
         AppRoutes.verifyOtp,

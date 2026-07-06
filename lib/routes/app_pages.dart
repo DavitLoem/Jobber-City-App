@@ -130,5 +130,27 @@ class AppPages {
         RoleMiddleware(requiredRole: AppRoles.employer),
       ],
     ),
+    GetPage(
+      name: AppRoutes.experience,
+      page: () => ExperienceScreenView(),
+      binding: ExperienceScreenViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.educations,
+      page: () => EducationsScreenView(),
+      binding: EducationsScreenViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.trainings,
+      page: () => TrainingsScreenView(),
+      binding: TrainingsScreenViewBinding(),
+    ),
+
+    // Employer routes
+    GetPage(
+      name: AppRoutes.mainScreenEmployer,
+      page: () => MainScreenEmloyerView(),
+      binding: MainScreenEmloyerBinding(),
+    ),
   ];
 }

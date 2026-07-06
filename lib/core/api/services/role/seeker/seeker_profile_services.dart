@@ -1,5 +1,6 @@
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
+import 'package:dio/dio.dart';
 
 class SeekerProfileServices {
   final ApiClient _apiClient = ApiClient();
@@ -22,7 +23,27 @@ class SeekerProfileServices {
   // មុខងារសម្រាប់ទាញយកទិន្នន័យ Profile មកបង្ហាញលើអេក្រង់
   Future<dynamic> getSeekerProfile() async {
     try {
-      final response = await _apiClient.get('/seeker/profile/core');
+      final response = await _apiClient.get('/seeker/profile/');
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> profileImage(String filePath) async {
+    try {
+      FormData formData = FormData.fromMap({
+        // 🟢 កែត្រង់នេះ! ដូរពី "profile_image" ទៅជា "file" វិញ
+        "file": await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+      });
+
+      final response = await _apiClient.post(
+        '/seeker/profile/upload-image',
+        data: formData,
+      );
       return response;
     } catch (e) {
       rethrow;

@@ -7,6 +7,7 @@ import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 
 part 'profile_screen_binding.dart';
 part 'profile_screen_controller.dart';
@@ -17,10 +18,10 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ពណ៌ Background ស្អាតបន្ទះស
+      backgroundColor: Colors.white, // Clean background color
       body: SafeArea(
         child: Obx(() {
-          // បង្ហាញ Loading ពេលកំពុងទាញទិន្នន័យពី API
+          // Show Loading while fetching data from API
           if (controller.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -31,17 +32,18 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar(),
-                const SizedBox(height: 20),
                 _buildProfileCard(),
                 const SizedBox(height: 14),
                 _buildCompleteProfileBanner(),
                 const SizedBox(height: 24),
 
-                // 🟢 បញ្ជី Section ផ្សេងៗនៃ Profile
+                // Profile Section List
                 _buildSectionItem(
                   icon: Icons.person_outline,
                   title: "Contact Information",
-                  onTap: () => Get.toNamed('/edit-profile'),
+                  onTap: () => Get.toNamed(
+                    '/edit-profile',
+                  )?.then((_) => controller.fetchProfileRaw()),
                 ),
                 const SizedBox(height: 12),
                 _buildSectionItem(
@@ -59,13 +61,24 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 _buildSectionItem(
                   icon: Icons.work_outline,
                   title: "Work Experience",
-                  onTap: () {},
+                  onTap: () async {
+                    // ១. រង់ចាំរហូតដល់អ្នកប្រើប្រាស់ Back ត្រឡប់មកពីទំព័រ Experience វិញ
+                    await Get.toNamed(
+                      AppRoutes.experience,
+                    ); // សូមដូរឈ្មោះ Route ឲ្យត្រូវនឹងកូដពិតរបស់អ្នក
+
+                    // ២. ពេលត្រឡប់មកដល់ទីនេះវិញ ហៅមុខងារទាញទិន្នន័យម្ដងទៀត ដើម្បី Refresh UI!
+                    controller.fetchProfileRaw();
+                  },
                 ),
                 const SizedBox(height: 12),
                 _buildSectionItem(
                   icon: Icons.school_outlined,
                   title: "Education",
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed(AppRoutes.educations);
+                    controller.fetchProfileRaw();
+                  },
                 ),
                 const SizedBox(height: 12),
                 _buildSectionItem(
@@ -77,7 +90,10 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 _buildSectionItem(
                   icon: Icons.workspace_premium_outlined,
                   title: "Certifications & Licenses",
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed(AppRoutes.trainings);
+                    controller.fetchProfileRaw();
+                  },
                 ),
 
                 const SizedBox(height: 30),
@@ -89,7 +105,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
     );
   }
 
-  // ── ផ្នែក AppBar ──
+  // ── AppBar Section ──
   Widget _buildAppBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,7 +135,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
     );
   }
 
-  // ── ផ្នែកកាត Profile Information (Avatar, Name, Position, Edit) ──
+  // ── Profile Information Card (Avatar, Name, Position, Edit) ──
   Widget _buildProfileCard() {
     final bool hasPosition = controller.position.value.isNotEmpty;
 
@@ -141,30 +157,55 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // 🟢 Avatar (Outlined Circle)
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryLight,
-              border: Border.all(color: AppColors.primary, width: 2),
-            ),
-            child: Center(
-              child: Text(
-                controller.firstName.value.isNotEmpty
-                    ? controller.firstName.value[0].toUpperCase()
-                    : 'U',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
+          Obx(
+            () => Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryLight,
+                border: Border.all(color: AppColors.primary, width: 2),
+              ),
+              child: ClipOval(
+                child: controller.profileImageUrl.value.isNotEmpty
+                    ? Image.network(
+                        controller.profileImageUrl.value,
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Text(
+                              controller.firstName.value.isNotEmpty
+                                  ? controller.firstName.value[0].toUpperCase()
+                                  : 'U',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(
+                          controller.firstName.value.isNotEmpty
+                              ? controller.firstName.value[0].toUpperCase()
+                              : 'U',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
               ),
             ),
           ),
           const SizedBox(width: 14),
 
-          // 🟢 ឈ្មោះ និង ស្ថានភាពមុខតំណែង
+          // Name and Position Status
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,9 +269,11 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
             ),
           ),
 
-          // 🟢 ប៊ូតុង Edit (សញ្ញាខ្មៅដៃ)
+          // Edit Button (pencil icon)
           GestureDetector(
-            onTap: () => Get.toNamed('/edit-profile'),
+            onTap: () => Get.toNamed(
+              '/edit-profile',
+            )?.then((_) => controller.fetchProfileRaw()),
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -249,7 +292,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
     );
   }
 
-  // ── ផ្ទាំងជំរុញឱ្យបំពេញ Profile ឱ្យពេញលេញ ──
+  // ── Complete Profile Banner ──
   Widget _buildCompleteProfileBanner() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -285,7 +328,9 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
           ),
           const SizedBox(width: 10),
           GestureDetector(
-            onTap: () => Get.toNamed('/edit-profile'),
+            onTap: () => Get.toNamed(
+              '/edit-profile',
+            )?.then((_) => controller.fetchProfileRaw()),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               decoration: BoxDecoration(
@@ -307,7 +352,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
     );
   }
 
-  // ── ធាតុ Section នីមួយៗ (Icon + Title + ប៊ូតុង Add) ──
+  // ── Section Item (Icon + Title + Add Button) ──
   Widget _buildSectionItem({
     required IconData icon,
     required String title,

@@ -6,6 +6,7 @@ import 'package:jobber_city/bindings/initial_binding.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_pages.dart';
 import 'package:jobber_city/routes/app_routes.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
