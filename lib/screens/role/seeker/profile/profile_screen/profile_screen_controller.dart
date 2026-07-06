@@ -7,7 +7,8 @@ class ProfileScreenViewController extends GetxController {
   var firstName = ''.obs;
   var lastName = ''.obs;
   var email = ''.obs;
-  var position = ''.obs; // ⬅ មុខតំណែង (Job Title / Position)
+  var position = ''.obs; // Job Title / Position
+  var profileImageUrl = ''.obs;
 
   @override
   void onInit() {
@@ -18,12 +19,12 @@ class ProfileScreenViewController extends GetxController {
   Future<void> checkTokenExpiry() async {
     String? token = await TokenStorage.getAccessToken();
     if (token == null || token.isEmpty) {
-      AppLogger.i("📭 មិនមាន Access Token ទេ");
+      AppLogger.i("No Access Token");
       return;
     }
 
     try {
-      // វះកាត់ Token ជា ៣ ចំណែក រួចយកចំណែកកណ្តាល (Payload) មកអាន
+      // Split Token into 3 parts and take the middle part (Payload) to read
       final parts = token.split('.');
       if (parts.length != 3) return;
 
@@ -32,30 +33,30 @@ class ProfileScreenViewController extends GetxController {
       Map<String, dynamic> payloadMap = json.decode(payload);
 
       if (payloadMap.containsKey('exp')) {
-        // បំប្លែងម៉ោងពី Backend (វិនាទី) មកជាម៉ោងពិត (មិល្លីវិនាទី)
+        // Convert time from Backend (seconds) to real time (milliseconds)
         DateTime expiryDate = DateTime.fromMillisecondsSinceEpoch(
           payloadMap['exp'] * 1000,
         );
         DateTime now = DateTime.now();
 
         AppLogger.i(
-          "🔑 Token របស់អ្នក: ${token.substring(0, 15)}...",
-        ); // ព្រីនត្រឹម 15 តួ
-        AppLogger.i("⏰ ម៉ោងបច្ចុប្បន្ន: $now");
-        AppLogger.i("🕒 ម៉ោង Expire:   $expiryDate");
+          "Your Token: ${token.substring(0, 15)}...",
+        ); // Print only first 15 characters
+        AppLogger.i("Current time: $now");
+        AppLogger.i("Expire time: $expiryDate");
 
         if (now.isAfter(expiryDate)) {
-          AppLogger.e("🔴 លទ្ធផល: Token នេះបាន EXPIRED បាត់ទៅហើយ!");
+          AppLogger.e("Result: This Token has EXPIRED!");
         } else {
           Duration timeLeft = expiryDate.difference(now);
           AppLogger.i(
-            "🟢 លទ្ធផល: Token នេះនៅរស់ (សល់ ${timeLeft.inMinutes} នាទី និង ${timeLeft.inSeconds % 60} វិនាទីទៀត)",
+            "Result: This Token is still alive (${timeLeft.inMinutes} minutes and ${timeLeft.inSeconds % 60} seconds remaining)",
           );
         }
         debugPrint("========================================");
       }
     } catch (e) {
-      debugPrint("❌ Error ពេល Decode Token: $e");
+      debugPrint("Error decoding Token: $e");
     }
   }
 
@@ -64,23 +65,24 @@ class ProfileScreenViewController extends GetxController {
 
     try {
       isLoading.value = true;
-      AppLogger.i("⏳ កំពុងទាញយកទិន្នន័យ Profile...");
+      AppLogger.i("Fetching Profile data...");
 
       final response = await _seekerServices.getRawProfile();
 
-      // ទាញយក Object "data" ពី JSON រួចចាប់យកឈ្មោះ
+      // Get "data" Object from JSON and extract the name
       var data = response['data'];
       firstName.value = data['first_name'] ?? 'NoName';
       lastName.value = data['last_name'] ?? '';
       email.value = data['email'] ?? '';
       position.value = data['position'] ?? data['job_title'] ?? '';
+      profileImageUrl.value = data['profile_image_url'] ?? '';
 
       AppLogger.i(
-        "✅ ទាញយកជោគជ័យ: ${firstName.value} ${lastName.value} ${email.value}",
+        "Successfully fetched: ${firstName.value} ${lastName.value} ${email.value}",
       );
     } catch (e) {
-      AppLogger.i("❌ បរាជ័យក្នុងការទាញយក Profile: $e");
-      Get.snackbar("Error", "មិនអាចទាញយក Profile បានទេ");
+      AppLogger.i("Failed to fetch Profile: $e");
+      Get.snackbar("Error", "Cannot fetch Profile");
     } finally {
       isLoading.value = false;
     }

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
-import 'package:jobber_city/models/role/district_model.dart';
+import 'package:jobber_city/models/role/seeker/district_model.dart';
 
 class DistrictServices {
   final ApiClient _apiClient = ApiClient();

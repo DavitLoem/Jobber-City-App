@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:jobber_city/core/api/services/role/category_services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jobber_city/core/api/services/role/seeker/category_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
-import 'package:jobber_city/models/role/category_model.dart';
+import 'package:jobber_city/models/role/seeker/category_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/widgets/arrow_key_back.dart';
 

@@ -1,5 +1,5 @@
 import 'package:jobber_city/core/api/network/api_client.dart';
-import 'package:jobber_city/models/role/location_model.dart';
+import 'package:jobber_city/models/role/seeker/location_model.dart';
 
 class LocationServices {
   final ApiClient _apiClient = ApiClient();

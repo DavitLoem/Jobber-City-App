@@ -2,6 +2,7 @@ part of 'category_screen_view.dart';
 
 class CategoryScreenViewController extends GetxController {
   final CategoryServices _categoryServices = CategoryServices();
+  final _storage = const FlutterSecureStorage();
 
   var categoriesList = <CategoryModel>[].obs;
   var isLoading = false.obs;
@@ -43,7 +44,7 @@ class CategoryScreenViewController extends GetxController {
     }
   }
 
-  void continueToNextScreen() {
+  Future<void> continueToNextScreen() async {
     if (selectedCategoryIds.isEmpty) {
       Get.snackbar(
         'Action Required',
@@ -67,15 +68,19 @@ class CategoryScreenViewController extends GetxController {
         '';
     debugPrint("Final Route Check - Province ID: $provinceId");
 
-    // 🟢 ២. អាន Role ពី GetStorage ត្រង់ៗ (សាមញ្ញបំផុត)
+    // 🟢 ២. អាន Role ពី FlutterSecureStorage ត្រង់ៗ (សាមញ្ញបំផុត)
     final String userRole =
-        GetStorage().read('role')?.toString().toLowerCase() ?? 'seeker';
+        (await _storage.read(key: 'role'))?.toString().toLowerCase() ??
+        'seeker';
     debugPrint("Final Route Check - Role: $userRole");
 
-    // 🟢 ៣. រក្សាទុក categories ដែលបានរើសទៅក្នុង GetStorage ផងដែរ ដើម្បីឲ្យ
+    // 🟢 ៣. រក្សាទុក categories ដែលបានរើសទៅក្នុង FlutterSecureStorage ផងដែរ ដើម្បីឲ្យ
     //    Edit Profile Screen អាចទាញវាមកបំពេញដោយស្វ័យប្រវត្តិ
     //    ទោះបីជា Get.arguments ត្រូវបាត់បង់ពេលឆ្លងកាត់ច្រើនអេក្រង់ក៏ដោយ
-    GetStorage().write('temp_category_ids', selectedCategoryIds.toList());
+    await _storage.write(
+      key: 'temp_category_ids',
+      value: jsonEncode(selectedCategoryIds.toList()),
+    );
 
     // 🟢 ៤. បំបែកផ្លូវ
     if (userRole == 'employer') {
@@ -93,7 +98,10 @@ class CategoryScreenViewController extends GetxController {
       // (e.g. Edit Profile) can auto-fill from them.
       incomingArgs['category_ids'] = selectedCategoryIds.toList();
       incomingArgs['province_id'] = provinceId.value;
-      Get.offAllNamed(AppRoutes.mainScreen, arguments: incomingArgs);
+      Get.toNamed(
+        AppRoutes.mainScreen,
+        arguments: {"category_ids": selectedCategoryIds},
+      );
     }
   }
 }

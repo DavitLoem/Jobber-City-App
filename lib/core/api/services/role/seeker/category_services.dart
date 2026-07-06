@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
-import 'package:jobber_city/models/role/category_model.dart';
+import 'package:jobber_city/models/role/seeker/category_model.dart';
 
 class CategoryServices {
   final ApiClient _apiClient = ApiClient();
