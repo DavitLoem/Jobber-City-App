@@ -11,6 +11,7 @@ class AuthController extends GetxController {
 
   var isLoggedIn = false.obs;
   var userRole = ''.obs;
+  var isOnboardingCompleted = false.obs;
 
   @override
   void onInit() {
@@ -22,15 +23,18 @@ class AuthController extends GetxController {
   Future<void> checkLoginStatus() async {
     String? token = await TokenStorage.getAccessToken();
     String? role = await TokenStorage.getUserRole();
+    bool onboarding = await TokenStorage.getOnboardingStatus();
 
     if (token != null && token.isNotEmpty) {
       isLoggedIn.value = true;
       userRole.value = role ?? 'seeker';
-      debugPrint("✅ Status: Login as ${userRole.value}");
+      isOnboardingCompleted.value = onboarding;
+      // debugPrint("✅ Status: Login as ${userRole.value}");
     } else {
       isLoggedIn.value = false;
       userRole.value = '';
-      debugPrint("❌ Status: Not Logged In");
+      isOnboardingCompleted.value = false;
+      // debugPrint("❌ Status: Not Logged In");
     }
   }
 

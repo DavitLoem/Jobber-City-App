@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/api/services/role/location_services.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/models/role/location_model.dart';
+import 'package:jobber_city/core/api/services/location_services.dart';
+import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/screens/role/seeker/location_screen/widget/location_list_item.dart';
-import 'package:jobber_city/screens/role/seeker/location_screen/widget/location_search_bar.dart';
-import 'package:jobber_city/widgets/custom_button.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/widgets/location_continue_button.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/widgets/location_empty_search.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/widgets/location_header.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/widgets/location_search_bar.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/widgets/location_selected_chip.dart';
+import 'package:jobber_city/screens/role/seeker/location_screen/widgets/location_tile.dart';
 
 part 'location_screen_binding.dart';
 part 'location_screen_controller.dart';
@@ -17,72 +22,133 @@ class LocationScreenView extends GetView<LocationScreenController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: LocationColors.scaffoldBg,
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ១. Header
+            Obx(
+              () => LocationHeader(
+                title: controller.currentPage.value == 0
+                    ? 'Your City'
+                    : 'Your District',
+                onBackPressed: controller.goBack,
+                showBackButton: controller.currentPage.value != 0,
+              ),
+            ),
+
+            // ── Search Bar (នៅនឹងថ្កល់ តែបាញ់ API ឆ្លាតវៃ) ──
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Row(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: LocationSearchBar(
+                searchController: controller.searchController,
+                onChanged: controller.filterLocations,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ── PageView (ស្លាយចុះឡើងរវាង ខេត្ត និង ស្រុក) ──
+            Expanded(
+              child: PageView(
+                controller: controller.pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (index) => controller.currentPage.value = index,
                 children: [
-                  Text(
-                    'Your City',
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  // 🔹 ទំព័រទី ១៖ បញ្ជីខេត្ត
+                  _buildProvincePage(),
+                  _buildDistrictPage(),
                 ],
               ),
             ),
-
-            // ២. Search Bar
-            LocationSearchBar(
-              controller: controller.searchController,
-              onChanged: controller.filterLocations,
-            ),
-
-            const SizedBox(height: 8),
-
-            // ៣. ListView
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: controller.filteredList.length,
-                  itemBuilder: (context, index) {
-                    final location = controller.filteredList[index];
-                    return Obx(
-                      () => LocationListItem(
-                        location: location,
-                        isSelected:
-                            controller.selectedLocationId.value == location.id,
-                        onTap: () =>
-                            controller.selectedLocationId.value = location.id,
-                      ),
-                    );
-                  },
-                );
-              }),
-            ),
-
-            // ៤. Footer
-            Divider(color: AppColors.line, thickness: 1.8),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: CustomButton(
-                text: "Continue",
-                onPressed: () => controller.continueToNextScreen(),
-              ),
-            ),
+            LocationContinueButton(controller: controller),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildProvincePage() {
+    return Obx(() {
+      if (controller.isProvinceLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(color: LocationColors.accent),
+        );
+      }
+
+      final list = controller.provincesList;
+      if (list.isEmpty) return const LocationEmptySearch();
+
+      return ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        itemCount: list.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 2),
+        itemBuilder: (context, index) {
+          final province = list[index];
+          return Obx(() {
+            final isSelected =
+                controller.selectedProvinceId.value == province.id;
+            return LocationTile(
+              location: province,
+              isSelected: isSelected,
+              onTap: () => controller.onProvinceSelected(province.id),
+            );
+          });
+        },
+      );
+    });
+  }
+
+  Widget _buildDistrictPage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 🔹 Chip បង្ហាញខេត្តដែលបានរើស
+        Obx(() {
+          final selectedProv = controller.provincesList.firstWhereOrNull(
+            (p) => p.id == controller.selectedProvinceId.value,
+          );
+          if (selectedProv == null) return const SizedBox.shrink();
+
+          return Padding(
+            padding: const EdgeInsets.only(left: 20, bottom: 8),
+            child: LocationSelectedChip(
+              cityName: selectedProv.nameEn,
+              onClear: controller.goBack,
+            ),
+          );
+        }),
+
+        Expanded(
+          child: Obx(() {
+            if (controller.isDistrictLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(color: LocationColors.accent),
+              );
+            }
+
+            final list = controller.districtsList;
+            if (list.isEmpty) return const LocationEmptySearch();
+
+            return ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              itemCount: list.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 2),
+              itemBuilder: (context, index) {
+                final district = list[index];
+                return Obx(() {
+                  final isSelected =
+                      controller.selectedDistrictId.value == district.id;
+                  return LocationTile(
+                    location: district,
+                    isSelected: isSelected,
+                    onTap: () => controller.onDistrictSelected(district.id),
+                  );
+                });
+              },
+            );
+          }),
+        ),
+      ],
     );
   }
 }

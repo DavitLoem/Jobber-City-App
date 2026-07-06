@@ -50,9 +50,19 @@ class LoginScreenViewController extends GetxController {
 
       String? accessToken = dataMap["access_token"];
       String? refreshToken = dataMap["refresh_token"];
+
+      // 🎯 ទាញយក Role ពី JSON
       String? role = dataMap["user"] != null
           ? dataMap["user"]["role"]
           : dataMap["role"];
+
+      // 🎯 ១. ទាញយក onboarding_completed ពី JSON (ដាក់ false បើរកមិនឃើញ)
+      bool onboardingCompleted = false;
+      if (dataMap["user"] != null &&
+          dataMap["user"]["onboarding_completed"] != null) {
+        onboardingCompleted = dataMap["user"]["onboarding_completed"];
+      }
+
       String message = response["message"] ?? "Login Successfully";
 
       if (accessToken != null) {
@@ -60,6 +70,8 @@ class LoginScreenViewController extends GetxController {
           accessToken: accessToken,
           refreshToken: refreshToken ?? "",
           role: role ?? 'seeker',
+          onboardingCompleted:
+              onboardingCompleted, // 🎯 ២. រក្សាទុកក្នុង Storage
         );
 
         await Get.find<AuthController>().checkLoginStatus();
@@ -67,23 +79,27 @@ class LoginScreenViewController extends GetxController {
 
       Get.snackbar("Success", message);
 
-      // 🟢 ត្រូវប្រាកដថាអ្នកមានបន្ទាត់នេះ! (វាជាអ្នកបង្កើតអថេរ userEmail)
       String userEmail = emailCtrl.text.trim();
-
-      // បន្ទាប់ពីចាប់ Email ទុកហើយ ទើបយើងលុបវាចេញពីប្រអប់
       clearFields();
 
-      // 🟢 បំបែកផ្លូវ
+      // 🎯 ៣. បំបែកផ្លូវ (Smart Routing)
       if (role == 'employer') {
         Get.offAllNamed(
           AppRoutes.companyProfile,
-          arguments: {'email': userEmail}, // ប្រើអថេរដែលទើបបង្កើត
+          arguments: {'email': userEmail},
         );
       } else {
-        Get.offAllNamed(
-          AppRoutes.location,
-          arguments: {'email': userEmail},
-        ); // ប្រើអថេរដែលទើបបង្កើត
+        // សម្រាប់ Seeker ត្រូវឆែកលក្ខខណ្ឌ Onboarding
+        if (onboardingCompleted == true) {
+          Get.offAllNamed(
+            AppRoutes.mainScreen,
+          ); // បើបំពេញរួច ឱ្យចូល Main តែម្តង
+        } else {
+          Get.offAllNamed(
+            AppRoutes.location, // បើមិនទាន់បំពេញ ទាត់ទៅ Location
+            arguments: {'email': userEmail},
+          );
+        }
       }
     } on ApiException catch (e) {
       Get.snackbar("Error", e.message);

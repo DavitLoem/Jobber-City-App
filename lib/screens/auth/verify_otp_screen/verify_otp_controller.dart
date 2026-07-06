@@ -71,7 +71,7 @@ class VerifyOtpController extends GetxController {
     String otp = completeOtp;
 
     //១. ពិនិត្យភាពត្រឹមត្រូវ (Validation) តាមរយៈ AuthValidator
-    String? validationError = AuthValidator.validateOTP(otpCode: otp);
+    String? validationError = AuthValidator.validateOtp(otpCode: otp);
     if (validationError != null) {
       Get.snackbar('Error', validationError);
       return;
@@ -99,6 +99,7 @@ class VerifyOtpController extends GetxController {
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,
           role: response.user.role,
+          onboardingCompleted: response.user.onboardingCompleted,
         );
 
         await Get.find<AuthController>().checkLoginStatus();
@@ -106,9 +107,13 @@ class VerifyOtpController extends GetxController {
         Get.snackbar('Success', 'Your account has been verified successfully!');
 
         if (response.user.role == 'employer') {
-          Get.offAllNamed(AppRoutes.login);
+          Get.offAllNamed(AppRoutes.homeEmployer);
         } else {
-          Get.offAllNamed(AppRoutes.login);
+          if (response.user.onboardingCompleted == true) {
+            Get.offAllNamed(AppRoutes.mainScreen);
+          } else {
+            Get.offAllNamed(AppRoutes.location);
+          }
         }
       }
     } on ApiException catch (e) {

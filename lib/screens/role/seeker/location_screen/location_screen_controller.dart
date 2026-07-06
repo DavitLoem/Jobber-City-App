@@ -3,58 +3,134 @@ part of 'location_screen_view.dart';
 class LocationScreenController extends GetxController {
   final LocationServices _locationServices = LocationServices();
 
-  var isLoading = false.obs;
-  var locationList = <LocationModel>[].obs;
-  var filteredList = <LocationModel>[].obs;
-  var selectedLocationId = ''.obs;
+  var isProvinceLoading = false.obs;
+  var provincesList = <LocationModel>[].obs;
+  var selectedProvinceId = ''.obs;
+
+  var isDistrictLoading = false.obs;
+  var districtsList = <LocationModel>[].obs;
+  var selectedDistrictId = ''.obs;
 
   final TextEditingController searchController = TextEditingController();
+  final PageController pageController = PageController();
+  final currentPage = 0.obs;
+
+  Timer? _debounce;
 
   @override
   void onInit() {
     super.onInit();
-    fetchLocations();
+    fetchProvinces();
   }
 
-  void fetchLocations() async {
+  // ១. មុខងារទាញយកខេត្ត
+  void fetchProvinces({String? query}) async {
     try {
-      isLoading.value = true;
-      var data = await _locationServices.getLocation();
-      locationList.assignAll(data);
-      filteredList.assignAll(data);
+      isProvinceLoading.value = true;
+      var data = await _locationServices.getProvinces(search: query);
+
+      // sortOrder
+      data.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+      provincesList.assignAll(data);
     } catch (e) {
-      debugPrint('Error fetching locations: $e');
+      debugPrint('Error fetching provinces: $e');
     } finally {
-      isLoading.value = false;
+      isProvinceLoading.value = false;
     }
+  }
+
+  void onProvinceSelected(String provinceId) {
+    if (selectedProvinceId.value != provinceId) {
+      selectedProvinceId.value = provinceId;
+      selectedDistrictId.value = '';
+      districtsList.clear();
+      searchController.clear();
+      fetchDistricts(provinceId);
+    }
+
+    pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void fetchDistricts(String provinceId, {String? query}) async {
+    try {
+      isDistrictLoading.value = true;
+      var data = await _locationServices.getDistricts(
+        provinceId,
+        search: query,
+      );
+
+      data.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+      districtsList.assignAll(data);
+    } catch (e) {
+      debugPrint('Error fetching districts: $e');
+    } finally {
+      isDistrictLoading.value = false;
+    }
+  }
+
+  void onDistrictSelected(String districtId) {
+    selectedDistrictId.value = districtId;
   }
 
   void filterLocations(String query) {
-    if (query.isEmpty) {
-      filteredList.assignAll(locationList);
+    // បើគាត់កំពុងវាយអក្សរជាប់ៗគ្នា យើងលុប Timer ចាស់ចោល
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    // បង្កើត Timer ថ្មី រង់ចាំ ៥០០ មិល្លីវិនាទី បន្ទាប់ពីគាត់ឈប់វាយអក្សរ ទើបបាញ់ API
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (selectedProvinceId.value.isEmpty) {
+        fetchProvinces(query: query);
+      } else {
+        fetchDistricts(selectedProvinceId.value, query: query);
+      }
+    });
+  }
+
+  void continueToNextScreen() {
+    if (currentPage.value == 0) {
+      if (selectedProvinceId.value.isNotEmpty) {
+        pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     } else {
-      var lowerCaseQuery = query.toLowerCase();
-      filteredList.assignAll(
-        locationList.where((location) {
-          return location.nameEn.toLowerCase().contains(lowerCaseQuery) ||
-              (location.nameKm != null &&
-                  location.nameKm.toString().contains(query));
-        }).toList(),
+      if (selectedDistrictId.value.isEmpty) {
+        Get.snackbar('Action Required', 'Please select a district.');
+        return;
+      }
+
+      Get.toNamed(
+        AppRoutes.category,
+        arguments: {
+          'province_id': selectedProvinceId.value,
+          'district_id': selectedDistrictId.value,
+        },
       );
     }
   }
 
-  void continueToNextScreen() {
-    if (selectedLocationId.value.isEmpty) {
-      Get.snackbar(
-        'Action Required',
-        'Please select your city to continue.',
-        snackPosition: SnackPosition.TOP,
+  void goBack() {
+    if (currentPage.value == 1) {
+      pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
-      return;
+    } else {
+      Get.back();
     }
+  }
 
-    // 🟢 សាមញ្ញបំផុត: គ្រាន់តែបញ្ជូន ID ខេត្តទៅ Category (មិនបាច់មាន Map ស្មុគស្មាញ)
-    Get.toNamed(AppRoutes.category, arguments: selectedLocationId.value);
+  @override
+  void onClose() {
+    pageController.dispose();
+    _debounce?.cancel();
+    searchController.dispose();
+    super.onClose();
   }
 }

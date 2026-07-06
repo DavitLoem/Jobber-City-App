@@ -159,17 +159,26 @@ class SplashViewController extends GetxController
 
   void _checkAutoLogin() async {
     try {
-      // ១. ទាញយក Token និង Role ពី Secure Storage
+      // ១. ទាញយក Token, Role និង Onboarding Status ពី Secure Storage
       String? token = await TokenStorage.getAccessToken();
       String? role = await TokenStorage.getUserRole();
+      bool onboardingCompleted =
+          await TokenStorage.getOnboardingStatus(); // 🎯 ថែមការអាន Onboarding Status
 
       // ២. លក្ខខណ្ឌកាត់ក្តី
       if (token != null && token.isNotEmpty) {
-        // បើមាន Token (មានន័យថាគាត់ធ្លាប់ Login)
+        // បើមាន Token (មានន័យថាគាត់ធ្លាប់ Login ឬ Verify រួច)
         if (role == 'employer') {
           Get.offAllNamed(AppRoutes.homeEmployer);
         } else {
-          Get.offAllNamed(AppRoutes.mainScreen);
+          // 🎯 បែងចែកផ្លូវសម្រាប់ Seeker ផ្អែកលើ Onboarding
+          if (onboardingCompleted) {
+            Get.offAllNamed(AppRoutes.mainScreen);
+          } else {
+            Get.offAllNamed(
+              AppRoutes.location,
+            ); // បើមិនទាន់បំពេញ ទៅ Location វិញ
+          }
         }
       } else {
         // បើគ្មាន Token ទេ (មិនទាន់ Login)

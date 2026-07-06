@@ -50,7 +50,7 @@ class AuthValidator {
     return null;
   }
 
-  static String? validateOTP({String? otpCode}) {
+  static String? validateOtp({String? otpCode}) {
     if (otpCode == null || otpCode.isEmpty) {
       return "Please enter your OTP";
     }
