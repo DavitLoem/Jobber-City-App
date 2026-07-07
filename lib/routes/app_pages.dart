@@ -7,7 +7,6 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
-import 'package:jobber_city/screens/category_screen/category_screen_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
@@ -15,7 +14,8 @@ import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_scree
 import 'package:jobber_city/screens/role/seeker/educations_screen/educations_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_view.dart';
-import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
+import 'package:jobber_city/screens/role/seeker/expertise_screen/category_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/job_detail/job_detail_view.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_view.dart';
@@ -70,18 +70,27 @@ class AppPages {
     // 🔵 ២. SEEKER ROUTES (ត្រូវការ Login ជា Seeker)
     // ==========================================
     GetPage(
-      name: AppRoutes.homeSeeker,
-      page: () => HomeSeekerView(),
-      binding: HomeSeekerViewBinding(),
+      name: AppRoutes.mainScreenSeeker,
+      page: () => MainScreenView(),
+      binding: MainScreenBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),
       ],
     ),
     GetPage(
-      name: AppRoutes.mainScreen,
-      page: () => MainScreenView(),
-      binding: MainScreenBinding(),
+      name: AppRoutes.expertise,
+      page: () => CategoryScreenView(),
+      binding: CategoryScreenViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.location,
+      page: () => LocationScreenView(),
+      binding: LocationScreenViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),
@@ -97,18 +106,9 @@ class AppPages {
       ],
     ),
     GetPage(
-      name: AppRoutes.category,
-      page: () => CategoryScreenView(),
-      binding: CategoryScreenViewBinding(),
-      middlewares: [
-        AuthMiddleware(),
-        RoleMiddleware(requiredRole: AppRoles.seeker),
-      ],
-    ),
-    GetPage(
-      name: AppRoutes.location,
-      page: () => LocationScreenView(),
-      binding: LocationScreenViewBinding(),
+      name: AppRoutes.jobDetail,
+      page: () => JobDetailView(),
+      binding: JobDetailViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),

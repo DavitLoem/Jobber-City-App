@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/api/services/location_services.dart';
+import 'package:jobber_city/core/api/services/role/seeker/location_services.dart';
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
@@ -37,7 +37,6 @@ class LocationScreenView extends GetView<LocationScreenController> {
               ),
             ),
 
-            // ── Search Bar (នៅនឹងថ្កល់ តែបាញ់ API ឆ្លាតវៃ) ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: LocationSearchBar(

@@ -1,41 +1,30 @@
+import 'package:cuberto_bottom_bar/cuberto_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:cuberto_bottom_bar/cuberto_bottom_bar.dart';
-
-// 🟢 កុំភ្លេច Import View ទាំងពីរនេះចូល
-import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
-import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
-import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_controller.dart';
 
 class MainScreenView extends GetView<MainScreenController> {
-  MainScreenView({super.key});
-
-  // 🟢 បញ្ចូលទំព័រពិតប្រាកដរបស់អ្នកនៅទីនេះ
-  final List<Widget> pages = [
-    const HomeSeekerView(),
-    const Center(child: Text("Saved Jobs", style: TextStyle(fontSize: 24))),
-    const Center(child: Text("Applications", style: TextStyle(fontSize: 24))),
-    const ProfileScreenView(), // 👈 ទំព័រ Profile
-  ];
+  const MainScreenView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 🚀 ដំណោះស្រាយ ១០០%: បង្ខំបញ្ចូល Controller ទាំងអស់នៅទីនេះមុនពេល UI ចាប់ផ្តើម!
-    Get.put(MainScreenController());
-    Get.put(HomeSeekerViewController());
-    // EditProfileScreenViewController is already registered in MainScreenBinding
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
 
-      // 🟢 IndexedStack
+      // 🎯 ប្រើ IndexedStack ផ្ទុក Navigators ទាំង ៤
       body: Obx(
-        () =>
-            IndexedStack(index: controller.currentIndex.value, children: pages),
+        () => IndexedStack(
+          index: controller.currentIndex.value,
+          children: [
+            _buildNavigator(1, AppRoutes.homeSeeker),
+            _buildNavigator(2, '/saved'),
+            _buildNavigator(3, '/applied'),
+            _buildNavigator(4, '/profile'),
+          ],
+        ),
       ),
 
-      // 🟢 Cuberto Bottom Bar
       bottomNavigationBar: Obx(
         () => CubertoBottomBar(
           key: const Key("BottomBar"),
@@ -51,17 +40,17 @@ class MainScreenView extends GetView<MainScreenController> {
             TabData(
               iconData: Icons.bookmark_rounded,
               title: "Saved",
-              tabColor: Colors.orange,
+              tabColor: Colors.blue,
             ),
             TabData(
               iconData: Icons.description_rounded,
-              title: "Applied",
-              tabColor: Colors.teal,
+              title: "Applications",
+              tabColor: Colors.blue,
             ),
             TabData(
               iconData: Icons.person_rounded,
               title: "Profile",
-              tabColor: Colors.purple,
+              tabColor: Colors.blue,
             ),
           ],
           onTabChangedListener: (position, title, color) {
@@ -69,6 +58,14 @@ class MainScreenView extends GetView<MainScreenController> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildNavigator(int nestedId, String initialRoute) {
+    return Navigator(
+      key: Get.nestedKey(nestedId), // កំណត់ ID ផ្តាច់មុខឱ្យ Tab នីមួយៗ
+      initialRoute: initialRoute, // តម្រុយទៅកាន់ onGenerateRoute (ឧ. /home)
+      onGenerateRoute: controller.onGenerateRoute,
     );
   }
 }

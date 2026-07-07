@@ -92,7 +92,7 @@ class LoginScreenViewController extends GetxController {
         // សម្រាប់ Seeker ត្រូវឆែកលក្ខខណ្ឌ Onboarding
         if (onboardingCompleted == true) {
           Get.offAllNamed(
-            AppRoutes.mainScreen,
+            AppRoutes.mainScreenSeeker,
           ); // បើបំពេញរួច ឱ្យចូល Main តែម្តង
         } else {
           Get.offAllNamed(

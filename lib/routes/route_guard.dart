@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/controllers/auth_controller.dart';
+
 import '../../routes/app_routes.dart';
 
 // 🛡 ១. អ្នកយាមទ្វារទី១៖ ឆែកមើលថាតើគាត់បាន Login ហើយឬនៅ?
@@ -34,11 +35,11 @@ class RoleMiddleware extends GetMiddleware {
     final String currentRole = Get.find<AuthController>().userRole.value;
 
     if (currentRole != requiredRole) {
-      // បើ Role មិនត្រូវគ្នា ទាត់ទៅ Home របស់ពួកគេរៀងៗខ្លួន
+      // បើ Role មិនត្រូវគ្នា ទាត់ទៅ Main Screen របស់ពួកគេរៀងៗខ្លួន
       if (currentRole == 'employer') {
         return const RouteSettings(name: AppRoutes.homeEmployer);
       } else {
-        return const RouteSettings(name: AppRoutes.homeSeeker);
+        return const RouteSettings(name: AppRoutes.mainScreenSeeker);
       }
     }
     return null; // បើ Role ត្រូវគ្នា អនុញ្ញាតឱ្យចូល

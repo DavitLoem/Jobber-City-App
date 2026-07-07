@@ -110,7 +110,7 @@ class VerifyOtpController extends GetxController {
           Get.offAllNamed(AppRoutes.homeEmployer);
         } else {
           if (response.user.onboardingCompleted == true) {
-            Get.offAllNamed(AppRoutes.mainScreen);
+            Get.offAllNamed(AppRoutes.mainScreenSeeker);
           } else {
             Get.offAllNamed(AppRoutes.location);
           }

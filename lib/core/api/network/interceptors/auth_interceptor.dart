@@ -19,9 +19,13 @@ class AuthInterceptor extends Interceptor {
   ) async {
     final accessToken = await TokenStorage.getAccessToken();
 
+    // debugPrint("🛡️ [AuthInterceptor] Access Token: $accessToken");
+
     // បើមាន Token, ភ្ជាប់វាទៅក្នុង Header ជានិច្ច
-    if (accessToken != null) {
+    if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
+    } else {
+      debugPrint("⚠️ [AuthInterceptor] Warning: Token is missing or empty!");
     }
 
     return handler.next(options); // អនុញ្ញាតឱ្យ Request បន្តដំណើរទៅមុខ

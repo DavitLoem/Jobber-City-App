@@ -1,8 +1,3 @@
-// To parse this JSON data, do
-//
-//     final seekerProflieModel = seekerProflieModelFromJson(jsonString);
-
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 SeekerProflieModel seekerProflieModelFromJson(String str) =>

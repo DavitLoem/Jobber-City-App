@@ -1,8 +1,3 @@
-// To parse this JSON data, do
-//
-//     final locationModel = locationModelFromJson(jsonString);
-
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 LocationModel locationModelFromJson(String str) =>

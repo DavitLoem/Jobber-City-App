@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
 class LocationHeader extends StatelessWidget {
@@ -25,16 +26,24 @@ class LocationHeader extends StatelessWidget {
               if (showBackButton) ...[
                 GestureDetector(
                   onTap: onBackPressed,
-                  child: const Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 20,
-                    color: LocationColors.ink,
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBackground, // ជំនួស _Tok.surfaceEl
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.cardBorder),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      size: 16,
+                      color: AppColors.textPrimary, // ជំនួស _Tok.ink
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
               ],
-              _buildLocationLogo(),
-              const SizedBox(width: 16),
+
               Text(
                 title,
                 style: TextStyle(
@@ -45,6 +54,7 @@ class LocationHeader extends StatelessWidget {
                   height: 1.1,
                 ),
               ),
+              const SizedBox(width: 16),
             ],
           ),
           const SizedBox(height: 16),
@@ -57,33 +67,6 @@ class LocationHeader extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLocationLogo() {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [LocationColors.accent, LocationColors.accentLt],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: LocationColors.accent.withValues(alpha: 0.30),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: const Icon(
-        Icons.location_city_rounded,
-        color: Colors.white,
-        size: 24,
       ),
     );
   }

@@ -52,8 +52,8 @@ class CompanyProfileViewController extends GetxController {
       final inds = await _industryServices.getIndustries();
       industriesList.assignAll(inds);
 
-      final provs = await _locationServices.getLocation();
-      provincesList.assignAll(provs);
+      //final provs = await _locationServices.getLocation();
+      //provincesList.assignAll(provs);
     } catch (e) {
       debugPrint("Error fetching initial data: $e");
     } finally {

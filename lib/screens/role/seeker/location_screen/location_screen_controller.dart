@@ -106,7 +106,7 @@ class LocationScreenController extends GetxController {
       }
 
       Get.toNamed(
-        AppRoutes.category,
+        AppRoutes.expertise,
         arguments: {
           'province_id': selectedProvinceId.value,
           'district_id': selectedDistrictId.value,

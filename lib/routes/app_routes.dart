@@ -12,23 +12,23 @@ class AppRoutes {
   // ==========================================
   // 🔵 ២. SEEKER ROUTES (សម្រាប់អ្នកស្វែងរកការងារ)
   // ==========================================
-  static const String mainScreen = '/main-screen';
+  static const String mainScreenSeeker = '/main-screen';
   static const String homeSeeker = '/home-seeker';
   static const String editprofile = '/edit-profile';
-  static const String category = '/category';
+  static const String expertise = '/expertise';
   static const String location = '/location';
+  static const String jobDetail = '/job-detail';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES (សម្រាប់ថៅកែ ឬក្រុមហ៊ុន)
   // ==========================================
   static const String homeEmployer = '/home-employer';
   static const String companyProfile = '/company-profile';
-  static const String employerMainScreen = '/main-screen';
+  static const String mainScreenEmployer = '/main-screen-employer';
   static const String employerEditprofile = '/edit-profile';
   static const String experience = '/experience';
   static const String educations = '/educations';
   static const String trainings = '/trainings';
 
   // Employer routes
-  static const String mainScreenEmployer = '/main-screen-employer';
 }

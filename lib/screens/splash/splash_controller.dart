@@ -173,7 +173,7 @@ class SplashViewController extends GetxController
         } else {
           // 🎯 បែងចែកផ្លូវសម្រាប់ Seeker ផ្អែកលើ Onboarding
           if (onboardingCompleted) {
-            Get.offAllNamed(AppRoutes.mainScreen);
+            Get.offAllNamed(AppRoutes.mainScreenSeeker);
           } else {
             Get.offAllNamed(
               AppRoutes.location,

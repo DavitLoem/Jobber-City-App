@@ -1,19 +1,19 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/api/services/role/seeker/category_services.dart';
+import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/location_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/category_services.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
-import 'package:jobber_city/models/role/seeker/location_model.dart';
-import 'package:jobber_city/models/role/seeker/district_model.dart';
 import 'package:jobber_city/models/role/seeker/category_model.dart';
+import 'package:jobber_city/models/role/seeker/district_model.dart';
+import 'package:jobber_city/models/role/seeker/location_model.dart';
 import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 
 class EditProfileScreenViewController extends GetxController {
@@ -187,12 +187,12 @@ class EditProfileScreenViewController extends GetxController {
   // ═══════════════════════════════════════════════
   Future<void> fetchInitialData() async {
     try {
-      final provinces = await _locationServices.getLocation();
-      provincesList.assignAll(provinces);
-      debugPrint("Loaded ${provinces.length} provinces");
+      //final provinces = await _locationServices.getLocation();
+      //provincesList.assignAll(provinces);
+      //debugPrint("Loaded ${provinces.length} provinces");
 
       final categories = await _categoryServices.getCategories();
-      categoriesList.assignAll(categories);
+      // categoriesList.assignAll(categories);
       debugPrint("Loaded ${categories.length} categories");
 
       debugPrint("selectedCategoryIds: $selectedCategoryIds");
@@ -262,7 +262,8 @@ class EditProfileScreenViewController extends GetxController {
   Future<List<LocationModel>> fetchProvinceOptions() async {
     try {
       if (provincesList.isNotEmpty) return provincesList;
-      return await _locationServices.getLocation();
+      // return await _locationServices.getLocation();
+      return [];
     } catch (e) {
       debugPrint("Error fetching province options: $e");
       return [];
