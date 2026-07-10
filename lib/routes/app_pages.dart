@@ -8,6 +8,9 @@ import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_vie
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_view.dart';
+import 'package:jobber_city/screens/role/employer/recruit/post_job_screen/post_job_screen_view.dart';
+import 'package:jobber_city/screens/role/employer/recruit/recruit_screen/recruit_screen_view.dart';
+import 'package:jobber_city/screens/role/employer/recruit/detail_post_screen/detail_post_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/category_screen/category_screen_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
@@ -111,6 +114,22 @@ class AppPages {
       name: AppRoutes.mainScreenEmployer,
       page: () => MainScreenEmloyerView(),
       binding: MainScreenEmloyerBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.postJob,
+      page: () => PostJobScreenView(),
+      binding: PostJobScreenViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.recruit,
+      page: () => RecruitScreenView(),
+      binding: RecruitScreenViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.detailPost,
+      page: () => DetailPostScreenView(),
+      binding: DetailPostScreenViewBinding(),
     ),
   ];
 }

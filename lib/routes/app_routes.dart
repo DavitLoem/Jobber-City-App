@@ -18,4 +18,7 @@ class AppRoutes {
 
   // Employer routes
   static const String mainScreenEmployer = '/main-screen-employer';
+  static const String postJob = '/post-job';
+  static const String recruit = '/recruit';
+  static const String detailPost = '/recruit/detail';
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
@@ -14,6 +15,7 @@ import 'package:jobber_city/widgets/custom_textfield.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/models/role/employer/company_model.dart';
 import 'package:jobber_city/core/api/services/role/employer/company_services.dart';
+import 'package:jobber_city/core/api/services/role/employer/company_logo_services.dart';
 import 'package:jobber_city/models/role/seeker/location_model.dart';
 import 'package:jobber_city/models/role/employer/industry_model.dart';
 import 'package:jobber_city/core/api/services/role/employer/industry_services.dart';
@@ -187,8 +189,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                     decoration: InputDecoration(
                       hintText: "Company Description (Min 10 characters)...",
                       filled: true,
-                      fillColor:
-                          AppColors.inputBackground ?? Colors.grey.shade50,
+                      fillColor: AppColors.inputBackground,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -232,25 +233,10 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                       context: context,
                       title: "Select Province",
                       items: controller.provincesList,
-                      getName: (item) {
-                        try {
-                          return (item as dynamic).name ??
-                              (item as dynamic).nameEn ??
-                              (item as dynamic).provinceName ??
-                              "";
-                        } catch (e) {
-                          return "";
-                        }
-                      },
+                      getName: (item) => item.nameEn,
                       onSelected: (item) {
-                        try {
-                          controller.provinceCtrl.text =
-                              (item as dynamic).name ??
-                              (item as dynamic).nameEn ??
-                              "";
-                          controller.selectedProvinceId.value =
-                              (item as dynamic).id.toString();
-                        } catch (e) {}
+                        controller.provinceCtrl.text = item.nameEn;
+                        controller.selectedProvinceId.value = item.id.toString();
                         controller.districtCtrl.clear();
                         controller.fetchDistricts(
                           controller.selectedProvinceId.value,
@@ -278,26 +264,11 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                         context: context,
                         title: "Select District",
                         items: controller.districtsList,
-                        getName: (item) {
-                          try {
-                            return (item as dynamic).name ??
-                                (item as dynamic).nameEn ??
-                                (item as dynamic).districtName ??
-                                "";
-                          } catch (e) {
-                            return "";
-                          }
-                        },
-                        onSelected: (item) {
-                          try {
-                            controller.districtCtrl.text =
-                                (item as dynamic).name ??
-                                (item as dynamic).nameEn ??
-                                "";
-                            controller.selectedDistrictId.value =
-                                (item as dynamic).id.toString();
-                          } catch (e) {}
-                        },
+                      getName: (item) => item.nameEn,
+                      onSelected: (item) {
+                        controller.districtCtrl.text = item.nameEn;
+                        controller.selectedDistrictId.value = item.id.toString();
+                      },
                       );
                     },
                   ),

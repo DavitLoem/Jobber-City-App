@@ -167,7 +167,7 @@ class SplashViewController extends GetxController
       if (token != null && token.isNotEmpty) {
         // បើមាន Token (មានន័យថាគាត់ធ្លាប់ Login)
         if (role == 'employer') {
-          Get.offAllNamed(AppRoutes.homeEmployer);
+          Get.offAllNamed(AppRoutes.mainScreenEmployer);
         } else {
           Get.offAllNamed(AppRoutes.mainScreen);
         }

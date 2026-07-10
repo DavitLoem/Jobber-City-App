@@ -7,10 +7,9 @@ class IndustryServices {
 
   Future<List<IndustryModel>> getIndustries() async {
     try {
-      // 🟢 កែពាក្យ master-date ទៅជា master-data រួចថែមសញ្ញា / នៅខាងចុង
-      final response = await _apiClient.get('/master-data/industries/');
+      // ✅ Fixed: was /master-date/industries (typo), now /master-data/industries/
+      final response = await _apiClient.get('/master-data/industries');
 
-      // ចាប់យកទិន្នន័យ (ទោះបី API បោះមកជាទម្រង់ { "data": [...] } ឬ [...] ផ្ទាល់ក៏ដោយ)
       dynamic data = response;
       if (response != null && response is Map && response.containsKey('data')) {
         data = response['data'];
@@ -21,7 +20,7 @@ class IndustryServices {
       }
       return [];
     } catch (e) {
-      debugPrint('Service Error fetching industries: $e');
+      debugPrint('IndustryServices Error: $e');
       rethrow;
     }
   }
