@@ -85,7 +85,7 @@ class LoginScreenViewController extends GetxController {
       // 🎯 ៣. បំបែកផ្លូវ (Smart Routing)
       if (role == 'employer') {
         Get.offAllNamed(
-          AppRoutes.companyProfile,
+          AppRoutes.mainScreenEmployer,
           arguments: {'email': userEmail},
         );
       } else {

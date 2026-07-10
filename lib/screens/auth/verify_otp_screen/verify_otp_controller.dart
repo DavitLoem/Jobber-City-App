@@ -107,7 +107,7 @@ class VerifyOtpController extends GetxController {
         Get.snackbar('Success', 'Your account has been verified successfully!');
 
         if (response.user.role == 'employer') {
-          Get.offAllNamed(AppRoutes.homeEmployer);
+          Get.offAllNamed(AppRoutes.mainScreenEmployer);
         } else {
           if (response.user.onboardingCompleted == true) {
             Get.offAllNamed(AppRoutes.mainScreenSeeker);

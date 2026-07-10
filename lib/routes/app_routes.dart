@@ -20,11 +20,14 @@ class AppRoutes {
   static const String jobDetail = '/job-detail';
 
   // ==========================================
-  // 🟠 ៣. EMPLOYER ROUTES (សម្រាប់ថៅកែ ឬក្រុមហ៊ុន)
+  // 🟠 ៣. EMPLOYER ROUTES
   // ==========================================
   static const String homeEmployer = '/home-employer';
   static const String companyProfile = '/company-profile';
   static const String mainScreenEmployer = '/main-screen-employer';
+  static const String myJob = '/my-job';
+  static const String candidates = '/candidates';
+  static const String employerProfile = '/employer-profile';
   static const String employerEditprofile = '/edit-profile';
   static const String experience = '/experience';
   static const String educations = '/educations';

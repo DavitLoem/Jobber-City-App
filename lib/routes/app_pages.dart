@@ -8,7 +8,6 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
-import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_view.dart';
 import 'package:jobber_city/screens/role/seeker/educations_screen/educations_screen_view.dart';
@@ -116,12 +115,12 @@ class AppPages {
     ),
 
     // ==========================================
-    // 🟠 ៣. EMPLOYER ROUTES (ត្រូវការ Login ជា Employer)
+    // 🟠 ៣. EMPLOYER ROUTES
     // ==========================================
     GetPage(
-      name: AppRoutes.homeEmployer,
-      page: () => HomeEmployerView(),
-      binding: HomeEmployerViewBinding(),
+      name: AppRoutes.mainScreenEmployer,
+      page: () => MainScreenEmloyerView(),
+      binding: MainScreenEmloyerBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.employer),
@@ -153,10 +152,5 @@ class AppPages {
     ),
 
     // Employer routes
-    GetPage(
-      name: AppRoutes.mainScreenEmployer,
-      page: () => MainScreenEmloyerView(),
-      binding: MainScreenEmloyerBinding(),
-    ),
   ];
 }

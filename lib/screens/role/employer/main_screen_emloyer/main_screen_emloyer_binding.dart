@@ -1,20 +1,19 @@
 import 'package:get/get.dart';
-import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_controller.dart';
-
-// 🟢 ១. ត្រូវ Import ហ្វាល់ View (ព្រោះ Controller របស់អ្នកស្ថិតក្នុងហ្វាល់ View ជាទម្រង់ part of)
+import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
+import 'package:jobber_city/screens/role/employer/employer_profile/employer_profile_view.dart';
+import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_controller.dart';
+import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
-import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
 
 class MainScreenEmloyerBinding extends Bindings {
   @override
   void dependencies() {
     // សម្រាប់ Bottom Bar (Main)
-    Get.lazyPut(() => MainScreenController());
+    Get.lazyPut(() => MainScreenEmloyerController());
 
-    // សម្រាប់ Tab ទី១ (Home)
-    Get.lazyPut(() => HomeSeekerViewController());
-
-    // 🟢 ២. សម្រាប់ Tab ទី៤ (Profile)
-    Get.lazyPut(() => ProfileScreenViewController());
+    Get.lazyPut(() => HomeSeekerViewController(), fenix: true);
+    Get.lazyPut(() => MyJobViewController(), fenix: true);
+    Get.lazyPut(() => CandidatesViewController(), fenix: true);
+    Get.lazyPut(() => EmployerProfileViewController(), fenix: true);
   }
 }

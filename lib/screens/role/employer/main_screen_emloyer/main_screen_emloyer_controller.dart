@@ -1,28 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/routes/app_routes.dart';
+import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
+import 'package:jobber_city/screens/role/employer/employer_profile/employer_profile_view.dart';
+import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
+import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 
 class MainScreenEmloyerController extends GetxController {
-  // អថេរសម្រាប់កំណត់ទីតាំង Tab (ចាប់ផ្តើមពីលេខ 0 គឺ Home)
-  var currentIndex = 0.obs;
-
-  // Store arguments to pass to child screens
-  Map<String, dynamic>? _arguments;
-
-  @override
-  void onInit() {
-    super.onInit();
-    try {
-      // Get arguments from navigation
-      _arguments = Get.arguments;
-      debugPrint("MainScreenEmloyerController received arguments: $_arguments");
-    } catch (e) {
-      debugPrint("Error in MainScreenEmloyerController onInit: $e");
-    }
-  }
-
-  Map<String, dynamic>? getArguments() => _arguments;
+var currentIndex = 0.obs;
 
   void changeTab(int index) {
     currentIndex.value = index;
+  }
+
+  Route? onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppRoutes.homeEmployer:
+        return GetPageRoute(
+          settings: settings,
+          page: () => const HomeEmployerView(),
+        );
+      case AppRoutes.myJob:
+        return GetPageRoute(
+          settings: settings,
+          page: () => const MyJobView(),
+        );
+      case AppRoutes.candidates:
+        return GetPageRoute(
+          settings: settings,
+          page: () => const CandidatesView(),
+        );
+      case AppRoutes.employerProfile:
+        return GetPageRoute(
+          settings: settings,
+          page: () => const EmployerProfileView(),
+        );
+      default:
+        return null;
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/controllers/auth_controller.dart';
+
+import 'widgets/home_header.dart';
 
 part 'home_employer_binding.dart';
 part 'home_employer_controller.dart';
@@ -11,17 +12,14 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Employer'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Get.find<AuthController>().logout();
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
+      body: SafeArea(child: Column(children: [const HomeHeader()])),
     );
   }
 }
+
+          // IconButton(
+          //   onPressed: () {
+          //     Get.find<AuthController>().logout();
+          //   },
+          //   icon: const Icon(Icons.logout),
+          // ),

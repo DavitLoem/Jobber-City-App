@@ -29,7 +29,7 @@ class AuthController extends GetxController {
       isLoggedIn.value = true;
       userRole.value = role ?? 'seeker';
       isOnboardingCompleted.value = onboarding;
-      // debugPrint("✅ Status: Login as ${userRole.value}");
+      debugPrint("✅ Status: Login as ${userRole.value}");
     } else {
       isLoggedIn.value = false;
       userRole.value = '';
