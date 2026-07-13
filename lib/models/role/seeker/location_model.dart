@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+// To parse this JSON data, do
+//
+//     final locationModel = locationModelFromJson(jsonString);
+
+>>>>>>> origin/profile_new
 import 'dart:convert';
 
 LocationModel locationModelFromJson(String str) =>
@@ -13,9 +20,9 @@ class LocationModel {
   LocationModel({required this.id, required this.nameKm, required this.nameEn});
 
   factory LocationModel.fromJson(Map<String, dynamic> json) => LocationModel(
-    id: json["id"],
+    id: json["id"]?.toString() ?? json["_id"]?.toString() ?? '',
     nameKm: json["name_km"],
-    nameEn: json["name_en"],
+    nameEn: json["name_en"]?.toString() ?? json["name"]?.toString() ?? '',
   );
 
   Map<String, dynamic> toJson() => {
