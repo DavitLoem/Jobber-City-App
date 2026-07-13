@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/models/role/seeker/district_model.dart';
-import 'package:jobber_city/models/role/seeker/location_model.dart';
+import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_controller.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/widget/city_select_field.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
@@ -85,7 +84,10 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.primaryLight.withOpacity(0.55), Colors.white],
+          colors: [
+            AppColors.primaryLight.withValues(alpha: 0.55),
+            Colors.white,
+          ],
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
@@ -468,7 +470,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         _buildFieldLabel('District / Khan'),
         const SizedBox(height: 6),
         Obx(
-          () => CitySelectField<DistrictModel>(
+          () => CitySelectField<LocationModel>(
             controller: controller.districtCtrl,
             fetchOptions: controller.fetchDistrictOptions,
             labelOf: (d) => d.nameEn,
@@ -769,7 +771,7 @@ class _Section extends StatelessWidget {
               ],
             ),
             padding: const EdgeInsets.all(16),
-            child: this.child,
+            child: child,
           ),
         ],
       ),

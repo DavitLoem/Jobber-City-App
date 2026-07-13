@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/controllers/auth_controller.dart';
-import 'package:jobber_city/core/api/services/role/seeker/category_services.dart';
+import 'package:jobber_city/core/api/services/category_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/onboarding_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';

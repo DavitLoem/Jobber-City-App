@@ -152,29 +152,5 @@ class AppPages {
     ),
 
     // Employer routes
-<<<<<<< HEAD
-=======
-    GetPage(
-      name: AppRoutes.mainScreenEmployer,
-      page: () => MainScreenEmloyerView(),
-      binding: MainScreenEmloyerBinding(),
-    ),
-
-    GetPage(
-      name: AppRoutes.postJob,
-      page: () => PostJobScreenView(),
-      binding: PostJobScreenViewBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.recruit,
-      page: () => RecruitScreenView(),
-      binding: RecruitScreenViewBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.detailPost,
-      page: () => DetailPostScreenView(),
-      binding: DetailPostScreenViewBinding(),
-    ),
->>>>>>> origin/profile_new
   ];
 }

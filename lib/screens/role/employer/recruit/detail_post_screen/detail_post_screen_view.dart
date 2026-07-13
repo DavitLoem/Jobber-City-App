@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/api/services/role/employer/master_data_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/location_services.dart';
+import 'package:jobber_city/controllers/master_data_controller.dart';
+import 'package:jobber_city/core/api/services/location_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/employer_job_model.dart';
 import 'package:jobber_city/widgets/arrow_key_back.dart';
@@ -122,7 +121,8 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
                 const SizedBox(height: 16),
                 _buildSectionCard(
                   title: 'Benefits',
-                  children: job.benefits
+                  children:
+                      job.benefits
                           .where((b) => b.toLowerCase() != 'not specified')
                           .toList()
                           .isNotEmpty

@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-
+import 'package:jobber_city/core/api/services/location_services.dart';
 import 'package:jobber_city/core/api/services/role/employer/job_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/core/api/services/role/employer/master_data_services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/location_services.dart';
+import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/models/role/employer/job_post_model.dart';
-import 'package:jobber_city/models/role/employer/master_data_item.dart';
-import 'package:jobber_city/models/role/seeker/location_model.dart';
-import 'package:jobber_city/models/role/seeker/district_model.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/widget/city_select_field.dart';
 import 'package:jobber_city/widgets/arrow_key_back.dart';
 
@@ -212,7 +207,8 @@ class Step1BasicInfoWidget extends StatelessWidget {
               required: true,
               child: CitySelectField<LocationModel>(
                 controller: controller.provinceCtrl,
-                fetchOptions: () => LocationServices().getLocation(),
+                // fetchOptions: () => LocationServices().getProvinces(),
+                fetchOptions: () => Future.value([]),
                 labelOf: (loc) => loc.nameEn,
                 hintText: "Select province",
                 sheetTitle: "Select Province",
@@ -230,11 +226,11 @@ class Step1BasicInfoWidget extends StatelessWidget {
               () => FormFieldWrapper(
                 label: 'District / City',
                 required: true,
-                child: CitySelectField<DistrictModel>(
+                child: CitySelectField<LocationModel>(
                   controller: controller.districtCtrl,
                   fetchOptions: controller.provinceId.value.isEmpty
                       ? () async => []
-                      : () => DistrictServices().getDistricts(
+                      : () => LocationServices().getDistricts(
                           controller.provinceId.value,
                         ),
                   labelOf: (dist) => dist.nameEn,
@@ -253,81 +249,81 @@ class Step1BasicInfoWidget extends StatelessWidget {
             ),
           ],
         ),
-        StepSectionCard(
-          title: 'Job Classification',
-          icon: Icons.category_outlined,
-          children: [
-            FormFieldWrapper(
-              label: 'Job Category',
-              required: true,
-              child: CitySelectField<MasterDataItem>(
-                controller: controller.categoryNameCtrl,
-                fetchOptions: controller.fetchCategories,
-                labelOf: (item) => item.name,
-                hintText: "Select category",
-                prefixIcon: Icons.category_outlined,
-                sheetTitle: "Select Category",
-                searchHint: "Search category...",
-                onSelected: (item) => controller.categoryId.value = item.id,
-              ),
-            ),
-            const SizedBox(height: 14),
-            FormFieldWrapper(
-              label: 'Job Level',
-              required: true,
-              child: CitySelectField<MasterDataItem>(
-                controller: controller.jobLevelNameCtrl,
-                fetchOptions: controller.fetchJobLevels,
-                labelOf: (item) => item.name,
-                hintText: "Select level",
-                prefixIcon: Icons.layers_outlined,
-                sheetTitle: "Select Job Level",
-                searchHint: "Search level...",
-                onSelected: (item) => controller.jobLevelId.value = item.id,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: FormFieldWrapper(
-                    label: 'Employment Type',
-                    required: true,
-                    child: CitySelectField<MasterDataItem>(
-                      controller: controller.employmentTypeNameCtrl,
-                      fetchOptions: controller.fetchEmploymentTypes,
-                      labelOf: (item) => item.name,
-                      hintText: "Type",
-                      prefixIcon: Icons.work_history_outlined,
-                      sheetTitle: "Select Employment Type",
-                      searchHint: "Search...",
-                      onSelected: (item) =>
-                          controller.employmentTypeId.value = item.id,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FormFieldWrapper(
-                    label: 'Work Type',
-                    required: true,
-                    child: CitySelectField<MasterDataItem>(
-                      controller: controller.workTypeNameCtrl,
-                      fetchOptions: controller.fetchWorkTypes,
-                      labelOf: (item) => item.name,
-                      hintText: "Mode",
-                      prefixIcon: Icons.home_work_outlined,
-                      sheetTitle: "Select Work Type",
-                      searchHint: "Search...",
-                      onSelected: (item) =>
-                          controller.workTypeId.value = item.id,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+        // StepSectionCard(
+        //   title: 'Job Classification',
+        //   icon: Icons.category_outlined,
+        //   children: [
+        //     FormFieldWrapper(
+        //       label: 'Job Category',
+        //       required: true,
+        //       child: CitySelectField<MasterDataItem>(
+        //         controller: controller.categoryNameCtrl,
+        //         fetchOptions: controller.fetchCategories,
+        //         labelOf: (item) => item.name,
+        //         hintText: "Select category",
+        //         prefixIcon: Icons.category_outlined,
+        //         sheetTitle: "Select Category",
+        //         searchHint: "Search category...",
+        //         onSelected: (item) => controller.categoryId.value = item.id,
+        //       ),
+        //     ),
+        //     const SizedBox(height: 14),
+        //     FormFieldWrapper(
+        //       label: 'Job Level',
+        //       required: true,
+        //       child: CitySelectField<MasterDataItem>(
+        //         controller: controller.jobLevelNameCtrl,
+        //         fetchOptions: controller.fetchJobLevels,
+        //         labelOf: (item) => item.name,
+        //         hintText: "Select level",
+        //         prefixIcon: Icons.layers_outlined,
+        //         sheetTitle: "Select Job Level",
+        //         searchHint: "Search level...",
+        //         onSelected: (item) => controller.jobLevelId.value = item.id,
+        //       ),
+        //     ),
+        //     const SizedBox(height: 14),
+        //     Row(
+        //       children: [
+        //         Expanded(
+        //           child: FormFieldWrapper(
+        //             label: 'Employment Type',
+        //             required: true,
+        //             child: CitySelectField<MasterDataItem>(
+        //               controller: controller.employmentTypeNameCtrl,
+        //               fetchOptions: controller.fetchEmploymentTypes,
+        //               labelOf: (item) => item.name,
+        //               hintText: "Type",
+        //               prefixIcon: Icons.work_history_outlined,
+        //               sheetTitle: "Select Employment Type",
+        //               searchHint: "Search...",
+        //               onSelected: (item) =>
+        //                   controller.employmentTypeId.value = item.id,
+        //             ),
+        //           ),
+        //         ),
+        //         const SizedBox(width: 12),
+        //         Expanded(
+        //           child: FormFieldWrapper(
+        //             label: 'Work Type',
+        //             required: true,
+        //             child: CitySelectField<MasterDataItem>(
+        //               controller: controller.workTypeNameCtrl,
+        //               fetchOptions: controller.fetchWorkTypes,
+        //               labelOf: (item) => item.name,
+        //               hintText: "Mode",
+        //               prefixIcon: Icons.home_work_outlined,
+        //               sheetTitle: "Select Work Type",
+        //               searchHint: "Search...",
+        //               onSelected: (item) =>
+        //                   controller.workTypeId.value = item.id,
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
@@ -602,7 +598,7 @@ class Step2SalaryWidget extends StatelessWidget {
                     Switch(
                       value: controller.isNegotiable.value,
                       onChanged: (v) => controller.isNegotiable.value = v,
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ],
                 ),
@@ -643,21 +639,21 @@ class Step2SalaryWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            FormFieldWrapper(
-              label: 'Education Level',
-              required: true,
-              child: CitySelectField<MasterDataItem>(
-                controller: controller.educationLevelNameCtrl,
-                fetchOptions: controller.fetchEducationLevels,
-                labelOf: (item) => item.name,
-                hintText: "Select education",
-                prefixIcon: Icons.school_outlined,
-                sheetTitle: "Select Education Level",
-                searchHint: "Search education...",
-                onSelected: (item) =>
-                    controller.educationLevelId.value = item.id,
-              ),
-            ),
+            // FormFieldWrapper(
+            //   label: 'Education Level',
+            //   required: true,
+            //   child: CitySelectField<MasterDataItem>(
+            //     controller: controller.educationLevelNameCtrl,
+            //     fetchOptions: controller.fetchEducationLevels,
+            //     labelOf: (item) => item.name,
+            //     hintText: "Select education",
+            //     prefixIcon: Icons.school_outlined,
+            //     sheetTitle: "Select Education Level",
+            //     searchHint: "Search education...",
+            //     onSelected: (item) =>
+            //         controller.educationLevelId.value = item.id,
+            //   ),
+            // ),
           ],
         ),
       ],
@@ -808,24 +804,24 @@ class Step3DetailsWidget extends StatelessWidget {
           title: 'Required Skills',
           icon: Icons.psychology_outlined,
           children: [
-            FormFieldWrapper(
-              label: 'Select Skills',
-              required: true, // Marked as required since submitJob checks it
-              child: CitySelectField<MasterDataItem>(
-                controller: controller.skillNameCtrl,
-                fetchOptions: controller.fetchSkills,
-                labelOf: (item) => item.name,
-                hintText: "Search and add skills",
-                prefixIcon: Icons.search_rounded,
-                sheetTitle: "Select Skill",
-                searchHint: "Search for skills...",
-                onSelected: (item) {
-                  controller.addSkill(item.id, item.name);
-                  controller.skillNameCtrl
-                      .clear(); // Clear input so they can add more
-                },
-              ),
-            ),
+            // FormFieldWrapper(
+            //   label: 'Select Skills',
+            //   required: true, // Marked as required since submitJob checks it
+            //   child: CitySelectField<MasterDataItem>(
+            //     controller: controller.skillNameCtrl,
+            //     fetchOptions: controller.fetchSkills,
+            //     labelOf: (item) => item.name,
+            //     hintText: "Search and add skills",
+            //     prefixIcon: Icons.search_rounded,
+            //     sheetTitle: "Select Skill",
+            //     searchHint: "Search for skills...",
+            //     onSelected: (item) {
+            //       controller.addSkill(item.id, item.name);
+            //       controller.skillNameCtrl
+            //           .clear(); // Clear input so they can add more
+            //     },
+            //   ),
+            // ),
             Obx(() {
               if (controller.selectedSkillNames.isEmpty)
                 return const SizedBox.shrink();

@@ -26,7 +26,6 @@ class CompanyProfileViewController extends GetxController {
   // Image & IDs
   final companyLogoPath = ''.obs;
   final ImagePicker _picker = ImagePicker();
-  final _storage = const FlutterSecureStorage();
 
   final selectedIndustryId = ''.obs;
   final selectedCompanySize = ''.obs;
@@ -176,23 +175,6 @@ class CompanyProfileViewController extends GetxController {
       }
     }
     return e.toString();
-  }
-
-  String? _extractString(dynamic data, List<String> keys) {
-    if (data is! Map) return null;
-    final searchIn = <Map>[];
-    if (data['data'] is Map) searchIn.add(data['data']);
-    searchIn.add(data);
-
-    for (final map in searchIn) {
-      for (final key in keys) {
-        final value = map[key];
-        if (value != null && value.toString().isNotEmpty) {
-          return value.toString();
-        }
-      }
-    }
-    return null;
   }
 
   @override

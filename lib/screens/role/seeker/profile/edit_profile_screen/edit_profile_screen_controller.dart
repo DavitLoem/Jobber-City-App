@@ -5,15 +5,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/api/services/category_services.dart';
 import 'package:jobber_city/core/api/services/location_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/category_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
-import 'package:jobber_city/models/role/seeker/category_model.dart';
-import 'package:jobber_city/models/role/seeker/district_model.dart';
-import 'package:jobber_city/models/role/seeker/location_model.dart';
+import 'package:jobber_city/models/category_model.dart';
+import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 
 class EditProfileScreenViewController extends GetxController {
@@ -21,7 +19,6 @@ class EditProfileScreenViewController extends GetxController {
   final _seekerServices = AuthServices();
   final _profileServices = SeekerProfileServices();
   final _locationServices = LocationServices();
-  final _districtServices = DistrictServices();
   final _categoryServices = CategoryServices();
   final _storage = const FlutterSecureStorage();
 
@@ -82,7 +79,7 @@ class EditProfileScreenViewController extends GetxController {
   final houseNoCtrl = TextEditingController();
 
   // ADDED — Extra lists & IDs
-  var districtsList = <DistrictModel>[].obs;
+  var districtsList = <LocationModel>[].obs;
   var selectedDistrictId = ''.obs;
   var isSaving = false.obs;
   var isFormValid = false.obs;
@@ -248,7 +245,7 @@ class EditProfileScreenViewController extends GetxController {
       districtsList.clear();
       districtCtrl.clear();
       selectedDistrictId.value = '';
-      final dists = await _districtServices.getDistricts(provinceId);
+      final dists = await _locationServices.getDistricts(provinceId);
       districtsList.assignAll(dists);
       debugPrint("Loaded ${dists.length} districts");
     } catch (e) {
@@ -270,11 +267,11 @@ class EditProfileScreenViewController extends GetxController {
     }
   }
 
-  Future<List<DistrictModel>> fetchDistrictOptions() async {
+  Future<List<LocationModel>> fetchDistrictOptions() async {
     try {
       if (selectedProvinceId.value.isEmpty) return [];
       if (districtsList.isNotEmpty) return districtsList;
-      return await _districtServices.getDistricts(selectedProvinceId.value);
+      return await _locationServices.getDistricts(selectedProvinceId.value);
     } catch (e) {
       debugPrint("Error fetching district options: $e");
       return [];

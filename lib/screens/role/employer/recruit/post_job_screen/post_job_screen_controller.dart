@@ -8,7 +8,6 @@ class DropdownItem {
 
 class PostJobScreenViewController extends GetxController {
   final JobServices _jobServices = JobServices();
-  final MasterDataServices _masterDataServices = MasterDataServices();
 
   final isLoading = false.obs;
 
@@ -130,17 +129,17 @@ class PostJobScreenViewController extends GetxController {
   }
 
   // Lazy loaders for the picker sheets (same pattern as provinces).
-  Future<List<MasterDataItem>> fetchCategories() =>
-      _masterDataServices.getCategories();
-  Future<List<MasterDataItem>> fetchJobLevels() =>
-      _masterDataServices.getJobLevels();
-  Future<List<MasterDataItem>> fetchEducationLevels() =>
-      _masterDataServices.getEducationLevels();
-  Future<List<MasterDataItem>> fetchEmploymentTypes() =>
-      _masterDataServices.getEmploymentTypes();
-  Future<List<MasterDataItem>> fetchWorkTypes() =>
-      _masterDataServices.getWorkTypes();
-  Future<List<MasterDataItem>> fetchSkills() => _masterDataServices.getSkills();
+  // Future<List<MasterDataItem>> fetchCategories() =>
+  //     _masterDataServices.getCategories();
+  // Future<List<MasterDataItem>> fetchJobLevels() =>
+  //     _masterDataServices.getJobLevels();
+  // Future<List<MasterDataItem>> fetchEducationLevels() =>
+  //     _masterDataServices.getEducationLevels();
+  // Future<List<MasterDataItem>> fetchEmploymentTypes() =>
+  //     _masterDataServices.getEmploymentTypes();
+  // Future<List<MasterDataItem>> fetchWorkTypes() =>
+  //     _masterDataServices.getWorkTypes();
+  // Future<List<MasterDataItem>> fetchSkills() => _masterDataServices.getSkills();
 
   Future<void> selectClosingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(

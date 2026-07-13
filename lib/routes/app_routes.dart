@@ -33,5 +33,7 @@ class AppRoutes {
   static const String educations = '/educations';
   static const String trainings = '/trainings';
 
-  // Employer routes
+  static const String postJob = '/post-job';
+  static const String recruit = '/recruit';
+  static const String detailPost = '/recruit/detail';
 }
