@@ -82,7 +82,8 @@ class CategoryScreenViewController extends GetxController {
         accessToken: (await TokenStorage.getAccessToken()) ?? '',
         refreshToken: (await TokenStorage.getRefreshToken()) ?? '',
         role: 'seeker',
-        onboardingCompleted: true, // កំណត់ទៅជា true
+        onboardingCompleted: true,
+        isProfileCompleted: false,
       );
 
       // ប្រាប់ AuthController ឱ្យអាន State ថ្មី

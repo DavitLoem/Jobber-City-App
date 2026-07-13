@@ -11,12 +11,12 @@ class AuthController extends GetxController {
 
   var isLoggedIn = false.obs;
   var userRole = ''.obs;
+  var isProfileCompleted = false.obs;
   var isOnboardingCompleted = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // ពេល App បើកភ្លាម ឱ្យវាឆែកមើល Token ភ្លាម
     checkLoginStatus();
   }
 
@@ -24,16 +24,19 @@ class AuthController extends GetxController {
     String? token = await TokenStorage.getAccessToken();
     String? role = await TokenStorage.getUserRole();
     bool onboarding = await TokenStorage.getOnboardingStatus();
+    bool profileCompleted = await TokenStorage.getProfileCompletedStatus();
 
     if (token != null && token.isNotEmpty) {
       isLoggedIn.value = true;
       userRole.value = role ?? 'seeker';
       isOnboardingCompleted.value = onboarding;
+      isProfileCompleted.value = profileCompleted;
       debugPrint("✅ Status: Login as ${userRole.value}");
     } else {
       isLoggedIn.value = false;
       userRole.value = '';
       isOnboardingCompleted.value = false;
+      isProfileCompleted.value = false;
       // debugPrint("❌ Status: Not Logged In");
     }
   }
@@ -68,9 +71,10 @@ class AuthController extends GetxController {
   void _clearStateAndLogout(String message, String title) async {
     await TokenStorage.clearTokens();
 
-    // Reset
     isLoggedIn.value = false;
     userRole.value = '';
+    isOnboardingCompleted.value = false;
+    isProfileCompleted.value = false;
 
     Get.offAllNamed(AppRoutes.login);
     Get.snackbar(title, message);

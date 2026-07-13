@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
@@ -11,10 +9,10 @@ import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/auth_validator.dart';
 import 'package:jobber_city/models/auth_model/register_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
 import 'package:jobber_city/screens/auth/widget/logo.dart';
 import 'package:jobber_city/screens/auth/widget/social_login.dart';
 import 'package:jobber_city/screens/auth/widget/tab_bar.dart';
+import 'package:jobber_city/widgets/custom_animated_checkbox.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
 

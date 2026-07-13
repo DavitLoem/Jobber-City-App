@@ -4,19 +4,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:jobber_city/core/api/services/role/seeker/district_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/location_services.dart';
+import 'package:jobber_city/controllers/auth_controller.dart';
+import 'package:jobber_city/controllers/location_controller.dart';
+import 'package:jobber_city/controllers/master_data_controller.dart';
+import 'package:jobber_city/core/api/services/role/employer/company_profile_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/models/role/seeker/district_model.dart';
+import 'package:jobber_city/core/utils/token_storage.dart';
+import 'package:jobber_city/models/location_model.dart';
+import 'package:jobber_city/models/master_data_model.dart';
+import 'package:jobber_city/models/role/employer/company_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/widget/custom_card.dart';
-import 'package:jobber_city/widgets/custom_textfield.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
-import 'package:jobber_city/models/role/employer/company_model.dart';
-import 'package:jobber_city/core/api/services/role/employer/company_services.dart';
-import 'package:jobber_city/models/role/seeker/location_model.dart';
-import 'package:jobber_city/models/role/employer/industry_model.dart';
-import 'package:jobber_city/core/api/services/role/employer/industry_services.dart';
+import 'package:jobber_city/widgets/custom_textfield.dart';
 
 part 'company_profile_binding.dart';
 part 'company_profile_controller.dart';
@@ -82,7 +82,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                       title: Text(getName(item)),
                       onTap: () {
                         onSelected(item);
-                        Get.back();
+                        Get.back(); // បិទ BottomSheet ពេលរើសរួច
                       },
                     );
                   },
@@ -110,9 +110,11 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
         elevation: 0,
       ),
       body: Obx(() {
+        // បង្ហាញ Loading ពេលកំពុងទាញយកទិន្នន័យដំបូង (Initial Data)
         if (controller.isFetching.value) {
           return const Center(child: CircularProgressIndicator());
         }
+
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -137,7 +139,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                     prefixIcon: Icons.category_outlined,
                     suffixIcon: Icons.keyboard_arrow_down,
                     controller: controller.industryCtrl,
-                    readOnly: true, // មិនអោយវាយអក្សរផ្ទាល់
+                    readOnly: true,
                     onTap: () {
                       if (controller.industriesList.isEmpty) {
                         Get.snackbar(
@@ -146,16 +148,17 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                         );
                         return;
                       }
-                      _showPicker<IndustryModel>(
+                      // ប្រើ MasterDataModel ជំនួស IndustryModel
+                      _showPicker<MasterDataModel>(
                         context: context,
                         title: "Select Industry",
-                        items: controller.industriesList,
-                        getName: (item) =>
-                            item.name, // ចាប់យកឈ្មោះ Industry មកបង្ហាញ
+                        // Cast ទៅជា List<MasterDataModel> ឱ្យប្រាកដ
+                        items: controller.industriesList
+                            .cast<MasterDataModel>(),
+                        getName: (item) => item.name,
                         onSelected: (item) {
                           controller.industryCtrl.text = item.name;
-                          controller.selectedIndustryId.value = item.id
-                              .toString();
+                          controller.selectedIndustryId.value = item.id;
                         },
                       );
                     },
@@ -187,8 +190,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                     decoration: InputDecoration(
                       hintText: "Company Description (Min 10 characters)...",
                       filled: true,
-                      fillColor:
-                          AppColors.inputBackground ?? Colors.grey.shade50,
+                      fillColor: AppColors.inputBackground,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -222,6 +224,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                   const SizedBox(height: 15),
 
+                  // 🟢 ប្រអប់ Province
                   CustomTextfield(
                     hintText: "Select Province",
                     prefixIcon: Icons.map_outlined,
@@ -231,27 +234,19 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                     onTap: () => _showPicker<LocationModel>(
                       context: context,
                       title: "Select Province",
-                      items: controller.provincesList,
-                      getName: (item) {
-                        try {
-                          return (item as dynamic).name ??
-                              (item as dynamic).nameEn ??
-                              (item as dynamic).provinceName ??
-                              "";
-                        } catch (e) {
-                          return "";
-                        }
-                      },
+                      // 🎯 ទាញយកបញ្ជីខេត្តចេញពី Global Location Controller ផ្ទាល់
+                      items: controller.locationCtrl.provinces,
+                      getName: (item) => item.nameEn,
                       onSelected: (item) {
-                        try {
-                          controller.provinceCtrl.text =
-                              (item as dynamic).name ??
-                              (item as dynamic).nameEn ??
-                              "";
-                          controller.selectedProvinceId.value =
-                              (item as dynamic).id.toString();
-                        } catch (e) {}
+                        controller.provinceCtrl.text = item.nameEn;
+                        controller.selectedProvinceId.value = item.id
+                            .toString();
+
+                        // លុបស្រុកចាស់ចោល ពេលគាត់ដូរខេត្តថ្មី
                         controller.districtCtrl.clear();
+                        controller.selectedDistrictId.value = '';
+
+                        // ហៅទាញយកស្រុករបស់ខេត្តថ្មីនេះ
                         controller.fetchDistricts(
                           controller.selectedProvinceId.value,
                         );
@@ -260,6 +255,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                   const SizedBox(height: 15),
 
+                  // 🟢 ប្រអប់ District
                   CustomTextfield(
                     hintText: "Select District",
                     prefixIcon: Icons.location_city_outlined,
@@ -274,29 +270,17 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                         );
                         return;
                       }
-                      _showPicker<DistrictModel>(
+
+                      // ប្រើ LocationModel ជំនួស DistrictModel
+                      _showPicker<LocationModel>(
                         context: context,
                         title: "Select District",
-                        items: controller.districtsList,
-                        getName: (item) {
-                          try {
-                            return (item as dynamic).name ??
-                                (item as dynamic).nameEn ??
-                                (item as dynamic).districtName ??
-                                "";
-                          } catch (e) {
-                            return "";
-                          }
-                        },
+                        items: controller.districtsList.cast<LocationModel>(),
+                        getName: (item) => item.nameEn,
                         onSelected: (item) {
-                          try {
-                            controller.districtCtrl.text =
-                                (item as dynamic).name ??
-                                (item as dynamic).nameEn ??
-                                "";
-                            controller.selectedDistrictId.value =
-                                (item as dynamic).id.toString();
-                          } catch (e) {}
+                          controller.districtCtrl.text = item.nameEn;
+                          controller.selectedDistrictId.value = item.id
+                              .toString();
                         },
                       );
                     },
@@ -344,10 +328,10 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       width: 2,
                     ),
                     image: controller.companyLogoPath.value.isNotEmpty

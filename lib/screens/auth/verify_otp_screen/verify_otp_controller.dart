@@ -6,7 +6,7 @@ class VerifyOtpController extends GetxController {
   var isLoading = false.obs;
   String userEmail = '';
   String maskedEmail = '';
-  String fromScreen = ''; // 🟢 Track where the navigation came from
+  String fromScreen = '';
 
   // Countdown timer setup
   var remainingSeconds = 30.obs;
@@ -94,12 +94,12 @@ class VerifyOtpController extends GetxController {
           otp: otp,
         );
 
-        // ក. រក្សាទុកសោ (Tokens) ចូលក្នុង Secure Storage
         await TokenStorage.saveTokens(
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,
           role: response.user.role,
           onboardingCompleted: response.user.onboardingCompleted,
+          isProfileCompleted: response.user.isProfileCompleted,
         );
 
         await Get.find<AuthController>().checkLoginStatus();
@@ -107,7 +107,11 @@ class VerifyOtpController extends GetxController {
         Get.snackbar('Success', 'Your account has been verified successfully!');
 
         if (response.user.role == 'employer') {
-          Get.offAllNamed(AppRoutes.mainScreenEmployer);
+          if (response.user.isProfileCompleted == true) {
+            Get.offAllNamed(AppRoutes.mainScreenEmployer);
+          } else {
+            Get.offAllNamed(AppRoutes.companyProfile);
+          }
         } else {
           if (response.user.onboardingCompleted == true) {
             Get.offAllNamed(AppRoutes.mainScreenSeeker);

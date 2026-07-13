@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -7,7 +8,6 @@ class HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -22,28 +22,21 @@ class HomeHeader extends StatelessWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF4F7DF7), Color(0xFF78A8FF)],
-                      ),
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF4F7DF7).withOpacity(0.35),
+                          color: const Color(
+                            0xFF4F7DF7,
+                          ).withValues(alpha: 0.35),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
                       ],
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
-                      "JC",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
+                    child: Image.asset(
+                      "assets/logos/jbc.png",
+                      fit: BoxFit.cover,
                     ),
                   ),
                   const SizedBox(width: 13),
@@ -79,13 +72,13 @@ class HomeHeader extends StatelessWidget {
               Row(
                 children: [
                   _RoundIconButton(
-                    icon: Icons.search,
+                    icon: LucideIcons.search,
                     iconColor: const Color(0xFF697386),
                     onTap: () {},
                   ),
                   const SizedBox(width: 10),
                   _RoundIconButton(
-                    icon: Icons.notifications_none,
+                    icon: LucideIcons.bell,
                     iconColor: const Color(0xFF1A1F36),
                     onTap: () {},
                     showDot: true,
@@ -94,11 +87,11 @@ class HomeHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           const Text(
             "Here's your hiring overview today.",
             style: TextStyle(
-              fontSize: 12.5,
+              fontSize: 13,
               color: Color(0xFF697386),
               fontWeight: FontWeight.w400,
             ),
@@ -139,7 +132,7 @@ class _RoundIconButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(13),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.07),
+                color: Colors.black.withValues(alpha: 0.07),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -149,14 +142,14 @@ class _RoundIconButton extends StatelessWidget {
             clipBehavior: Clip.none,
             alignment: Alignment.center,
             children: [
-              Icon(icon, size: 17, color: iconColor),
+              Icon(icon, size: 20, color: iconColor),
               if (showDot)
                 Positioned(
-                  top: 6,
-                  right: 6,
+                  top: 9,
+                  right: 10,
                   child: Container(
-                    width: 8,
-                    height: 8,
+                    width: 9,
+                    height: 9,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: const Color(0xFFEF4444),

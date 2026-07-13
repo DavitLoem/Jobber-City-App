@@ -3,30 +3,30 @@ import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_controller.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MainScreenEmloyerView extends GetView<MainScreenEmloyerController> {
   const MainScreenEmloyerView({super.key});
 
   final List<_NavItem> _navItems = const [
     _NavItem(
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home_rounded,
+      icon: LucideIcons.home,
+      activeIcon: LucideIcons.home,
       label: 'Home',
     ),
     _NavItem(
-      icon: Icons.bookmark_outline_rounded,
-      activeIcon: Icons.bookmark_rounded,
+      icon: LucideIcons.briefcase,
+      activeIcon: LucideIcons.briefcase,
       label: 'My Jobs',
     ),
     _NavItem(
-      icon: Icons.people_alt_outlined,
-      activeIcon: Icons.people_alt_rounded,
+      icon: LucideIcons.users,
+      activeIcon: LucideIcons.users,
       label: 'Candidates',
     ),
     _NavItem(
-      icon:
-          Icons.business_outlined, // ប្រើរូប Business សម្រាប់ Employer Profile
-      activeIcon: Icons.business_rounded,
+      icon: LucideIcons.aLargeSmall,
+      activeIcon: LucideIcons.aLargeSmall,
       label: 'Profile',
     ),
   ];

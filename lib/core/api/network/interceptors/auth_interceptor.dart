@@ -75,16 +75,17 @@ class AuthInterceptor extends Interceptor {
       // ២. ទាញយក Role ចាស់មកប្រើវិញ ការពារកុំឱ្យ Error ដោយសារ API មិនបោះ Role ថ្មីមក
       final oldRole = await TokenStorage.getUserRole() ?? 'seeker';
       final oldOnboardingStatus = await TokenStorage.getOnboardingStatus();
+      final oldProfileStatus = await TokenStorage.getProfileCompletedStatus();
 
       // ៣. រក្សាទុក Token ថ្មី
       await TokenStorage.saveTokens(
         accessToken: newAccessToken,
-        refreshToken:
-            newRefreshToken ??
-            refreshToken, // បើ API អត់បោះ Refresh ថ្មីមកទេ ប្រើអាចាស់សិន
+        refreshToken: newRefreshToken ?? refreshToken,
         role: responseData['role'] ?? oldRole,
         onboardingCompleted:
             responseData['onboarding_completed'] ?? oldOnboardingStatus,
+        isProfileCompleted:
+            responseData['is_profile_completed'] ?? oldProfileStatus,
       );
 
       // ៤. ធ្វើបច្ចុប្បន្នភាព Request ចាស់ដែលបាន Fail នោះ ជាមួយនឹង Token ថ្មី

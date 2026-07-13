@@ -56,11 +56,16 @@ class LoginScreenViewController extends GetxController {
           ? dataMap["user"]["role"]
           : dataMap["role"];
 
-      // 🎯 ១. ទាញយក onboarding_completed ពី JSON (ដាក់ false បើរកមិនឃើញ)
       bool onboardingCompleted = false;
       if (dataMap["user"] != null &&
           dataMap["user"]["onboarding_completed"] != null) {
         onboardingCompleted = dataMap["user"]["onboarding_completed"];
+      }
+
+      bool isProfileCompleted = false;
+      if (dataMap["user"] != null &&
+          dataMap["user"]["is_profile_completed"] != null) {
+        isProfileCompleted = dataMap["user"]["is_profile_completed"];
       }
 
       String message = response["message"] ?? "Login Successfully";
@@ -70,8 +75,8 @@ class LoginScreenViewController extends GetxController {
           accessToken: accessToken,
           refreshToken: refreshToken ?? "",
           role: role ?? 'seeker',
-          onboardingCompleted:
-              onboardingCompleted, // 🎯 ២. រក្សាទុកក្នុង Storage
+          onboardingCompleted: onboardingCompleted,
+          isProfileCompleted: isProfileCompleted,
         );
 
         await Get.find<AuthController>().checkLoginStatus();
@@ -82,23 +87,17 @@ class LoginScreenViewController extends GetxController {
       String userEmail = emailCtrl.text.trim();
       clearFields();
 
-      // 🎯 ៣. បំបែកផ្លូវ (Smart Routing)
       if (role == 'employer') {
-        Get.offAllNamed(
-          AppRoutes.mainScreenEmployer,
-          arguments: {'email': userEmail},
-        );
-      } else {
-        // សម្រាប់ Seeker ត្រូវឆែកលក្ខខណ្ឌ Onboarding
-        if (onboardingCompleted == true) {
-          Get.offAllNamed(
-            AppRoutes.mainScreenSeeker,
-          ); // បើបំពេញរួច ឱ្យចូល Main តែម្តង
+        if (isProfileCompleted == true) {
+          Get.offAllNamed(AppRoutes.mainScreenEmployer);
         } else {
-          Get.offAllNamed(
-            AppRoutes.location, // បើមិនទាន់បំពេញ ទាត់ទៅ Location
-            arguments: {'email': userEmail},
-          );
+          Get.offAllNamed(AppRoutes.companyProfile);
+        }
+      } else {
+        if (onboardingCompleted == true) {
+          Get.offAllNamed(AppRoutes.mainScreenSeeker);
+        } else {
+          Get.offAllNamed(AppRoutes.location, arguments: {'email': userEmail});
         }
       }
     } on ApiException catch (e) {

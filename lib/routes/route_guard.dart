@@ -31,17 +31,32 @@ class RoleMiddleware extends GetMiddleware {
 
   @override
   RouteSettings? redirect(String? route) {
-    // ទាញយក Role បច្ចុប្បន្នពី AuthController
-    final String currentRole = Get.find<AuthController>().userRole.value;
+    final authCtrl = Get.find<AuthController>();
+    final String currentRole = authCtrl.userRole.value;
+    final bool isProfileCompleted =
+        authCtrl.isProfileCompleted.value; // 🎯 ទាញពី Auth
 
+    // លក្ខខណ្ឌទី ១៖ បើ Role មិនត្រូវគ្នា (ចង់ចូលខុសផ្ទះ)
     if (currentRole != requiredRole) {
-      // បើ Role មិនត្រូវគ្នា ទាត់ទៅ Main Screen របស់ពួកគេរៀងៗខ្លួន
       if (currentRole == 'employer') {
-        return const RouteSettings(name: AppRoutes.homeEmployer);
+        // បើគាត់ជា Employer ត្រូវបញ្ជូនទៅតាម Status Profile របស់គាត់
+        return isProfileCompleted
+            ? const RouteSettings(name: AppRoutes.mainScreenEmployer)
+            : const RouteSettings(name: AppRoutes.companyProfile);
       } else {
         return const RouteSettings(name: AppRoutes.mainScreenSeeker);
       }
     }
-    return null; // បើ Role ត្រូវគ្នា អនុញ្ញាតឱ្យចូល
+
+    // លក្ខខណ្ឌទី ២ 🎯៖ បើគាត់ជា Employer ត្រូវ Role ហើយ តែមិនទាន់បំពេញ Profile!
+    if (currentRole == 'employer' &&
+        !isProfileCompleted &&
+        route != AppRoutes.companyProfile) {
+      return const RouteSettings(
+        name: AppRoutes.companyProfile,
+      ); // ទាត់ត្រឡប់ទៅឱ្យបំពេញសិន
+    }
+
+    return null;
   }
 }
