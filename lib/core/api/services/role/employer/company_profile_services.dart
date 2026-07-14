@@ -17,7 +17,7 @@ class CompanyProfileService {
         '$_baseUrl/',
         data: requestModel.toJson(),
       );
-      return CompanyProfileResponse.fromJson(response.data);
+      return CompanyProfileResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }
@@ -26,7 +26,7 @@ class CompanyProfileService {
   Future<CompanyProfileResponse> getMyCompanyProfile() async {
     try {
       final response = await _apiClient.get('$_baseUrl/me');
-      return CompanyProfileResponse.fromJson(response.data);
+      return CompanyProfileResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }
@@ -40,7 +40,7 @@ class CompanyProfileService {
         '$_baseUrl/',
         data: requestModel.toJson(),
       );
-      return CompanyProfileResponse.fromJson(response.data);
+      return CompanyProfileResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }

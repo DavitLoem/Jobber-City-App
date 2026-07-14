@@ -4,19 +4,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/controllers/location_controller.dart';
 import 'package:jobber_city/controllers/master_data_controller.dart';
 import 'package:jobber_city/core/api/services/role/employer/company_profile_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/models/master_data_model.dart';
 import 'package:jobber_city/models/role/employer/company_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/screens/role/employer/company_profile/widget/custom_card.dart';
-import 'package:jobber_city/widgets/custom_button.dart';
-import 'package:jobber_city/widgets/custom_textfield.dart';
+
+import '../../../../controllers/auth_controller.dart';
+import '../../../../core/utils/token_storage.dart';
+import '../../../../widgets/custom_form_textfield.dart';
+import 'widgets/profile_section_card.dart.dart';
 
 part 'company_profile_binding.dart';
 part 'company_profile_controller.dart';
@@ -24,6 +24,7 @@ part 'company_profile_controller.dart';
 class CompanyProfileView extends GetView<CompanyProfileViewController> {
   const CompanyProfileView({super.key});
 
+  // មុខងារបង្ហាញ BottomSheet សម្រាប់ជ្រើសរើសទិន្នន័យ (រក្សាទុកដូចដើម)
   void _showPicker<T>({
     required BuildContext context,
     required String title,
@@ -82,7 +83,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                       title: Text(getName(item)),
                       onTap: () {
                         onSelected(item);
-                        Get.back(); // បិទ BottomSheet ពេលរើសរួច
+                        Get.back();
                       },
                     );
                   },
@@ -99,60 +100,61 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
         title: const Text(
           "Company Profile",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: Colors.grey.shade200, height: 1),
+        ),
       ),
       body: Obx(() {
-        // បង្ហាញ Loading ពេលកំពុងទាញយកទិន្នន័យដំបូង (Initial Data)
         if (controller.isFetching.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLogoUpload(),
-              const SizedBox(height: 20),
+              _buildHeaderSection(),
+              const SizedBox(height: 30),
 
-              CustomCard(
-                title: "Basic Information",
-                icon: Icons.business,
+              // ── ផ្នែកទី១: Basic Information ──
+              ProfileSectionCard(
+                title: "Company Identity",
+                subtitle: "Tell us about your business",
                 children: [
-                  CustomTextfield(
-                    hintText: "Company Name",
-                    prefixIcon: Icons.apartment,
+                  CustomFormTextField(
+                    label: "Company Name *",
+                    hint: "e.g. Jobber City Co., Ltd.",
                     controller: controller.companyNameController,
                   ),
-                  const SizedBox(height: 15),
-
-                  // 🟢 ប្រអប់ Industry ដែលអាចចុចរើសបានពី API
-                  CustomTextfield(
-                    hintText: "Select Industry",
-                    prefixIcon: Icons.category_outlined,
-                    suffixIcon: Icons.keyboard_arrow_down,
+                  const SizedBox(height: 16),
+                  CustomFormTextField(
+                    label: "Industry *",
+                    hint: "Select your industry",
+                    isDropdown: true,
                     controller: controller.industryCtrl,
-                    readOnly: true,
                     onTap: () {
                       if (controller.industriesList.isEmpty) {
-                        Get.snackbar(
-                          "Notice",
-                          "Industries are loading or failed to load.",
-                        );
+                        Get.snackbar("Notice", "Industries are loading.");
                         return;
                       }
-                      // ប្រើ MasterDataModel ជំនួស IndustryModel
                       _showPicker<MasterDataModel>(
                         context: context,
                         title: "Select Industry",
-                        // Cast ទៅជា List<MasterDataModel> ឱ្យប្រាកដ
                         items: controller.industriesList
                             .cast<MasterDataModel>(),
                         getName: (item) => item.name,
@@ -163,14 +165,12 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                       );
                     },
                   ),
-                  const SizedBox(height: 15),
-
-                  CustomTextfield(
-                    hintText: "Company Size",
-                    prefixIcon: Icons.group_outlined,
-                    suffixIcon: Icons.keyboard_arrow_down,
+                  const SizedBox(height: 16),
+                  CustomFormTextField(
+                    label: "Company Size *",
+                    hint: "Select company size",
+                    isDropdown: true,
                     controller: controller.companySizeCtrl,
-                    readOnly: true,
                     onTap: () => _showPicker<String>(
                       context: context,
                       title: "Select Company Size",
@@ -182,158 +182,189 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 15),
-
-                  TextFormField(
-                    controller: controller.descriptionCtrl,
+                  const SizedBox(height: 16),
+                  CustomFormTextField(
+                    label: "Description *",
+                    hint: "Briefly describe your company (min 10 chars)...",
                     maxLines: 4,
-                    decoration: InputDecoration(
-                      hintText: "Company Description (Min 10 characters)...",
-                      filled: true,
-                      fillColor: AppColors.inputBackground,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.all(16),
-                    ),
+                    controller: controller.descriptionCtrl,
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
 
-              CustomCard(
+              // ── ផ្នែកទី២: Contact & Location ──
+              ProfileSectionCard(
                 title: "Contact & Location",
-                icon: Icons.contact_mail_outlined,
+                subtitle: "Where can candidates find you?",
                 children: [
-                  CustomTextfield(
-                    hintText: "Email",
-                    prefixIcon: Icons.email_outlined,
+                  CustomFormTextField(
+                    label: "Contact Email *",
+                    hint: "hr@company.com",
+                    keyboardType: TextInputType.emailAddress,
                     controller: controller.contactEmailController,
                   ),
-                  const SizedBox(height: 15),
-                  CustomTextfield(
-                    hintText: "Phone Number",
-                    prefixIcon: Icons.phone_outlined,
+                  const SizedBox(height: 16),
+                  CustomFormTextField(
+                    label: "Phone Number *",
+                    hint: "+855 12 345 678",
+                    keyboardType: TextInputType.phone,
                     controller: controller.contactPhoneController,
                   ),
-                  const SizedBox(height: 15),
-                  CustomTextfield(
-                    hintText: "Website URL (Optional)",
-                    prefixIcon: Icons.language_outlined,
+                  const SizedBox(height: 16),
+                  CustomFormTextField(
+                    label: "Website (Optional)",
+                    hint: "https://www.company.com",
                     controller: controller.websiteUrlController,
                   ),
-                  const SizedBox(height: 15),
-
-                  // 🟢 ប្រអប់ Province
-                  CustomTextfield(
-                    hintText: "Select Province",
-                    prefixIcon: Icons.map_outlined,
-                    suffixIcon: Icons.keyboard_arrow_down,
-                    controller: controller.provinceCtrl,
-                    readOnly: true,
-                    onTap: () => _showPicker<LocationModel>(
-                      context: context,
-                      title: "Select Province",
-                      // 🎯 ទាញយកបញ្ជីខេត្តចេញពី Global Location Controller ផ្ទាល់
-                      items: controller.locationCtrl.provinces,
-                      getName: (item) => item.nameEn,
-                      onSelected: (item) {
-                        controller.provinceCtrl.text = item.nameEn;
-                        controller.selectedProvinceId.value = item.id
-                            .toString();
-
-                        // លុបស្រុកចាស់ចោល ពេលគាត់ដូរខេត្តថ្មី
-                        controller.districtCtrl.clear();
-                        controller.selectedDistrictId.value = '';
-
-                        // ហៅទាញយកស្រុករបស់ខេត្តថ្មីនេះ
-                        controller.fetchDistricts(
-                          controller.selectedProvinceId.value,
-                        );
-                      },
-                    ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomFormTextField(
+                          label: "Province *",
+                          hint: "Select Province",
+                          isDropdown: true,
+                          controller: controller.provinceCtrl,
+                          onTap: () => _showPicker<LocationModel>(
+                            context: context,
+                            title: "Select Province",
+                            items: controller.locationCtrl.provinces,
+                            getName: (item) => item.nameEn,
+                            onSelected: (item) {
+                              controller.provinceCtrl.text = item.nameEn;
+                              controller.selectedProvinceId.value = item.id
+                                  .toString();
+                              controller.districtCtrl.clear();
+                              controller.selectedDistrictId.value = '';
+                              controller.fetchDistricts(
+                                controller.selectedProvinceId.value,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: CustomFormTextField(
+                          label: "District *",
+                          hint: "Select District",
+                          isDropdown: true,
+                          controller: controller.districtCtrl,
+                          onTap: () {
+                            if (controller.selectedProvinceId.value.isEmpty) {
+                              Get.snackbar(
+                                "Notice",
+                                "Please select a Province first",
+                              );
+                              return;
+                            }
+                            _showPicker<LocationModel>(
+                              context: context,
+                              title: "Select District",
+                              items: controller.districtsList
+                                  .cast<LocationModel>(),
+                              getName: (item) => item.nameEn,
+                              onSelected: (item) {
+                                controller.districtCtrl.text = item.nameEn;
+                                controller.selectedDistrictId.value = item.id
+                                    .toString();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 15),
-
-                  // 🟢 ប្រអប់ District
-                  CustomTextfield(
-                    hintText: "Select District",
-                    prefixIcon: Icons.location_city_outlined,
-                    suffixIcon: Icons.keyboard_arrow_down,
-                    controller: controller.districtCtrl,
-                    readOnly: true,
-                    onTap: () {
-                      if (controller.selectedProvinceId.value.isEmpty) {
-                        Get.snackbar(
-                          "Notice",
-                          "Please select a Province first",
-                        );
-                        return;
-                      }
-
-                      // ប្រើ LocationModel ជំនួស DistrictModel
-                      _showPicker<LocationModel>(
-                        context: context,
-                        title: "Select District",
-                        items: controller.districtsList.cast<LocationModel>(),
-                        getName: (item) => item.nameEn,
-                        onSelected: (item) {
-                          controller.districtCtrl.text = item.nameEn;
-                          controller.selectedDistrictId.value = item.id
-                              .toString();
-                        },
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 15),
-
-                  CustomTextfield(
-                    hintText: "Address Detail",
-                    prefixIcon: Icons.home_outlined,
+                  const SizedBox(height: 16),
+                  CustomFormTextField(
+                    label: "Address Detail *",
+                    hint: "Street 123, Sangkat...",
+                    maxLines: 2,
                     controller: controller.addressDetailController,
                   ),
                 ],
               ),
-
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: CustomButton(
-                  text: controller.isLoading.value
-                      ? "Saving..."
-                      : "Save Profile",
-                  onPressed: controller.isLoading.value
-                      ? () {}
-                      : controller.saveProfile,
-                ),
-              ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 100), // Space សម្រាប់ប៊ូតុងខាងក្រោម
             ],
           ),
         );
       }),
+      // ── ប៊ូតុង Save ស្អិតជាប់ខាងក្រោម ──
+      bottomSheet: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        ),
+        child: SafeArea(
+          child: SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: Obx(
+              () => ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: controller.isLoading.value
+                    ? null
+                    : controller.saveProfile,
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        "Save Profile",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildLogoUpload() {
+  // ── ផ្នែករចនាការ Upload Logo ──
+  Widget _buildHeaderSection() {
     return Center(
       child: Column(
         children: [
-          _LogoTapScale(
+          GestureDetector(
             onTap: controller.pickCompanyLogo,
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 95,
+                  height: 95,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Colors.white,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                     image: controller.companyLogoPath.value.isNotEmpty
                         ? DecorationImage(
                             image: FileImage(
@@ -346,7 +377,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   child: controller.companyLogoPath.value.isEmpty
                       ? const Icon(
                           Icons.business,
-                          size: 40,
+                          size: 35,
                           color: AppColors.primary,
                         )
                       : null,
@@ -367,46 +398,21 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           const Text(
             "Upload Company Logo",
             style: TextStyle(
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppColors.primary,
               fontSize: 14,
             ),
           ),
+          const SizedBox(height: 4),
+          Text(
+            "Recommended size: 500x500px",
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class _LogoTapScale extends StatefulWidget {
-  const _LogoTapScale({required this.onTap, required this.child});
-  final VoidCallback onTap;
-  final Widget child;
-
-  @override
-  State<_LogoTapScale> createState() => _LogoTapScaleState();
-}
-
-class _LogoTapScaleState extends State<_LogoTapScale> {
-  double _scale = 1.0;
-  void _setScale(double value) => setState(() => _scale = value);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      onTapDown: (_) => _setScale(0.92),
-      onTapUp: (_) => _setScale(1.0),
-      onTapCancel: () => _setScale(1.0),
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOut,
-        child: widget.child,
       ),
     );
   }

@@ -32,7 +32,7 @@ class AppRoles {
 class AppPages {
   static final routes = [
     // ==========================================
-    // 🟢 ១. PUBLIC ROUTES (មិនត្រូវការ Login)
+    // 🟢 ១. PUBLIC ROUTES
     // ==========================================
     GetPage(
       name: AppRoutes.splash,

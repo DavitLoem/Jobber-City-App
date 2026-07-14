@@ -49,6 +49,10 @@ class CompanyProfileViewController extends GetxController {
       // 🎯 ២. ទាញយក Industries ពី Global Master Data Controller
       final inds = await masterDataCtrl.getMasterData(endpoint: 'industries');
       industriesList.assignAll(inds);
+
+      if (locationCtrl.provinces.isEmpty) {
+        await locationCtrl.fetchProvinces();
+      }
     } catch (e) {
       debugPrint("Error fetching initial data: $e");
     } finally {
@@ -56,7 +60,6 @@ class CompanyProfileViewController extends GetxController {
     }
   }
 
-  // 🎯 ៣. ប្រើប្រាស់ Global Location Controller ដើម្បីទាញស្រុកពី Cache
   Future<void> fetchDistricts(String provinceId) async {
     try {
       districtsList.clear();
@@ -91,7 +94,6 @@ class CompanyProfileViewController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 🎯 ៤. ប្រើប្រាស់ Request Model ថ្មី (គ្មាន Field លើស)
       final requestData = CompanyProfileRequest(
         companyName: companyNameController.text.trim(),
         industryId: selectedIndustryId.value,
@@ -111,7 +113,6 @@ class CompanyProfileViewController extends GetxController {
         addressDetail: addressDetailController.text.trim(),
       );
 
-      // បញ្ជូនទិន្នន័យ Profile ទៅ API
       await _companyProfileService.createCompanyProfile(requestData);
 
       // 🎯 ៥. ការ Upload Logo ជាទម្រង់ File (FormData)
@@ -136,7 +137,9 @@ class CompanyProfileViewController extends GetxController {
       );
 
       // Update State ក្នុង AuthController ភ្លាមៗ
-      Get.find<AuthController>().checkLoginStatus();
+      final authCtrl = Get.find<AuthController>();
+      authCtrl.isProfileCompleted.value = true;
+      authCtrl.checkLoginStatus();
 
       Get.snackbar(
         'Success',
@@ -145,7 +148,8 @@ class CompanyProfileViewController extends GetxController {
         colorText: Colors.white,
       );
 
-      // 🎯 ៧. បញ្ជូនទៅកាន់ Main Screen ថ្មីរបស់ Employer
+      await Future.delayed(const Duration(milliseconds: 1000));
+
       Get.offAllNamed(AppRoutes.mainScreenEmployer);
     } catch (e) {
       Get.snackbar('Failed', _extractErrorMessage(e));

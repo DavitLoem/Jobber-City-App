@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -80,7 +82,9 @@ class HomeHeader extends StatelessWidget {
                   _RoundIconButton(
                     icon: LucideIcons.bell,
                     iconColor: const Color(0xFF1A1F36),
-                    onTap: () {},
+                    onTap: () {
+                      Get.find<AuthController>().logout();
+                    },
                     showDot: true,
                   ),
                 ],
