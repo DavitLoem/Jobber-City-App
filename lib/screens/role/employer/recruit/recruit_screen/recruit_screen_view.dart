@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/api/services/role/employer/job_services.dart';
+import 'package:jobber_city/core/api/services/role/employer/job_post_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/employer_job_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';

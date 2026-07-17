@@ -10,6 +10,7 @@ import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart'
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_view.dart';
+import 'package:jobber_city/screens/role/employer/new_job/new_job_view.dart';
 import 'package:jobber_city/screens/role/seeker/educations_screen/educations_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_view.dart';
@@ -130,6 +131,15 @@ class AppPages {
       name: AppRoutes.companyProfile,
       page: () => CompanyProfileView(),
       binding: CompanyProfileViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.newJob,
+      page: () => NewJobView(),
+      binding: NewJobViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.employer),

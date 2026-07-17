@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomFormTextField extends StatelessWidget {
   final String label;
@@ -9,6 +10,8 @@ class CustomFormTextField extends StatelessWidget {
   final int maxLines;
   final TextInputType? keyboardType;
   final VoidCallback? onTap;
+  final List<TextInputFormatter>? inputFormatters;
+  final Widget? suffixIcon; // 👈 ១. បន្ថែមអថេរនេះ
 
   const CustomFormTextField({
     super.key,
@@ -20,6 +23,8 @@ class CustomFormTextField extends StatelessWidget {
     this.maxLines = 1,
     this.keyboardType,
     this.onTap,
+    this.inputFormatters,
+    this.suffixIcon,
   });
 
   @override
@@ -27,30 +32,36 @@ class CustomFormTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+        if (label.isNotEmpty) ...[
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         TextFormField(
           controller: controller,
           maxLines: maxLines,
           readOnly: isDropdown || readOnly,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           onTap: onTap,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-            suffixIcon: isDropdown
-                ? const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.grey,
-                  )
-                : null,
+            suffixIcon:
+                suffixIcon ??
+                (isDropdown
+                    ? const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.grey,
+                      )
+                    : null),
+
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(

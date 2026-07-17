@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/auth_model/auth_response_model.dart';
@@ -22,17 +24,17 @@ class AuthServices {
     }
   }
 
-  Future<dynamic> login({
+  Future<AuthResponseModel> login({
     required String email,
     required String password,
   }) async {
     try {
-      var response = await _apiClient.post(
+      final response = await _apiClient.post(
         '/auth/login',
         data: {'email': email, 'password': password},
       );
-
-      return response;
+      // Parse the response into a model for type safety
+      return AuthResponseModel.fromJson(response['data'] ?? response);
     } catch (e) {
       rethrow;
     }
@@ -99,6 +101,38 @@ class AuthServices {
         data: {'refresh_token': refreshToken ?? " "},
       );
       return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<AuthResponseModel> loginWithGoogle(String role) async {
+    try {
+      final webClientId = dotenv.env['WEB_CLIENT_ID'];
+
+      // ទាញយក Instance ជំនួសឱ្យការបង្កើត Object ថ្មី
+      final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+
+      // ធ្វើការ Initialize ដោយបញ្ចូល serverClientId នៅទីនេះ
+      await googleSignIn.initialize(serverClientId: webClientId);
+
+      await googleSignIn.signOut();
+
+      // មុខងារនេះនឹងបង្ហាញ UI ឱ្យ User Login
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+      // ទាញយក idToken
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) throw Exception("ID Token is null");
+
+      var response = await _apiClient.post(
+        '/auth/google-login',
+        data: {'id_token': idToken, 'role': role},
+      );
+
+      return AuthResponseModel.fromJson(response['data'] ?? response);
     } catch (e) {
       rethrow;
     }

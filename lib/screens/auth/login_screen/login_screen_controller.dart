@@ -45,60 +45,37 @@ class LoginScreenViewController extends GetxController {
 
     isLoading.value = true;
     try {
-      var response = await authServices.login(
+      final response = await authServices.login(
         email: emailCtrl.text.trim(),
         password: passwordCtrl.text.trim(),
       );
 
-      var dataMap = response["data"] ?? response;
+      await TokenStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        role: response.user.role,
+        onboardingCompleted: response.user.onboardingCompleted,
+        isProfileCompleted: response.user.isProfileCompleted,
+      );
 
-      String? accessToken = dataMap["access_token"];
-      String? refreshToken = dataMap["refresh_token"];
+      await Get.find<AuthController>().checkLoginStatus();
 
-      // 🎯 ទាញយក Role ពី JSON
-      String? role = dataMap["user"] != null
-          ? dataMap["user"]["role"]
-          : dataMap["role"];
-
-      bool onboardingCompleted = false;
-      if (dataMap["user"] != null &&
-          dataMap["user"]["onboarding_completed"] != null) {
-        onboardingCompleted = dataMap["user"]["onboarding_completed"];
-      }
-
-      bool isProfileCompleted = false;
-      if (dataMap["user"] != null &&
-          dataMap["user"]["is_profile_completed"] != null) {
-        isProfileCompleted = dataMap["user"]["is_profile_completed"];
-      }
-
-      String message = response["message"] ?? "Login Successfully";
-
-      if (accessToken != null) {
-        await TokenStorage.saveTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken ?? "",
-          role: role ?? 'seeker',
-          onboardingCompleted: onboardingCompleted,
-          isProfileCompleted: isProfileCompleted,
-        );
-
-        await Get.find<AuthController>().checkLoginStatus();
-      }
-
-      Get.snackbar("Success", message);
+      Get.snackbar("Success", "Login Successfully");
 
       String userEmail = emailCtrl.text.trim();
       clearFields();
 
-      if (role == 'employer') {
-        if (isProfileCompleted == true) {
+      // Use the data from the response model for navigation
+      final user = response.user;
+
+      if (user.role == 'employer') {
+        if (user.isProfileCompleted) {
           Get.offAllNamed(AppRoutes.mainScreenEmployer);
         } else {
           Get.offAllNamed(AppRoutes.companyProfile);
         }
       } else {
-        if (onboardingCompleted == true) {
+        if (user.onboardingCompleted) {
           Get.offAllNamed(AppRoutes.mainScreenSeeker);
         } else {
           Get.offAllNamed(AppRoutes.location, arguments: {'email': userEmail});

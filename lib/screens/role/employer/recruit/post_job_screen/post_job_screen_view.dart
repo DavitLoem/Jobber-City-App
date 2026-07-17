@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/location_services.dart';
-import 'package:jobber_city/core/api/services/role/employer/job_services.dart';
+import 'package:jobber_city/core/api/services/role/employer/job_post_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/models/role/employer/job_post_model.dart';

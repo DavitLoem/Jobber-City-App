@@ -13,6 +13,7 @@ class AuthController extends GetxController {
   var userRole = ''.obs;
   var isProfileCompleted = false.obs;
   var isOnboardingCompleted = false.obs;
+  var isGoogleLoading = false.obs;
 
   @override
   void onInit() {
@@ -38,6 +39,67 @@ class AuthController extends GetxController {
       isOnboardingCompleted.value = false;
       isProfileCompleted.value = false;
       // debugPrint("❌ Status: Not Logged In");
+    }
+  }
+
+  Future<void> loginWithGoogle(String role) async {
+    try {
+      isGoogleLoading.value = true;
+      var response = await _authService.loginWithGoogle(role);
+
+      await TokenStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        role: response.user.role,
+        isProfileCompleted: response.user.isProfileCompleted,
+        onboardingCompleted: response.user.onboardingCompleted,
+      );
+
+      isLoggedIn.value = true;
+      userRole.value = response.user.role;
+      isOnboardingCompleted.value = response.user.onboardingCompleted;
+      isProfileCompleted.value = response.user.isProfileCompleted;
+
+      Get.snackbar(
+        "Success",
+        "Login Successfully",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+
+      _navigateBasedOnStatus();
+    } on ApiException catch (e) {
+      Get.snackbar(
+        "Failed",
+        e.message,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Could not login with Google",
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } finally {
+      isGoogleLoading.value = false;
+    }
+  }
+
+  void _navigateBasedOnStatus() {
+    if (userRole.value == 'seeker') {
+      if (!isOnboardingCompleted.value) {
+        Get.offAllNamed(AppRoutes.mainScreenSeeker);
+      } else {
+        Get.offAllNamed(AppRoutes.location);
+      }
+    } else if (userRole.value == 'employer') {
+      if (!isProfileCompleted.value) {
+        Get.offAllNamed(AppRoutes.mainScreenEmployer);
+      } else {
+        Get.offAllNamed(AppRoutes.companyProfile);
+      }
     }
   }
 

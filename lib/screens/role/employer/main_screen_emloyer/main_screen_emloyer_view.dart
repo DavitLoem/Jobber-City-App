@@ -25,8 +25,8 @@ class MainScreenEmloyerView extends GetView<MainScreenEmloyerController> {
       label: 'Candidates',
     ),
     _NavItem(
-      icon: LucideIcons.aLargeSmall,
-      activeIcon: LucideIcons.aLargeSmall,
+      icon: LucideIcons.user,
+      activeIcon: LucideIcons.user,
       label: 'Profile',
     ),
   ];
