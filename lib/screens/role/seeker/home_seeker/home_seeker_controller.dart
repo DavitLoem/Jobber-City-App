@@ -2,74 +2,67 @@ part of 'home_seeker_view.dart';
 
 class HomeSeekerViewController extends GetxController {
   final _seekerServices = AuthServices();
+  final _recommendedServices = JobRecommendedServices();
+  final _recentServices = JobRecentServices();
+
+  var recommendedJobs = <JobRecommendedModel>[].obs;
+  var isRecommendedLoading = false.obs;
+
+  var recentJobs = <JobRecentModel>[].obs;
+  var isRecentLoading = false.obs;
 
   var isLoading = true.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
+  var profileImageUrl = ''.obs;
+
+  // Selected filter index for Recent Jobs
+  var selectedRecentFilterIndex = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
+    fetchJobRecommended();
+    fetchJobRecent();
     fetchProfileRaw();
   }
 
-  Future<void> checkTokenExpiry() async {
-    String? token = await TokenStorage.getAccessToken();
-    if (token == null || token.isEmpty) {
-      AppLogger.i("📭 មិនមាន Access Token ទេ");
-      return;
-    }
-
+  void fetchJobRecommended() async {
     try {
-      // វះកាត់ Token ជា ៣ ចំណែក រួចយកចំណែកកណ្តាល (Payload) មកអាន
-      final parts = token.split('.');
-      if (parts.length != 3) return;
-
-      String normalized = base64Url.normalize(parts[1]);
-      String payload = utf8.decode(base64Url.decode(normalized));
-      Map<String, dynamic> payloadMap = json.decode(payload);
-
-      if (payloadMap.containsKey('exp')) {
-        // បំប្លែងម៉ោងពី Backend (វិនាទី) មកជាម៉ោងពិត (មិល្លីវិនាទី)
-        DateTime expiryDate = DateTime.fromMillisecondsSinceEpoch(
-          payloadMap['exp'] * 1000,
-        );
-        DateTime now = DateTime.now();
-
-        AppLogger.i(
-          "🔑 Token របស់អ្នក: ${token.substring(0, 15)}...",
-        ); // ព្រីនត្រឹម 15 តួ
-        AppLogger.i("⏰ ម៉ោងបច្ចុប្បន្ន: $now");
-        AppLogger.i("🕒 ម៉ោង Expire:   $expiryDate");
-
-        if (now.isAfter(expiryDate)) {
-          AppLogger.e("🔴 លទ្ធផល: Token នេះបាន EXPIRED បាត់ទៅហើយ!");
-        } else {
-          Duration timeLeft = expiryDate.difference(now);
-          AppLogger.i(
-            "🟢 លទ្ធផល: Token នេះនៅរស់ (សល់ ${timeLeft.inMinutes} នាទី និង ${timeLeft.inSeconds % 60} វិនាទីទៀត)",
-          );
-        }
-        debugPrint("========================================");
-      }
+      isRecommendedLoading.value = true;
+      var data = await _recommendedServices.getJobRecommended();
+      recommendedJobs.assignAll(data);
+      debugPrint('Fetched ${recommendedJobs.length} recommended jobs');
     } catch (e) {
-      debugPrint("❌ Error ពេល Decode Token: $e");
+      debugPrint('Error fetching recommended jobs: $e');
+    } finally {
+      isRecommendedLoading.value = false;
+    }
+  }
+
+  void fetchJobRecent() async {
+    try {
+      isRecentLoading.value = true;
+      var data = await _recentServices.getJobRecent();
+      recentJobs.assignAll(data);
+      debugPrint('Fetched ${recentJobs.length} recent jobs');
+    } catch (e) {
+      debugPrint('Error fetching recent jobs: $e');
+    } finally {
+      isRecentLoading.value = false;
     }
   }
 
   void fetchProfileRaw() async {
-    checkTokenExpiry();
-
     try {
       isLoading.value = true;
       AppLogger.i("⏳ កំពុងទាញយកទិន្នន័យ Profile...");
 
       final response = await _seekerServices.getRawProfile();
-
-      // ទាញយក Object "data" ពី JSON រួចចាប់យកឈ្មោះ
       var data = response['data'];
       firstName.value = data['first_name'] ?? 'NoName';
       lastName.value = data['last_name'] ?? '';
+      profileImageUrl.value = data['profile_image_url'] ?? '';
 
       AppLogger.i("✅ ទាញយកជោគជ័យ: ${firstName.value} ${lastName.value}");
     } catch (e) {
@@ -78,5 +71,54 @@ class HomeSeekerViewController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  String getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return "Good morning";
+    } else if (hour < 17) {
+      return "Good afternoon";
+    } else {
+      return "Good evening";
+    }
+  }
+
+  // 🟢 មុខងារសម្រាប់ចុច Save លើ Recommended Job
+  void toggleSaveRecommendedJob(int index) {
+    final job = recommendedJobs[index];
+
+    // បង្កើត Object ថ្មីដោយចម្លងទិន្នន័យចាស់ទាំងអស់ លើកលែងតែ isSaved
+    recommendedJobs[index] = JobRecommendedModel(
+      id: job.id,
+      title: job.title,
+      minSalary: job.minSalary,
+      maxSalary: job.maxSalary,
+      salaryPeriod: job.salaryPeriod,
+      companyName: job.companyName,
+      logoUrl: job.logoUrl,
+      location: job.location,
+      employmentType: job.employmentType,
+      isSaved: !job.isSaved, // 🔄 ប្តូរពី true ទៅ false ឬ false ទៅ true
+    );
+  }
+
+  // 🟢 មុខងារសម្រាប់ចុច Save លើ Recent Job
+  void toggleSaveRecentJob(int index) {
+    final job = recentJobs[index];
+
+    recentJobs[index] = JobRecentModel(
+      id: job.id,
+      title: job.title,
+      minSalary: job.minSalary,
+      maxSalary: job.maxSalary,
+      salaryPeriod: job.salaryPeriod,
+      companyName: job.companyName,
+      logoUrl: job.logoUrl,
+      location: job.location,
+      employmentType: job.employmentType,
+      workType: job.workType,
+      isSaved: !job.isSaved, // 🔄 ប្តូរតម្លៃ
+    );
   }
 }

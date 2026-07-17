@@ -17,6 +17,8 @@ import 'package:jobber_city/screens/role/employer/home_employer/home_employer_vi
 import 'package:jobber_city/screens/role/seeker/educations_screen/educations_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/job_detail_screen/job_detail_screen_binding.dart';
+import 'package:jobber_city/screens/role/seeker/job_detail_screen/job_detail_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.dart';
@@ -130,6 +132,11 @@ class AppPages {
       name: AppRoutes.detailPost,
       page: () => DetailPostScreenView(),
       binding: DetailPostScreenViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.jobDetail,
+      page: () => JobDetailScreenView(),
+      binding: JobDetailScreenViewBinding(),
     ),
   ];
 }

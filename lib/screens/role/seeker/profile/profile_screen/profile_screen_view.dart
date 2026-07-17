@@ -1,12 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
-import 'package:jobber_city/core/utils/token_storage.dart';
-import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 part 'profile_screen_binding.dart';
@@ -18,7 +14,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Clean background color
+      backgroundColor: AppColors.white, // Clean background color
       body: SafeArea(
         child: Obx(() {
           // Show Loading while fetching data from API
@@ -115,20 +111,20 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
-            color: Colors.black87,
+            color: AppColors.textPrimary,
           ),
         ),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.cardBorder),
           ),
           child: const Icon(
             Icons.settings_outlined,
             size: 22,
-            color: Colors.black87,
+            color: AppColors.textPrimary,
           ),
         ),
       ],
@@ -142,7 +138,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.cardBorder, width: 1),
         boxShadow: [
@@ -173,33 +169,10 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                         width: 56,
                         height: 56,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: Text(
-                              controller.firstName.value.isNotEmpty
-                                  ? controller.firstName.value[0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          );
-                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            _buildAvatarFallback(22),
                       )
-                    : Center(
-                        child: Text(
-                          controller.firstName.value.isNotEmpty
-                              ? controller.firstName.value[0].toUpperCase()
-                              : 'U',
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
+                    : _buildAvatarFallback(22),
               ),
             ),
           ),
@@ -216,7 +189,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -305,7 +278,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -342,12 +315,29 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Shared avatar fallback (initials) ──
+  Widget _buildAvatarFallback(double fontSize) {
+    final initial = controller.firstName.value.isNotEmpty
+        ? controller.firstName.value[0].toUpperCase()
+        : 'U';
+    return Center(
+      child: Text(
+        initial,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: AppColors.primary,
+        ),
       ),
     );
   }
@@ -359,7 +349,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white,
+      color: AppColors.white,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -367,7 +357,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.cardBorder, width: 1),
             boxShadow: [
@@ -395,7 +385,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),

@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
-import 'package:jobber_city/screens/role/employer/recruit/post_job_screen/post_job_screen_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_controller.dart';
 import 'package:jobber_city/screens/role/employer/recruit/recruit_screen/recruit_screen_view.dart';

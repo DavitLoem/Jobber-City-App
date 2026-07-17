@@ -4,7 +4,6 @@ import 'package:cuberto_bottom_bar/cuberto_bottom_bar.dart';
 
 // 🟢 កុំភ្លេច Import View ទាំងពីរនេះចូល
 import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
-import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_controller.dart';
 

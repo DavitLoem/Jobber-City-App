@@ -2,7 +2,6 @@
 //
 //     final companyProfileModel = companyProfileModelFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 CompanyProfileModel companyProfileModelFromJson(String str) =>
