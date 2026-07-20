@@ -59,7 +59,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   _buildDivider(),
                   const SizedBox(height: 25),
                   SocialLogin(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.loginWithGoogle();
+                    },
                     text: 'Continue with Google',
                     iconPath: AppAssets.google,
                   ),

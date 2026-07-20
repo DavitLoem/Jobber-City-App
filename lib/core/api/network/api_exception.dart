@@ -3,7 +3,15 @@ class ApiException implements Exception {
   final String message;
   final int? statusCode;
 
-  ApiException(this.message, {this.statusCode});
+  final String? errorCode;
+  final String? existingRole;
+
+  ApiException(
+    this.message, {
+    this.statusCode,
+    this.errorCode,
+    this.existingRole,
+  });
 
   @override
   String toString() => message;

@@ -106,7 +106,7 @@ class AuthServices {
     }
   }
 
-  Future<AuthResponseModel> loginWithGoogle(String role) async {
+  Future<AuthResponseModel> loginWithGoogle(String? role) async {
     try {
       final webClientId = dotenv.env['WEB_CLIENT_ID'];
 
@@ -127,9 +127,16 @@ class AuthServices {
 
       if (idToken == null) throw Exception("ID Token is null");
 
+      Map<String, dynamic> requestData = {'id_token': idToken};
+
+      // បើមានបោះ role មក (ពីទំព័រ Register) ទើបយើងបញ្ជូនវាទៅ
+      if (role != null && role.isNotEmpty) {
+        requestData['role'] = role;
+      }
+
       var response = await _apiClient.post(
         '/auth/google-login',
-        data: {'id_token': idToken, 'role': role},
+        data: requestData,
       );
 
       return AuthResponseModel.fromJson(response['data'] ?? response);

@@ -90,4 +90,9 @@ class LoginScreenViewController extends GetxController {
       if (!isClosed) isLoading.value = false;
     }
   }
+
+  void loginWithGoogle() {
+    // 🎯 មិនបោះ Role ទេ ព្រោះយើងចង់ Login សុទ្ធ
+    Get.find<AuthController>().loginWithGoogle();
+  }
 }

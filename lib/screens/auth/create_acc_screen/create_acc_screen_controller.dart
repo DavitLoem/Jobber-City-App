@@ -88,6 +88,12 @@ class CreateAccScreenViewController extends GetxController {
     }
   }
 
+  void registerWithGoogle() {
+    String selectedRole = selectedIndex.value == 0 ? 'seeker' : 'employer';
+    // 🎯 បោះ Role ទៅ ដើម្បីប្រាប់ថាចង់ Register ជាអ្វី
+    Get.find<AuthController>().loginWithGoogle(role: selectedRole);
+  }
+
   void changeTab(int index) {
     selectedIndex.value = index;
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
@@ -210,14 +211,31 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
         const SizedBox(height: 24),
 
-        SizedBox(
-          width: double.infinity,
-          child: SocialLogin(
-            onPressed: () {},
-            text: 'Continue with Google',
-            iconPath: AppAssets.google,
-          ),
-        ),
+        Obx(() {
+          // ១. កំណត់អក្សរទៅតាម Tab
+          String btnText = isEmployer
+              ? 'Continue as Employer with Google'
+              : 'Continue as Seeker with Google';
+
+          // ២. ទាញយក Loading State ពី AuthController
+          bool isGoogleLoading =
+              Get.find<AuthController>().isGoogleLoading.value;
+
+          return SizedBox(
+            width: double.infinity,
+            child: SocialLogin(
+              // បិទប៊ូតុងមិនឱ្យចុច ពេលកំពុង Loading
+              onPressed: isGoogleLoading
+                  ? null
+                  : () {
+                      controller.registerWithGoogle();
+                    },
+              text: btnText,
+              iconPath: AppAssets.google,
+              isLoading: isGoogleLoading,
+            ),
+          );
+        }),
 
         const SizedBox(height: 24),
 
