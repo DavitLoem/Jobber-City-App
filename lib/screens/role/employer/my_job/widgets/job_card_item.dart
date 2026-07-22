@@ -10,6 +10,7 @@ class JobCardItem extends StatelessWidget {
   final bool isUrgent;
   final int candidatesCount;
   final VoidCallback onTap;
+  final VoidCallback onMoreTap;
 
   const JobCardItem({
     super.key,
@@ -21,16 +22,29 @@ class JobCardItem extends StatelessWidget {
     this.isUrgent = false,
     required this.candidatesCount,
     required this.onTap,
+    required this.onMoreTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    // កំណត់ពណ៌ Badge ទៅតាម Status
-    final isDraft = status.toLowerCase() == 'draft';
-    final badgeColor = isDraft ? Colors.orange.shade100 : Colors.green.shade100;
-    final badgeTextColor = isDraft
-        ? Colors.orange.shade800
-        : Colors.green.shade700;
+    final statusLower = status.toLowerCase();
+
+    Color badgeColor = Colors.grey.shade100;
+    Color badgeTextColor = Colors.grey.shade700;
+
+    if (statusLower == 'active') {
+      badgeColor = Colors.green.shade100;
+      badgeTextColor = Colors.green.shade700;
+    } else if (statusLower == 'inactive') {
+      badgeColor = Colors.red.shade100; // ពណ៌ក្រហម/ផ្កាឈូកស្រាល
+      badgeTextColor = Colors.red.shade700;
+    } else if (statusLower == 'draft') {
+      badgeColor = Colors.orange.shade100;
+      badgeTextColor = Colors.orange.shade800;
+    } else if (statusLower == 'closed') {
+      badgeColor = Colors.grey.shade200;
+      badgeTextColor = Colors.grey.shade700;
+    }
 
     return InkWell(
       onTap: onTap,
@@ -141,7 +155,14 @@ class JobCardItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+                GestureDetector(
+                  onTap: onMoreTap,
+                  child: const Icon(
+                    Icons.more_vert,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                ),
               ],
             ),
 
@@ -177,14 +198,25 @@ class JobCardItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    _buildOverlappingAvatars(), // ហៅមុខងារគូររូប Avatar ត្រួតគ្នា
-                    const SizedBox(width: 12),
+                    // 🎯 លក្ខខណ្ឌទី១: បង្ហាញរូប Profile លុះត្រាតែមានបេក្ខជន (candidatesCount > 0)
+                    if (candidatesCount > 0) ...[
+                      _buildOverlappingAvatars(),
+                      const SizedBox(width: 12),
+                    ],
+
+                    // 🎯 លក្ខខណ្ឌទី២: ប្តូរពណ៌អក្សរតាមចំនួនបេក្ខជន
                     Text(
-                      "$candidatesCount candidates",
-                      style: const TextStyle(
+                      candidatesCount == 0
+                          ? "No candidates yet" // ឬអ្នកអាចដាក់ "0 candidates" ដូចដើមក៏បាន
+                          : "$candidatesCount candidates",
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF4f7df7),
+                        color: candidatesCount == 0
+                            ? Colors
+                                  .grey
+                                  .shade500 // ពណ៌ប្រផេះពេលគ្មានមនុស្ស
+                            : const Color(0xFF4f7df7), // ពណ៌ខៀវពេលមានមនុស្ស
                       ),
                     ),
                   ],
@@ -204,30 +236,39 @@ class JobCardItem extends StatelessWidget {
 
   // មុខងារសម្រាប់គូររូប Avatar ត្រួតលើគ្នា (B, C, D)
   Widget _buildOverlappingAvatars() {
+    // ការពារ Error បើសិនជាចំនួន 0 មិនបាច់គូរអ្វីទាំងអស់
+    if (candidatesCount == 0) return const SizedBox.shrink();
+
+    // 🎯 លក្ខខណ្ឌទី៣: កំណត់ចំនួនរូបដែលត្រូវបង្ហាញ (អតិបរមាគឺ ៣ រូប)
+    final displayCount = candidatesCount > 3 ? 3 : candidatesCount;
+
     final colors = [
       const Color(0xFF6366F1),
       const Color(0xFF8B5CF6),
       const Color(0xFF3B82F6),
     ];
-    final letters = ['B', 'C', 'D'];
+    final letters = [
+      'A',
+      'B',
+      'C',
+    ]; // អាចប្តូរជាអក្សរទី១នៃឈ្មោះបេក្ខជននៅថ្ងៃក្រោយ
 
     return SizedBox(
-      width: 70, // កំណត់ប្រវែងសរុប (កុំឱ្យវាហៀរ)
+      // គណនាប្រវែង Width សរុបដោយស្វ័យប្រវត្តិ អាស្រ័យលើចំនួនរូបភាព (រូបទី១ 26px, រូបបន្ទាប់ថែម 18px)
+      width: 26.0 + ((displayCount - 1) * 18.0),
       height: 26,
       child: Stack(
-        children: List.generate(3, (index) {
+        children: List.generate(displayCount, (index) {
           return Positioned(
             left: index * 18.0, // រំកិលទៅស្តាំម្តងបន្តិចៗ (Overlap effect)
+
             child: Container(
               width: 26,
               height: 26,
               decoration: BoxDecoration(
                 color: colors[index],
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 2,
-                ), // គែមសកាត់គ្នា
+                border: Border.all(color: Colors.white, width: 2),
               ),
               child: Center(
                 child: Text(

@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/category_controller.dart';
+import 'package:jobber_city/controllers/location_controller.dart';
+import 'package:jobber_city/core/api/services/role/employer/job_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/models/role/employer/job_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/employer/my_job/widgets/job_card_item.dart';
 import 'package:jobber_city/screens/role/employer/my_job/widgets/job_search_bar.dart';
 import 'package:jobber_city/screens/role/employer/my_job/widgets/job_status_tabs.dart';
+import 'package:jobber_city/widgets/confirm_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+import '../../../../core/utils/debouncer.dart';
+import 'widgets/job_action_bottom_sheet.dart';
+import 'widgets/job_card_skeleton.dart';
 
 part 'my_job_binding.dart';
 part 'my_job_controller.dart';
@@ -15,7 +25,7 @@ class MyJobView extends GetView<MyJobViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ដាក់ផ្ទៃខាងក្រោយពណ៌ស
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -29,81 +39,247 @@ class MyJobView extends GetView<MyJobViewController> {
         ),
         actions: [_buildNewJobButton()],
       ),
-
-      // ── ផ្គុំ Widgets ទាំង៣ បញ្ចូលគ្នា ──
       body: Column(
         children: [
-          // 1. ប្រអប់ Search និង Filter
           JobSearchBar(
             searchController: TextEditingController(),
             onChanged: (val) {},
             onSortTap: () {},
           ),
-
           const SizedBox(height: 10),
-
           JobStatusTabs(
             tabs: const ['All (35)', 'Active (15)', 'Paused (5)', 'Draft (2)'],
             selectedTab: 'All (35)',
             onTabChanged: (tab) {},
           ),
-
           const SizedBox(height: 20),
 
-          // 3. បញ្ជីការងារ (Job Cards List)
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              itemCount: 3, // បង្ហាញ ៣កាតសាកល្បងសិន
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                // ── គូរ Static Data សម្រាប់តេស្ត UI ──
-                if (index == 0) {
-                  return JobCardItem(
-                    title: "Senior Product Designer",
-                    department: "Design",
-                    location: "Remote • Global",
-                    timeAgo: "2d ago",
-                    status: "active",
-                    isUrgent: true,
-                    candidatesCount: 84,
-                    onTap: () {},
-                  );
-                } else if (index == 1) {
-                  return JobCardItem(
-                    title: "Full Stack Engineer",
-                    department: "Engineering",
-                    location: "New York, NY",
-                    timeAgo: "5d ago",
-                    status: "active",
-                    candidatesCount: 127,
-                    onTap: () {},
-                  );
-                } else {
-                  return JobCardItem(
-                    title: "Growth Marketing Lead",
-                    department: "Marketing",
-                    location: "Phnom Penh",
-                    timeAgo: "1w ago",
-                    status: "draft",
-                    candidatesCount: 0,
-                    onTap: () {},
-                  );
-                }
-              },
-            ),
-          ),
+          // ── ប្រើប្រាស់ Function ដើម្បីបង្ហាញបញ្ជីការងារ ──
+          Expanded(child: _buildJobList()),
         ],
       ),
     );
   }
 
-  // ── ប៊ូតុង + New Job (ទុកដូចដើម) ──
+  // ==========================================
+  // ── 1. Function សម្រាប់សាងសង់បញ្ជីការងារ (List View)
+  // ==========================================
+  Widget _buildJobList() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          itemCount: 5,
+          separatorBuilder: (_, _) => const SizedBox(height: 16),
+          itemBuilder: (_, _) => const JobCardSkeleton(),
+        );
+      }
+
+      if (controller.jobs.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(LucideIcons.inbox, size: 48, color: Colors.grey.shade300),
+              const SizedBox(height: 16),
+              Text(
+                "No jobs found.",
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return ListView.separated(
+        controller: controller.scrollController,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        itemCount:
+            controller.jobs.length + (controller.isLoadingMore.value ? 1 : 0),
+        separatorBuilder: (_, _) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          // Loading ផ្នែកខាងក្រោមពេលអូស (Pagination)
+          if (index == controller.jobs.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFF4f7df7),
+                ),
+              ),
+            );
+          }
+
+          final job = controller.jobs[index];
+
+          return JobCardItem(
+            title: job.title,
+            department: _getDepartmentName(job.categoryId),
+            location: _getLocationName(job.provinceId),
+            timeAgo: _getTimeAgo(job.createdAt),
+            status: job.status.isEmpty ? 'draft' : job.status,
+            isUrgent: false,
+            candidatesCount: 0,
+            onTap: () {},
+
+            // 🎯 បញ្ជូនតែ Context និង Job ID ទៅប៉ុណ្ណោះ!
+            onMoreTap: () => _showJobActionSheet(context, job.id),
+          );
+        },
+      );
+    });
+  }
+
+  // ==========================================
+  // ── 2. Function សម្រាប់បង្ហាញ Job Action Bottom Sheet
+  // ==========================================
+  void _showJobActionSheet(BuildContext context, String targetJobId) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        // ── 🎯 ដំណោះស្រាយ: រុំ Obx ខាងក្នុង builder ──
+        // វានឹងបង្ខំឱ្យ Bottom Sheet គូរខ្លួនឯងឡើងវិញ រាល់ពេលទិន្នន័យ jobs ប្រែប្រួល
+        return Obx(() {
+          // 🎯 ទាញយក Object និងគណនា Status ត្រូវតែដាក់ក្នុង Obx នេះ
+          final actualJob = controller.jobs.firstWhere(
+            (j) => j.id == targetJobId,
+            orElse: () => throw Exception('Job not found'),
+          );
+
+          final statusLower = actualJob.status.trim().toLowerCase();
+          final isCurrentlyInactive =
+              statusLower == 'inactive' || statusLower == 'paused';
+          final isCurrentlyClosed = statusLower == 'closed';
+          final isDraft = statusLower == 'draft';
+
+          return JobActionBottomSheet(
+            pauseLabel: isCurrentlyInactive ? "Resume Job" : "Pause Job",
+            pauseIcon: isCurrentlyInactive
+                ? LucideIcons.play
+                : LucideIcons.pause,
+
+            onEdit: () {
+              Get.back();
+              Get.toNamed(AppRoutes.newJob, arguments: actualJob);
+            },
+
+            onShare: () {},
+
+            onPause: (isCurrentlyClosed || isDraft)
+                ? () {}
+                : () {
+                    // បើអ្នកមិនចង់ឱ្យ Bottom Sheet បិទ ពេលចុច Pause ទេ សូមលុប Get.back() នេះចោល
+                    Get.back();
+
+                    final newStatus = isCurrentlyInactive
+                        ? 'active'
+                        : 'inactive';
+                    final titleText = isCurrentlyInactive
+                        ? "Resume Job?"
+                        : "Pause Job?";
+                    final messageText = isCurrentlyInactive
+                        ? "Are you sure you want to resume this job? It will be visible to candidates again."
+                        : "Are you sure you want to pause this job? It will be temporarily hidden from candidates.";
+
+                    Get.dialog(
+                      ConfirmDialog(
+                        title: titleText,
+                        message: messageText,
+                        confirmText: isCurrentlyInactive ? "Resume" : "Pause",
+                        cancelText: "Cancel",
+                        isDestructive: !isCurrentlyInactive,
+                        onConfirm: () {
+                          controller.changeJobStatus(actualJob.id, newStatus);
+                        },
+                      ),
+                    );
+                  },
+
+            onDuplicate: () {},
+
+            onCloseJob: (isCurrentlyClosed || isDraft)
+                ? () {}
+                : () {
+                    Get.back();
+                    Get.dialog(
+                      ConfirmDialog(
+                        title: "Close Job?",
+                        message:
+                            "Are you sure you want to close this job? Candidates will no longer be able to apply.",
+                        confirmText: "Close Job",
+                        cancelText: "Cancel",
+                        onConfirm: () {
+                          controller.changeJobStatus(actualJob.id, 'closed');
+                        },
+                      ),
+                    );
+                  },
+
+            onDelete: () {
+              Get.back();
+              Get.dialog(
+                ConfirmDialog(
+                  title: "Delete Job?",
+                  message:
+                      "Are you sure you want to delete this job? This action cannot be undone.",
+                  confirmText: "Delete",
+                  cancelText: "Cancel",
+                  isDestructive: true,
+                  onConfirm: () {
+                    controller.deleteJob(actualJob.id);
+                  },
+                ),
+              );
+            },
+          );
+        });
+      },
+    );
+  }
+
+  // ==========================================
+  // ── 3. Helper Functions (សម្រាប់បំប្លែងទិន្នន័យ)
+  // ==========================================
+
+  String _getLocationName(String provinceId) {
+    if (Get.isRegistered<LocationController>()) {
+      try {
+        final locCtrl = Get.find<LocationController>();
+        return locCtrl.provinces.firstWhere((p) => p.id == provinceId).nameEn;
+      } catch (_) {}
+    }
+    return "Unknown Location";
+  }
+
+  String _getDepartmentName(String categoryId) {
+    if (Get.isRegistered<CategoryController>()) {
+      try {
+        final catCtrl = Get.find<CategoryController>();
+        return catCtrl.categories.firstWhere((c) => c.id == categoryId).name;
+      } catch (_) {}
+    }
+    return "General";
+  }
+
+  String _getTimeAgo(String createdAt) {
+    try {
+      final createdDate = DateTime.parse(createdAt).toLocal();
+      final difference = DateTime.now().difference(createdDate);
+
+      if (difference.inDays > 0) return "${difference.inDays}d ago";
+      if (difference.inHours > 0) return "${difference.inHours}h ago";
+      if (difference.inMinutes > 0) return "${difference.inMinutes}m ago";
+    } catch (_) {}
+    return "Just now";
+  }
+
+  // ── ប៊ូតុង + New Job ──
   InkWell _buildNewJobButton() {
     return InkWell(
-      onTap: () {
-        Get.toNamed(AppRoutes.newJob);
-      },
+      onTap: () => Get.toNamed(AppRoutes.newJob),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -111,11 +287,11 @@ class MyJobView extends GetView<MyJobViewController> {
           color: const Color(0xFF4f7df7),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
+        child: const Row(
           children: [
-            const Icon(LucideIcons.plus, color: Colors.white, size: 18),
-            const SizedBox(width: 4),
-            const Text(
+            Icon(LucideIcons.plus, color: Colors.white, size: 18),
+            SizedBox(width: 4),
+            Text(
               'New Job',
               style: TextStyle(
                 color: Colors.white,

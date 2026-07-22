@@ -9,6 +9,12 @@ class CategoryController extends GetxController {
   final categoiesCache = <String, List<CategoryModel>>{}.obs;
   final isLoading = false.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchCategories();
+  }
+
   Future<void> fetchCategories({String? search}) async {
     isLoading.value = true;
     try {
