@@ -28,6 +28,23 @@ class MyJobViewController extends GetxController {
     scrollController.addListener(_scrollListener);
   }
 
+  List<JobDataModel> get displayJobs {
+    if (seletedTab.value == 'Active') {
+      return jobs.where((j) => j.status.toLowerCase() == 'active').toList();
+    } else if (seletedTab.value == 'Paused') {
+      return jobs
+          .where(
+            (j) =>
+                j.status.toLowerCase() == 'inactive' ||
+                j.status.toLowerCase() == 'paused',
+          )
+          .toList();
+    } else if (seletedTab.value == 'Draft') {
+      return jobs.where((j) => j.status.toLowerCase() == 'draft').toList();
+    }
+    return jobs; // ប្រសិនបើជា All គឺបង្ហាញទាំងអស់
+  }
+
   Future<void> fetchJobs({bool isRefresh = false}) async {
     // ប្រសិនបើជាការ Refresh ឬប្តូរ Tab ថ្មី
     if (isRefresh) {
@@ -44,7 +61,7 @@ class MyJobViewController extends GetxController {
       final response = await _jobService.getJobs(
         page: _currentPage,
         limit: _limit,
-        status: seletedTab.value,
+        // status: seletedTab.value,
         searchKeyword: searchController.text,
       );
 
@@ -143,15 +160,8 @@ class MyJobViewController extends GetxController {
       if (success) {
         for (int i = 0; i < jobs.length; i++) {
           if (jobs[i].id == jobId) {
-            // ១. Print តម្លៃចាស់ និងតម្លៃដែលយើងចង់ប្តូរទៅ
-            debugPrint('🎯 TARGET STATUS: $newStatus');
-            debugPrint('👉 BEFORE Update: ${jobs[i].id} -> ${jobs[i].status}');
-
             // ២. ធ្វើការ Update
             jobs[i] = jobs[i].copyWith(status: newStatus);
-
-            // ៣. Print តម្លៃថ្មីដើម្បីផ្ទៀងផ្ទាត់
-            debugPrint('✅ AFTER Update: ${jobs[i].id} -> ${jobs[i].status}');
           }
         }
 
@@ -186,10 +196,22 @@ class MyJobViewController extends GetxController {
     }
   }
 
-  void changeTab(String tab) {
-    if (seletedTab.value == tab) return; // បើចុចចំ Tab ដដែល មិនបាច់ធ្វើអ្វីទេ
-    seletedTab.value = tab;
-    fetchJobs(isRefresh: true);
+  void changeTab(String tabString) {
+    // 🎯 ១. កាត់យកតែពាក្យខាងមុខ (ឧ. ពី "Active (15)" មកត្រឹម "Active")
+    String newFilter = 'All';
+    if (tabString.startsWith('Active')) {
+      newFilter = 'Active';
+    } else if (tabString.startsWith('Paused')) {
+      newFilter = 'Paused';
+    } else if (tabString.startsWith('Draft')) {
+      newFilter = 'Draft';
+    }
+
+    // បើចុចចំ Tab ដដែល មិនបាច់ធ្វើអ្វីទេ
+    if (seletedTab.value == newFilter) return;
+
+    // 🎯 ២. គ្រាន់តែប្តូរតម្លៃឱ្យ Obx ធ្វើការ Rebuild UI ជាការស្រេច
+    seletedTab.value = newFilter;
   }
 
   void onSearchChanged(String query) {

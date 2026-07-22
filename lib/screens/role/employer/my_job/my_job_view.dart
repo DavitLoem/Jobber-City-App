@@ -42,16 +42,45 @@ class MyJobView extends GetView<MyJobViewController> {
       body: Column(
         children: [
           JobSearchBar(
-            searchController: TextEditingController(),
-            onChanged: (val) {},
+            searchController: controller.searchController,
+            onChanged: controller.onSearchChanged,
             onSortTap: () {},
           ),
           const SizedBox(height: 10),
-          JobStatusTabs(
-            tabs: const ['All (35)', 'Active (15)', 'Paused (5)', 'Draft (2)'],
-            selectedTab: 'All (35)',
-            onTabChanged: (tab) {},
-          ),
+          Obx(() {
+            final allCount = controller.jobs.length;
+            final activeCount = controller.jobs
+                .where((j) => j.status.toLowerCase() == 'active')
+                .length;
+            final pausedCount = controller.jobs
+                .where(
+                  (j) =>
+                      j.status.toLowerCase() == 'inactive' ||
+                      j.status.toLowerCase() == 'paused',
+                )
+                .length;
+            final draftCount = controller.jobs
+                .where((j) => j.status.toLowerCase() == 'draft')
+                .length;
+
+            final tabList = [
+              'All ($allCount)',
+              'Active ($activeCount)',
+              'Paused ($pausedCount)',
+              'Draft ($draftCount)',
+            ];
+
+            final selectedStr = tabList.firstWhere(
+              (t) => t.startsWith(controller.seletedTab.value),
+              orElse: () => tabList[0],
+            );
+
+            return JobStatusTabs(
+              tabs: tabList,
+              selectedTab: selectedStr,
+              onTabChanged: controller.changeTab,
+            );
+          }),
           const SizedBox(height: 20),
 
           // ── ប្រើប្រាស់ Function ដើម្បីបង្ហាញបញ្ជីការងារ ──
@@ -66,6 +95,8 @@ class MyJobView extends GetView<MyJobViewController> {
   // ==========================================
   Widget _buildJobList() {
     return Obx(() {
+      final currentList = controller.displayJobs;
+
       if (controller.isLoading.value) {
         return ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -75,7 +106,7 @@ class MyJobView extends GetView<MyJobViewController> {
         );
       }
 
-      if (controller.jobs.isEmpty) {
+      if (currentList.isEmpty) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -83,7 +114,7 @@ class MyJobView extends GetView<MyJobViewController> {
               Icon(LucideIcons.inbox, size: 48, color: Colors.grey.shade300),
               const SizedBox(height: 16),
               Text(
-                "No jobs found.",
+                "No jobs found in this status",
                 style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
               ),
             ],
@@ -95,11 +126,11 @@ class MyJobView extends GetView<MyJobViewController> {
         controller: controller.scrollController,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         itemCount:
-            controller.jobs.length + (controller.isLoadingMore.value ? 1 : 0),
+            currentList.length + (controller.isLoadingMore.value ? 1 : 0),
         separatorBuilder: (_, _) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
           // Loading ផ្នែកខាងក្រោមពេលអូស (Pagination)
-          if (index == controller.jobs.length) {
+          if (index == currentList.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(
@@ -111,7 +142,7 @@ class MyJobView extends GetView<MyJobViewController> {
             );
           }
 
-          final job = controller.jobs[index];
+          final job = currentList[index];
 
           return JobCardItem(
             title: job.title,
