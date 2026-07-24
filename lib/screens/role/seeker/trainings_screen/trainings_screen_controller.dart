@@ -100,14 +100,8 @@ class TrainingsScreenViewController extends GetxController {
       );
 
       await _trainingsServices.addTraining(newTraining);
-
-      Get.snackbar(
-        'Success',
-        'Training saved successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-      Get.back();
+      Get.toNamed(AppRoutes.trainings);
+      Get.snackbar('Success', 'Training saved successfully');
     } catch (e) {
       debugPrint('Error saving training: $e');
       Get.snackbar(

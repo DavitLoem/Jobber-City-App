@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/location_services.dart';
 import 'package:jobber_city/models/location_model.dart';
@@ -39,9 +40,49 @@ class LocationScreenView extends GetView<LocationScreenController> {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: LocationSearchBar(
-                searchController: controller.searchController,
-                onChanged: controller.filterLocations,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: LocationSearchBar(
+                      searchController: controller.searchController,
+                      onChanged: controller.filterLocations,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Obx(
+                    () => GestureDetector(
+                      onTap: controller.isGettingCurrentLocation.value
+                          ? null
+                          : controller.getCurrentLocation,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: controller.isGettingCurrentLocation.value
+                              ? LocationColors.muted
+                              : LocationColors.accent,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: controller.isGettingCurrentLocation.value
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Icon(
+                                Icons.my_location_rounded,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -75,6 +116,15 @@ class LocationScreenView extends GetView<LocationScreenController> {
       }
 
       final list = controller.provincesList;
+      final error = controller.provinceError.value;
+
+      if (error.isNotEmpty) {
+        return _buildErrorState(
+          error,
+          onRetry: () => controller.fetchProvinces(),
+        );
+      }
+
       if (list.isEmpty) return const LocationEmptySearch();
 
       return ListView.separated(
@@ -126,6 +176,19 @@ class LocationScreenView extends GetView<LocationScreenController> {
             }
 
             final list = controller.districtsList;
+            final error = controller.districtError.value;
+
+            if (error.isNotEmpty) {
+              return _buildErrorState(
+                error,
+                onRetry: () {
+                  controller.fetchDistricts(
+                    controller.selectedProvinceId.value,
+                  );
+                },
+              );
+            }
+
             if (list.isEmpty) return const LocationEmptySearch();
 
             return ListView.separated(
@@ -148,6 +211,44 @@ class LocationScreenView extends GetView<LocationScreenController> {
           }),
         ),
       ],
+    );
+  }
+
+  Widget _buildErrorState(String error, {required VoidCallback onRetry}) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            size: 48,
+            color: LocationColors.border,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            error,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: LocationColors.sub,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: LocationColors.accent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 }

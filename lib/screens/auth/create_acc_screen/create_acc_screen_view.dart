@@ -147,6 +147,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           prefixIcon: Icons.lock,
           suffixIcon: Icons.visibility,
           isPasswordField: true,
+          showPasswordStrength: true,
           validator: AuthValidator.validatePassword,
           textInputAction: TextInputAction.done,
         ),

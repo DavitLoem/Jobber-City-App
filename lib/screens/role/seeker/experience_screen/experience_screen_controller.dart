@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/role/seeker/experience_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
 import 'package:jobber_city/models/role/seeker/experience_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 
 class ExperienceScreenViewController extends GetxController {
   final ExperienceServices _experienceServices = ExperienceServices();
@@ -112,14 +113,9 @@ class ExperienceScreenViewController extends GetxController {
       );
 
       await _experienceServices.addExperience(newExperience);
-      Get.snackbar(
-        "Success",
-        "Experience saved successfully!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
 
-      Get.back(); // ថយក្រោយទៅកាន់ Profile វិញពេល Save រួច
+      Get.toNamed(AppRoutes.experience);
+      Get.snackbar("Success", "Experience saved successfully!");
     } catch (e) {
       Get.snackbar(
         "Error",

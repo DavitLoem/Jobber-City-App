@@ -4,15 +4,6 @@ import 'package:jobber_city/core/constants/app_colors.dart';
 
 /// A text-field-styled selector for City / Province (or any other
 /// API-backed single-select list).
-///
-/// Same public API as before — [controller], [fetchOptions], [labelOf],
-/// [onSelected], [validator], etc. — so existing call sites keep working.
-/// What changed is purely visual/interaction polish:
-/// - Smooth focus/scale animation matching [CustomTextfield]
-/// - A dropdown arrow that rotates open/closed
-/// - A redesigned picker sheet: avatar-style leading letter, selected-item
-///   highlight + check mark, animated search clear button, shimmer-free
-///   loading state, and nicer empty/error states.
 class CitySelectField<T> extends StatefulWidget {
   const CitySelectField({
     super.key,
@@ -30,15 +21,8 @@ class CitySelectField<T> extends StatefulWidget {
   });
 
   final TextEditingController controller;
-
-  /// Should call your API and return the list of available items.
-  /// e.g. () => LocationServices().getLocation()
   final Future<List<T>> Function() fetchOptions;
-
-  /// How to turn an item of type [T] into the text shown in the list /
-  /// field. e.g. (location) => location.name
   final String Function(T option) labelOf;
-
   final String hintText;
   final IconData prefixIcon;
   final String? Function(String?)? validator;
@@ -46,9 +30,6 @@ class CitySelectField<T> extends StatefulWidget {
   final String searchHint;
   final bool enabled;
   final bool showSeparators;
-
-  /// Called with the selected item when the user picks one, so you can
-  /// pull its id (or anything else) for your update request.
   final void Function(T option)? onSelected;
 
   @override
@@ -60,6 +41,8 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
   bool _isOpen = false;
+  // 🟢 បន្ថែមអថេរសម្រាប់តាមដានថាមានទិន្នន័យ (អក្សរ) ត្រូវបានជ្រើសរើសឬអត់
+  bool _hasText = false;
 
   late final AnimationController _arrowController = AnimationController(
     vsync: this,
@@ -69,8 +52,20 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
   @override
   void initState() {
     super.initState();
+    _hasText =
+        widget.controller.text.isNotEmpty; // ឆែកមើលពេលបើកមកដំបូង[cite: 48]
+
     _focusNode.addListener(() {
       setState(() => _isFocused = _focusNode.hasFocus);
+    });
+
+    // 🟢 ស្តាប់រាល់ពេលមានការផ្លាស់ប្តូរនៅក្នុង Controller[cite: 48]
+    widget.controller.addListener(() {
+      if (mounted) {
+        setState(() {
+          _hasText = widget.controller.text.isNotEmpty;
+        });
+      }
     });
   }
 
@@ -113,11 +108,14 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
     }
   }
 
-  Color get _accentColor => widget.enabled
-      ? ((_isFocused || _isOpen)
-            ? AppColors.inputFocusedBorder
-            : AppColors.inputIconText)
-      : AppColors.iconDisabled;
+  // 🟢 កែប្រែ Logic ពណ៌ Icon ត្រង់នេះឲ្យដូចទៅនឹង ProfileTextField[cite: 48]
+  Color get _accentColor {
+    if (!widget.enabled) return AppColors.iconDisabled;
+    if (_isFocused || _isOpen) return AppColors.inputFocusedBorder;
+    if (_hasText)
+      return AppColors.inputIconText; // ប្តូរទៅពណ៌ខ្មៅពេលមានទិន្នន័យជ្រើសរើសរួច
+    return AppColors.inputIconText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +134,7 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: widget.enabled ? AppColors.inputIconText : Colors.grey,
+          color: widget.enabled ? Colors.black87 : Colors.grey,
         ),
         decoration: InputDecoration(
           filled: true,
@@ -175,7 +173,8 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
               duration: const Duration(milliseconds: 180),
               child: Icon(
                 widget.prefixIcon,
-                key: ValueKey('${_isFocused}_${_isOpen}'),
+                // 🟢 បន្ថែម _hasText ចូលក្នុង Key ដើម្បីឲ្យវា Animates ដូរពណ៌
+                key: ValueKey('$_isFocused-$_isOpen-$_hasText'),
                 color: _accentColor,
               ),
             ),
@@ -192,7 +191,10 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
           ),
           hintText: widget.hintText,
           hintStyle: TextStyle(
-            color: _accentColor,
+            // 🟢 Hint Text នៅតែជាពណ៌ប្រផេះធម្មតា
+            color: widget.enabled
+                ? AppColors.inputIconText
+                : AppColors.iconDisabled,
             fontSize: 16,
             fontWeight: FontWeight.w400,
           ),
