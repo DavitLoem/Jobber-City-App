@@ -7,6 +7,7 @@ import 'package:jobber_city/models/master_data_model.dart';
 import 'package:jobber_city/widgets/custom_bottom_sheet_picker.dart';
 import 'package:jobber_city/widgets/custom_form_textfield.dart';
 
+import '../../employer_profile/employer_profile_view.dart';
 import '../new_job_view.dart';
 
 class Step1BasicInfo extends GetView<NewJobViewController> {
@@ -239,6 +240,12 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
 
   // ── ផ្នែករចនា Company Logo ──
   Widget _buildCompanyLogo() {
+    final profileCtrl = Get.find<EmployerProfileViewController>();
+    final profile = profileCtrl.companyProfile.value;
+    final hasLogo =
+        profile != null &&
+        profile.logoUrl != null &&
+        profile.logoUrl!.isNotEmpty;
     return Row(
       children: [
         Stack(
@@ -254,36 +261,21 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
                   color: AppColors.primary.withValues(alpha: 0.2),
                   width: 1.5,
                 ),
-                // image: DecorationImage(image: NetworkImage('url'), fit: BoxFit.cover),
               ),
-              child: const Center(
-                child: Text(
-                  "JC", // តំណាងឈ្មោះក្រុមហ៊ុន
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade300, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.camera_alt_rounded,
-                size: 12,
-                color: AppColors.primary,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: hasLogo
+                    ? Image.network(
+                        profile.logoUrl!,
+                        width: 65,
+                        height: 65,
+                        fit: BoxFit.cover,
+                      )
+                    : const Icon(
+                        Icons.camera_alt_rounded,
+                        size: 32,
+                        color: AppColors.primary,
+                      ),
               ),
             ),
           ],

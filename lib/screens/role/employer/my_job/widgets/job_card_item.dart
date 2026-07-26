@@ -3,6 +3,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobCardItem extends StatelessWidget {
   final String title;
+  final String? logoUrl;
   final String department;
   final String location;
   final String timeAgo;
@@ -23,6 +24,7 @@ class JobCardItem extends StatelessWidget {
     required this.candidatesCount,
     required this.onTap,
     required this.onMoreTap,
+    this.logoUrl,
   });
 
   @override
@@ -78,9 +80,20 @@ class JobCardItem extends StatelessWidget {
                     color: const Color(0xFFEEF2FF), // ពណ៌ខៀវស្រាល
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    LucideIcons.briefcase,
-                    color: Color(0xFF4f7df7),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: logoUrl != null && logoUrl!.isNotEmpty
+                        ? Image.network(
+                            logoUrl!,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(
+                            LucideIcons.briefcase,
+                            size: 28,
+                            color: Colors.grey.shade400,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 12),

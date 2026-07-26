@@ -46,6 +46,17 @@ class JobService {
     }
   }
 
+  // 🎯 មុខងារថ្មីសម្រាប់ទាញយកការងារលម្អិតតាមរយៈ ID
+  Future<JobSingleResponseModel> getJobById(String jobId) async {
+    try {
+      final response = await _apiClient.get('$endpoint$jobId');
+
+      return JobSingleResponseModel.fromJson(response);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<JobSingleResponseModel> updateJob(
     String jobId,
     JobRequestModel jobData,

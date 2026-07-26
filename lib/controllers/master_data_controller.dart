@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/master_data_service.dart';
 import 'package:jobber_city/models/master_data_model.dart';
@@ -49,5 +50,28 @@ class MasterDataController extends GetxController {
     } finally {
       loadingStates[endpoint] = false;
     }
+  }
+
+  String getMasterDataName(String cacheKey, String id) {
+    if (id.isEmpty) return '';
+
+    try {
+      // ១. ចាប់យកបញ្ជីទិន្នន័យផ្អែកលើ Key (ឧ. 'skills', 'employment-types')
+      final dataList = masterDataCache[cacheKey];
+
+      if (dataList != null) {
+        // ២. ស្វែងរកធាតុដែលមាន ID ត្រូវគ្នា
+        // ចំណាំ៖ សូមប្តូរ element.id និង element.name ទៅតាម Field ពិតរបស់ Master Data Model
+        final item = dataList.firstWhereOrNull((element) => element.id == id);
+
+        // ៣. បើរកឃើញបោះឈ្មោះឱ្យ បើរកមិនឃើញបោះ ID សិន
+        return item?.name ?? id;
+      }
+    } catch (_) {
+      debugPrint("🔥 Error getting name for $cacheKey with ID $id");
+    }
+
+    // Fallback ប្រសិនបើមានបញ្ហា ឬរកមិនឃើញ Cache
+    return id;
   }
 }

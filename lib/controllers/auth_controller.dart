@@ -259,6 +259,7 @@ class AuthController extends GetxController {
   void logout() {
     Get.dialog(
       AlertDialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [

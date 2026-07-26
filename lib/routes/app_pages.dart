@@ -8,8 +8,10 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
+import 'package:jobber_city/screens/role/employer/employer_profile/company_detail/company_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_view.dart';
+import 'package:jobber_city/screens/role/employer/my_job_detail/my_job_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/new_job/new_job_view.dart';
 import 'package:jobber_city/screens/role/seeker/educations_screen/educations_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_binding.dart';
@@ -24,6 +26,10 @@ import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit
 import 'package:jobber_city/screens/role/seeker/trainings_screen/trainings_screen_view.dart';
 // Import Views & Bindings
 import 'package:jobber_city/screens/splash/splash_view.dart';
+
+import '../screens/role/employer/employer_profile/change_password/change_password_view.dart';
+import '../screens/role/employer/employer_profile/edit_profile_employer/edit_profile_employer_view.dart';
+import '../screens/role/employer/employer_profile/notification_employer/notification_employer_view.dart';
 
 class AppRoles {
   static const String seeker = 'seeker';
@@ -140,6 +146,60 @@ class AppPages {
       name: AppRoutes.newJob,
       page: () => NewJobView(),
       binding: NewJobViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.myJobDetail,
+      page: () => MyJobDetailView(),
+      binding: MyJobDetailViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.editProfileEmployer,
+      page: () => EditProfileEmployerView(),
+      binding: EditProfileEmployerViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.companyDetail,
+      page: () => CompanyDetailView(),
+      binding: CompanyDetailViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.changePassword,
+      page: () => ChangePasswordView(),
+      binding: ChangePasswordViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.changePassword,
+      page: () => ChangePasswordView(),
+      binding: ChangePasswordViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.notificationEmployer,
+      page: () => NotificationEmployerView(),
+      binding: NotificationEmployerViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.employer),

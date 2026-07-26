@@ -118,4 +118,42 @@ class CompanyProfileModel {
       status: json['status'] ?? 'pending',
     );
   }
+
+  CompanyProfileModel copyWith({
+    String? id,
+    String? userId,
+    String? companyName,
+    String? industryId,
+    String? companySize,
+    String? description,
+    String? contactEmail,
+    String? contactPhone,
+    String? websiteUrl,
+    String? provinceId,
+    String? districtId,
+    String? addressDetail,
+    String? logoUrl,
+    String? bannerUrl,
+    bool? isVerified,
+    String? status,
+  }) {
+    return CompanyProfileModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      companyName: companyName ?? this.companyName,
+      industryId: industryId ?? this.industryId,
+      companySize: companySize ?? this.companySize,
+      description: description ?? this.description,
+      contactEmail: contactEmail ?? this.contactEmail,
+      contactPhone: contactPhone ?? this.contactPhone,
+      websiteUrl: websiteUrl ?? this.websiteUrl,
+      provinceId: provinceId ?? this.provinceId,
+      districtId: districtId ?? this.districtId,
+      addressDetail: addressDetail ?? this.addressDetail,
+      logoUrl: logoUrl ?? this.logoUrl,
+      bannerUrl: bannerUrl ?? this.bannerUrl,
+      isVerified: isVerified ?? this.isVerified,
+      status: status ?? this.status,
+    );
+  }
 }

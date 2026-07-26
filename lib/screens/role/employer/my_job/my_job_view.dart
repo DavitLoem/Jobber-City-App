@@ -13,6 +13,7 @@ import 'package:jobber_city/widgets/confirm_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/utils/debouncer.dart';
+import '../employer_profile/employer_profile_view.dart';
 import 'widgets/job_action_bottom_sheet.dart';
 import 'widgets/job_card_skeleton.dart';
 
@@ -144,17 +145,26 @@ class MyJobView extends GetView<MyJobViewController> {
 
           final job = currentList[index];
 
+          final profileCtrl = Get.find<EmployerProfileViewController>();
+          final profile = profileCtrl.companyProfile.value;
+          final hasLogo =
+              profile != null &&
+              profile.logoUrl != null &&
+              profile.logoUrl!.isNotEmpty;
+
           return JobCardItem(
             title: job.title,
+            logoUrl: hasLogo ? profile.logoUrl! : null,
             department: _getDepartmentName(job.categoryId),
             location: _getLocationName(job.provinceId),
             timeAgo: _getTimeAgo(job.createdAt),
             status: job.status.isEmpty ? 'draft' : job.status,
             isUrgent: false,
             candidatesCount: 0,
-            onTap: () {},
+            onTap: () {
+              Get.toNamed(AppRoutes.myJobDetail, arguments: job.id);
+            },
 
-            // 🎯 បញ្ជូនតែ Context និង Job ID ទៅប៉ុណ្ណោះ!
             onMoreTap: () => _showJobActionSheet(context, job.id),
           );
         },

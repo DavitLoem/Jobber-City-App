@@ -57,8 +57,11 @@ class CompanyProfileService {
         ),
       });
 
+      // response ទទួលបានជាប្រភេទ Map<String, dynamic>
       final response = await _apiClient.post('$_baseUrl/logo', data: formData);
-      return response.statusCode == 200 || response.statusCode == 201;
+
+      // 🎯 កែប្រែត្រង់នេះ៖ ឆែកមើល key 'success' នៅក្នុង Map ជំនួសឱ្យ statusCode
+      return response['success'] == true;
     } catch (e) {
       rethrow;
     }
