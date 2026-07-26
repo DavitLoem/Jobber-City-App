@@ -1,3 +1,4 @@
+// ── ហ្វាល់ edit_profile_screen_controller.dart ──
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/api/services/category_services.dart';
-import 'package:jobber_city/core/api/services/location_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
@@ -14,24 +14,24 @@ import 'package:jobber_city/models/category_model.dart';
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 
+// 🟢 បញ្ចូល LocationController
+import 'package:jobber_city/controllers/location_controller.dart';
+
 class EditProfileScreenViewController extends GetxController {
-  // ── Services (original kept + new added) ──
   final _seekerServices = AuthServices();
   final _profileServices = SeekerProfileServices();
-  final _locationServices = LocationServices();
   final _categoryServices = CategoryServices();
   final _storage = const FlutterSecureStorage();
 
-  // ═══════════════════════════════════════════════
-  // ORIGINAL controllers (kept exactly as-is)
-  // ═══════════════════════════════════════════════
+  // 🟢 ប្រើប្រាស់ LocationController ដើម្បីទាញយកខេត្ត និងស្រុក[cite: 39, 41]
+  final locationController = Get.put(LocationController());
+
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController positionController = TextEditingController();
   final TextEditingController provinceController = TextEditingController();
 
-  // ORIGINAL reactive vars (kept exactly as-is)
   var isLoading = true.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
@@ -39,15 +39,10 @@ class EditProfileScreenViewController extends GetxController {
   var position = ''.obs;
   var selectedCategoryNames = ''.obs;
 
-  // ORIGINAL lists & IDs (kept exactly as-is)
-  var provincesList = <LocationModel>[].obs;
   var categoriesList = <CategoryModel>[].obs;
   var selectedProvinceId = ''.obs;
   var selectedCategoryIds = <String>[].obs;
 
-  // ═══════════════════════════════════════════════
-  // ADDED — Reactive variables for full form
-  // ═══════════════════════════════════════════════
   var phone = ''.obs;
   var currentPosition = ''.obs;
   var dateOfBirth = ''.obs;
@@ -59,9 +54,6 @@ class EditProfileScreenViewController extends GetxController {
   var selectedGender = ''.obs;
   var selectedMaritalStatus = ''.obs;
 
-  // ═══════════════════════════════════════════════
-  // ADDED — Controllers (synced with reactive vars)
-  // ═══════════════════════════════════════════════
   final firstNameCtrl = TextEditingController();
   final lastNameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
@@ -78,13 +70,10 @@ class EditProfileScreenViewController extends GetxController {
   final streetCtrl = TextEditingController();
   final houseNoCtrl = TextEditingController();
 
-  // ADDED — Extra lists & IDs
-  var districtsList = <LocationModel>[].obs;
   var selectedDistrictId = ''.obs;
   var isSaving = false.obs;
   var isFormValid = false.obs;
 
-  // Profile image upload
   final profileImagePath = ''.obs;
   final profileImageUrl = ''.obs;
   final ImagePicker _picker = ImagePicker();
@@ -100,42 +89,27 @@ class EditProfileScreenViewController extends GetxController {
     'Other',
   ];
 
-  // ═══════════════════════════════════════════════
-  // onInit — original kept exactly, no changes
-  // ═══════════════════════════════════════════════
   @override
   void onInit() {
     super.onInit();
-
-    // Add listeners to all controllers for validation
     _addValidationListeners();
 
-    // Get category IDs from FlutterSecureStorage
     _storage.read(key: 'temp_category_ids').then((value) {
       if (value != null) {
         final List<dynamic> ids = jsonDecode(value);
         selectedCategoryIds.assignAll(ids.map((e) => e.toString()).toList());
-        debugPrint("Set categoryIds from storage: $ids");
       }
     });
 
-    // Get arguments from navigation
     final args = Get.arguments;
     if (args != null && args is Map<String, dynamic>) {
-      debugPrint("Navigation arguments: $args");
-
       if (args['province_id'] != null) {
         selectedProvinceId.value = args['province_id'].toString();
-        debugPrint(
-          "Set province_id from arguments: ${selectedProvinceId.value}",
-        );
       }
-
       if (args['category_ids'] != null && args['category_ids'] is List) {
         selectedCategoryIds.assignAll(
           (args['category_ids'] as List).map((e) => e.toString()),
         );
-        debugPrint("Set categoryIds from arguments: $selectedCategoryIds");
       }
     }
 
@@ -179,57 +153,33 @@ class EditProfileScreenViewController extends GetxController {
     isFormValid.value = isValid;
   }
 
-  // ═══════════════════════════════════════════════
-  // fetchInitialData — original kept exactly
-  // ═══════════════════════════════════════════════
   Future<void> fetchInitialData() async {
     try {
-      //final provinces = await _locationServices.getLocation();
-      //provincesList.assignAll(provinces);
-      //debugPrint("Loaded ${provinces.length} provinces");
-
       final categories = await _categoryServices.getCategories();
-      // categoriesList.assignAll(categories);
-      debugPrint("Loaded ${categories.length} categories");
-
-      debugPrint("selectedCategoryIds: $selectedCategoryIds");
-      debugPrint("categoriesList count: ${categoriesList.length}");
-      if (categoriesList.isNotEmpty) {
-        debugPrint(
-          "First few category IDs from API: ${categoriesList.take(3).map((c) => c.id).toList()}",
-        );
-      }
 
       if (selectedCategoryIds.isNotEmpty && categoriesList.isNotEmpty) {
         final matchedCategories = categoriesList
             .where((cat) => selectedCategoryIds.contains(cat.id))
             .toList();
-        debugPrint(
-          "Matched categories: ${matchedCategories.map((c) => '${c.id}: ${c.name}').toList()}",
-        );
         final categoryNames = matchedCategories
             .map((cat) => cat.name)
             .join(', ');
         position.value = categoryNames;
         positionController.text = categoryNames;
-        // Also sync new ctrl
         currentPosition.value = categoryNames;
         currentPositionCtrl.text = categoryNames;
-        debugPrint("Set position from categories: $categoryNames");
-      } else {
-        debugPrint(
-          "No categories matched - selectedCategoryIds empty: ${selectedCategoryIds.isEmpty}, categoriesList empty: ${categoriesList.isEmpty}",
-        );
       }
 
-      if (selectedProvinceId.isNotEmpty && provincesList.isNotEmpty) {
-        final province = provincesList.firstWhereOrNull(
+      if (selectedProvinceId.isNotEmpty) {
+        if (locationController.provinces.isEmpty) {
+          await locationController.fetchProvinces();
+        }
+        final province = locationController.provinces.firstWhereOrNull(
           (p) => p.id.toString() == selectedProvinceId.value,
         );
         if (province != null) {
           provinceController.text = province.nameEn;
-          provinceCtrl.text = province.nameEn; // sync new ctrl
-          debugPrint("Set province name: ${province.nameEn}");
+          provinceCtrl.text = province.nameEn;
         }
       }
     } catch (e) {
@@ -237,52 +187,22 @@ class EditProfileScreenViewController extends GetxController {
     }
   }
 
-  // ═══════════════════════════════════════════════
-  // ADDED — fetch districts when province selected
-  // ═══════════════════════════════════════════════
-  Future<void> fetchDistricts(String provinceId) async {
-    try {
-      districtsList.clear();
-      districtCtrl.clear();
-      selectedDistrictId.value = '';
-      final dists = await _locationServices.getDistricts(provinceId);
-      districtsList.assignAll(dists);
-      debugPrint("Loaded ${dists.length} districts");
-    } catch (e) {
-      debugPrint("Error fetching districts: $e");
-    }
-  }
-
-  // ═══════════════════════════════════════════════
-  // Option providers (original kept + new added)
-  // ═══════════════════════════════════════════════
+  // 🟢 ប្រើ locationController សម្រាប់ទាញយកទិន្នន័យ[cite: 39, 41]
   Future<List<LocationModel>> fetchProvinceOptions() async {
-    try {
-      if (provincesList.isNotEmpty) return provincesList;
-      // return await _locationServices.getLocation();
-      return [];
-    } catch (e) {
-      debugPrint("Error fetching province options: $e");
-      return [];
+    if (locationController.provinces.isEmpty) {
+      await locationController.fetchProvinces();
     }
+    return locationController.provinces;
   }
 
+  // 🟢 ប្រើ locationController សម្រាប់ទាញយកទិន្នន័យ[cite: 39, 41]
   Future<List<LocationModel>> fetchDistrictOptions() async {
-    try {
-      if (selectedProvinceId.value.isEmpty) return [];
-      if (districtsList.isNotEmpty) return districtsList;
-      return await _locationServices.getDistricts(selectedProvinceId.value);
-    } catch (e) {
-      debugPrint("Error fetching district options: $e");
-      return [];
-    }
+    if (selectedProvinceId.value.isEmpty) return [];
+    return await locationController.getDistricts(selectedProvinceId.value);
   }
 
   Future<List<String>> fetchNationalityOptions() async => nationalities;
 
-  // ═══════════════════════════════════════════════
-  // Profile image upload methods
-  // ═══════════════════════════════════════════════
   Future<void> pickProfileImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -295,26 +215,17 @@ class EditProfileScreenViewController extends GetxController {
     try {
       isSaving.value = true;
       final response = await _profileServices.profileImage(filePath);
-      debugPrint('Profile image upload response: $response');
       Get.snackbar('Success', 'Profile image uploaded successfully');
     } catch (e) {
       Get.snackbar('Error', 'Failed to upload profile image: $e');
-      debugPrint('Error uploading profile image: $e');
-      debugPrint('Error type: ${e.runtimeType}');
     } finally {
       isSaving.value = false;
     }
   }
 
-  // ═══════════════════════════════════════════════
-  // checkTokenExpiry — original kept exactly
-  // ═══════════════════════════════════════════════
   Future<void> checkTokenExpiry() async {
     String? token = await TokenStorage.getAccessToken();
-    if (token == null || token.isEmpty) {
-      AppLogger.i("Don't have access token");
-      return;
-    }
+    if (token == null || token.isEmpty) return;
     try {
       final parts = token.split('.');
       if (parts.length != 3) return;
@@ -326,54 +237,42 @@ class EditProfileScreenViewController extends GetxController {
           payloadMap['exp'] * 1000,
         );
         DateTime now = DateTime.now();
-        AppLogger.i("Your Token: ${token.substring(0, 15)}...");
-        AppLogger.i("Current time: $now");
-        AppLogger.i("Expire time: $expiryDate");
         if (now.isAfter(expiryDate)) {
           AppLogger.e("Result: This Token has EXPIRED!");
-        } else {
-          Duration timeLeft = expiryDate.difference(now);
-          AppLogger.i(
-            "Result: This Token is still alive (${timeLeft.inMinutes} minutes and ${timeLeft.inSeconds % 60} seconds remaining)",
-          );
         }
-        debugPrint("========================================");
       }
     } catch (e) {
       debugPrint("Error decoding Token: $e");
     }
   }
 
-  // ═══════════════════════════════════════════════
-  // fetchProfileRaw — original logic kept exactly,
-  // extended to also populate new fields/ctrls
-  // ═══════════════════════════════════════════════
   void fetchProfileRaw() async {
     checkTokenExpiry();
     try {
       isLoading.value = true;
-      AppLogger.i("Fetching Profile data...");
-
       final response = await _seekerServices.getRawProfile();
       var data = response['data'];
 
-      // ── Original fields (kept exactly) ──
       firstName.value = data['first_name'] ?? 'NoName';
       lastName.value = data['last_name'] ?? '';
       email.value = data['email'] ?? '';
-      position.value = data['position'] ?? data['job_title'] ?? '';
+
+      // 🟢 ជួសជុលត្រង់នេះ៖ បន្ថែមការអាន key 'current_position' ពី API
+      position.value =
+          data['current_position'] ??
+          data['position'] ??
+          data['job_title'] ??
+          '';
 
       firstNameController.text = firstName.value;
       lastNameController.text = lastName.value;
       emailController.text = email.value;
       positionController.text = position.value;
 
-      // ── Sync new Ctrl mirrors too ──
       firstNameCtrl.text = firstName.value;
       lastNameCtrl.text = lastName.value;
       emailCtrl.text = email.value;
 
-      // ── New fields populated from API ──
       phone.value = data['phone_number'] ?? '';
       dateOfBirth.value = data['date_of_birth'] ?? '';
       nationality.value = data['nationality'] ?? '';
@@ -383,6 +282,8 @@ class EditProfileScreenViewController extends GetxController {
       village.value = data['village'] ?? '';
       street.value = data['street'] ?? '';
       houseNo.value = data['house_no'] ?? '';
+
+      // 🟢 ជួសជុលត្រង់នេះ៖ ប្រើប្រាស់តម្លៃដែលអានបានពី 'current_position' ខាងលើ
       currentPosition.value = position.value;
 
       phoneCtrl.text = phone.value;
@@ -394,69 +295,70 @@ class EditProfileScreenViewController extends GetxController {
       villageCtrl.text = village.value;
       streetCtrl.text = street.value;
       houseNoCtrl.text = houseNo.value;
+
+      // 🟢 Update ចូលក្នុង TextField ឲ្យវាបង្ហាញអក្សរ
       currentPositionCtrl.text = currentPosition.value;
 
-      // Profile image URL from API
       profileImageUrl.value = data['profile_image_url'] ?? '';
-      debugPrint('Profile image URL: ${profileImageUrl.value}');
 
-      // Province + district
       final pId = data['province_id']?.toString() ?? '';
       final dId = data['district_id']?.toString() ?? '';
+
       if (pId.isNotEmpty) {
         selectedProvinceId.value = pId;
-        await fetchDistricts(pId);
-        final p = provincesList.firstWhereOrNull((e) => e.id.toString() == pId);
+        if (locationController.provinces.isEmpty) {
+          await locationController.fetchProvinces();
+        }
+        final p = locationController.provinces.firstWhereOrNull(
+          (e) => e.id.toString() == pId,
+        );
         if (p != null) {
           provinceController.text = p.nameEn;
           provinceCtrl.text = p.nameEn;
         }
+
         if (dId.isNotEmpty) {
           selectedDistrictId.value = dId;
-          final d = districtsList.firstWhereOrNull(
-            (e) => e.id.toString() == dId,
-          );
+          final dists = await locationController.getDistricts(pId);
+          final d = dists.firstWhereOrNull((e) => e.id.toString() == dId);
           if (d != null) districtCtrl.text = d.nameEn;
         }
       }
 
-      // Categories from API (override storage/args)
       final apiCategoryIds = data['expertise_category_ids'];
       if (apiCategoryIds != null &&
           apiCategoryIds is List &&
           apiCategoryIds.isNotEmpty) {
         selectedCategoryIds.assignAll(apiCategoryIds.map((e) => e.toString()));
+        // ប្រសិនបើអ្នកមិនចង់ឲ្យ Categories លុបពីលើ Current Position ដែលវាយបញ្ចូលទេ
+        // អាចផ្អាកការហៅ _syncCategoryDisplay() សិន ឬ កែប្រែវាកុំឲ្យ Overwrite currentPositionCtrl។
         _syncCategoryDisplay();
       }
-
-      AppLogger.i(
-        "Successfully fetched: ${firstName.value} ${lastName.value} ${email.value}",
-      );
     } catch (e) {
-      AppLogger.i("Failed to fetch Profile: $e");
       Get.snackbar("Error", "Cannot fetch Profile");
     } finally {
       isLoading.value = false;
     }
   }
 
+  // 🟢 ជួសជុលបន្ថែម៖ កុំឲ្យវាទាញ Category Name មកលុបពីលើ Current Position ដែលអ្នកបានវាយបញ្ចូល
   void _syncCategoryDisplay() {
     if (categoriesList.isEmpty || selectedCategoryIds.isEmpty) return;
     final names = categoriesList
         .where((c) => selectedCategoryIds.contains(c.id))
         .map((c) => c.name)
         .join(', ');
+
+    // កែប្រែ៖ Update តែ position ធម្មតា កុំ Update currentPositionCtrl បើវាមានទិន្នន័យពី API រួចហើយ
     if (names.isNotEmpty) {
-      position.value = names;
-      positionController.text = names;
-      currentPosition.value = names;
-      currentPositionCtrl.text = names;
+      // បើ currentPosition ទទេ ទើបយើងយក Category មកបង្ហាញជំនួស
+      if (currentPositionCtrl.text.isEmpty) {
+        currentPosition.value = names;
+        currentPositionCtrl.text = names;
+      }
     }
   }
 
-  // ═══════════════════════════════════════════════
-  // ADDED — Save profile
-  // ═══════════════════════════════════════════════
   Future<void> updateProfile() async {
     if (firstNameController.text.trim().isEmpty ||
         lastNameController.text.trim().isEmpty) {
@@ -495,12 +397,13 @@ class EditProfileScreenViewController extends GetxController {
         portfolioUrl: '',
         linkedinUrl: '',
       );
+
       await _profileServices.updateSeekerProfile(requestModel);
       await _storage.delete(key: 'temp_category_ids');
 
-      Get.back();
+      // 🟢 បញ្ជូនទិន្នន័យត្រឡប់ទៅកាន់ទំព័រ Profile ដើម្បី Update Badge Position[cite: 45, 46]
+      Get.back(result: currentPositionCtrl.text.trim());
 
-      // Small pause for the route transition to settle, then show message
       await Future.delayed(const Duration(milliseconds: 300));
       Get.snackbar(
         'Success',
@@ -518,7 +421,6 @@ class EditProfileScreenViewController extends GetxController {
     }
   }
 
-  // ADDED — Date picker
   void selectDate() {
     showDatePicker(
       context: Get.context!,
@@ -535,18 +437,13 @@ class EditProfileScreenViewController extends GetxController {
     });
   }
 
-  // ═══════════════════════════════════════════════
-  // ADDED — Dispose all controllers
-  // ═══════════════════════════════════════════════
   @override
   void onClose() {
-    // Original
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
     positionController.dispose();
     provinceController.dispose();
-    // New
     firstNameCtrl.dispose();
     lastNameCtrl.dispose();
     emailCtrl.dispose();

@@ -4,6 +4,7 @@ import 'package:jobber_city/core/api/services/role/seeker/trainings_services.dar
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/seeker/trainings_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
 import 'package:jobber_city/widgets/custom_textfield.dart';
 

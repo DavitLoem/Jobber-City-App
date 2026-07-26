@@ -25,6 +25,7 @@ class CustomTextfield extends StatefulWidget {
     this.labelText,
     this.autovalidateMode,
     this.maxLines = 1, // Added maxLines parameter here
+    this.showPasswordStrength = false,
   });
 
   final String hintText;
@@ -43,6 +44,10 @@ class CustomTextfield extends StatefulWidget {
   /// Optional floating label. If null, [hintText] is used as a plain hint.
   final String? labelText;
   final AutovalidateMode? autovalidateMode;
+
+  /// When true (and [isPasswordField] is true), shows a segmented strength
+  /// bar + label ("Weak" / "Fair" / "Strong" / "Very Strong") below the field.
+  final bool showPasswordStrength;
 
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
@@ -87,6 +92,66 @@ class _CustomTextfieldState extends State<CustomTextfield>
     super.initState();
     _obscureText = widget.isPasswordField;
     _focusNode.addListener(_handleFocusChange);
+    if (widget.showPasswordStrength) {
+      widget.controller.addListener(_handlePasswordChanged);
+    }
+  }
+
+  void _handlePasswordChanged() {
+    setState(() {});
+  }
+
+  /// Returns a score from 0 (empty) to 4 (very strong).
+  int get _passwordStrengthScore {
+    final text = widget.controller.text;
+    if (text.isEmpty) return 0;
+
+    int score = 0;
+    if (text.length >= 8) score++;
+    if (text.length >= 12) score++;
+    if (RegExp(r'[A-Z]').hasMatch(text) && RegExp(r'[a-z]').hasMatch(text)) {
+      score++;
+    }
+    if (RegExp(r'[0-9]').hasMatch(text)) score++;
+    if (RegExp(r'[!@#$%^&*(),.?":{}|<>_\-\[\];/~`+=]').hasMatch(text)) {
+      score++;
+    }
+
+    // Clamp into 4 buckets: 1 = Weak, 2 = Fair, 3 = Good/Strong, 4 = Very Strong
+    if (score <= 1) return 1;
+    if (score == 2) return 2;
+    if (score <= 4) return 3;
+    return 4;
+  }
+
+  String get _passwordStrengthLabel {
+    switch (_passwordStrengthScore) {
+      case 0:
+        return '';
+      case 1:
+        return 'Weak';
+      case 2:
+        return 'Fair';
+      case 3:
+        return 'Strong';
+      default:
+        return 'Very Strong';
+    }
+  }
+
+  Color get _passwordStrengthColor {
+    switch (_passwordStrengthScore) {
+      case 1:
+        return Colors.redAccent;
+      case 2:
+        return Colors.orangeAccent;
+      case 3:
+        return AppColors.inputFocusedBorder;
+      case 4:
+        return Colors.green;
+      default:
+        return AppColors.line;
+    }
   }
 
   void _handleFocusChange() {
@@ -110,6 +175,9 @@ class _CustomTextfieldState extends State<CustomTextfield>
   @override
   void dispose() {
     _focusNode.removeListener(_handleFocusChange);
+    if (widget.showPasswordStrength) {
+      widget.controller.removeListener(_handlePasswordChanged);
+    }
     _focusNode.dispose();
     _focusController.dispose();
     _shakeController.dispose();
@@ -122,9 +190,51 @@ class _CustomTextfieldState extends State<CustomTextfield>
   Color get _iconColor =>
       _isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText;
 
+  Widget _buildStrengthIndicator() {
+    final score = _passwordStrengthScore;
+    final color = _passwordStrengthColor;
+
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: score == 0 ? 0 : 1,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Password strength: $_passwordStrengthLabel',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: List.generate(4, (index) {
+                final filled = index < score;
+                return Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(right: index == 3 ? 0 : 6),
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: filled ? color : AppColors.line,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
+    final field = AnimatedBuilder(
       animation: Listenable.merge([_focusController, _shakeController]),
       builder: (context, child) {
         return Transform.translate(
@@ -158,7 +268,7 @@ class _CustomTextfieldState extends State<CustomTextfield>
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: AppColors.inputIconText,
+          color: AppColors.inputText,
         ),
         decoration: InputDecoration(
           filled: true,
@@ -244,6 +354,15 @@ class _CustomTextfieldState extends State<CustomTextfield>
           ),
         ),
       ),
+    );
+
+    if (!widget.isPasswordField || !widget.showPasswordStrength) {
+      return field;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [field, _buildStrengthIndicator()],
     );
   }
 }

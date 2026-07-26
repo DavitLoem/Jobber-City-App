@@ -14,10 +14,13 @@ class AppRoutes {
   // ==========================================
   static const String mainScreenSeeker = '/main-screen';
   static const String homeSeeker = '/home-seeker';
+  static const String search = '/search';
   static const String editprofile = '/edit-profile';
   static const String expertise = '/expertise';
   static const String location = '/location';
   static const String jobDetail = '/job-detail';
+  static const String saveJob = '/save-job';
+  static const String setting = '/setting';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES

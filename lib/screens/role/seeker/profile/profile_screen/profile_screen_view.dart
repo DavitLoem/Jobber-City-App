@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
-import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 part 'profile_screen_binding.dart';
@@ -32,6 +31,8 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar(),
+
+                const SizedBox(height: 15),
                 _buildProfileCard(),
                 const SizedBox(height: 14),
                 _buildCompleteProfileBanner(),
@@ -41,9 +42,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 _buildSectionItem(
                   icon: Icons.person_outline,
                   title: "Contact Information",
-                  onTap: () => Get.toNamed(
-                    '/edit-profile',
-                  )?.then((_) => controller.fetchProfileRaw()),
+                  onTap: () => controller.goToEditProfile(),
                 ),
                 const SizedBox(height: 12),
                 _buildSectionItem(
@@ -118,17 +117,22 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
             color: Colors.black87,
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.cardBorder),
-          ),
-          child: const Icon(
-            Icons.settings_outlined,
-            size: 22,
-            color: Colors.black87,
+        GestureDetector(
+          onTap: () {
+            Get.toNamed(AppRoutes.setting);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.cardBorder),
+            ),
+            child: const Icon(
+              Icons.settings_outlined,
+              size: 22,
+              color: Colors.black87,
+            ),
           ),
         ),
       ],
@@ -271,9 +275,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
 
           // Edit Button (pencil icon)
           GestureDetector(
-            onTap: () => Get.toNamed(
-              '/edit-profile',
-            )?.then((_) => controller.fetchProfileRaw()),
+            onTap: () => controller.goToEditProfile(),
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -328,9 +330,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
           ),
           const SizedBox(width: 10),
           GestureDetector(
-            onTap: () => Get.toNamed(
-              '/edit-profile',
-            )?.then((_) => controller.fetchProfileRaw()),
+            onTap: () => controller.goToEditProfile(),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               decoration: BoxDecoration(

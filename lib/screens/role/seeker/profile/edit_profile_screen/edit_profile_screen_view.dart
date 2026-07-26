@@ -1,3 +1,4 @@
+// ── ហ្វាល់ edit_profile_screen_view.dart ──
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,8 +7,8 @@ import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_controller.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/widget/city_select_field.dart';
+import 'package:jobber_city/screens/role/seeker/profile/widget/profile_text_field.dart';
 import 'package:jobber_city/widgets/custom_button.dart';
-import 'package:jobber_city/widgets/custom_textfield.dart';
 
 class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
   const EditProfileScreenView({super.key});
@@ -75,7 +76,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Header: gradient banner + back button + avatar ──
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
@@ -130,10 +130,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Avatar header — reads from firstName/lastName obs (live) ──
-  // Scales+fades in on first paint, gives a tactile press-scale on tap,
-  // and cross-fades between the picked photo and a person-icon placeholder
-  // when no image has been set yet.
   Widget _buildAvatarHeader() {
     return Center(
       child: TweenAnimationBuilder<double>(
@@ -234,7 +230,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                         ),
                       ),
                     ),
-                    // Camera edit badge
                     Positioned(
                       right: -2,
                       bottom: -2,
@@ -306,7 +301,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Personal Info ──
+  // 🟢 ជំនួស CustomTextfield ដោយ ProfileTextField[cite: 40, 47]
   Widget _buildPersonalInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,7 +315,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                 children: [
                   _buildFieldLabel('First Name'),
                   const SizedBox(height: 6),
-                  CustomTextfield(
+                  ProfileTextField(
                     hintText: 'First Name',
                     prefixIcon: Icons.person_outline,
                     controller: controller.firstNameController,
@@ -335,7 +330,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                 children: [
                   _buildFieldLabel('Last Name'),
                   const SizedBox(height: 6),
-                  CustomTextfield(
+                  ProfileTextField(
                     hintText: 'Last Name',
                     prefixIcon: Icons.person_outline,
                     controller: controller.lastNameController,
@@ -347,10 +342,9 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         ),
         const SizedBox(height: 20),
 
-        // Date of Birth
         _buildFieldLabel('Date of Birth'),
         const SizedBox(height: 6),
-        CustomTextfield(
+        ProfileTextField(
           hintText: 'DD/MM/YYYY',
           prefixIcon: Icons.date_range_outlined,
           controller: controller.dateOfBirthCtrl,
@@ -359,7 +353,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         ),
         const SizedBox(height: 20),
 
-        // Gender
         _buildFieldLabel('Gender'),
         const SizedBox(height: 6),
         Row(
@@ -373,7 +366,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         ),
         const SizedBox(height: 20),
 
-        // Marital Status
         _buildFieldLabel('Marital Status'),
         const SizedBox(height: 6),
         Wrap(
@@ -388,7 +380,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         ),
         const SizedBox(height: 20),
 
-        // Nationality
         _buildFieldLabel('Nationality'),
         const SizedBox(height: 6),
         CitySelectField<String>(
@@ -406,14 +397,14 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Contact ──
+  // 🟢 ជំនួស CustomTextfield ដោយ ProfileTextField[cite: 40, 47]
   Widget _buildContact() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildFieldLabel('Email'),
         const SizedBox(height: 6),
-        CustomTextfield(
+        ProfileTextField(
           prefixIcon: Icons.email_outlined,
           hintText: 'Email',
           controller: controller.emailController,
@@ -421,7 +412,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         const SizedBox(height: 20),
         _buildFieldLabel('Phone'),
         const SizedBox(height: 6),
-        CustomTextfield(
+        ProfileTextField(
           prefixIcon: Icons.phone_outlined,
           hintText: 'Phone Number',
           controller: controller.phoneCtrl,
@@ -430,14 +421,14 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Current Position ──
+  // 🟢 ជំនួស CustomTextfield ដោយ ProfileTextField[cite: 40, 47]
   Widget _buildCurrentPosition() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildFieldLabel('Current Position'),
         const SizedBox(height: 6),
-        CustomTextfield(
+        ProfileTextField(
           prefixIcon: Icons.work_outline,
           hintText: 'Enter your current position',
           controller: controller.currentPositionCtrl,
@@ -446,7 +437,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Address ──
+  // 🟢 ជំនួស CustomTextfield ដោយ ProfileTextField[cite: 40, 47]
   Widget _buildAddress() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,14 +446,17 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         const SizedBox(height: 6),
         CitySelectField<LocationModel>(
           controller: controller.provinceController,
-          fetchOptions: controller.fetchProvinceOptions,
+          fetchOptions: controller
+              .fetchProvinceOptions, // 🟢 ប្រើប្រាស់ LocationController options តាមរយៈ edit controller
           labelOf: (loc) => loc.nameEn,
           hintText: 'Select Province',
           sheetTitle: 'Select Province',
           onSelected: (loc) {
             controller.selectedProvinceId.value = loc.id.toString();
             controller.provinceCtrl.text = loc.nameEn;
-            controller.fetchDistricts(loc.id.toString());
+            // 🟢 ទាញយកស្រុក ពេលជ្រើសរើសខេត្ត
+            controller.districtCtrl.clear();
+            controller.selectedDistrictId.value = '';
           },
         ),
         const SizedBox(height: 20),
@@ -472,7 +466,8 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         Obx(
           () => CitySelectField<LocationModel>(
             controller: controller.districtCtrl,
-            fetchOptions: controller.fetchDistrictOptions,
+            fetchOptions: controller
+                .fetchDistrictOptions, // 🟢 ប្រើប្រាស់ LocationController options តាមរយៈ edit controller
             labelOf: (d) => d.nameEn,
             hintText: controller.selectedProvinceId.value.isEmpty
                 ? 'Select province first'
@@ -488,7 +483,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
 
         _buildFieldLabel('Commune / Sangkat'),
         const SizedBox(height: 6),
-        CustomTextfield(
+        ProfileTextField(
           prefixIcon: Icons.location_on_outlined,
           hintText: 'Enter commune',
           controller: controller.communeCtrl,
@@ -497,7 +492,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
 
         _buildFieldLabel('Village'),
         const SizedBox(height: 6),
-        CustomTextfield(
+        ProfileTextField(
           prefixIcon: Icons.holiday_village_outlined,
           hintText: 'Enter village',
           controller: controller.villageCtrl,
@@ -512,7 +507,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                 children: [
                   _buildFieldLabel('Street'),
                   const SizedBox(height: 6),
-                  CustomTextfield(
+                  ProfileTextField(
                     prefixIcon: Icons.signpost_outlined,
                     hintText: 'Street name',
                     controller: controller.streetCtrl,
@@ -527,7 +522,7 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                 children: [
                   _buildFieldLabel('House / No.'),
                   const SizedBox(height: 6),
-                  CustomTextfield(
+                  ProfileTextField(
                     prefixIcon: Icons.home_outlined,
                     hintText: 'e.g. 12A',
                     controller: controller.houseNoCtrl,
@@ -541,7 +536,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Gender chip ──
   Widget _buildGenderChip(String name, IconData icon) {
     return Expanded(
       child: ValueListenableBuilder<TextEditingValue>(
@@ -595,7 +589,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Marital status chip ──
   Widget _buildMaritalChip(String name) {
     final chipWidth = (Get.width - 40 - 32 - 30) / 4;
     return SizedBox(
@@ -641,9 +634,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
     );
   }
 
-  // ── Save button ──
-  // Gray + untappable until every required field is filled in.
-  // Snaps to full color + becomes tappable the moment isFormValid flips true.
   Widget _buildSaveButton() {
     return Obx(() {
       final isSaving = controller.isSaving.value;
@@ -673,8 +663,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
         ),
       );
 
-      // IgnorePointer fully blocks taps while disabled, so onPressed above
-      // can never fire until the form is actually complete.
       return IgnorePointer(
         ignoring: !isEnabled,
         child: AnimatedOpacity(
@@ -700,8 +688,6 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
   }
 }
 
-/// Section wrapper: icon + label header above a rounded card, with a
-/// staggered fade + slide-up entrance so the screen doesn't just pop in.
 class _Section extends StatelessWidget {
   const _Section({
     required this.index,
@@ -779,9 +765,6 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// Small helper: scales its child down slightly on press for tactile
-/// feedback, then springs back on release. Used to make the avatar
-/// picker feel interactive/tappable.
 class _AvatarTapScale extends StatefulWidget {
   const _AvatarTapScale({required this.onTap, required this.child});
 

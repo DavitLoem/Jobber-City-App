@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_view.dart';
 
 class MainScreenController extends GetxController {
   var currentIndex = 0.obs;
@@ -19,12 +20,10 @@ class MainScreenController extends GetxController {
           settings: settings,
           page: () => const HomeSeekerView(),
         );
-      case '/saved':
+      case AppRoutes.saveJob:
         return GetPageRoute(
           settings: settings,
-          page: () => const Center(
-            child: Text("Saved Jobs", style: TextStyle(fontSize: 24)),
-          ),
+          page: () => const SaveJobScreenView(),
         );
       case '/applied':
         return GetPageRoute(

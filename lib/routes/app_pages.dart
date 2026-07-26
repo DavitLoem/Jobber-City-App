@@ -23,6 +23,10 @@ import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/search_button/search_button_binding.dart';
+import 'package:jobber_city/screens/role/seeker/search_button/search_button_view.dart';
+import 'package:jobber_city/screens/role/seeker/setting_screen/setting_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/trainings_screen/trainings_screen_view.dart';
 // Import Views & Bindings
 import 'package:jobber_city/screens/splash/splash_view.dart';
@@ -112,9 +116,36 @@ class AppPages {
       ],
     ),
     GetPage(
+      name: AppRoutes.search,
+      page: () => SearchButtonView(),
+      binding: SearchButtonViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
       name: AppRoutes.jobDetail,
       page: () => JobDetailView(),
-      binding: JobDetailViewBinding(),
+      binding: JobDetailBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.saveJob,
+      page: () => SaveJobScreenView(),
+      binding: SaveJobScreenViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.setting,
+      page: () => SettingScreenView(),
+      binding: SettingScreenViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),

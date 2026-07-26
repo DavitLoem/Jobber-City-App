@@ -24,7 +24,6 @@ class ProfileScreenViewController extends GetxController {
     }
 
     try {
-      // Split Token into 3 parts and take the middle part (Payload) to read
       final parts = token.split('.');
       if (parts.length != 3) return;
 
@@ -33,17 +32,10 @@ class ProfileScreenViewController extends GetxController {
       Map<String, dynamic> payloadMap = json.decode(payload);
 
       if (payloadMap.containsKey('exp')) {
-        // Convert time from Backend (seconds) to real time (milliseconds)
         DateTime expiryDate = DateTime.fromMillisecondsSinceEpoch(
           payloadMap['exp'] * 1000,
         );
         DateTime now = DateTime.now();
-
-        AppLogger.i(
-          "Your Token: ${token.substring(0, 15)}...",
-        ); // Print only first 15 characters
-        AppLogger.i("Current time: $now");
-        AppLogger.i("Expire time: $expiryDate");
 
         if (now.isAfter(expiryDate)) {
           AppLogger.e("Result: This Token has EXPIRED!");
@@ -53,11 +45,18 @@ class ProfileScreenViewController extends GetxController {
             "Result: This Token is still alive (${timeLeft.inMinutes} minutes and ${timeLeft.inSeconds % 60} seconds remaining)",
           );
         }
-        debugPrint("========================================");
       }
     } catch (e) {
       debugPrint("Error decoding Token: $e");
     }
+  }
+
+  Future<void> goToEditProfile() async {
+    final result = await Get.toNamed('/edit-profile');
+    if (result is String && result.trim().isNotEmpty) {
+      position.value = result.trim();
+    }
+    fetchProfileRaw();
   }
 
   void fetchProfileRaw() async {
@@ -69,12 +68,18 @@ class ProfileScreenViewController extends GetxController {
 
       final response = await _seekerServices.getRawProfile();
 
-      // Get "data" Object from JSON and extract the name
       var data = response['data'];
       firstName.value = data['first_name'] ?? 'NoName';
       lastName.value = data['last_name'] ?? '';
       email.value = data['email'] ?? '';
-      position.value = data['position'] ?? data['job_title'] ?? '';
+
+      // 🟢 ជួសជុលត្រង់នេះ៖ បន្ថែមការអាន key 'current_position' ឲ្យស៊ីគ្នានឹង API
+      position.value =
+          data['current_position'] ??
+          data['position'] ??
+          data['job_title'] ??
+          '';
+
       profileImageUrl.value = data['profile_image_url'] ?? '';
 
       AppLogger.i(

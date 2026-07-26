@@ -18,7 +18,7 @@ class MainScreenView extends GetView<MainScreenController> {
           index: controller.currentIndex.value,
           children: [
             _buildNavigator(1, AppRoutes.homeSeeker),
-            _buildNavigator(2, '/saved'),
+            _buildNavigator(2, AppRoutes.saveJob),
             _buildNavigator(3, '/applied'),
             _buildNavigator(4, '/profile'),
           ],

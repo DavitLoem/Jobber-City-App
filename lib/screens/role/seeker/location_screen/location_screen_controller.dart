@@ -6,10 +6,15 @@ class LocationScreenController extends GetxController {
   var isProvinceLoading = false.obs;
   var provincesList = <LocationModel>[].obs;
   var selectedProvinceId = ''.obs;
+  var provinceError = ''.obs;
 
   var isDistrictLoading = false.obs;
   var districtsList = <LocationModel>[].obs;
   var selectedDistrictId = ''.obs;
+  var districtError = ''.obs;
+
+  var isGettingCurrentLocation = false.obs;
+  var currentLocationError = ''.obs;
 
   final TextEditingController searchController = TextEditingController();
   final PageController pageController = PageController();
@@ -27,14 +32,22 @@ class LocationScreenController extends GetxController {
   void fetchProvinces({String? query}) async {
     try {
       isProvinceLoading.value = true;
+      provinceError.value = '';
       var data = await _locationServices.getProvinces(search: query);
 
       // sortOrder
       data.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
       provincesList.assignAll(data);
+
+      if (data.isEmpty) {
+        provinceError.value = 'No provinces found';
+      }
     } catch (e) {
       debugPrint('Error fetching provinces: $e');
+      provinceError.value =
+          'Failed to load provinces. Please check your connection.';
+      provincesList.clear();
     } finally {
       isProvinceLoading.value = false;
     }
@@ -58,6 +71,7 @@ class LocationScreenController extends GetxController {
   void fetchDistricts(String provinceId, {String? query}) async {
     try {
       isDistrictLoading.value = true;
+      districtError.value = '';
       var data = await _locationServices.getDistricts(
         provinceId,
         search: query,
@@ -66,8 +80,15 @@ class LocationScreenController extends GetxController {
       data.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
       districtsList.assignAll(data);
+
+      if (data.isEmpty) {
+        districtError.value = 'No districts found';
+      }
     } catch (e) {
       debugPrint('Error fetching districts: $e');
+      districtError.value =
+          'Failed to load districts. Please check your connection.';
+      districtsList.clear();
     } finally {
       isDistrictLoading.value = false;
     }
@@ -132,5 +153,61 @@ class LocationScreenController extends GetxController {
     _debounce?.cancel();
     searchController.dispose();
     super.onClose();
+  }
+
+  // GPS/Current Location functionality
+  Future<void> getCurrentLocation() async {
+    try {
+      isGettingCurrentLocation.value = true;
+      currentLocationError.value = '';
+
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        currentLocationError.value =
+            'Location services are disabled. Please enable them.';
+        return;
+      }
+
+      // Check for location permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          currentLocationError.value = 'Location permissions are denied.';
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        currentLocationError.value =
+            'Location permissions are permanently denied.';
+        return;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // For now, just show success message
+      // In a real implementation, you would reverse geocode the coordinates
+      // to get the province/district and auto-select them
+      Get.snackbar(
+        'Location Found',
+        'Lat: ${position.latitude.toStringAsFixed(4)}, Lng: ${position.longitude.toStringAsFixed(4)}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      debugPrint(
+        'Current location: ${position.latitude}, ${position.longitude}',
+      );
+    } catch (e) {
+      debugPrint('Error getting current location: $e');
+      currentLocationError.value =
+          'Failed to get current location. Please try again.';
+    } finally {
+      isGettingCurrentLocation.value = false;
+    }
   }
 }
