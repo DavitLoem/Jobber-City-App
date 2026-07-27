@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/job_recent_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/job_recommended_services.dart';
@@ -438,13 +439,7 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
         // That call has been removed.
         GestureDetector(
           onTap: () {
-            Get.snackbar(
-              'Notifications',
-              'No new notifications',
-              snackPosition: SnackPosition.TOP,
-              backgroundColor: AppColors.primaryLight,
-              colorText: AppColors.primary,
-            );
+            Get.find<AuthController>().logout();
           },
           child: Container(
             width: 42,

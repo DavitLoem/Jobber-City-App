@@ -1,20 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
-import 'package:dio/dio.dart';
 
 class SeekerProfileServices {
   final ApiClient _apiClient = ApiClient();
+  final String _endpoint = '/seeker/profile';
 
-  // មុខងារសម្រាប់ Update ទិន្នន័យ Profile ទៅកាន់ Server
-  Future<Map<String, dynamic>> updateSeekerProfile(
-    SeekerProflieModel requestModel,
-  ) async {
+  Future<bool> updateCoreProfile(SeekerCoreUpdateRequest data) async {
     try {
       final response = await _apiClient.put(
-        '/seeker/profile/core',
-        data: requestModel.toJson(),
+        '$_endpoint/core',
+        data: data.toJson(),
       );
-      return response;
+
+      return response['success'] == true;
     } catch (e) {
       rethrow;
     }

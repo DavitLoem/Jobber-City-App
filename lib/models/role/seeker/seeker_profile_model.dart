@@ -1,37 +1,177 @@
-import 'dart:convert';
+class SeekerProfileResponse {
+  final bool success;
+  final String message;
+  final SeekerProfileModel? data;
 
-SeekerProflieModel seekerProflieModelFromJson(String str) =>
-    SeekerProflieModel.fromJson(json.decode(str));
+  SeekerProfileResponse({
+    required this.success,
+    required this.message,
+    this.data,
+  });
 
-String seekerProflieModelToJson(SeekerProflieModel data) =>
-    json.encode(data.toJson());
+  factory SeekerProfileResponse.fromJson(Map<String, dynamic> json) {
+    return SeekerProfileResponse(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      data: json['data'] != null
+          ? SeekerProfileModel.fromJson(json['data'])
+          : null,
+    );
+  }
+}
 
-class SeekerProflieModel {
-  String firstName;
-  String lastName;
-  DateTime dateOfBirth;
-  String gender;
-  String maritalStatus;
-  String nationality;
-  String currentPosition;
-  String email;
-  String phoneNumber;
-  String provinceId;
-  String districtId;
-  String commune;
-  String village;
-  String street;
-  String houseNo;
-  String biography;
-  int expectedSalaryMin;
-  int expectedSalaryMax;
-  List<String> jobTypePreferences;
-  List<String> expertiseCategoryIds;
-  List<String> skills;
-  String portfolioUrl;
-  String linkedinUrl;
+class SeekerProfileModel {
+  final String id;
+  final String userId;
+  final String profileImageUrl;
+  final num profileCompletionPercentage;
+  final bool onboardingCompleted;
 
-  SeekerProflieModel({
+  final String firstName;
+  final String lastName;
+  final String dateOfBirth;
+  final String gender;
+  final String maritalStatus;
+  final String nationality;
+  final String currentPosition;
+
+  final String email;
+  final String phoneNumber;
+
+  final String provinceId;
+  final String districtId;
+  final String commune;
+  final String village;
+  final String street;
+  final String houseNo;
+
+  final String biography;
+  final num expectedSalaryMin;
+  final num expectedSalaryMax;
+
+  final List<String> jobTypePreferences;
+  final List<String> expertiseCategoryIds;
+  final List<String> skills;
+
+  final String resumeUrl;
+  final String portfolioUrl;
+  final String linkedinUrl;
+
+  // Array បន្ថែមដែលទាន់មិនមានទិន្នន័យលម្អិត
+  final List<dynamic> experiences;
+  final List<dynamic> educations;
+  final List<dynamic> trainings;
+  final List<dynamic> languages;
+
+  SeekerProfileModel({
+    required this.id,
+    required this.userId,
+    required this.profileImageUrl,
+    required this.profileCompletionPercentage,
+    required this.onboardingCompleted,
+    required this.firstName,
+    required this.lastName,
+    required this.dateOfBirth,
+    required this.gender,
+    required this.maritalStatus,
+    required this.nationality,
+    required this.currentPosition,
+    required this.email,
+    required this.phoneNumber,
+    required this.provinceId,
+    required this.districtId,
+    required this.commune,
+    required this.village,
+    required this.street,
+    required this.houseNo,
+    required this.biography,
+    required this.expectedSalaryMin,
+    required this.expectedSalaryMax,
+    required this.jobTypePreferences,
+    required this.expertiseCategoryIds,
+    required this.skills,
+    required this.resumeUrl,
+    required this.portfolioUrl,
+    required this.linkedinUrl,
+    required this.experiences,
+    required this.educations,
+    required this.trainings,
+    required this.languages,
+  });
+
+  factory SeekerProfileModel.fromJson(Map<String, dynamic> json) {
+    return SeekerProfileModel(
+      id: json['_id'] ?? '',
+      userId: json['user_id'] ?? '',
+      profileImageUrl: json['profile_image_url'] ?? '',
+      profileCompletionPercentage: json['profile_completion_percentage'] ?? 0,
+      onboardingCompleted: json['onboarding_completed'] ?? false,
+      firstName: json['first_name'] ?? '',
+      lastName: json['last_name'] ?? '',
+      dateOfBirth: json['date_of_birth'] ?? '',
+      gender: json['gender'] ?? '',
+      maritalStatus: json['marital_status'] ?? '',
+      nationality: json['nationality'] ?? '',
+      currentPosition: json['current_position'] ?? '',
+      email: json['email'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
+      provinceId: json['province_id'] ?? '',
+      districtId: json['district_id'] ?? '',
+      commune: json['commune'] ?? '',
+      village: json['village'] ?? '',
+      street: json['street'] ?? '',
+      houseNo: json['house_no'] ?? '',
+      biography: json['biography'] ?? '',
+      expectedSalaryMin: json['expected_salary_min'] ?? 0,
+      expectedSalaryMax: json['expected_salary_max'] ?? 0,
+      jobTypePreferences: List<String>.from(json['job_type_preferences'] ?? []),
+      expertiseCategoryIds: List<String>.from(
+        json['expertise_category_ids'] ?? [],
+      ),
+      skills: List<String>.from(json['skills'] ?? []),
+      resumeUrl: json['resume_url'] ?? '',
+      portfolioUrl: json['portfolio_url'] ?? '',
+      linkedinUrl: json['linkedin_url'] ?? '',
+      experiences: json['experiences'] ?? [],
+      educations: json['educations'] ?? [],
+      trainings: json['trainings'] ?? [],
+      languages: json['languages'] ?? [],
+    );
+  }
+}
+
+class SeekerCoreUpdateRequest {
+  final String firstName;
+  final String lastName;
+  final String dateOfBirth;
+  final String gender;
+  final String maritalStatus;
+  final String nationality;
+  final String currentPosition;
+
+  final String email;
+  final String phoneNumber;
+
+  final String provinceId;
+  final String districtId;
+  final String commune;
+  final String village;
+  final String street;
+  final String houseNo;
+
+  final String biography;
+  final num expectedSalaryMin;
+  final num expectedSalaryMax;
+
+  final List<String> jobTypePreferences;
+  final List<String> expertiseCategoryIds;
+  final List<String> skills;
+
+  final String portfolioUrl;
+  final String linkedinUrl;
+  final bool onboardingCompleted;
+
+  SeekerCoreUpdateRequest({
     required this.firstName,
     required this.lastName,
     required this.dateOfBirth,
@@ -55,67 +195,35 @@ class SeekerProflieModel {
     required this.skills,
     required this.portfolioUrl,
     required this.linkedinUrl,
+    required this.onboardingCompleted,
   });
 
-  factory SeekerProflieModel.fromJson(Map<String, dynamic> json) =>
-      SeekerProflieModel(
-        firstName: json["first_name"],
-        lastName: json["last_name"],
-        dateOfBirth: DateTime.parse(json["date_of_birth"]),
-        gender: json["gender"],
-        maritalStatus: json["marital_status"],
-        nationality: json["nationality"],
-        currentPosition: json["current_position"],
-        email: json["email"],
-        phoneNumber: json["phone_number"],
-        provinceId: json["province_id"],
-        districtId: json["district_id"],
-        commune: json["commune"],
-        village: json["village"],
-        street: json["street"],
-        houseNo: json["house_no"],
-        biography: json["biography"],
-        expectedSalaryMin: json["expected_salary_min"],
-        expectedSalaryMax: json["expected_salary_max"],
-        jobTypePreferences: List<String>.from(
-          json["job_type_preferences"].map((x) => x),
-        ),
-        expertiseCategoryIds: List<String>.from(
-          json["expertise_category_ids"].map((x) => x),
-        ),
-        skills: List<String>.from(json["skills"].map((x) => x)),
-        portfolioUrl: json["portfolio_url"],
-        linkedinUrl: json["linkedin_url"],
-      );
-
-  Map<String, dynamic> toJson() => {
-    "first_name": firstName,
-    "last_name": lastName,
-    "date_of_birth":
-        "${dateOfBirth.year.toString().padLeft(4, '0')}-${dateOfBirth.month.toString().padLeft(2, '0')}-${dateOfBirth.day.toString().padLeft(2, '0')}",
-    "gender": gender,
-    "marital_status": maritalStatus,
-    "nationality": nationality,
-    "current_position": currentPosition,
-    "email": email,
-    "phone_number": phoneNumber,
-    "province_id": provinceId,
-    "district_id": districtId,
-    "commune": commune,
-    "village": village,
-    "street": street,
-    "house_no": houseNo,
-    "biography": biography,
-    "expected_salary_min": expectedSalaryMin,
-    "expected_salary_max": expectedSalaryMax,
-    "job_type_preferences": List<dynamic>.from(
-      jobTypePreferences.map((x) => x),
-    ),
-    "expertise_category_ids": List<dynamic>.from(
-      expertiseCategoryIds.map((x) => x),
-    ),
-    "skills": List<dynamic>.from(skills.map((x) => x)),
-    "portfolio_url": portfolioUrl,
-    "linkedin_url": linkedinUrl,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "first_name": firstName,
+      "last_name": lastName,
+      "date_of_birth": dateOfBirth,
+      "gender": gender,
+      "marital_status": maritalStatus,
+      "nationality": nationality,
+      "current_position": currentPosition,
+      "email": email,
+      "phone_number": phoneNumber,
+      "province_id": provinceId,
+      "district_id": districtId,
+      "commune": commune,
+      "village": village,
+      "street": street,
+      "house_no": houseNo,
+      "biography": biography,
+      "expected_salary_min": expectedSalaryMin,
+      "expected_salary_max": expectedSalaryMax,
+      "job_type_preferences": jobTypePreferences,
+      "expertise_category_ids": expertiseCategoryIds,
+      "skills": skills,
+      "portfolio_url": portfolioUrl,
+      "linkedin_url": linkedinUrl,
+      "onboarding_completed": onboardingCompleted,
+    };
+  }
 }

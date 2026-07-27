@@ -1,7 +1,7 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
@@ -151,7 +151,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
         border: Border.all(color: AppColors.cardBorder, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -215,7 +215,7 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${controller.firstName.value} ${controller.lastName.value}"
+                  "${controller.lastName.value} ${controller.firstName.value}"
                       .trim(),
                   style: const TextStyle(
                     fontSize: 17,

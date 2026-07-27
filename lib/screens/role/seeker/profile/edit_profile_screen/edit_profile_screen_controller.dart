@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+// 🟢 បញ្ចូល LocationController
+import 'package:jobber_city/controllers/location_controller.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
 import 'package:jobber_city/core/api/services/category_services.dart';
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
@@ -12,10 +14,6 @@ import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/category_model.dart';
 import 'package:jobber_city/models/location_model.dart';
-import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
-
-// 🟢 បញ្ចូល LocationController
-import 'package:jobber_city/controllers/location_controller.dart';
 
 class EditProfileScreenViewController extends GetxController {
   final _seekerServices = AuthServices();
@@ -367,38 +365,38 @@ class EditProfileScreenViewController extends GetxController {
     }
     isSaving.value = true;
     try {
-      final requestModel = SeekerProflieModel(
-        firstName: firstNameController.text.trim(),
-        lastName: lastNameController.text.trim(),
-        dateOfBirth:
-            DateTime.tryParse(dateOfBirthCtrl.text.trim()) ?? DateTime.now(),
-        nationality: nationalityCtrl.text.trim(),
-        gender: genderCtrl.text.trim(),
-        maritalStatus: maritalStatusCtrl.text.trim(),
-        email: emailController.text.trim(),
-        phoneNumber: phoneCtrl.text.trim(),
-        currentPosition: currentPositionCtrl.text.trim(),
-        provinceId: selectedProvinceId.value.isEmpty
-            ? '1'
-            : selectedProvinceId.value,
-        districtId: selectedDistrictId.value.isEmpty
-            ? '1'
-            : selectedDistrictId.value,
-        commune: communeCtrl.text.trim(),
-        village: villageCtrl.text.trim(),
-        street: streetCtrl.text.trim(),
-        houseNo: houseNoCtrl.text.trim(),
-        biography: '',
-        expectedSalaryMin: 0,
-        expectedSalaryMax: 0,
-        jobTypePreferences: [],
-        expertiseCategoryIds: selectedCategoryIds.toList(),
-        skills: [],
-        portfolioUrl: '',
-        linkedinUrl: '',
-      );
+      // final requestModel = SeekerProflieModel(
+      //   firstName: firstNameController.text.trim(),
+      //   lastName: lastNameController.text.trim(),
+      //   dateOfBirth:
+      //       DateTime.tryParse(dateOfBirthCtrl.text.trim()) ?? DateTime.now(),
+      //   nationality: nationalityCtrl.text.trim(),
+      //   gender: genderCtrl.text.trim(),
+      //   maritalStatus: maritalStatusCtrl.text.trim(),
+      //   email: emailController.text.trim(),
+      //   phoneNumber: phoneCtrl.text.trim(),
+      //   currentPosition: currentPositionCtrl.text.trim(),
+      //   provinceId: selectedProvinceId.value.isEmpty
+      //       ? '1'
+      //       : selectedProvinceId.value,
+      //   districtId: selectedDistrictId.value.isEmpty
+      //       ? '1'
+      //       : selectedDistrictId.value,
+      //   commune: communeCtrl.text.trim(),
+      //   village: villageCtrl.text.trim(),
+      //   street: streetCtrl.text.trim(),
+      //   houseNo: houseNoCtrl.text.trim(),
+      //   biography: '',
+      //   expectedSalaryMin: 0,
+      //   expectedSalaryMax: 0,
+      //   jobTypePreferences: [],
+      //   expertiseCategoryIds: selectedCategoryIds.toList(),
+      //   skills: [],
+      //   portfolioUrl: '',
+      //   linkedinUrl: '',
+      // );
 
-      await _profileServices.updateSeekerProfile(requestModel);
+      // await _profileServices.updateSeekerProfile(requestModel);
       await _storage.delete(key: 'temp_category_ids');
 
       // 🟢 បញ្ជូនទិន្នន័យត្រឡប់ទៅកាន់ទំព័រ Profile ដើម្បី Update Badge Position[cite: 45, 46]
