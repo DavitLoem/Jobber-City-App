@@ -21,6 +21,7 @@ import 'package:jobber_city/screens/role/seeker/job_detail/job_detail_view.dart'
 import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/cv_extraction/cv_extraction_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_view.dart';
@@ -146,6 +147,15 @@ class AppPages {
       name: AppRoutes.setting,
       page: () => SettingScreenView(),
       binding: SettingScreenViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+        GetPage(
+      name: AppRoutes.cvExtraction,
+      page: () => CvExtractionView(),
+      binding: CvExtractionViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),

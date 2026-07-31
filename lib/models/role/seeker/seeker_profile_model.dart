@@ -40,6 +40,9 @@ class SeekerProfileModel {
 
   final String provinceId;
   final String districtId;
+
+  final String addressProvinceId;
+  final String addressDistrictId;
   final String commune;
   final String village;
   final String street;
@@ -79,6 +82,8 @@ class SeekerProfileModel {
     required this.email,
     required this.phoneNumber,
     required this.provinceId,
+    required this.addressProvinceId,
+    required this.addressDistrictId,
     required this.districtId,
     required this.commune,
     required this.village,
@@ -117,6 +122,8 @@ class SeekerProfileModel {
       phoneNumber: json['phone_number'] ?? '',
       provinceId: json['province_id'] ?? '',
       districtId: json['district_id'] ?? '',
+      addressProvinceId: json['address_province_id'] ?? '',
+      addressDistrictId: json['address_district_id'] ?? '',
       commune: json['commune'] ?? '',
       village: json['village'] ?? '',
       street: json['street'] ?? '',
@@ -152,8 +159,9 @@ class SeekerCoreUpdateRequest {
   final String email;
   final String phoneNumber;
 
-  final String provinceId;
-  final String districtId;
+  final String addressProvinceId;
+  final String addressDistrictId;
+
   final String commune;
   final String village;
   final String street;
@@ -181,8 +189,8 @@ class SeekerCoreUpdateRequest {
     required this.currentPosition,
     required this.email,
     required this.phoneNumber,
-    required this.provinceId,
-    required this.districtId,
+    required this.addressProvinceId,
+    required this.addressDistrictId,
     required this.commune,
     required this.village,
     required this.street,
@@ -209,8 +217,8 @@ class SeekerCoreUpdateRequest {
       "current_position": currentPosition,
       "email": email,
       "phone_number": phoneNumber,
-      "province_id": provinceId,
-      "district_id": districtId,
+      'address_province_id': addressProvinceId,
+      'address_district_id': addressDistrictId,
       "commune": commune,
       "village": village,
       "street": street,

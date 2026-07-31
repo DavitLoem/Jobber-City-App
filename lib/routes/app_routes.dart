@@ -21,6 +21,8 @@ class AppRoutes {
   static const String jobDetail = '/job-detail';
   static const String saveJob = '/save-job';
   static const String setting = '/setting';
+  static const String cvExtraction = '/cv-extraction';
+  static const String applied = '/applied';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES

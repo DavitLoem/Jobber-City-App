@@ -43,30 +43,30 @@ class TrainingsScreenViewController extends GetxController {
       isLoading.value = true;
       final response = await _profileServices.getSeekerProfile();
 
-      if (response != null && response is Map && response['data'] != null) {
-        final data = response['data'];
-        final trainings = data['trainings'] as List<dynamic>? ?? [];
+      // if (response is Map && response['data'] != null) {
+      //   final data = response['data'];
+      //   final trainings = data['trainings'] as List<dynamic>? ?? [];
 
-        if (trainings.isNotEmpty) {
-          final trainingData = trainings.last;
+      //   if (trainings.isNotEmpty) {
+      //     final trainingData = trainings.last;
 
-          courseNameController.text =
-              trainingData['course_name']?.toString() ?? '';
-          institutionController.text =
-              trainingData['institution']?.toString() ?? '';
+      //     courseNameController.text =
+      //         trainingData['course_name']?.toString() ?? '';
+      //     institutionController.text =
+      //         trainingData['institution']?.toString() ?? '';
 
-          // 🟢 ចាប់យកទិន្នន័យឲ្យត្រូវនឹង JSON របស់ Model
-          descriptionController.text =
-              trainingData['description']?.toString() ?? '';
-          certificateUrlController.text =
-              trainingData['certificate_url']?.toString() ?? '';
+      //     // 🟢 ចាប់យកទិន្នន័យឲ្យត្រូវនឹង JSON របស់ Model
+      //     descriptionController.text =
+      //         trainingData['description']?.toString() ?? '';
+      //     certificateUrlController.text =
+      //         trainingData['certificate_url']?.toString() ?? '';
 
-          startDateController.text =
-              trainingData['start_date']?.toString().split('T').first ?? '';
-          endDateController.text =
-              trainingData['end_date']?.toString().split('T').first ?? '';
-        }
-      }
+      //     startDateController.text =
+      //         trainingData['start_date']?.toString().split('T').first ?? '';
+      //     endDateController.text =
+      //         trainingData['end_date']?.toString().split('T').first ?? '';
+      //   }
+      // }
     } catch (e) {
       debugPrint('Error fetching trainings: $e');
     } finally {

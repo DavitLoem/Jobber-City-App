@@ -20,10 +20,12 @@ class SeekerProfileServices {
   }
 
   // មុខងារសម្រាប់ទាញយកទិន្នន័យ Profile មកបង្ហាញលើអេក្រង់
-  Future<dynamic> getSeekerProfile() async {
+  Future<SeekerProfileResponse> getSeekerProfile() async {
     try {
       final response = await _apiClient.get('/seeker/profile/');
-      return response;
+
+      // 🎯 បំប្លែង Map (JSON) ទៅជា Dart Model
+      return SeekerProfileResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }

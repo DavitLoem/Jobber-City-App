@@ -26,28 +26,28 @@ class EducationsScreenViewController extends GetxController {
 
       debugPrint('Profile response: $response');
 
-      if (response != null && response is Map && response['data'] != null) {
-        final data = response['data'];
+      // if (response != null && response is Map && response['data'] != null) {
+      //   final data = response['data'];
 
-        // ចាប់យក Array នៃ Education ពី API
-        final educations = data['educations'] as List<dynamic>? ?? [];
+      //   // ចាប់យក Array នៃ Education ពី API
+      //   final educations = data['educations'] as List<dynamic>? ?? [];
 
-        if (educations.isNotEmpty) {
-          // ចាប់យកទិន្នន័យចុងក្រោយគេបង្អស់ (ឬអាចប្រើ .first ទៅតាមការចង់បាន)
-          final eduData = educations.last;
+      //   if (educations.isNotEmpty) {
+      //     // ចាប់យកទិន្នន័យចុងក្រោយគេបង្អស់ (ឬអាចប្រើ .first ទៅតាមការចង់បាន)
+      //     final eduData = educations.last;
 
-          // 🟢 បញ្ចូលទិន្នន័យទៅក្នុង Textfield ទាំងអស់
-          schoolNameCtrl.text = eduData['school_name']?.toString() ?? '';
-          degreeCtrl.text = eduData['degree']?.toString() ?? '';
-          fieldOfStudyCtrl.text = eduData['field_of_study']?.toString() ?? '';
+      //     // 🟢 បញ្ចូលទិន្នន័យទៅក្នុង Textfield ទាំងអស់
+      //     schoolNameCtrl.text = eduData['school_name']?.toString() ?? '';
+      //     degreeCtrl.text = eduData['degree']?.toString() ?? '';
+      //     fieldOfStudyCtrl.text = eduData['field_of_study']?.toString() ?? '';
 
-          // កាត់យកតែថ្ងៃខែឆ្នាំ ដោយកាត់អក្សរ 'T' ចេញពី "2026-07-01T00:00:00"
-          startDateCtrl.text =
-              eduData['start_date']?.toString().split('T').first ?? '';
-          endDateCtrl.text =
-              eduData['end_date']?.toString().split('T').first ?? '';
-        }
-      }
+      //     // កាត់យកតែថ្ងៃខែឆ្នាំ ដោយកាត់អក្សរ 'T' ចេញពី "2026-07-01T00:00:00"
+      //     startDateCtrl.text =
+      //         eduData['start_date']?.toString().split('T').first ?? '';
+      //     endDateCtrl.text =
+      //         eduData['end_date']?.toString().split('T').first ?? '';
+      //   }
+      // }
     } catch (e) {
       debugPrint('Error fetching educations: $e');
     } finally {

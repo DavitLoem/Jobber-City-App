@@ -7,7 +7,7 @@ class ProfileScreenViewController extends GetxController {
   var firstName = ''.obs;
   var lastName = ''.obs;
   var email = ''.obs;
-  var position = ''.obs; // Job Title / Position
+  var position = ''.obs;
   var profileImageUrl = ''.obs;
 
   @override

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:jobber_city/screens/role/seeker/application/application_view.dart';
 // 🟢 ១. ត្រូវ Import ហ្វាល់ View (ព្រោះ Controller របស់អ្នកស្ថិតក្នុងហ្វាល់ View ជាទម្រង់ part of)
 import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_controller.dart';
@@ -17,8 +18,8 @@ class MainScreenBinding extends Bindings {
     // 🟢 ២. សម្រាប់ Tab ទី២ (Save Job)
     Get.lazyPut(() => SaveJobScreenViewController(), fenix: true);
 
-    // 🟢 ៣. សម្រាប់ Tab ទីៃ (Applied)
-    // Get.lazyPut(() => AppliedScreenController(), fenix: true);
+    // 🟢 ៣. សម្រាប់ Tab ទីៃ (Applied).
+    Get.lazyPut(() => ApplicationViewBinding(), fenix: true);
 
     // 🟢 ៤. សម្រាប់ Tab ទី៤ (Profile)
     Get.lazyPut(() => ProfileScreenViewController());

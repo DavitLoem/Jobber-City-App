@@ -3,3 +3,53 @@ My Job Screen:
 - រៀបតាមកាលបរិច្ឆេទ (Newest / Oldest)
 - រៀបតាមចំនួនបេក្ខជនដាក់ពាក្យ (Most Candidates / Least Candidates)
 - រៀបតាមប្រាក់ខែ (Highest Salary)
+
+UploadCVScreen
+
+ដើម្បីឱ្យកូដមានសណ្តាប់ធ្នាប់ ខ្ញុំសូមស្នើប្លង់ (Blueprint) ជា ៤ ផ្នែកធំៗដូចខាងក្រោម៖
+
+១. ផ្នែក Data Models (អ្នកទទួលទិន្នន័យ)
+យើងមិនអាចយកទិន្នន័យ JSON មកប្រើផ្ទាល់ៗបានទេ យើងត្រូវបង្កើត Model ថ្មីមួយសម្រាប់ចាប់យក Response ពី API upload-cv។
+
+អ្វីដែលត្រូវបង្កើត៖ CvExtractionResponseModel, ParsedExperienceModel, ParsedEducationModel, និង ParsedSkillModel។
+
+តួនាទី៖ បំប្លែង JSON ទៅជា Object ងាយស្រួលឱ្យសរសេរកូដនៅខាង Controller (មាន Auto-complete មិនងាយសរសេរខុស)។
+
+២. ផ្នែក Controller (ខួរក្បាលបញ្ជា)
+យើងមិនគួរសរសេរ Logic នេះចូលក្នុង Profile Controller ចាស់ទេ វាអាចធ្វើឱ្យកូដវឹកវរ។ យើងគួររៀបចំ Controller ថ្មីមួយដាច់ដោយឡែក។
+
+អ្វីដែលត្រូវបង្កើត៖ CvSmartFillController (ឬឈ្មោះអ្វីក៏បានតាមអ្នកចូលចិត្ត)។
+
+តួនាទីធំៗ៖
+
+ហៅ FilePicker ឱ្យ User រើសឯកសារ PDF។
+
+បញ្ជូនឯកសារទៅ API និងគ្រប់គ្រង State Loading (Scanning)។
+
+រក្សាទុកទិន្នន័យ parsed_data ជាអថេរបណ្ដោះអាសន្ន (.obs)។
+
+បញ្ជូន User ទៅអេក្រង់ Review។
+
+៣. ផ្នែក UI Flow (លំហូរអេក្រង់ទាំង ៣ ដំណាក់កាល)
+នេះជាបទពិសោធន៍ប្រើប្រាស់ (UX) ដែលយើងត្រូវរៀបចំ៖
+
+ដំណាក់កាលទី ១ (Trigger): ប៊ូតុង "Upload CV (Auto-fill)" ដ៏ទាក់ទាញមួយនៅលើអេក្រង់ Profile របស់ Seeker។
+
+ដំណាក់កាលទី ២ (Scanning Overlay): ពេលកំពុង Upload និងរង់ចាំ AI គិត យើងមិនបើកអេក្រង់ថ្មីទេ តែយើងប្រើ Get.dialog() បង្ហាញផ្ទាំង Loading វិលៗ ឬ Lottie Animation (រូបរ៉ាដា) ជាមួយអក្សរ "AI is analyzing your CV..." ដើម្បីកុំឱ្យគាត់ចុចអ្វីផ្សេងបាន។
+
+ដំណាក់កាលទី ៣ (Result BottomSheet): ពេល AI បោះទិន្នន័យមកវិញ យើងបិទ Dialog នោះ ហើយលោត BottomSheet បញ្ជាក់ថា៖ "ជោគជ័យ! យើងរកឃើញបទពិសោធន៍ (៣) និងការអប់រំ (២)។ តើអ្នកចង់ពិនិត្យមើលវាទេ?" បើគាត់ចុច "Review" ទើបយើងរុញគាត់ (Get.to) ទៅអេក្រង់បន្ទាប់។
+
+៤. ផ្នែក Review Hub & Form Integration (ចំណុចសំខាន់បំផុត)
+នេះជាកន្លែងដែលវេទមន្តកើតឡើង ដោយយើងប្រើប្រាស់ UI ចាស់របស់អ្នកមកច្នៃ៖
+
+អ្វីដែលត្រូវបង្កើត៖ អេក្រង់ថ្មីមួយឈ្មោះ CvDataReviewScreen។ អេក្រង់នេះគ្រាន់តែបង្ហាញជាបញ្ជី (List) នូវអ្វីដែល AI រកឃើញ។ ឧទាហរណ៍៖
+
+AI បានរកឃើញ Experiences:
+
+Software Engineer នៅ ABA Bank ➔ [ប៊ូតុង: Add to Profile]
+
+Intern នៅ Cellcard ➔ [ប៊ូតុង: Add to Profile]
+
+ការភ្ជាប់ទៅ Form ចាស់ (Integration):
+នៅពេលគាត់ចុចប៊ូតុង [Add to Profile] យើងនឹងប្រើ Get.toNamed('/add-experience', arguments: parsedExperience)។
+រួចហើយនៅក្នុង AddExperienceController ចាស់របស់អ្នក យើងគ្រាន់តែថែមលក្ខខណ្ឌមួយជួរថា៖ ប្រសិនបើមានទិន្នន័យបោះមកតាម arguments នោះត្រូវយកវាមកញាត់ (Pre-fill) ចូល TextController ឱ្យហើយទៅ។

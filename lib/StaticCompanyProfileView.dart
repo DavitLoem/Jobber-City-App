@@ -1,318 +1,304 @@
 import 'package:flutter/material.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 
-class StaticCompanyProfileView extends StatelessWidget {
-  const StaticCompanyProfileView({super.key});
+class ProfileFilledMockupView extends StatelessWidget {
+  const ProfileFilledMockupView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(
-        0xFFF8F9FA,
-      ), // ពណ៌ប្រផេះស្រាលខ្លាំង ធ្វើឱ្យកាតពណ៌សលេចធ្លោ
+        0xFFF8F9FB,
+      ), // ពណ៌ផ្ទៃខាងក្រោយស្រាលជាងមុនបន្តិច
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true,
         title: const Text(
-          "Company Profile",
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: Colors.grey.shade200, height: 1),
+          'Profile Preview',
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeaderSection(),
-            const SizedBox(height: 30),
-
-            // ផ្នែកទី១: Basic Information
-            _buildSectionCard(
-              title: "Company Identity",
-              subtitle: "Tell us about your business",
-              children: [
-                _buildProfileTextField(
-                  label: "Company Name *",
-                  hint: "e.g. Jobber City Co., Ltd.",
+            // 🎯 ១. គំរូបង្ហាញ CV ដែលបាន Upload រួច
+            _buildDataCard(
+              title: "Resume (CV)",
+              actionIcon: Icons.edit_outlined,
+              onActionTap: () {},
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.shade100),
                 ),
-                const SizedBox(height: 16),
-                _buildProfileTextField(
-                  label: "Industry *",
-                  hint: "Select your industry",
-                  isDropdown: true,
-                ),
-                const SizedBox(height: 16),
-                _buildProfileTextField(
-                  label: "Company Size",
-                  hint: "Select company size",
-                  isDropdown: true,
-                ),
-                const SizedBox(height: 16),
-                _buildProfileTextField(
-                  label: "Description *",
-                  hint: "Briefly describe your company (min 10 chars)...",
-                  maxLines: 4,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            // ផ្នែកទី២: Contact & Location
-            _buildSectionCard(
-              title: "Contact & Location",
-              subtitle: "Where can candidates find you?",
-              children: [
-                _buildProfileTextField(
-                  label: "Contact Email *",
-                  hint: "hr@company.com",
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 16),
-                _buildProfileTextField(
-                  label: "Phone Number *",
-                  hint: "+855 12 345 678",
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 16),
-                _buildProfileTextField(
-                  label: "Website (Optional)",
-                  hint: "https://www.company.com",
-                ),
-                const SizedBox(height: 16),
-                Row(
+                child: Row(
                   children: [
-                    Expanded(
-                      child: _buildProfileTextField(
-                        label: "Province *",
-                        hint: "Select Province",
-                        isDropdown: true,
-                      ),
+                    const Icon(
+                      Icons.picture_as_pdf_rounded,
+                      color: Colors.red,
+                      size: 32,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildProfileTextField(
-                        label: "District *",
-                        hint: "Select District",
-                        isDropdown: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Sles_Rofath_CV_2026.pdf",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Uploaded on Oct 24, 2026 • 2.4 MB",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.remove_red_eye_outlined,
+                        color: AppColors.primary,
+                      ),
+                      onPressed: () {},
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                _buildProfileTextField(
-                  label: "Address Detail",
-                  hint: "Street 123, Sangkat...",
-                  maxLines: 2,
-                ),
-              ],
+              ),
             ),
+            const SizedBox(height: 16),
 
-            const SizedBox(height: 100), // Space សម្រាប់ប៊ូតុងខាងក្រោម
+            // 🎯 ២. គំរូបង្ហាញ Work Experience ដែលបានទាញយកដោយ AI
+            _buildDataCard(
+              title: "Work Experience",
+              actionIcon: Icons.add,
+              onActionTap: () {},
+              child: Column(
+                children: [
+                  _buildExperienceItem(
+                    jobTitle: "Senior Flutter Developer",
+                    company: "Tech Solutions App",
+                    date: "Jan 2024 - Present",
+                    isLast: false,
+                    onEdit: () {},
+                    onDelete: () {},
+                  ),
+                  _buildExperienceItem(
+                    jobTitle: "Mobile App Developer",
+                    company: "Sabaicode",
+                    date: "Mar 2021 - Dec 2023",
+                    isLast: true,
+                    onEdit: () {},
+                    onDelete: () {},
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 🎯 ៣. គំរូបង្ហាញ Skills
+            _buildDataCard(
+              title: "Skills",
+              actionIcon: Icons.edit_outlined,
+              onActionTap: () {},
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildSkillChip("Flutter"),
+                  _buildSkillChip("Dart"),
+                  _buildSkillChip("Firebase"),
+                  _buildSkillChip("RESTful API"),
+                  _buildSkillChip("UI/UX Design"),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      // 🟢 ប៊ូតុង Save ស្អិតជាប់ខាងក្រោម (Sticky Bottom Bar)
-      bottomSheet: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200)),
-        ),
-        child: SafeArea(
-          child: SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.blueAccent, // ដូរទៅ AppColors.primary របស់អ្នក
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () {},
-              child: const Text(
-                "Save Profile",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
-  // ==========================================
-  // WIDGETS ទម្រង់ថ្មីដែលមើលទៅ Professional
-  // ==========================================
-
-  Widget _buildHeaderSection() {
-    return Center(
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey.shade300, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.business,
-                  size: 35,
-                  color: Colors.blueAccent, // AppColors.primary
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: const Icon(
-                  Icons.camera_alt_rounded,
-                  size: 14,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            "Upload Company Logo",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.blueAccent,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "Recommended size: 500x500px",
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionCard({
+  // ── វីដជេត (Widget) ជំនួយសម្រាប់បង្កើត Card ──
+  Widget _buildDataCard({
     required String title,
-    required String subtitle,
-    required List<Widget> children,
+    required Widget child,
+    required IconData actionIcon,
+    required VoidCallback onActionTap,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        // ដក Shadow ធំៗចេញ ជំនួសដោយ Flat UI
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              GestureDetector(
+                onTap: onActionTap,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(actionIcon, size: 20, color: AppColors.primary),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-          ),
-          const SizedBox(height: 20),
-          Divider(height: 1, color: Colors.grey.shade100),
-          const SizedBox(height: 20),
-          ...children,
+          const SizedBox(height: 16),
+          child,
         ],
       ),
     );
   }
 
-  // 🎯 ប្រអប់ Text Field ថ្មី (គ្មាន Prefix Icon, មាន Label ខាងលើ)
-  Widget _buildProfileTextField({
-    required String label,
-    required String hint,
-    bool isDropdown = false,
-    int maxLines = 1,
-    TextInputType? keyboardType,
+  Widget _buildExperienceItem({
+    required String jobTitle,
+    required String company,
+    required String date,
+    required bool isLast,
+    required VoidCallback onEdit, // 🎯 ទទួលយកមុខងារ Edit
+    required VoidCallback onDelete, // 🎯 ទទួលយកមុខងារ Delete
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.work_outline, color: Colors.grey, size: 24),
           ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          maxLines: maxLines,
-          readOnly: isDropdown,
-          keyboardType: keyboardType,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-            suffixIcon: isDropdown
-                ? const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.grey,
-                  )
-                : null,
-            filled: true,
-            fillColor: Colors.white, // ពណ៌ស
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  jobTitle,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  company,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  date,
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                ),
+                if (!isLast) ...[
+                  const SizedBox(height: 16),
+                  Divider(color: Colors.grey.shade200, height: 1),
+                ],
+              ],
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey.shade300), // គែមស្តើង
+          ),
+          // 🎯 បន្ថែមប៊ូតុង Menu (3 ចំណុច) ដែលលាក់ភាពរញ៉េរញ៉ៃ
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'edit') onEdit();
+              if (value == 'delete') onDelete();
+            },
+            icon: const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.blueAccent,
-                width: 1.5,
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                    SizedBox(width: 8),
+                    Text('Edit'),
+                  ],
+                ),
               ),
-            ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Delete', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkillChip(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.blue.shade100),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.blue,
         ),
-      ],
+      ),
     );
   }
 }

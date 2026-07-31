@@ -32,39 +32,39 @@ class ExperienceScreenViewController extends GetxController {
 
       debugPrint('Profile response: $response');
 
-      if (response != null && response is Map && response['data'] != null) {
-        final data = response['data'];
-        debugPrint('Data: $data');
+      // if (response != null && response is Map && response['data'] != null) {
+      //   final data = response['data'];
+      //   debugPrint('Data: $data');
 
-        if (data['experiences'] != null &&
-            (data['experiences'] as List).isNotEmpty) {
-          final experiences = data['experiences'] as List;
-          debugPrint('Experiences length: ${experiences.length}');
-          final expData = experiences.last; // Get the most recent experience
-          debugPrint('Last experience: $expData');
+      //   if (data['experiences'] != null &&
+      //       (data['experiences'] as List).isNotEmpty) {
+      //     final experiences = data['experiences'] as List;
+      //     debugPrint('Experiences length: ${experiences.length}');
+      //     final expData = experiences.last; // Get the most recent experience
+      //     debugPrint('Last experience: $expData');
 
-          jobTitleCtrl.text = expData['job_title']?.toString() ?? '';
-          companyNameCtrl.text = expData['company_name']?.toString() ?? '';
+      //     jobTitleCtrl.text = expData['job_title']?.toString() ?? '';
+      //     companyNameCtrl.text = expData['company_name']?.toString() ?? '';
 
-          // Fix date format: split 'T' from datetime
-          startDateCtrl.text =
-              expData['start_date']?.toString().split('T').first ?? '';
-          endDateCtrl.text =
-              expData['end_date']?.toString().split('T').first ?? '';
+      //     // Fix date format: split 'T' from datetime
+      //     startDateCtrl.text =
+      //         expData['start_date']?.toString().split('T').first ?? '';
+      //     endDateCtrl.text =
+      //         expData['end_date']?.toString().split('T').first ?? '';
 
-          descriptionCtrl.text = expData['description']?.toString() ?? '';
+      //     descriptionCtrl.text = expData['description']?.toString() ?? '';
 
-          isCurrentJob.value =
-              expData['is_current_job'] == true ||
-              expData['is_current_job'] == "true";
+      //     isCurrentJob.value =
+      //         expData['is_current_job'] == true ||
+      //         expData['is_current_job'] == "true";
 
-          debugPrint('Job Title: ${jobTitleCtrl.text}');
-          debugPrint('Company: ${companyNameCtrl.text}');
-          debugPrint('Start Date: ${startDateCtrl.text}');
-        } else {
-          debugPrint('No experiences found');
-        }
-      }
+      //     debugPrint('Job Title: ${jobTitleCtrl.text}');
+      //     debugPrint('Company: ${companyNameCtrl.text}');
+      //     debugPrint('Start Date: ${startDateCtrl.text}');
+      //   } else {
+      //     debugPrint('No experiences found');
+      //   }
+      // }
     } catch (e) {
       debugPrint("Fetch Experience Error: $e");
     } finally {
