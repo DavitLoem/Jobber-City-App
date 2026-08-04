@@ -71,7 +71,7 @@ class SplashLogo extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(22),
                     child: Image.asset(
-                      "assets/images/logo.png",
+                      "assets/logos/jbc.png",
                       fit: BoxFit.contain,
                     ),
                   ),

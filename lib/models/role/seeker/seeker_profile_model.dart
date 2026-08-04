@@ -56,6 +56,8 @@ class SeekerProfileModel {
   final List<String> expertiseCategoryIds;
   final List<String> skills;
 
+  final String resumeFilename;
+  final String resumePublicId;
   final String resumeUrl;
   final String portfolioUrl;
   final String linkedinUrl;
@@ -95,6 +97,8 @@ class SeekerProfileModel {
     required this.jobTypePreferences,
     required this.expertiseCategoryIds,
     required this.skills,
+    required this.resumeFilename,
+    required this.resumePublicId,
     required this.resumeUrl,
     required this.portfolioUrl,
     required this.linkedinUrl,
@@ -136,6 +140,8 @@ class SeekerProfileModel {
         json['expertise_category_ids'] ?? [],
       ),
       skills: List<String>.from(json['skills'] ?? []),
+      resumeFilename: json['resume_filename'] ?? '',
+      resumePublicId: json['resume_public_id'] ?? '',
       resumeUrl: json['resume_url'] ?? '',
       portfolioUrl: json['portfolio_url'] ?? '',
       linkedinUrl: json['linkedin_url'] ?? '',

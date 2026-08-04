@@ -19,7 +19,7 @@ class MainScreenBinding extends Bindings {
     Get.lazyPut(() => SaveJobScreenViewController(), fenix: true);
 
     // 🟢 ៣. សម្រាប់ Tab ទីៃ (Applied).
-    Get.lazyPut(() => ApplicationViewBinding(), fenix: true);
+    Get.lazyPut(() => ApplicationViewController(), fenix: true);
 
     // 🟢 ៤. សម្រាប់ Tab ទី៤ (Profile)
     Get.lazyPut(() => ProfileScreenViewController());

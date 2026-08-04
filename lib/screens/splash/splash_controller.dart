@@ -141,18 +141,27 @@ class SplashViewController extends GetxController
   }
 
   Future<void> _startSequence() async {
+    // មិនបាច់ឆែកទេ ព្រោះវានៅដើមគេមិនទាន់មានការរង់ចាំ
     bgCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 200));
+    // 🎯 បន្ថែមការការពារទី១៖ បើ Controller ត្រូវបិទហើយ (ឧ. លោតទៅ Login បាត់) សូមបញ្ឈប់ការងារ
+    if (isClosed) return;
     logoCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 700));
+    // 🎯 បន្ថែមការការពារទី២
+    if (isClosed) return;
     taglineCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 400));
+    // 🎯 បន្ថែមការការពារទី៣
+    if (isClosed) return;
     loaderCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 2000));
+    // 🎯 បន្ថែមការការពារចុងក្រោយ មុននឹងហៅការឆែក Auto Login
+    if (isClosed) return;
 
     _checkAutoLogin();
   }

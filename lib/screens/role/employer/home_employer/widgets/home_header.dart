@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+import '../home_employer_view.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 🎯 ចាប់យក Controller
+    final controller = Get.put(HomeEmployerViewController());
+
     return Container(
       color: Colors.white,
       child: Column(
@@ -15,60 +21,83 @@ class HomeHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Left: Logo + greeting
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(
-                            0xFF4F7DF7,
-                          ).withValues(alpha: 0.35),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+              Obx(() {
+                // 🎯 ទាញយកទិន្នន័យពី Controller
+                final profile = controller.companyProfile.value;
+                final companyName = profile?.companyName ?? 'Company Name';
+                final hasLogo =
+                    profile?.logoUrl != null && profile!.logoUrl!.isNotEmpty;
+
+                return Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF4F7DF7,
+                            ).withValues(alpha: 0.35),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      clipBehavior:
+                          Clip.hardEdge, // 🎯 កាត់រូបភាពកុំឱ្យចេញក្រៅគែមសងខាង
+                      child: hasLogo
+                          ? Image.network(
+                              profile.logoUrl!,
+                              fit: BoxFit.cover,
+                              width: 48,
+                              height: 48,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    LucideIcons.building,
+                                    color: Color(0xFF4f7df7),
+                                  ),
+                            )
+                          : const Icon(
+                              LucideIcons.building,
+                              color: Color(0xFF4f7df7),
+                            ),
+                    ),
+                    const SizedBox(width: 13),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Welcome back,",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF697386),
+                            height: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          companyName, // 🎯 បង្ហាញឈ្មោះពិតប្រាកដ
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1A1F36),
+                            height: 1.2,
+                            letterSpacing: -0.4,
+                          ),
                         ),
                       ],
                     ),
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/logos/jbc.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 13),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        "Welcome back,",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF697386),
-                          height: 1.0,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        "Jobber City",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F36),
-                          height: 1.2,
-                          letterSpacing: -0.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              // Right: actions
+                  ],
+                );
+              }),
+
+              // Right: actions ទុកដដែល[cite: 7]
               Row(
                 children: [
                   _RoundIconButton(

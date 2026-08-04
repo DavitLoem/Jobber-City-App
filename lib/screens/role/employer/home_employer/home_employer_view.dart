@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/api/services/role/employer/company_profile_services.dart';
+import 'package:jobber_city/models/role/employer/company_model.dart';
 
 import 'widgets/applicant_pipeline_card.dart';
 import 'widgets/home_header.dart';

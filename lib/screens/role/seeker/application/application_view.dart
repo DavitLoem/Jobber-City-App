@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/api/services/role/seeker/seeker_application_service.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
+// 🎯 Import Model និង Service
+import 'package:jobber_city/models/role/seeker/my_application_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'application_binding.dart';
 part 'application_controller.dart';
@@ -10,11 +14,10 @@ class ApplicationView extends GetView<ApplicationViewController> {
 
   @override
   Widget build(BuildContext context) {
-    // ប្រើ DefaultTabController ដើម្បីគ្រប់គ្រង Tab ទាំង ៣
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FB), // ពណ៌ផ្ទៃខាងក្រោយស្រាល
+        backgroundColor: const Color(0xFFF8F9FB),
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -39,65 +42,106 @@ class ApplicationView extends GetView<ApplicationViewController> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            // Tab 1: ការងារកំពុងរង់ចាំ
-            _buildApplicationList(status: 'Pending'),
+        // 🎯 ប្រើប្រាស់ Obx() ដើម្បីរង់ចាំទិន្នន័យពី Controller
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
+          }
 
-            // Tab 2: ការងារត្រូវហៅសម្ភាសន៍
-            _buildApplicationList(status: 'Interview'),
-
-            // Tab 3: ការងារដែលបិទ ឬធ្លាក់
-            _buildApplicationList(status: 'Rejected'),
-          ],
-        ),
+          return TabBarView(
+            children: [
+              _buildApplicationList(
+                apps: controller.pendingApps,
+                emptyMessage: "No pending applications",
+              ),
+              _buildApplicationList(
+                apps: controller.interviewApps,
+                emptyMessage: "No interviews scheduled yet",
+              ),
+              _buildApplicationList(
+                apps: controller.closedApps,
+                emptyMessage: "No closed applications",
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
 
-  // 🎯 មុខងារសម្រាប់បង្កើតបញ្ជីរាយនាមការងារ
-  Widget _buildApplicationList({required String status}) {
-    // បង្កើត Mock Data បន្តិចបន្តួចដើម្បីមើល UI
+  // 🎯 ប្តូរពីការទទួល String status មកទទួលយក List នៃទិន្នន័យពិតប្រាកដ
+  Widget _buildApplicationList({
+    required List<MyApplicationModel> apps,
+    required String emptyMessage,
+  }) {
+    if (apps.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(LucideIcons.folderOpen, size: 60, color: Colors.grey.shade300),
+            const SizedBox(height: 16),
+            Text(
+              emptyMessage,
+              style: TextStyle(
+                color: Colors.grey.shade500,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(20),
-      itemCount: 3, // ចំនួនកាតគំរូ
+      itemCount: apps.length,
       itemBuilder: (context, index) {
-        return _buildApplicationCard(
-          jobTitle: index == 0 ? "Senior Flutter Developer" : "UI/UX Designer",
-          companyName: index == 0 ? "Tech Solutions App" : "Creative Studio",
-          location: "Phnom Penh, Cambodia",
-          appliedDate: "Applied 2 days ago",
-          status: status,
-          logoUrl:
-              "https://via.placeholder.com/150", // ដាក់ URL រូបពិតនៅពេលមាន Data
-        );
+        final app = apps[index];
+        return _buildApplicationCard(app); // បញ្ជូន Object ទៅគូរ
       },
     );
   }
 
-  // 🎯 មុខងារសម្រាប់គូរកាត (Card) នៃការងារនីមួយៗ
-  Widget _buildApplicationCard({
-    required String jobTitle,
-    required String companyName,
-    required String location,
-    required String appliedDate,
-    required String status,
-    required String logoUrl,
-  }) {
-    // កំណត់ពណ៌តាមស្ថានភាព (Status)
+  // 🎯 មុខងារគូរកាត ដោយទទួលយកទិន្នន័យពិតពី MyApplicationModel
+  Widget _buildApplicationCard(MyApplicationModel app) {
     Color statusColor;
     Color statusBgColor;
+    String displayStatus = app.status.capitalizeFirst ?? app.status;
 
-    if (status == 'Pending') {
-      statusColor = Colors.orange.shade700;
-      statusBgColor = Colors.orange.shade50;
-    } else if (status == 'Interview') {
-      statusColor = AppColors.success;
-      statusBgColor = AppColors.success.withOpacity(0.1);
-    } else {
-      statusColor = Colors.red.shade700;
-      statusBgColor = Colors.red.shade50;
+    // 🎯 កំណត់ពណ៌តាម Status ពិតប្រាកដដែល Backend បោះមក
+    switch (app.status.toLowerCase()) {
+      case 'pending':
+      case 'reviewed':
+      case 'shortlisted':
+        statusColor = Colors.orange.shade700;
+        statusBgColor = Colors.orange.shade50;
+        break;
+      case 'interview':
+        statusColor = AppColors.success;
+        statusBgColor = AppColors.success.withOpacity(0.1);
+        break;
+      case 'rejected':
+        statusColor = Colors.red.shade700;
+        statusBgColor = Colors.red.shade50;
+        break;
+      case 'hired':
+        statusColor = Colors.green.shade700;
+        statusBgColor = Colors.green.shade50;
+        break;
+      default:
+        statusColor = Colors.grey.shade700;
+        statusBgColor = Colors.grey.shade100;
     }
+
+    // គណនាថ្ងៃដែលបានដាក់ពាក្យ
+    final daysAgo = DateTime.now().difference(app.appliedAt).inDays;
+    final appliedDateText = daysAgo == 0
+        ? "Applied Today"
+        : "Applied $daysAgo days ago";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -117,7 +161,6 @@ class ApplicationView extends GetView<ApplicationViewController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ផ្នែកខាងលើ៖ រូប Logo និង ស្ថានភាព
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -128,11 +171,18 @@ class ApplicationView extends GetView<ApplicationViewController> {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    image: NetworkImage(logoUrl),
-                    fit: BoxFit.cover,
-                  ),
                 ),
+                clipBehavior: Clip.hardEdge,
+                child: (app.companyLogo != null && app.companyLogo!.isNotEmpty)
+                    ? Image.network(
+                        app.companyLogo!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                          LucideIcons.building,
+                          color: Colors.grey.shade400,
+                        ),
+                      )
+                    : Icon(LucideIcons.building, color: Colors.grey.shade400),
               ),
               const SizedBox(width: 16),
               // ឈ្មោះការងារ និង ក្រុមហ៊ុន
@@ -141,7 +191,7 @@ class ApplicationView extends GetView<ApplicationViewController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      jobTitle,
+                      app.jobTitle,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -152,7 +202,7 @@ class ApplicationView extends GetView<ApplicationViewController> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      companyName,
+                      app.companyName,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -171,7 +221,7 @@ class ApplicationView extends GetView<ApplicationViewController> {
           const Divider(height: 1, color: Color(0xFFEEEEEE)),
           const SizedBox(height: 16),
 
-          // ផ្នែកខាងក្រោម៖ ទីតាំង ពេលវេលា និង Status Pill
+          // ផ្នែកខាងក្រោម
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -181,31 +231,13 @@ class ApplicationView extends GetView<ApplicationViewController> {
                   Row(
                     children: [
                       Icon(
-                        Icons.location_on_outlined,
-                        size: 14,
-                        color: Colors.grey.shade500,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        location,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(
                         Icons.access_time_rounded,
                         size: 14,
                         color: Colors.grey.shade500,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        appliedDate,
+                        appliedDateText,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade600,
@@ -215,8 +247,6 @@ class ApplicationView extends GetView<ApplicationViewController> {
                   ),
                 ],
               ),
-
-              // Status Pill (បន្តោងពណ៌ប្រាប់ពីស្ថានភាព)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -227,7 +257,7 @@ class ApplicationView extends GetView<ApplicationViewController> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  status,
+                  displayStatus,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

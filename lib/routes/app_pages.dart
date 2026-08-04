@@ -7,6 +7,7 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
+import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/employer_profile/company_detail/company_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
@@ -152,7 +153,7 @@ class AppPages {
         RoleMiddleware(requiredRole: AppRoles.seeker),
       ],
     ),
-        GetPage(
+    GetPage(
       name: AppRoutes.cvExtraction,
       page: () => CvExtractionView(),
       binding: CvExtractionViewBinding(),
@@ -246,6 +247,16 @@ class AppPages {
         RoleMiddleware(requiredRole: AppRoles.employer),
       ],
     ),
+    GetPage(
+      name: AppRoutes.candidateDetail,
+      page: () => CandidateDetailView(),
+      binding: CandidateDetailViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+
     GetPage(
       name: AppRoutes.experience,
       page: () => ExperienceScreenView(),

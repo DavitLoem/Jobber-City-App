@@ -7,7 +7,10 @@ import 'package:jobber_city/models/role/employer/cv_extraction_model.dart';
 class CvExtractionService {
   final ApiClient _apiClient = ApiClient();
 
-  Future<CvExtractionResponseModel> uploadAndExtractCv(File file) async {
+  Future<CvExtractionResponseModel> uploadAndExtractCv(
+    File file, {
+    required CancelToken? cancelToken,
+  }) async {
     try {
       // ១. រៀបចំទិន្នន័យឯកសារជាទម្រង់ FormData
       String fileName = file.path.split('/').last;
@@ -19,6 +22,7 @@ class CvExtractionService {
       final response = await _apiClient.post(
         '/seeker/profile/upload-cv',
         data: formData,
+        cancelToken: cancelToken,
       );
 
       // ៣. ពិនិត្យលទ្ធផល និងបំប្លែងទិន្នន័យទៅជា Model

@@ -93,7 +93,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           const SizedBox(width: 4),
           GestureDetector(
             onTap: () {
-              Get.toNamed(AppRoutes.createAccount);
+              Get.offNamed(AppRoutes.createAccount);
             },
             child: Text(
               'Sign up',

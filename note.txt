@@ -53,3 +53,7 @@ Intern នៅ Cellcard ➔ [ប៊ូតុង: Add to Profile]
 ការភ្ជាប់ទៅ Form ចាស់ (Integration):
 នៅពេលគាត់ចុចប៊ូតុង [Add to Profile] យើងនឹងប្រើ Get.toNamed('/add-experience', arguments: parsedExperience)។
 រួចហើយនៅក្នុង AddExperienceController ចាស់របស់អ្នក យើងគ្រាន់តែថែមលក្ខខណ្ឌមួយជួរថា៖ ប្រសិនបើមានទិន្នន័យបោះមកតាម arguments នោះត្រូវយកវាមកញាត់ (Pre-fill) ចូល TextController ឱ្យហើយទៅ។
+
+
+
+បញ្ហាទី ៣៖ Scan CV ពិតប្រាកដយូរ ហើយគាំងមូលហេតុ៖ នៅក្នុង Log បានបង្ហាញថា Request upload-cv ចំណាយពេលរហូតដល់ 72.0706 seconds។ បន្ទាប់មកមានចេញសារព្រមាន (Warning) ថា Gemini API overloaded (503). Retrying in 1s...។ នេះមានន័យថា ម៉ាស៊ីន API របស់ Gemini ផ្ទាល់កំពុងមានភាពមមាញឹកខ្លាំង ឬទំហំអត្ថបទពី CV វែងពេក ធ្វើឱ្យវាយូរ រហូតដល់ដាច់ Connection (Timeout) ពីខាង Frontend។  🛠 វិធីដោះស្រាយ៖បញ្ហានេះភាគច្រើនជាបញ្ហាខាង Server របស់ Google Gemini។ អ្វីដែលអ្នកអាចធ្វើបានដើម្បីសម្រួលដល់បញ្ហានេះគឺ៖នៅខាង Frontend (Flutter): ត្រូវប្រាកដថា connectTimeout និង receiveTimeout នៅក្នុង ApiClient (Dio) របស់អ្នកត្រូវបានកំណត់ឱ្យបានយូរគ្រប់គ្រាន់ (ឧទាហរណ៍៖ ២ ទៅ ៣ នាទី) សម្រាប់ត្រង់ Endpoint Upload CV នេះ។ បើមិនដូច្នេះទេ Dio នឹងកាត់ផ្តាច់ Request មុនពេល Gemini គិតរួច។នៅខាង Backend: ការពារកុំឱ្យ CV ដែលមានទំព័រច្រើនពេក (អត្ថបទវែងពេក) បញ្ជូនទៅ Gemini។ អ្នកអាចកំណត់ការទាញយកអត្ថបទត្រឹម ៣ ទៅ ៤ ទំព័រដំបូងនៅក្នុង extract_text_from_pdf។

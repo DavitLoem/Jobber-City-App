@@ -23,6 +23,7 @@ class AppRoutes {
   static const String setting = '/setting';
   static const String cvExtraction = '/cv-extraction';
   static const String applied = '/applied';
+  static const String candidateDetail = '/candidate-detail';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES

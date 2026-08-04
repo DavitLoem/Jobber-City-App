@@ -4,11 +4,14 @@ class CvExtractionViewController extends GetxController {
   final CvExtractionService _service = CvExtractionService();
   final ApiClient _apiClient = ApiClient();
 
+  CancelToken? _cancelToken;
+
   final extractionResult = Rxn<CvExtractionResponseModel>();
   final isScanning = false.obs;
   final errorMessage = ''.obs;
 
   final currentResumeUrl = ''.obs;
+  final currentResumeFilename = ''.obs;
 
   @override
   void onInit() {
@@ -16,14 +19,11 @@ class CvExtractionViewController extends GetxController {
     fetchCurrentResumeUrl();
   }
 
-  // 🎯 Getter សម្រាប់កាត់យកឈ្មោះ File ពី URL
-  String get currentResumeFilename {
-    if (currentResumeUrl.value.isEmpty) return "";
-    try {
-      return Uri.parse(currentResumeUrl.value).pathSegments.last;
-    } catch (e) {
-      return "Uploaded_Resume.pdf";
+  void cancelScanning() {
+    if (_cancelToken != null && !_cancelToken!.isCancelled) {
+      _cancelToken!.cancel("User cancelled the upload.");
     }
+    isScanning.value = false;
   }
 
   Future<void> fetchCurrentResumeUrl() async {
@@ -32,9 +32,18 @@ class CvExtractionViewController extends GetxController {
       if (response != null && response['data'] != null) {
         var data = response['data'];
         currentResumeUrl.value = data['resume_url'] ?? '';
+
+        // 🎯 ៣. ទាញយកឈ្មោះ File ពី Response ដែល Backend បោះមក
+        // បើអត់មានឈ្មោះ (ឯកសារចាស់) យើងបង្ហាញពាក្យ "Uploaded_Resume.pdf" សិន
+        currentResumeFilename.value =
+            data['resume_filename'] != null &&
+                data['resume_filename'].toString().isNotEmpty
+            ? data['resume_filename']
+            : "Uploaded_Resume.pdf";
       }
     } catch (e) {
       currentResumeUrl.value = '';
+      currentResumeFilename.value = '';
     }
   }
 
@@ -68,11 +77,13 @@ class CvExtractionViewController extends GetxController {
     if (confirm != true) return;
 
     try {
-      isScanning.value = true; // ប្រើ Loading ដដែល
+      isScanning.value = true;
 
-      await _service.deleteCv(); // ហៅ Service លុប
+      await _service.deleteCv();
 
-      currentResumeUrl.value = ''; // Update UI ភ្លាមៗ
+      // 🎯 ៤. Clear ទិន្នន័យទាំង URL ទាំងឈ្មោះ File ពេលលុបជោគជ័យ
+      currentResumeUrl.value = '';
+      currentResumeFilename.value = '';
 
       Get.snackbar(
         'Deleted',
@@ -99,17 +110,27 @@ class CvExtractionViewController extends GetxController {
       if (result == null || result.files.single.path == null) return;
 
       File cvFile = File(result.files.single.path!);
+
+      _cancelToken = CancelToken();
       isScanning.value = true;
 
-      final response = await _service.uploadAndExtractCv(cvFile);
+      final response = await _service.uploadAndExtractCv(
+        cvFile,
+        cancelToken: _cancelToken,
+      );
       extractionResult.value = response;
 
-      // បន្ទាប់ពី Upload ជោគជ័យ ទាញយក URL ថ្មីមកបង្ហាញ
       await fetchCurrentResumeUrl();
     } catch (e) {
-      errorMessage.value = e.toString().replaceAll('Exception: ', '');
+      // 🎯 ៥. ឆែកមើលថាតើ Error នេះមកពីការចុច Cancel ដែរឬទេ បើពិតមែនមិនបាច់លោត Snackbar ទេ
+      if (e is DioException && e.type == DioExceptionType.cancel) {
+        debugPrint("Upload was cancelled by user.");
+      } else {
+        errorMessage.value = e.toString().replaceAll('Exception: ', '');
+      }
     } finally {
       isScanning.value = false;
+      _cancelToken = null; // destroy the cancel token after operation
     }
   }
 }

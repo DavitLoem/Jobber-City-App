@@ -7,6 +7,6 @@ class ApiConfig {
 
   static String get baseUrl =>
       dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:8000/api';
-  static const int connectionTimeout = 2;
-  static const int receiveTimeout = 2;
+  static const int connectionTimeout = 4;
+  static const int receiveTimeout = 4;
 }
