@@ -1,0 +1,108 @@
+part of 'job_detail_view.dart';
+
+class JobDetailController extends GetxController {
+  // 🎯 ប្រើប្រាស់អថេរតែមួយគត់ដើម្បីផ្ទុកទិន្នន័យ Model ទាំងមូល (Rxn ព្រោះវាអាចជា null មុនពេលទាញយក)
+  final job = Rxn<JobFeedModel>();
+  final ApplicationService _appService = ApplicationService();
+  final ApiClient _apiClient = ApiClient();
+
+  // ស្ថានភាព UI
+  var isDescriptionExpanded = false.obs;
+  var isApplying = false.obs;
+  var hasApplied = false.obs;
+
+  var resumeUrl = ''.obs;
+  var isLoadingProfile = true.obs;
+
+  final TextEditingController coverLetterController = TextEditingController();
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    // ទទួលយកទិន្នន័យដែលបញ្ជូនពីអេក្រង់ Home (Get.toNamed(..., arguments: job))
+    if (Get.arguments is JobFeedModel) {
+      job.value = Get.arguments as JobFeedModel;
+
+      hasApplied.value = job.value!.hasApplied;
+    }
+    fetchUserProfile();
+  }
+
+  // 🎯 មុខងារទាញយក Profile ដើម្បីឆែកមើល CV
+  Future<void> fetchUserProfile() async {
+    try {
+      isLoadingProfile.value = true;
+      final response = await _apiClient.get('/seeker/profile/');
+      if (response != null && response['data'] != null) {
+        resumeUrl.value = response['data']['resume_url'] ?? '';
+      }
+    } catch (e) {
+      debugPrint("Error fetching profile for CV check: $e");
+    } finally {
+      isLoadingProfile.value = false;
+    }
+  }
+
+  void toggleSave() {
+    if (job.value == null) return;
+
+    // 🎯 ផ្លាស់ប្តូរតម្លៃផ្ទាល់ទៅលើ Model
+    job.value!.isSaved = !job.value!.isSaved;
+    job.refresh(); // 🔄 ប្រាប់ GetX ឱ្យ Update UI គ្រប់កន្លែងដែលប្រើអថេរ job នេះ
+
+    // ហៅ API បាញ់ទៅ Backend ទីនេះដើម្បី Save ពិតប្រាកដ
+  }
+
+  Future<void> submitApplication() async {
+    if (hasApplied.value ||
+        isApplying.value ||
+        job.value == null ||
+        resumeUrl.value.isEmpty) {
+      return;
+    }
+
+    isApplying.value = true;
+
+    try {
+      final isSuccess = await _appService.applyForJob(
+        jobId: job.value!.id,
+        coverLetter: coverLetterController.text.trim(),
+        // មិនបាច់ដាក់ resumeUrl ទេ ព្រោះ Backend នឹងទាញពី Profile ស្វ័យប្រវត្តិ
+      );
+
+      if (isSuccess) {
+        hasApplied.value = true;
+        job.value!.hasApplied = true;
+        Get.back(); // 🎯 បិទផ្ទាំង Bottom Sheet វិញពេលជោគជ័យ
+
+        Get.snackbar(
+          "Application Sent! 🎉",
+          "You have successfully applied to ${job.value!.companyName}.",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: AppColors.successBackground,
+          colorText: AppColors.success,
+          duration: const Duration(seconds: 4),
+        );
+      }
+    } catch (e) {
+      // 🎯 បង្ហាញ Error ពេលគាត់ដាក់ពាក្យលើស ១០ ដង ឬ Error ផ្សេងៗ
+      Get.snackbar(
+        "Application Failed",
+        e.toString().replaceAll("Exception: ", ""),
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade700,
+        duration: const Duration(seconds: 4),
+      );
+    } finally {
+      isApplying.value = false;
+    }
+  }
+
+  @override
+  void onClose() {
+    coverLetterController.dispose();
+    super.onClose();
+  }
+}

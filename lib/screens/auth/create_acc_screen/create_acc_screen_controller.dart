@@ -2,6 +2,7 @@ part of 'create_acc_screen_view.dart';
 
 class CreateAccScreenViewController extends GetxController {
   final AuthServices authServices = AuthServices();
+  final _storage = const FlutterSecureStorage();
 
   final firstNameCtrl = TextEditingController();
   final lastNameCtrl = TextEditingController();
@@ -64,7 +65,19 @@ class CreateAccScreenViewController extends GetxController {
 
       await authServices.register(requestModel);
 
-      Get.toNamed(AppRoutes.verifyOtp, arguments: emailCtrl.text.trim());
+      // Store user data in FlutterSecureStorage for later use
+      await _storage.write(key: 'temp_firstName', value: firstName);
+      await _storage.write(key: 'temp_lastName', value: lastName);
+      await _storage.write(key: 'temp_email', value: email);
+
+      Get.toNamed(
+        AppRoutes.verifyOtp,
+        arguments: {
+          'email': email,
+          'firstName': firstName,
+          'lastName': lastName,
+        },
+      );
     } on ApiException catch (e) {
       Get.snackbar("Error", e.message);
     } catch (e, stackTrace) {
@@ -73,6 +86,12 @@ class CreateAccScreenViewController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void registerWithGoogle() {
+    String selectedRole = selectedIndex.value == 0 ? 'seeker' : 'employer';
+    // 🎯 បោះ Role ទៅ ដើម្បីប្រាប់ថាចង់ Register ជាអ្វី
+    Get.find<AuthController>().loginWithGoogle(role: selectedRole);
   }
 
   void changeTab(int index) {

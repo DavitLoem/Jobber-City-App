@@ -19,8 +19,9 @@ class DioClient {
     dio = Dio(
       BaseOptions(
         baseUrl: ApiConfig.baseUrl,
-        connectTimeout: const Duration(seconds: ApiConfig.connectionTimeout),
-        receiveTimeout: const Duration(seconds: ApiConfig.receiveTimeout),
+        connectTimeout: const Duration(minutes: ApiConfig.connectionTimeout),
+        receiveTimeout: const Duration(minutes: ApiConfig.receiveTimeout),
+        sendTimeout: const Duration(minutes: 4),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -28,9 +29,10 @@ class DioClient {
       ),
     );
 
+    dio.interceptors.add(AuthInterceptor(dio));
+
     if (kDebugMode) {
-      dio.interceptors.addAll([
-        AuthInterceptor(dio),
+      dio.interceptors.add(
         PrettyDioLogger(
           requestHeader: true,
           requestBody:
@@ -41,7 +43,7 @@ class DioClient {
           compact: true,
           maxWidth: 90,
         ),
-      ]);
+      );
     }
   }
 }

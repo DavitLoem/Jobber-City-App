@@ -20,22 +20,26 @@ class AuthInterceptor extends Interceptor {
     final accessToken = await TokenStorage.getAccessToken();
 
     // បើមាន Token, ភ្ជាប់វាទៅក្នុង Header ជានិច្ច
-    if (accessToken != null) {
+    if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';
+    } else {
+      debugPrint("⚠️ [AuthInterceptor] Warning: Token is missing or empty!");
     }
 
-    return handler.next(options); // អនុញ្ញាតឱ្យ Request បន្តដំណើរទៅមុខ
+    return handler.next(options);
   }
 
   // ២. ដំណើរការនៅពេលមាន Error ត្រឡប់ពី Server មកវិញ
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // បើ Error មិនមែន 401 (Unauthorized) ទេ, បោះ Error ទៅធម្មតា
-    if (err.response?.statusCode != 401) {
+    final isAuthRoute =
+        err.requestOptions.path.contains('/auth/login') ||
+        err.requestOptions.path.contains('/auth/register');
+
+    if (err.response?.statusCode != 401 || isAuthRoute) {
       return handler.next(err);
     }
 
-    // បើកំពុង Refresh រួចហើយ, បដិសេធ Request ថ្មីៗសិន ការពារកុំឱ្យជាន់គ្នា
     if (_isRefreshing) {
       return handler.next(err);
     }
@@ -43,10 +47,12 @@ class AuthInterceptor extends Interceptor {
     _isRefreshing = true;
     final refreshToken = await TokenStorage.getRefreshToken();
 
-    // បើគ្មាន Refresh Token ទេ មានន័យថាអ្នកប្រើមិនទាន់ Login ឬ Logout រួចហើយ
+    // 🎯 ចំណុចកែប្រែទី១៖
+    // បើគ្មាន Refresh Token ទេ មានន័យថាអ្នកប្រើមិនទាន់ Login តាំងពីដំបូងមកម្ល៉េះ។
+    // ដូច្នេះ យើងមិនបាច់ហៅ _performLogout() ដើម្បីបង្ខំឱ្យលោតទៅ /login ទេ។
+    // យើងគ្រាន់តែបោះ Error ទៅកាន់ Controller វិញ (អម្បាញ់មិញយើងបានដាក់ try-catch ការពារក្នុង Controller រួចហើយ)។
     if (refreshToken == null) {
       _isRefreshing = false;
-      _performLogout();
       return handler.next(err);
     }
 
@@ -57,35 +63,32 @@ class AuthInterceptor extends Interceptor {
         data: {'refresh_token': refreshToken},
       );
 
-      // ១. ឆែកមើលក្រែងលោ Backend ខ្ចប់ទិន្នន័យក្នុង key "data"
-      // (បើអត់មាន key "data" ទេ យើងយក response.data ធម្មតា)
       final responseData = response.data['data'] ?? response.data;
 
       final newAccessToken = responseData['access_token'];
       final newRefreshToken = responseData['refresh_token'];
 
-      // ២. ទាញយក Role ចាស់មកប្រើវិញ ការពារកុំឱ្យ Error ដោយសារ API មិនបោះ Role ថ្មីមក
       final oldRole = await TokenStorage.getUserRole() ?? 'seeker';
+      final oldOnboardingStatus = await TokenStorage.getOnboardingStatus();
+      final oldProfileStatus = await TokenStorage.getProfileCompletedStatus();
 
-      // ៣. រក្សាទុក Token ថ្មី
       await TokenStorage.saveTokens(
         accessToken: newAccessToken,
-        refreshToken:
-            newRefreshToken ??
-            refreshToken, // បើ API អត់បោះ Refresh ថ្មីមកទេ ប្រើអាចាស់សិន
+        refreshToken: newRefreshToken ?? refreshToken,
         role: responseData['role'] ?? oldRole,
+        onboardingCompleted:
+            responseData['onboarding_completed'] ?? oldOnboardingStatus,
+        isProfileCompleted:
+            responseData['is_profile_completed'] ?? oldProfileStatus,
       );
 
-      // ៤. ធ្វើបច្ចុប្បន្នភាព Request ចាស់ដែលបាន Fail នោះ ជាមួយនឹង Token ថ្មី
       err.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
 
-      // ៥. បាញ់ Request ចាស់នោះម្តងទៀត (Retry)
       final cloneRequest = await dio.fetch(err.requestOptions);
 
       _isRefreshing = false;
       return handler.resolve(cloneRequest);
     } catch (e) {
-      // 6. Most important point: print this error to know exactly why refresh failed
       debugPrint("❌ Error calling refresh token API: $e");
 
       _isRefreshing = false;
@@ -94,9 +97,15 @@ class AuthInterceptor extends Interceptor {
     }
   }
 
+  // 🎯 ចំណុចកែប្រែទី២៖
+  // ការពារបន្ថែម កុំឱ្យលោតទៅទំព័រ Login ជាន់គ្នា បើកំពុងនៅទំព័រ Login ស្រាប់
   void _performLogout() async {
     await TokenStorage.clearTokens();
-    Get.offAllNamed(AppRoutes.login);
-    debugPrint("Session Expired. Logged out automatically.");
+
+    // បើមិនទាន់នៅទំព័រ Login ទេ ទើបបញ្ជាឱ្យលោតទៅ
+    if (Get.currentRoute != AppRoutes.login) {
+      Get.offAllNamed(AppRoutes.login);
+      debugPrint("Session Expired. Logged out automatically.");
+    }
   }
 }

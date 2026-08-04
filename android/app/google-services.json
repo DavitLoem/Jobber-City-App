@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "909914474747",
+    "project_id": "jobber-city-app",
+    "storage_bucket": "jobber-city-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909914474747:android:c0a9b4a3880ed2d32f085e",
+        "android_client_info": {
+          "package_name": "com.example.jobber_city"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsGvg3l_N1zqfq0n6dWiXp4l1Wt-6hhnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

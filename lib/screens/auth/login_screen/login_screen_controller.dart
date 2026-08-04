@@ -14,8 +14,8 @@ class LoginScreenViewController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    emailCtrl = TextEditingController(text: "slesrofath2203@gmail.com");
-    passwordCtrl = TextEditingController(text: "Rofath123");
+    emailCtrl = TextEditingController();
+    passwordCtrl = TextEditingController();
   }
 
   @override
@@ -25,7 +25,6 @@ class LoginScreenViewController extends GetxController {
     super.onClose();
   }
 
-  // Clear input fields manually
   void clearFields() {
     emailCtrl.clear();
     passwordCtrl.clear();
@@ -42,46 +41,54 @@ class LoginScreenViewController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 2. Call Auth API Service
-      var response = await authServices.login(
+      final response = await authServices.login(
         email: emailCtrl.text.trim(),
         password: passwordCtrl.text.trim(),
       );
 
-      var dataMap = response["data"] ?? response;
+      await TokenStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        role: response.user.role,
+        onboardingCompleted: response.user.onboardingCompleted,
+        isProfileCompleted: response.user.isProfileCompleted,
+      );
 
-      String? accessToken = dataMap["access_token"];
-      String? refreshToken = dataMap["refresh_token"];
-      String? role = dataMap["user"] != null
-          ? dataMap["user"]["role"]
-          : dataMap["role"];
-      String message = response["message"] ?? "Login Successfully";
+      await Get.find<AuthController>().checkLoginStatus();
 
-      if (accessToken != null) {
-        await TokenStorage.saveTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken ?? "",
-          role: role ?? 'seeker',
-        );
-      }
+      Get.snackbar("Success", "Login Successfully");
 
-      Get.snackbar("Success", message);
+      String userEmail = emailCtrl.text.trim();
       clearFields();
 
-      if (role == 'employer') {
-        Get.offAllNamed(AppRoutes.homeEmployer);
+      // Use the data from the response model for navigation
+      final user = response.user;
+
+      if (user.role == 'employer') {
+        if (user.isProfileCompleted) {
+          Get.offAllNamed(AppRoutes.mainScreenEmployer);
+        } else {
+          Get.offAllNamed(AppRoutes.companyProfile);
+        }
       } else {
-        Get.offAllNamed(AppRoutes.homeSeeker);
+        if (user.onboardingCompleted) {
+          Get.offAllNamed(AppRoutes.mainScreenSeeker);
+        } else {
+          Get.offAllNamed(AppRoutes.location, arguments: {'email': userEmail});
+        }
       }
     } on ApiException catch (e) {
       Get.snackbar("Error", e.message);
     } catch (e, stacktrace) {
-      debugPrint("❌ Login Runtime Crash Log: $e");
-      debugPrint("❌ Stacktrace: $stacktrace");
-
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      debugPrint("❌ Login Runtime Crash Log: $e\n$stacktrace");
+      Get.snackbar("Error", "An unexpected error occurred");
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isLoading.value = false;
     }
+  }
+
+  void loginWithGoogle() {
+    // 🎯 មិនបោះ Role ទេ ព្រោះយើងចង់ Login សុទ្ធ
+    Get.find<AuthController>().loginWithGoogle();
   }
 }

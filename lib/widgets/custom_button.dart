@@ -71,7 +71,12 @@ class _CustomButtonState extends State<CustomButton>
             // 🎯 3. ពេល Disable ប៊ូតុង ពណ៌អក្សរនឹងប្តូរដោយស្វ័យប្រវត្តិ
             disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
             foregroundColor: AppColors.buttonPrimaryText,
-            shadowColor: AppColors.buttonPrimary.withValues(alpha: 0.7),
+            shadowColor: const Color.fromARGB(
+              255,
+              1,
+              64,
+              239,
+            ).withValues(alpha: 0.7),
             elevation: widget.isLoading ? 0 : 3, // ដកស្រមោលចេញពេលកំពុង Loading
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),

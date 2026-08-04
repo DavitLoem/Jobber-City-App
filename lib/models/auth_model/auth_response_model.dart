@@ -6,6 +6,7 @@ class UserModel {
   final String role;
   final String? avatarUrl;
   final bool isProfileCompleted;
+  final bool onboardingCompleted;
 
   UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel {
     required this.role,
     this.avatarUrl,
     required this.isProfileCompleted,
+    required this.onboardingCompleted,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class UserModel {
       role: json['role'] ?? '',
       avatarUrl: json['avatar_url'],
       isProfileCompleted: json['is_profile_completed'] ?? false,
+      onboardingCompleted: json['onboarding_completed'] ?? false,
     );
   }
 }

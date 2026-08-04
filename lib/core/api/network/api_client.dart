@@ -24,9 +24,17 @@ class ApiClient {
   }
 
   // --- POST ---
-  Future<dynamic> post(String endpoint, {dynamic data}) async {
+  Future<dynamic> post(
+    String endpoint, {
+    dynamic data,
+    CancelToken? cancelToken,
+  }) async {
     try {
-      final response = await _dio.post(endpoint, data: data);
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        cancelToken: cancelToken,
+      );
       return response.data;
     } catch (e) {
       throw _handleError(e);
@@ -82,16 +90,19 @@ class ApiClient {
 
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode;
-
-          // 🎯 ចំណុចសំខាន់: ចាប់យកសារដែល Backend បោះមកតាមរយៈ key "detail" ឬ "message"
           final data = error.response?.data;
+
           String serverMessage = "Server error (code: $statusCode)";
 
+          // 🎯 បង្កើតអថេរសម្រាប់ត្រៀមចាប់យកកូដពី Backend
+          String? serverErrorCode;
+          String? serverExistingRole;
+
           if (data is Map<String, dynamic>) {
-            // 🎯 ១. ឆែកមើលទម្រង់ថ្មី (key: 'errors')
+            // ១. ឆែកមើលទម្រង់ថ្មី (key: 'errors')
             if (data['errors'] != null && data['errors'] is List) {
               serverMessage = (data['errors'] as List)
-                  .map((e) => e['message'].toString()) // ទាញយក key 'message'
+                  .map((e) => e['message'].toString())
                   .join('\n');
             }
             // ២. ឆែកមើលទម្រង់ចាស់ (key: 'detail')
@@ -101,26 +112,30 @@ class ApiClient {
                 serverMessage = detailData;
               } else if (detailData is List) {
                 serverMessage = detailData
-                    .map((e) => e['msg'].toString()) // ទាញយក key 'msg'
+                    .map((e) => e['msg'].toString())
                     .join('\n');
               }
+              // 🎯 ៣. ទម្រង់ថ្មី (Map) សម្រាប់ចាប់យក Role Mismatch
+              else if (detailData is Map<String, dynamic>) {
+                serverMessage =
+                    detailData['message']?.toString() ?? "Server error";
+                serverErrorCode = detailData['error_code']?.toString();
+                serverExistingRole = detailData['existing_role']?.toString();
+              }
             }
-            // ៣. ឆែកមើល key 'message' ខាងក្រៅ
+            // ៤. ឆែកមើល key 'message' ខាងក្រៅ
             else if (data['message'] != null) {
               serverMessage = data['message'].toString();
             }
           }
 
           if (statusCode == 404) {
-            // ឆែកមើលថាតើ Backend ពិតជាបានភ្ជាប់សារអ្វីមួយមកជាមួយដែរឬទេ?
             bool hasServerMessage =
                 data != null &&
                 (data['detail'] != null ||
                     data['message'] != null ||
                     data['errors'] != null);
 
-            // បើមានសារពី Backend (ឧ. "Email not found") យកវាមកបង្ហាញ។
-            // បើអត់ទេ បង្ហាញសារ Professional ជាភាសាអង់គ្លេសទូទៅ
             return ApiException(
               hasServerMessage
                   ? serverMessage
@@ -134,8 +149,13 @@ class ApiClient {
             );
           }
 
-          // សម្រាប់ Error ផ្សេងៗទៀត (ដូចជា 400, 401, 403, 429) យើងយកសារពី Backend មកបង្ហាញតែម្តង
-          return ApiException(serverMessage, statusCode: statusCode);
+          // 🎯 បញ្ជូនទិន្នន័យទាំងអស់ចូលទៅ ApiException
+          return ApiException(
+            serverMessage,
+            statusCode: statusCode,
+            errorCode: serverErrorCode,
+            existingRole: serverExistingRole,
+          );
 
         case DioExceptionType.cancel:
           return ApiException("Operation was cancelled.");
