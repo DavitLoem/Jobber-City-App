@@ -1,3 +1,5 @@
+import 'package:jobber_city/models/role/seeker/profile_model.dart';
+
 class SeekerProfileResponse {
   final bool success;
   final String message;
@@ -63,10 +65,10 @@ class SeekerProfileModel {
   final String linkedinUrl;
 
   // Array បន្ថែមដែលទាន់មិនមានទិន្នន័យលម្អិត
-  final List<dynamic> experiences;
-  final List<dynamic> educations;
-  final List<dynamic> trainings;
-  final List<dynamic> languages;
+  final List<ExperienceModel> experiences;
+  final List<EducationModel> educations;
+  final List<TrainingModel> trainings;
+  final List<LanguageModel> languages;
 
   SeekerProfileModel({
     required this.id,
@@ -145,10 +147,61 @@ class SeekerProfileModel {
       resumeUrl: json['resume_url'] ?? '',
       portfolioUrl: json['portfolio_url'] ?? '',
       linkedinUrl: json['linkedin_url'] ?? '',
-      experiences: json['experiences'] ?? [],
-      educations: json['educations'] ?? [],
-      trainings: json['trainings'] ?? [],
-      languages: json['languages'] ?? [],
+      experiences: json['experiences'] != null
+          ? (json['experiences'] as List)
+                .map((e) => ExperienceModel.fromJson(e))
+                .toList()
+          : [],
+      educations: json['educations'] != null
+          ? (json['educations'] as List)
+                .map((e) => EducationModel.fromJson(e))
+                .toList()
+          : [],
+      trainings: json['trainings'] != null
+          ? (json['trainings'] as List)
+                .map((e) => TrainingModel.fromJson(e))
+                .toList()
+          : [],
+      languages: json['languages'] != null
+          ? (json['languages'] as List)
+                .map((e) => LanguageModel.fromJson(e))
+                .toList()
+          : [],
+    );
+  }
+
+  // 🎯 មុខងារបំប្លែង Profile បច្ចុប្បន្ន ទៅជា UpdateRequest ដោយអាចកែតម្លៃណាមួយក៏បាន
+  SeekerCoreUpdateRequest toUpdateRequest({
+    String? biography,
+    List<String>? skills,
+  }) {
+    return SeekerCoreUpdateRequest(
+      firstName: firstName,
+      lastName: lastName,
+      dateOfBirth: dateOfBirth,
+      gender: gender,
+      maritalStatus: maritalStatus,
+      nationality: nationality,
+      currentPosition: currentPosition,
+      email: email,
+      phoneNumber: phoneNumber,
+      addressProvinceId: addressProvinceId,
+      addressDistrictId: addressDistrictId,
+      commune: commune,
+      village: village,
+      street: street,
+      houseNo: houseNo,
+      expectedSalaryMin: expectedSalaryMin,
+      expectedSalaryMax: expectedSalaryMax,
+      jobTypePreferences: jobTypePreferences,
+      expertiseCategoryIds: expertiseCategoryIds,
+      portfolioUrl: portfolioUrl,
+      linkedinUrl: linkedinUrl,
+      onboardingCompleted: onboardingCompleted,
+
+      // 🎯 ចំណុចសំខាន់៖ បើមានតម្លៃថ្មីបោះមក យកតម្លៃថ្មី បើគ្មានទេ យកតម្លៃដើម (this)
+      biography: biography ?? this.biography,
+      skills: skills ?? this.skills,
     );
   }
 }

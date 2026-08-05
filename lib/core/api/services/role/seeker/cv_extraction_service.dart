@@ -23,6 +23,10 @@ class CvExtractionService {
         '/seeker/profile/upload-cv',
         data: formData,
         cancelToken: cancelToken,
+        options: Options(
+          receiveTimeout: const Duration(minutes: 5),
+          sendTimeout: const Duration(minutes: 5),
+        ),
       );
 
       // ៣. ពិនិត្យលទ្ធផល និងបំប្លែងទិន្នន័យទៅជា Model

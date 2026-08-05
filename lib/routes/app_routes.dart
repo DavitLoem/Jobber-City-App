@@ -22,8 +22,15 @@ class AppRoutes {
   static const String saveJob = '/save-job';
   static const String setting = '/setting';
   static const String cvExtraction = '/cv-extraction';
+  static const String cvReview = '/cv-review';
   static const String applied = '/applied';
   static const String candidateDetail = '/candidate-detail';
+  static const String experience = '/experience';
+  static const String educations = '/educations';
+  static const String trainings = '/trainings';
+  static const String languages = '/languages';
+  static const String biography = '/biography';
+  static const String skill = '/skill';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES
@@ -42,9 +49,6 @@ class AppRoutes {
   static const String notificationEmployer = '/notification-employer';
 
   static const String employerEditprofile = '/edit-profile';
-  static const String experience = '/experience';
-  static const String educations = '/educations';
-  static const String trainings = '/trainings';
 
   static const String postJob = '/post-job';
   static const String recruit = '/recruit';

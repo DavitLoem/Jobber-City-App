@@ -8,6 +8,7 @@ import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/core/api/services/role/seeker/cv_extraction_service.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/cv_extraction_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/current_resume_card.dart';
@@ -106,7 +107,7 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight.withOpacity(0.5),
+                      color: AppColors.primaryLight.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -199,7 +200,7 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
         skillCount: skillCount,
         onReview: () {
           Get.back();
-          // TODO: បញ្ជូនទៅកាន់អេក្រង់ Review Data ទីនេះ
+          Get.toNamed(AppRoutes.cvReview, arguments: parsedData);
         },
       ),
       isScrollControlled: true,
