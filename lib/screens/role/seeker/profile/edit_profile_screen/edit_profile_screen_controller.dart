@@ -16,6 +16,8 @@ class EditProfileScreenViewController extends GetxController {
   final lastNameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
+  final portfolioCtrl = TextEditingController();
+  final linkedinCtrl = TextEditingController();
   final currentPositionCtrl = TextEditingController();
   final dateOfBirthCtrl = TextEditingController();
   final nationalityCtrl = TextEditingController();
@@ -78,6 +80,8 @@ class EditProfileScreenViewController extends GetxController {
         emailCtrl.text = data.email;
 
         phoneCtrl.text = data.phoneNumber;
+        portfolioCtrl.text = data.portfolioUrl;
+        linkedinCtrl.text = data.linkedinUrl;
         currentPositionCtrl.text = data.currentPosition;
         dateOfBirthCtrl.text = data.dateOfBirth;
         nationalityCtrl.text = data.nationality;
@@ -156,13 +160,14 @@ class EditProfileScreenViewController extends GetxController {
       final requestData = SeekerCoreUpdateRequest(
         firstName: firstNameCtrl.text.trim(),
         lastName: lastNameCtrl.text.trim(),
-        dateOfBirth: dateOfBirthCtrl.text.trim(), // ត្រូវប្រាកដថាជា YYYY-MM-DD
+        dateOfBirth: dateOfBirthCtrl.text.trim(),
         gender: selectedGender.value,
         maritalStatus: selectedMaritalStatus.value,
         nationality: nationalityCtrl.text.trim(),
         currentPosition: currentPositionCtrl.text.trim(),
         email: emailCtrl.text.trim(),
         phoneNumber: phoneCtrl.text.trim(),
+
         addressProvinceId: selectedProvinceId.value,
         addressDistrictId: selectedDistrictId.value,
         commune: communeCtrl.text.trim(),
@@ -175,8 +180,8 @@ class EditProfileScreenViewController extends GetxController {
         jobTypePreferences: [], // ដាក់ Default សិនបើអត់ទាន់មាន UI
         expertiseCategoryIds: selectedCategoryIds.toList(),
         skills: [],
-        portfolioUrl: '',
-        linkedinUrl: '',
+        portfolioUrl: portfolioCtrl.text.trim(),
+        linkedinUrl: linkedinCtrl.text.trim(),
         onboardingCompleted: true, // កំណត់ True ដើម្បីបញ្ចប់វគ្គ Onboarding
       );
 

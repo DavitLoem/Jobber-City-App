@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
+import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 import '../../../../../core/utils/app_logger.dart';
@@ -50,7 +52,11 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.upload_file_rounded,
                   title: "Edit Resume",
-                  isCompleted: false,
+                  // សន្មតថាបើមាន URL ឬ Filename គឺបាន Completed ហើយ
+                  isCompleted:
+                      controller.profileData.value?.resumeUrl != null &&
+                      controller.profileData.value!.resumeUrl.isNotEmpty,
+                  isResume: true, // 🟢 កំណត់ថាជា Resume ទីនេះ
                   onTap: () {
                     Get.toNamed(AppRoutes.cvExtraction);
                   },
@@ -61,10 +67,11 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.work_outline,
                   title: "Work Experience",
-                  isCompleted: true, // ចាំដាក់លក្ខខណ្ឌពិតប្រាកដតាមក្រោយ
+                  isCompleted:
+                      controller.profileData.value?.experiences != null &&
+                      controller.profileData.value!.experiences.isNotEmpty,
                   onTap: () async {
                     await Get.toNamed(AppRoutes.experience);
-                    controller.fetchProfileRaw();
                   },
                 ),
                 const SizedBox(height: 12),
@@ -73,10 +80,11 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.school_outlined,
                   title: "Education Background",
-                  isCompleted: true,
+                  isCompleted:
+                      controller.profileData.value?.educations != null &&
+                      controller.profileData.value!.educations.isNotEmpty,
                   onTap: () async {
                     await Get.toNamed(AppRoutes.educations);
-                    controller.fetchProfileRaw();
                   },
                 ),
                 const SizedBox(height: 12),
@@ -85,7 +93,9 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.workspace_premium_outlined,
                   title: "Trainings",
-                  isCompleted: false,
+                  isCompleted:
+                      controller.profileData.value?.trainings != null &&
+                      controller.profileData.value!.trainings.isNotEmpty,
                   onTap: () async {
                     await Get.toNamed(AppRoutes.trainings);
                     controller.fetchProfileRaw();
@@ -97,8 +107,12 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.psychology_outlined, // ឬ Icons.star_border
                   title: "Skills",
-                  isCompleted: false,
-                  onTap: () {},
+                  isCompleted:
+                      controller.profileData.value?.skills != null &&
+                      controller.profileData.value!.skills.isNotEmpty,
+                  onTap: () {
+                    Get.toNamed(AppRoutes.skill);
+                  },
                 ),
                 const SizedBox(height: 12),
 
@@ -106,8 +120,12 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.article_outlined,
                   title: "Biography",
-                  isCompleted: false,
-                  onTap: () {},
+                  isCompleted:
+                      controller.profileData.value?.biography != null &&
+                      controller.profileData.value!.biography.isNotEmpty,
+                  onTap: () {
+                    Get.toNamed(AppRoutes.biography);
+                  },
                 ),
                 const SizedBox(height: 12),
 
@@ -115,8 +133,12 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ProfileSectionItem(
                   icon: Icons.language_outlined,
                   title: "Language",
-                  isCompleted: false,
-                  onTap: () {},
+                  isCompleted:
+                      controller.profileData.value?.languages != null &&
+                      controller.profileData.value!.languages.isNotEmpty,
+                  onTap: () {
+                    Get.toNamed(AppRoutes.languages);
+                  },
                 ),
 
                 const SizedBox(height: 30),

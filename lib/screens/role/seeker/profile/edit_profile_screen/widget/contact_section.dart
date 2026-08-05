@@ -30,6 +30,24 @@ class ContactSection extends StatelessWidget {
           hintText: 'Phone Number',
           controller: controller.phoneCtrl,
         ),
+        const SizedBox(height: 20),
+
+        const SectionFieldLabel(title: 'Portfolio URL', isOptional: true),
+        const SizedBox(height: 6),
+        ProfileTextField(
+          prefixIcon: Icons.public_outlined,
+          hintText: 'Portfolio URL',
+          controller: controller.portfolioCtrl,
+        ),
+        const SizedBox(height: 20),
+
+        const SectionFieldLabel(title: 'LinkedIn URL', isOptional: true),
+        const SizedBox(height: 6),
+        ProfileTextField(
+          prefixIcon: Icons.link_outlined,
+          hintText: 'LinkedIn URL',
+          controller: controller.linkedinCtrl,
+        ),
       ],
     );
   }

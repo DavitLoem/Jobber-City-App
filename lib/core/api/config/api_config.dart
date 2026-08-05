@@ -6,7 +6,8 @@ class ApiConfig {
   // static const String baseUrl = "https://jobber-city-api-staging.up.railway.app/api";
 
   static String get baseUrl =>
-      dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:8000/api';
-  static const int connectionTimeout = 4;
-  static const int receiveTimeout = 4;
+      dotenv.env['BASE_URL'] ??
+      'https://jobber-city-staging.up.railway.app/api';
+  static const int connectionTimeout = 30;
+  static const int receiveTimeout = 30;
 }
