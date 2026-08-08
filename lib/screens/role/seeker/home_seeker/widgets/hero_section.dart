@@ -185,53 +185,51 @@ class HeroSection extends GetView<HomeSeekerViewController> {
   Widget _buildSearchBar() {
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.search),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+      child: Hero(
+        tag: 'search_bar_hero', // 🎯 ដាក់ Hero Tag ទី១
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            height: 52, // កំណត់កម្ពស់ឱ្យស្មើគ្នា
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            const SizedBox(width: 4),
-            const Expanded(
-              child: TextField(
-                enabled: false,
-                decoration: InputDecoration(
-                  hintText: 'Search for a job or Company...',
-                  hintStyle: TextStyle(
-                    color: AppColors.textHint,
-                    fontSize: 13.5,
-                  ),
-                  prefixIcon: Icon(Icons.search, color: AppColors.textHint),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 16,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Icon(Icons.search, color: AppColors.textHint, size: 22),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Search for a job or Company...',
+                    style: TextStyle(color: AppColors.textHint, fontSize: 14.5),
                   ),
                 ),
-              ),
+
+                // Container(
+                //   margin: const EdgeInsets.all(6),
+                //   padding: const EdgeInsets.all(10),
+                //   decoration: BoxDecoration(
+                //     color: AppColors.primary,
+                //     borderRadius: BorderRadius.circular(10),
+                //   ),
+                //   child: const Icon(
+                //     Icons.tune_rounded,
+                //     color: Colors.white,
+                //     size: 18,
+                //   ),
+                // ),
+              ],
             ),
-            Container(
-              margin: const EdgeInsets.all(6),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.tune_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

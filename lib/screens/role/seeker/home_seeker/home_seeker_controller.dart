@@ -8,6 +8,9 @@ class HomeSeekerViewController extends GetxController {
   // ── ផ្នែក Recommended Jobs ──
   var recommendedJobs = <JobFeedModel>[].obs;
   var isRecommendedLoading = false.obs;
+  var isRecommendedLoadingMore = false.obs;
+  int _recommendedPage = 1; // 🟢 ទំព័រទីប៉ុន្មាន
+  var hasMoreRecommended = true.obs; // 🟢 ឆែកថាតើអស់ទិន្នន័យឬនៅ
 
   // ── ផ្នែក Recent Jobs (ភ្ជាប់ជាមួយ Pagination) ──
   var recentJobs = <JobFeedModel>[].obs;
@@ -22,9 +25,8 @@ class HomeSeekerViewController extends GetxController {
   var lastName = ''.obs;
   var profileImageUrl = ''.obs;
 
-  // Selected filter index for Recent Jobs[cite: 10]
+  // Selected filter index for Recent Jobs
   var selectedRecentFilterIndex = 0.obs;
-
   var selectedCategoryId = ''.obs;
   @override
   void onInit() {
@@ -63,16 +65,37 @@ class HomeSeekerViewController extends GetxController {
     }
   }
 
-  /// ទាញយក Recommended Jobs (ទាញម្ដង ១០ សិន មិនបាច់មាន Infinite Scroll ទេព្រោះវាជា Horizontal List)
-  void fetchJobRecommended() async {
-    try {
+  // ទាញយក Recommended Jobs (ទាញម្ដង ១០ សិន មិនបាច់មាន Infinite Scroll ទេព្រោះវាជា Horizontal List)
+  Future<void> fetchJobRecommended({bool isRefresh = false}) async {
+    if (isRefresh) {
+      _recommendedPage = 1;
+      hasMoreRecommended.value = true;
       isRecommendedLoading.value = true;
-      var data = await _jobFeedService.getRecommendedJobs(page: 1, limit: 10);
-      recommendedJobs.assignAll(data);
+      recommendedJobs.clear();
+    } else {
+      // បើកំពុង Load ឬ អស់ទិន្នន័យហើយ មិនបាច់ហៅ API ទៀតទេ
+      if (isRecommendedLoadingMore.value || !hasMoreRecommended.value) return;
+      isRecommendedLoadingMore.value = true;
+    }
+
+    try {
+      var data = await _jobFeedService.getRecommendedJobs(
+        page: _recommendedPage,
+        limit: 10,
+      );
+
+      recommendedJobs.addAll(data);
+
+      if (data.length < 10) {
+        hasMoreRecommended.value = false; // អស់ទិន្នន័យ
+      } else {
+        _recommendedPage++; // តម្លើងទំព័រសម្រាប់ពេលអូសលើកក្រោយ
+      }
     } catch (e) {
       debugPrint('Error fetching recommended jobs: $e');
     } finally {
       isRecommendedLoading.value = false;
+      isRecommendedLoadingMore.value = false;
     }
   }
 
@@ -116,6 +139,7 @@ class HomeSeekerViewController extends GetxController {
     if (selectedCategoryId.value == categoryId) {
       return;
     }
+    // selectedRecentFilterIndex.value = index;
     selectedCategoryId.value = categoryId;
     fetchJobRecent(isRefresh: true); // ហៅ API ទាញយកការងារថ្មីពីទំព័រទី ១ មកវិញ
   }
@@ -131,7 +155,7 @@ class HomeSeekerViewController extends GetxController {
     }
   }
 
-  /// 🎯 ៤. ការកែសម្រួលមុខងារ Bookmark ដោយផ្លាស់ប្ដូរតម្លៃផ្ទាល់ និង Refresh UI
+  // 🎯 ៤. ការកែសម្រួលមុខងារ Bookmark ដោយផ្លាស់ប្ដូរតម្លៃផ្ទាល់ និង Refresh UI
   void toggleSaveRecommendedJob(int index) {
     var job = recommendedJobs[index];
     job.isSaved = !job.isSaved;

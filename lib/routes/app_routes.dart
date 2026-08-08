@@ -14,6 +14,7 @@ class AppRoutes {
   // ==========================================
   static const String mainScreenSeeker = '/main-screen';
   static const String homeSeeker = '/home-seeker';
+  static const String jobList = '/job-list';
   static const String search = '/search';
   static const String editprofile = '/edit-profile';
   static const String expertise = '/expertise';
