@@ -16,23 +16,43 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
     return SizedBox(
       height: 226,
       child: Obx(() {
-        if (controller.isRecommendedLoading.value) {
+        // 🟢 បង្ហាញ Shimmer តែពេល Load ដំបូងគេប៉ុណ្ណោះ
+        if (controller.isRecommendedLoading.value &&
+            controller.recommendedJobs.isEmpty) {
           return _buildRecommendedSkeleton();
         }
         if (controller.recommendedJobs.isEmpty) {
           return JobUiUtils.buildInlineEmptyState('No recommended jobs found');
         }
-        return ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: controller.recommendedJobs.length + 1,
-          separatorBuilder: (_, _) => const SizedBox(width: 14),
-          itemBuilder: (context, index) {
-            if (index == controller.recommendedJobs.length) {
-              return _buildSeeMoreRecommendedCard();
+
+        // 🟢 ប្រើ NotificationListener សម្រាប់ចាប់ការអូស (Scroll)
+        return NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            // បើអូសជិតដល់ចុងបញ្ជី (សល់ 50 pixels) ហៅ API ទាញយកបន្ត
+            if (!controller.isRecommendedLoadingMore.value &&
+                scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent - 50) {
+              controller.fetchJobRecommended();
             }
-            final job = controller.recommendedJobs[index];
-            return _buildRecommendedJobCard(job, index, index);
+            return false;
           },
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            // 🟢 បូក 1 តែពេលនៅមានទិន្នន័យ (hasMoreRecommended) ប៉ុណ្ណោះ
+            itemCount:
+                controller.recommendedJobs.length +
+                (controller.hasMoreRecommended.value ? 1 : 0),
+            separatorBuilder: (_, _) => const SizedBox(width: 14),
+            itemBuilder: (context, index) {
+              // 🟢 បង្ហាញរង្វង់ Loading នៅចុងបញ្ជី
+              if (index == controller.recommendedJobs.length) {
+                return _buildLoadingIndicator();
+              }
+
+              final job = controller.recommendedJobs[index];
+              return _buildRecommendedJobCard(job, index, index);
+            },
+          ),
         );
       }),
     );
@@ -169,67 +189,11 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
     );
   }
 
-  Widget _buildSeeMoreRecommendedCard() {
-    return GestureDetector(
-      onTap: () => Get.snackbar(
-        'Recommended Jobs',
-        'See all recommended jobs',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: AppColors.primaryLight,
-        colorText: AppColors.primary,
-      ),
-      child: Container(
-        width: 140,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.primaryLight,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadowLight,
-                    blurRadius: 8,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.arrow_forward_rounded,
-                color: AppColors.primary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              "See More",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 3),
-            const Text(
-              "Explore all jobs",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 11.5, color: AppColors.textTertiary),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
+  Widget _buildLoadingIndicator() {
+    return Container(
+      width: 80,
+      alignment: Alignment.center,
+      child: const CircularProgressIndicator(color: AppColors.primary),
     );
   }
 }

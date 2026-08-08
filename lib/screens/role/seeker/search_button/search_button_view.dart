@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_routes.dart';
+
 import 'search_button_controller.dart';
 
 class SearchButtonView extends GetView<SearchButtonViewController> {
@@ -44,7 +45,7 @@ class SearchButtonView extends GetView<SearchButtonViewController> {
       padding: EdgeInsets.fromLTRB(20, topInset > 0 ? 12 : 20, 20, 20),
       decoration: BoxDecoration(
         color: AppColors.lightSurface,
-        border: Border(
+        border: const Border(
           bottom: BorderSide(color: AppColors.cardBorder, width: 0.5),
         ),
       ),
@@ -70,68 +71,78 @@ class SearchButtonView extends GetView<SearchButtonViewController> {
           ),
           const SizedBox(width: 14),
 
-          // 🔍 Search Input Field
+          // 🔍 Search Input Field ជាមួយ Hero Animation
           Expanded(
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.inputBackground,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.inputBorder, width: 1),
-              ),
-              child: Obx(
-                () => TextField(
-                  controller: controller.searchController,
-                  autofocus: true,
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (value) {
-                    controller.saveRecentSearch(value);
-                  },
-                  textAlignVertical: TextAlignVertical.center,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+            child: Hero(
+              tag: 'search_bar_hero', // 🎯 ដាក់ Hero Tag ទី២ ឱ្យដូចគ្នាបេះបិទ
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBackground,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.inputBorder, width: 1),
                   ),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Search jobs, companies, skills...',
-                    hintStyle: const TextStyle(
-                      color: AppColors.textHint,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    prefixIcon: const Padding(
-                      padding: EdgeInsets.only(left: 12, right: 8),
-                      child: Icon(
-                        Icons.search_rounded,
-                        color: AppColors.textTertiary,
-                        size: 22,
+                  child: Obx(
+                    () => TextField(
+                      controller: controller.searchController,
+                      autofocus: true,
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (value) {
+                        controller.saveRecentSearch(value);
+                      },
+                      textAlignVertical: TextAlignVertical.center,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ),
-                    prefixIconConstraints: const BoxConstraints(minWidth: 44),
-                    suffixIcon: controller.searchQuery.value.isNotEmpty
-                        ? GestureDetector(
-                            onTap: () => controller.clearSearch(),
-                            child: Container(
-                              margin: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.clear_rounded,
-                                color: AppColors.primary,
-                                size: 18,
-                              ),
-                            ),
-                          )
-                        : null,
-                    suffixIconConstraints: const BoxConstraints(minWidth: 44),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        hintText: 'Search jobs, companies...',
+                        hintStyle: const TextStyle(
+                          color: AppColors.textHint,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 12, right: 8),
+                          child: Icon(
+                            Icons.search_rounded,
+                            color: AppColors.textTertiary,
+                            size: 22,
+                          ),
+                        ),
+                        prefixIconConstraints: const BoxConstraints(
+                          minWidth: 44,
+                        ),
+                        suffixIcon: controller.searchQuery.value.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () => controller.clearSearch(),
+                                child: Container(
+                                  margin: const EdgeInsets.all(8),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primaryLight,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.clear_rounded,
+                                    color: AppColors.primary,
+                                    size: 18,
+                                  ),
+                                ),
+                              )
+                            : null,
+                        suffixIconConstraints: const BoxConstraints(
+                          minWidth: 44,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -140,24 +151,24 @@ class SearchButtonView extends GetView<SearchButtonViewController> {
           ),
           const SizedBox(width: 14),
 
-          // 🎛️ Filter Button
+          // 🎛️ Filter Button (រក្សាទុកនៅទីនេះ ត្រឹមត្រូវហើយ!)
           GestureDetector(
             onTap: () {
-              // TODO: Open filter modal
+              //  Open filter modal (យើងនឹងធ្វើ BottomSheet នៅពេលក្រោយ)
             },
             child: Container(
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [AppColors.primary, AppColors.secondary],
                 ),
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: AppColors.shadowBlue,
                     blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),

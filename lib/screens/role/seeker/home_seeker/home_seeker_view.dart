@@ -6,10 +6,10 @@ import 'package:jobber_city/core/api/services/role/seeker/job_feed_service.dart'
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
 import 'package:jobber_city/models/role/seeker/job_feed_model.dart'; // 🎯 ប្តូរមកប្រើ Model ថ្មី
+import 'package:jobber_city/routes/app_routes.dart';
 
 import 'widgets/hero_section.dart';
 import 'widgets/job_ui_utils.dart';
-// 🎯 Import Widgets ដែលទើបនឹងបំបែក
 import 'widgets/promo_banner_slider.dart';
 import 'widgets/recent_jobs_section.dart';
 import 'widgets/recommended_jobs_section.dart';
@@ -37,7 +37,7 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
             if (!controller.isRecentLoadingMore.value &&
                 scrollInfo.metrics.pixels >=
                     scrollInfo.metrics.maxScrollExtent - 200) {
-              controller.fetchJobRecent(); // ទាញយក Page បន្ទាប់
+              controller.fetchJobRecent();
             }
             return false;
           },
@@ -48,25 +48,47 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const HeroSection(), // 🎯 ហៅ Component ទី ១ មកប្រើ
+                const HeroSection(),
                 const SizedBox(height: 36),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const PromoBannerSlider(), // 🎯 ហៅ Component ទី ២ មកប្រើ
+                      const PromoBannerSlider(),
                       const SizedBox(height: 28),
 
-                      JobUiUtils.buildSectionHeader("Recommended For You"),
+                      JobUiUtils.buildSectionHeader(
+                        "Recommended For You",
+                        onSeeAll: () {
+                          Get.toNamed(
+                            AppRoutes.jobList,
+                            arguments: {
+                              'type': 'recommended',
+                              'title': 'Recommended Jobs',
+                            },
+                          );
+                        },
+                      ),
                       const SizedBox(height: 16),
-                      const RecommendedJobsSection(), // 🎯 ហៅ Component ទី ៣ មកប្រើ
+                      const RecommendedJobsSection(),
 
                       const SizedBox(height: 32),
 
-                      JobUiUtils.buildSectionHeader("Recent Jobs"),
+                      JobUiUtils.buildSectionHeader(
+                        "Recent Jobs",
+                        onSeeAll: () {
+                          Get.toNamed(
+                            AppRoutes.jobList,
+                            arguments: {
+                              'type': 'recent',
+                              'title': 'Recent Jobs',
+                            },
+                          );
+                        },
+                      ),
                       const SizedBox(height: 16),
-                      const RecentJobsSection(), // 🎯 ហៅ Component ទី ៤ មកប្រើ
+                      const RecentJobsSection(),
 
                       const SizedBox(height: 30),
                     ],
