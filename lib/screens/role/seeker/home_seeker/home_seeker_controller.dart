@@ -4,6 +4,7 @@ class HomeSeekerViewController extends GetxController {
   // 🎯 ១. ប្រើប្រាស់ Service តែមួយគត់សម្រាប់ Job Feed និង ApiClient សម្រាប់ Profile
   final JobFeedService _jobFeedService = JobFeedService();
   final ApiClient _apiClient = ApiClient();
+  final BookmarkController bookmarkCtrl = Get.put(BookmarkController());
 
   // ── ផ្នែក Recommended Jobs ──
   var recommendedJobs = <JobFeedModel>[].obs;
@@ -157,14 +158,16 @@ class HomeSeekerViewController extends GetxController {
 
   // 🎯 ៤. ការកែសម្រួលមុខងារ Bookmark ដោយផ្លាស់ប្ដូរតម្លៃផ្ទាល់ និង Refresh UI
   void toggleSaveRecommendedJob(int index) {
-    var job = recommendedJobs[index];
-    job.isSaved = !job.isSaved;
-    recommendedJobs.refresh(); // ប្រាប់ GetX ឱ្យគូរ UI កាតនេះឡើងវិញ
+    bookmarkCtrl.toggleBookmark(
+      job: recommendedJobs[index],
+      onUpdate: () => recommendedJobs.refresh(),
+    );
   }
 
   void toggleSaveRecentJob(int index) {
-    var job = recentJobs[index];
-    job.isSaved = !job.isSaved;
-    recentJobs.refresh();
+    bookmarkCtrl.toggleBookmark(
+      job: recentJobs[index],
+      onUpdate: () => recentJobs.refresh(),
+    );
   }
 }

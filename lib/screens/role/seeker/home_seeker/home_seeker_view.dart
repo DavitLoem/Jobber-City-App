@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/bookmark_controller.dart';
 import 'package:jobber_city/controllers/category_controller.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/core/api/services/role/seeker/job_feed_service.dart';

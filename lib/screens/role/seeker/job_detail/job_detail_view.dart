@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/controllers/bookmark_controller.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/core/api/services/role/seeker/application_service.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
@@ -36,7 +37,7 @@ class JobDetailView extends GetView<JobDetailController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CompanyInfoCard(),
-                        SizedBox(height: 22),
+                        // SizedBox(height: 22),
                         JobContentSections(), // 🎯 ព័ត៌មានទាំងអស់នៅទីនេះ
                         SizedBox(
                           height: 110,

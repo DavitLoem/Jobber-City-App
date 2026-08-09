@@ -19,7 +19,7 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildDynamicFilters(categoryController),
-        // const SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildJobRecentList(),
       ],
     );
@@ -27,7 +27,7 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
 
   Widget _buildDynamicFilters(CategoryController categoryCtrl) {
     return SizedBox(
-      height: 38,
+      height: 40,
       child: Obx(() {
         if (categoryCtrl.isLoading.value && categoryCtrl.categories.isEmpty) {
           return const ShimmerBox(
@@ -130,6 +130,7 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
       return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
         itemCount: jobs.length + 1,
         separatorBuilder: (_, _) => const SizedBox(height: 14),
         itemBuilder: (context, index) {

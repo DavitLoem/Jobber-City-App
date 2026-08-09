@@ -63,6 +63,10 @@ class BottomApplyBar extends GetView<JobDetailController> {
                 }
 
                 bool hasCv = controller.resumeUrl.value.isNotEmpty;
+                // 🎯 យកឈ្មោះ CV មកបង្ហាញ បើគ្មានដាក់ "Attached Resume/CV"
+                String displayName = controller.resumeFilename.value.isNotEmpty
+                    ? controller.resumeFilename.value
+                    : "Attached Resume/CV";
 
                 return Container(
                   padding: const EdgeInsets.all(14),
@@ -71,7 +75,7 @@ class BottomApplyBar extends GetView<JobDetailController> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: hasCv
-                          ? AppColors.primary.withOpacity(0.3)
+                          ? AppColors.primary.withValues(alpha: 0.3)
                           : Colors.red.shade200,
                     ),
                   ),
@@ -100,8 +104,8 @@ class BottomApplyBar extends GetView<JobDetailController> {
                           children: [
                             Text(
                               hasCv
-                                  ? "Attached Resume/CV"
-                                  : "No Resume/CV Found",
+                                  ? displayName
+                                  : "No Resume/CV Found", // 🎯 បង្ហាញឈ្មោះឯកសារនៅទីនេះ
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -109,6 +113,9 @@ class BottomApplyBar extends GetView<JobDetailController> {
                                     ? AppColors.primary
                                     : Colors.red.shade700,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow
+                                  .ellipsis, // ការពារករណីឈ្មោះវែងពេក
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -118,7 +125,7 @@ class BottomApplyBar extends GetView<JobDetailController> {
                               style: TextStyle(
                                 fontSize: 12,
                                 color: hasCv
-                                    ? AppColors.primary.withOpacity(0.8)
+                                    ? AppColors.primary.withValues(alpha: 0.8)
                                     : Colors.red.shade600,
                               ),
                             ),
