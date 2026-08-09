@@ -42,14 +42,14 @@ class JobContentSections extends GetView<JobDetailController> {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // 🎯 ២. បន្ថែមកាតថ្មីដែលរៀបចំបញ្ជីដូចទៅនឹង Employer View
           _buildJobInfoCard(job),
 
-          const SizedBox(height: 26),
+          const SizedBox(height: 18),
           _buildSectionTitle("Job Description"),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           _buildTextList(job.description),
 
           const SizedBox(height: 24),

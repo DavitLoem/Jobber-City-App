@@ -5,6 +5,7 @@ class JobDetailController extends GetxController {
   final job = Rxn<JobFeedModel>();
   final ApplicationService _appService = ApplicationService();
   final ApiClient _apiClient = ApiClient();
+  final BookmarkController bookmarkCtrl = Get.put(BookmarkController());
 
   // ស្ថានភាព UI
   var isDescriptionExpanded = false.obs;
@@ -12,6 +13,7 @@ class JobDetailController extends GetxController {
   var hasApplied = false.obs;
 
   var resumeUrl = ''.obs;
+  var resumeFilename = ''.obs;
   var isLoadingProfile = true.obs;
 
   final TextEditingController coverLetterController = TextEditingController();
@@ -36,6 +38,9 @@ class JobDetailController extends GetxController {
       final response = await _apiClient.get('/seeker/profile/');
       if (response != null && response['data'] != null) {
         resumeUrl.value = response['data']['resume_url'] ?? '';
+        resumeFilename.value =
+            response['data']['resume_filename'] ??
+            'My_Resume.pdf'; // 🎯 ទាញយកឈ្មោះ CV មកដាក់ (បើគ្មានដាក់ Default)
       }
     } catch (e) {
       debugPrint("Error fetching profile for CV check: $e");
@@ -47,11 +52,11 @@ class JobDetailController extends GetxController {
   void toggleSave() {
     if (job.value == null) return;
 
-    // 🎯 ផ្លាស់ប្តូរតម្លៃផ្ទាល់ទៅលើ Model
-    job.value!.isSaved = !job.value!.isSaved;
-    job.refresh(); // 🔄 ប្រាប់ GetX ឱ្យ Update UI គ្រប់កន្លែងដែលប្រើអថេរ job នេះ
-
-    // ហៅ API បាញ់ទៅ Backend ទីនេះដើម្បី Save ពិតប្រាកដ
+    bookmarkCtrl.toggleBookmark(
+      job: job.value!,
+      onUpdate: () =>
+          job.refresh(), // ប្រាប់ GetX ឱ្យគូរ UI ក្នុង Detail ឡើងវិញ
+    );
   }
 
   Future<void> submitApplication() async {
