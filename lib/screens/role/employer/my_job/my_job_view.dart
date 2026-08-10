@@ -63,11 +63,15 @@ class MyJobView extends GetView<MyJobViewController> {
             final draftCount = controller.jobs
                 .where((j) => j.status.toLowerCase() == 'draft')
                 .length;
+            final closedCount = controller.jobs
+                .where((j) => j.status.toLowerCase() == 'closed')
+                .length;
 
             final tabList = [
               'All ($allCount)',
               'Active ($activeCount)',
               'Paused ($pausedCount)',
+              'Closed ($closedCount)',
               'Draft ($draftCount)',
             ];
 
@@ -97,6 +101,18 @@ class MyJobView extends GetView<MyJobViewController> {
   Widget _buildJobList() {
     return Obx(() {
       final currentList = controller.displayJobs;
+
+      // 🎯 ដំណោះស្រាយ៖ ទាញយក Profile នៅទីនេះ (ក្រៅ ListView តែក្នុង Obx)
+      // ធ្វើបែបនេះ GetX នឹងដឹងថាពេល Profile ដើរចប់ វាត្រូវ Rebuild UI បង្ហាញ Logo ភ្លាមៗ
+      final profileCtrl = Get.find<EmployerProfileViewController>();
+      final profile = profileCtrl.companyProfile.value;
+
+      final hasLogo =
+          profile != null &&
+          profile.logoUrl != null &&
+          profile.logoUrl!.isNotEmpty;
+
+      final logoUrl = hasLogo ? profile.logoUrl! : null;
 
       if (controller.isLoading.value) {
         return ListView.separated(
@@ -130,7 +146,6 @@ class MyJobView extends GetView<MyJobViewController> {
             currentList.length + (controller.isLoadingMore.value ? 1 : 0),
         separatorBuilder: (_, _) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
-          // Loading ផ្នែកខាងក្រោមពេលអូស (Pagination)
           if (index == currentList.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
@@ -145,16 +160,9 @@ class MyJobView extends GetView<MyJobViewController> {
 
           final job = currentList[index];
 
-          final profileCtrl = Get.find<EmployerProfileViewController>();
-          final profile = profileCtrl.companyProfile.value;
-          final hasLogo =
-              profile != null &&
-              profile.logoUrl != null &&
-              profile.logoUrl!.isNotEmpty;
-
           return JobCardItem(
             title: job.title,
-            logoUrl: hasLogo ? profile.logoUrl! : null,
+            logoUrl: logoUrl, // 🟢 ប្រើប្រាស់អថេរដែលបានទាញនៅខាងលើ
             department: _getDepartmentName(job.categoryId),
             location: _getLocationName(job.provinceId),
             timeAgo: _getTimeAgo(job.createdAt),
@@ -164,7 +172,6 @@ class MyJobView extends GetView<MyJobViewController> {
             onTap: () {
               Get.toNamed(AppRoutes.myJobDetail, arguments: job.id);
             },
-
             onMoreTap: () => _showJobActionSheet(context, job.id),
           );
         },
@@ -307,7 +314,14 @@ class MyJobView extends GetView<MyJobViewController> {
 
   String _getTimeAgo(String createdAt) {
     try {
-      final createdDate = DateTime.parse(createdAt).toLocal();
+      // 🎯 ១. បង្ខំឱ្យ Flutter ដឹងថាវាជាម៉ោង UTC ដោយការថែមអក្សរ 'Z' ពីក្រោយ
+      String dateStr = createdAt;
+      if (!dateStr.endsWith('Z')) {
+        dateStr += 'Z';
+      }
+
+      // 🎯 ២. ពេលមាន Z ហើយ ទើបការហៅ toLocal() អាចបូកថែម ៧ ម៉ោងបានត្រឹមត្រូវ
+      final createdDate = DateTime.parse(dateStr).toLocal();
       final difference = DateTime.now().difference(createdDate);
 
       if (difference.inDays > 0) return "${difference.inDays}d ago";

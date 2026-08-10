@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
+import 'package:jobber_city/models/role/employer/job_dropdown_item_model.dart';
 
 class ApplicantEmployerService {
   final ApiClient _apiClient = ApiClient();
@@ -28,16 +29,48 @@ class ApplicantEmployerService {
     }
   }
 
+  /// 🎯 ទាញយកបញ្ជីការងារសម្រាប់បង្ហាញក្នុង Bottom Sheet
+  Future<List<JobDropdownItemModel>> getJobDropdownList() async {
+    try {
+      final response = await _apiClient.get(
+        '/employer/jobs/applications/dropdown',
+      );
+
+      if (response['success'] == true && response['data'] != null) {
+        List<dynamic> dataList = response['data'];
+        return dataList
+            .map((json) => JobDropdownItemModel.fromJson(json))
+            .toList();
+      } else {
+        throw Exception(response['message'] ?? 'Failed to load job list.');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<bool> updateApplicationStatus({
     required String applicationId,
     required String newStatus,
+    Map<String, dynamic>? interviewSchedule,
+    String? feedback,
   }) async {
     try {
+      // 🎯 បង្កើត Payload សម្រាប់បញ្ជូនទៅ Backend
+      final Map<String, dynamic> payload = {'status': newStatus};
+
+      // 🎯 បញ្ចូលទិន្នន័យបន្ថែម តែក្នុងករណីដែលវាមានតម្លៃប៉ុណ្ណោះ
+      if (interviewSchedule != null) {
+        payload['interview_schedule'] = interviewSchedule;
+      }
+
+      if (feedback != null && feedback.isNotEmpty) {
+        payload['feedback'] = feedback;
+      }
+
       final response = await _apiClient.patch(
         '/employer/jobs/applications/$applicationId/status',
-        data: {
-          'status': newStatus,
-        }, // ត្រូវគ្នានឹង UpdateApplicationStatus payload របស់ FastAPI
+        data: payload,
       );
 
       return response['success'] == true;

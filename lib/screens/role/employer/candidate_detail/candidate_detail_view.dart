@@ -181,12 +181,17 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Applicant_Resume.pdf",
-                          style: TextStyle(
+                        Text(
+                          applicant.resumeFilename != null &&
+                                  applicant.resumeFilename!.isNotEmpty
+                              ? applicant.resumeFilename!
+                              : "Applicant_Resume.pdf", // Fallback បើគ្មានឈ្មោះ
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           "PDF Document",
@@ -230,7 +235,7 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
         ),
       ),
       // ── ៥. ប៊ូតុង Action ផ្នែកខាងក្រោម (Bottom Navigation Bar) ──
-      bottomNavigationBar: _buildBottomActionBar(),
+      bottomNavigationBar: _buildBottomActionBar(context),
     );
   }
 
@@ -254,7 +259,7 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
   }
 
   // 🎯 មុខងារបង្កើត Bottom Action Bar ទៅតាម Status របស់បេក្ខជន
-  Widget _buildBottomActionBar() {
+  Widget _buildBottomActionBar(BuildContext context) {
     final status = controller.applicant.status.toLowerCase();
 
     return Container(
@@ -277,7 +282,6 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           );
         }
 
-        // រៀបចំប៊ូតុងទៅតាម Status
         if (status == 'pending') {
           return Row(
             children: [
@@ -286,11 +290,7 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   "Reject",
                   Colors.red.shade600,
                   Colors.red.shade50,
-                  () => _showConfirmationDialog(
-                    "Reject",
-                    'rejected',
-                    Colors.red.shade600,
-                  ),
+                  () => _showRejectBottomSheet(context), // 🟢 ប្រើ Bottom Sheet
                 ),
               ),
               const SizedBox(width: 16),
@@ -316,11 +316,7 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   "Reject",
                   Colors.red.shade600,
                   Colors.red.shade50,
-                  () => _showConfirmationDialog(
-                    "Reject",
-                    'rejected',
-                    Colors.red.shade600,
-                  ),
+                  () => _showRejectBottomSheet(context), // 🟢 ប្រើ Bottom Sheet
                 ),
               ),
               const SizedBox(width: 16),
@@ -329,13 +325,11 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   "Interview",
                   Colors.white,
                   const Color(0xFF10B981),
-                  () => _showConfirmationDialog(
-                    "Interview",
-                    'interview',
-                    const Color(0xFF10B981),
-                  ),
+                  () => _showInterviewBottomSheet(
+                    context,
+                  ), // 🟢 ប្រើ Bottom Sheet សម្រាប់រៀបចំការសម្ភាសន៍
                 ),
-              ), // ពណ៌បៃតង
+              ),
             ],
           );
         } else if (status == 'interview') {
@@ -346,7 +340,9 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   "Reject",
                   Colors.red.shade600,
                   Colors.red.shade50,
-                  () => controller.changeApplicantStatus('rejected'),
+                  () => _showRejectBottomSheet(
+                    context,
+                  ), // 🟢 ដោះស្រាយ Bug: ឈប់ហៅផ្ទាល់
                 ),
               ),
               const SizedBox(width: 16),
@@ -355,13 +351,16 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   "Hire Candidate",
                   Colors.white,
                   const Color(0xFF059669),
-                  () => controller.changeApplicantStatus('hired'),
+                  () => _showConfirmationDialog(
+                    "Hire",
+                    'hired',
+                    const Color(0xFF059669),
+                  ), // 🟢 ដោះស្រាយ Bug
                 ),
               ),
             ],
           );
         } else {
-          // ករណី Rejected
           return SizedBox(
             width: double.infinity,
             height: 50,
@@ -374,7 +373,7 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                 ),
               ),
               child: Text(
-                "Application Rejected",
+                "Application Closed",
                 style: TextStyle(
                   color: Colors.grey.shade500,
                   fontWeight: FontWeight.bold,
@@ -385,6 +384,254 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           );
         }
       }),
+    );
+  }
+
+  void _showRejectBottomSheet(BuildContext context) {
+    controller.feedbackController.clear();
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Reject Candidate",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "Provide a reason or feedback (Optional):",
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: controller.feedbackController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: "E.g., Not enough experience in Flutter...",
+                filled: true,
+                fillColor: Colors.grey.shade50,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Get.back(),
+                    child: const Text("Cancel"),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.back();
+                      controller.changeApplicantStatus(
+                        'rejected',
+                        feedback: controller.feedbackController.text,
+                      );
+                    },
+                    child: const Text(
+                      "Confirm Reject",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _showInterviewBottomSheet(BuildContext context) {
+    controller.locationController.clear();
+    controller.messageController.clear();
+    controller.selectedInterviewDate.value = null;
+
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom:
+              MediaQuery.of(context).viewInsets.bottom +
+              24, // ការពារ Keyboard បាំង
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Schedule Interview",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF10B981),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Date Picker (សាមញ្ញ)
+              const Text(
+                "Interview Date & Time",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              Obx(
+                () => InkWell(
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030),
+                    );
+                    if (date != null)
+                      controller.selectedInterviewDate.value = date;
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          controller.selectedInterviewDate.value
+                                  ?.toString()
+                                  .split(' ')[0] ??
+                              "Select Date",
+                        ),
+                        const Icon(LucideIcons.calendar, color: Colors.grey),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              const Text(
+                "Location / Link",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controller.locationController,
+                decoration: InputDecoration(
+                  hintText: "E.g., Floor 5, Jobber City HQ or Zoom Link",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              const Text(
+                "Message to Candidate (Optional)",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controller.messageController,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  hintText: "E.g., Please prepare a small presentation.",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Get.back(),
+                      child: const Text("Cancel"),
+                    ),
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Validate Date & Location here...
+                        if (controller.selectedInterviewDate.value == null ||
+                            controller.locationController.text.isEmpty) {
+                          Get.snackbar(
+                            "Required",
+                            "Please select a date and enter a location.",
+                          );
+                          return;
+                        }
+                        Get.back();
+                        controller.changeApplicantStatus(
+                          'interview',
+                          interviewSchedule: {
+                            "date": controller.selectedInterviewDate.value!
+                                .toIso8601String(),
+                            "location": controller.locationController.text,
+                            "message": controller.messageController.text,
+                          },
+                        );
+                      },
+                      child: const Text(
+                        "Schedule",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 

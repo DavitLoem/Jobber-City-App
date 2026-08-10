@@ -33,19 +33,26 @@ class JobCardItem extends StatelessWidget {
 
     Color badgeColor = Colors.grey.shade100;
     Color badgeTextColor = Colors.grey.shade700;
+    String displayStatus = status
+        .toUpperCase(); // 🟢 បន្ថែមអថេរនេះមួយទៀតសម្រាប់ប្តូរអក្សរ
 
     if (statusLower == 'active') {
-      badgeColor = Colors.green.shade100;
+      badgeColor = Colors.green.shade50;
       badgeTextColor = Colors.green.shade700;
-    } else if (statusLower == 'inactive') {
-      badgeColor = Colors.red.shade100; // ពណ៌ក្រហម/ផ្កាឈូកស្រាល
-      badgeTextColor = Colors.red.shade700;
-    } else if (statusLower == 'draft') {
-      badgeColor = Colors.orange.shade100;
-      badgeTextColor = Colors.orange.shade800;
+      displayStatus = 'ACTIVE';
+    } else if (statusLower == 'inactive' || statusLower == 'paused') {
+      badgeColor = Colors.orange.shade50; // 🟢 ពណ៌ទឹកក្រូច សម្រាប់ Paused
+      badgeTextColor = Colors.orange.shade700;
+      displayStatus =
+          'PAUSED'; // 🟢 បង្ខំឱ្យចេញពាក្យ PAUSED ទោះជា Backend បោះមក inactive ក៏ដោយ
     } else if (statusLower == 'closed') {
-      badgeColor = Colors.grey.shade200;
+      badgeColor = Colors.red.shade50; // 🟢 ពណ៌ក្រហម សម្រាប់ Closed
+      badgeTextColor = Colors.red.shade700;
+      displayStatus = 'CLOSED';
+    } else if (statusLower == 'draft') {
+      badgeColor = Colors.grey.shade100; // 🟢 ពណ៌ប្រផេះ សម្រាប់ Draft
       badgeTextColor = Colors.grey.shade700;
+      displayStatus = 'DRAFT';
     }
 
     return InkWell(
@@ -159,7 +166,7 @@ class JobCardItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    status.toUpperCase(),
+                    displayStatus,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

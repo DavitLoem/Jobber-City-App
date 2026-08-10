@@ -14,6 +14,7 @@ import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_scree
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_view.dart';
 import 'package:jobber_city/screens/role/employer/my_job_detail/my_job_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/new_job/new_job_view.dart';
+import 'package:jobber_city/screens/role/seeker/application_detail/application_detail_view.dart';
 import 'package:jobber_city/screens/role/seeker/expertise_screen/category_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/job_detail/job_detail_view.dart';
 import 'package:jobber_city/screens/role/seeker/job_list/job_list_view.dart';
@@ -233,6 +234,15 @@ class AppPages {
       name: AppRoutes.skill,
       page: () => SkillsView(),
       binding: SkillsViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.applicationDetail,
+      page: () => ApplicationDetailView(),
+      binding: ApplicationDetailViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),

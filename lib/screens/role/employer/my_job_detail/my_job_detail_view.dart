@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../controllers/category_controller.dart';
@@ -185,33 +186,37 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
                 child: SafeArea(
                   child: Row(
                     children: [
-                      Expanded(
-                        flex: 1,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            controller.updateJobStatus('closed');
-                          },
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: Colors.red),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      // 🟢 បង្ហាញប៊ូតុង Close តែនៅពេលដែលវាមិនទាន់ Closed ប៉ុណ្ណោះ
+                      if (job.status.toLowerCase() != 'closed') ...[
+                        Expanded(
+                          flex: 1,
+                          child: OutlinedButton(
+                            onPressed: () =>
+                                _showCloseJobDialog(context), // 🟢 ហៅ Dialog
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              side: const BorderSide(color: Colors.red),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            "Close Job",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
+                            child: const Text(
+                              "Close Job",
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
+                        const SizedBox(width: 12),
+                      ],
                       Expanded(
                         flex: 2,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Get.toNamed(AppRoutes.myJobApplicants,);
+                          },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             backgroundColor: const Color(0xFF4f7df7),
@@ -247,10 +252,37 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
 
   // 🎯 បន្ថែម Parameter ឱ្យវាទទួល Data ពី Controller
   Widget _buildHeader(String? title, String? status) {
-    // កំណត់ពណ៌ Status ទៅតាមពាក្យ
-    final isClosed = status?.toLowerCase() == 'closed';
-    final statusColor = isClosed ? Colors.red : Colors.green;
-    final statusBgColor = isClosed ? Colors.red.shade50 : Colors.green.shade50;
+    Color statusColor;
+    Color statusBgColor;
+    String displayStatus = "UNKNOWN";
+
+    switch (status?.toLowerCase()) {
+      case 'active':
+        statusColor = Colors.green.shade700;
+        statusBgColor = Colors.green.shade50;
+        displayStatus = 'ACTIVE';
+        break;
+      case 'inactive':
+      case 'paused':
+        statusColor = Colors.orange.shade700;
+        statusBgColor = Colors.orange.shade50;
+        displayStatus = 'PAUSED'; // ប្រើពាក្យ Paused ឱ្យដូច Tab ខាងក្រៅ
+        break;
+      case 'closed':
+        statusColor = Colors.red.shade700;
+        statusBgColor = Colors.red.shade50;
+        displayStatus = 'CLOSED';
+        break;
+      case 'draft':
+        statusColor = Colors.grey.shade700;
+        statusBgColor = Colors.grey.shade100;
+        displayStatus = 'DRAFT';
+        break;
+      default:
+        statusColor = Colors.grey.shade700;
+        statusBgColor = Colors.grey.shade100;
+        displayStatus = status?.toUpperCase() ?? 'UNKNOWN';
+    }
 
     final profileCtrl = Get.find<EmployerProfileViewController>();
     final profile = profileCtrl.companyProfile.value;
@@ -303,7 +335,7 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  status?.toUpperCase() ?? "UNKNOWN",
+                  displayStatus, // 🟢 ប្រើប្រាស់ឈ្មោះ Status ដែលបានត្រងខាងលើ
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -474,6 +506,52 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
       backgroundColor: const Color(0xFFF0F4FF),
       side: BorderSide.none,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
+  // 🎯 អនុគមន៍សម្រាប់បង្ហាញ Modal សួរបញ្ជាក់ មុននឹង Close Job
+  void _showCloseJobDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(LucideIcons.alertCircle, color: Colors.red),
+            SizedBox(width: 10),
+            Text(
+              "Close Job",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ],
+        ),
+        content: const Text(
+          "Are you sure you want to close this job? Candidates will no longer be able to apply.",
+          style: TextStyle(fontSize: 15),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // 🟢 បិទ Dialog មុនសិន ទើបបញ្ជាឱ្យ Controller ធ្វើការ
+              controller.updateJobStatus('closed');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              "Close Job",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
