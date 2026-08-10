@@ -9,6 +9,7 @@ class ApplicantModel {
   final List<String> skills;
   final int yearsOfExperience;
   final String? resumeUrl;
+  final String? resumeFilename;
   final String? coverLetter;
   final String status;
   final DateTime? appliedAt;
@@ -24,6 +25,7 @@ class ApplicantModel {
     required this.skills,
     required this.yearsOfExperience,
     this.resumeUrl,
+    this.resumeFilename,
     this.coverLetter,
     required this.status,
     this.appliedAt,
@@ -42,6 +44,7 @@ class ApplicantModel {
       skills: List<String>.from(json['skills'] ?? []),
       yearsOfExperience: json['years_of_experience'] ?? 0,
       resumeUrl: json['resume_url'],
+      resumeFilename: json['resume_filename'],
       coverLetter: json['cover_letter'],
       status: json['status'] ?? 'pending',
       // បំប្លែងកាលបរិច្ឆេទ
@@ -67,6 +70,7 @@ class ApplicantModel {
       skills: skills,
       yearsOfExperience: yearsOfExperience,
       resumeUrl: resumeUrl,
+      resumeFilename: resumeFilename,
       coverLetter: coverLetter,
       status: status ?? this.status,
       appliedAt: appliedAt,

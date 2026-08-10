@@ -136,26 +136,37 @@ class MyJobDetailViewController extends GetxController {
 
   Future<void> updateJobStatus(String newStatus) async {
     try {
-      // 1. បង្ហាញរង្វង់ Loading
       Get.dialog(
         const Center(
           child: CircularProgressIndicator(
-            color: Colors.blue, // ដូរពណ៌តាម App របស់អ្នក
+            color: Color(0xFF4f7df7),
             strokeWidth: 3,
           ),
         ),
         barrierDismissible: false,
       );
 
-      // 2. ហៅ API ដើម្បី Update Status
       final success = await _jobService.updateJobStatus(jobId, newStatus);
 
-      // 3. បិទ Loading
       Get.back();
 
       if (success) {
-        // 🎯 ៤. ប្រើ copyWith ដើម្បី Update UI ក្នុង Detail Screen
+        // ១. Update UI ក្នុង Detail Screen
         jobData.value = jobData.value?.copyWith(status: newStatus);
+
+        // 🎯 ២. Update UI ក្នុង List Screen ខាងក្រៅ (MyJobViewController)
+        if (Get.isRegistered<MyJobViewController>()) {
+          final listCtrl = Get.find<MyJobViewController>();
+          // ស្វែងរកទីតាំង (Index) នៃការងារនេះក្នុងបញ្ជី
+          final index = listCtrl.jobs.indexWhere((j) => j.id == jobId);
+          if (index != -1) {
+            // Update តែ Item នេះប៉ុណ្ណោះ រួចប្រាប់ Obx ឱ្យគូរឡើងវិញ
+            listCtrl.jobs[index] = listCtrl.jobs[index].copyWith(
+              status: newStatus,
+            );
+            listCtrl.jobs.refresh();
+          }
+        }
 
         Get.snackbar(
           'Status Updated',
@@ -167,7 +178,6 @@ class MyJobDetailViewController extends GetxController {
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
-
       Get.snackbar(
         "Update Failed",
         e.toString(),

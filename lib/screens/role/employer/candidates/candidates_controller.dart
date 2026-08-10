@@ -1,34 +1,85 @@
 part of 'candidates_view.dart';
 
-class CandidatesViewController extends GetxController {
+class CandidatesViewController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   // 🎯 ហៅ Service ដែលយើងបានបង្កើត
   final ApplicantEmployerService _applicantService = ApplicantEmployerService();
 
   // 🎯 គ្រប់គ្រងស្ថានភាពនៃការ Load
   var isLoading = false.obs;
+  var isJobsLoading = false.obs; // 🟢 សម្រាប់ Load បញ្ជីការងារ
 
   // 🎯 បញ្ជីរក្សាទុកទិន្នន័យបេក្ខជន
   var applicants = <ApplicantModel>[].obs;
 
-  // 🎯 Status បច្ចុប្បន្ន (Tab ដែលកំពុងឈរ) - Default គឺ 'pending' (ត្រូវនឹងពាក្យថា "New" លើ UI)
-  var currentStatus = 'pending'.obs;
+  // 🟢 បញ្ជីរក្សាទុកការងារសម្រាប់ Bottom Sheet
+  var postedJobs = <JobDropdownItemModel>[].obs;
 
   // 🎯 Job ID សម្រាប់ការទាញយកបេក្ខជន
-  // (អាចទាញពី Dropdown "All Jobs" ឬបញ្ជូនមកពីទំព័រ My Jobs)
   var selectedJobId = ''.obs;
+
+  final List<String> tabs = [
+    'pending',
+    'shortlisted',
+    'interview',
+    'hired',
+    'rejected',
+  ];
+
+  late TabController tabController;
 
   @override
   void onInit() {
     super.onInit();
 
-    // ឆែកមើលថាតើមានបញ្ជូន Job ID មកពីទំព័រមុនដែរឬទេ
     if (Get.arguments != null && Get.arguments is String) {
       selectedJobId.value = Get.arguments as String;
     } else {
-      // 🎯 បើគ្មានទេ កំណត់វាឱ្យស្មើ 'all' ជាលំនាំដើម
       selectedJobId.value = 'all';
     }
+
+    tabController = TabController(length: tabs.length, vsync: this);
+
+    tabController.addListener(() {
+      if (!tabController.indexIsChanging) {
+        changeTab(tabs[tabController.index]);
+      }
+    });
+
+    // 🟢 ហៅទិន្នន័យទាំង ២ ស្របពេលគ្នា
+    fetchPostedJobs();
     fetchApplicants();
+  }
+
+  /// 🟢 ទាញយកបញ្ជីការងារសម្រាប់ដាក់ក្នុង Modal Bottom Sheet
+  Future<void> fetchPostedJobs() async {
+    try {
+      isJobsLoading.value = true;
+      final result = await _applicantService.getJobDropdownList();
+      postedJobs.assignAll(result);
+    } catch (e) {
+      debugPrint("❌ Error fetching jobs for dropdown: $e");
+    } finally {
+      isJobsLoading.value = false;
+    }
+  }
+
+  /// 🟢 អនុគមន៍ជំនួយសម្រាប់បង្ហាញឈ្មោះការងារដែលបានរើសនៅលើប៊ូតុង
+  String get selectedJobDisplayName {
+    if (selectedJobId.value == 'all' || selectedJobId.value.isEmpty) {
+      return 'All Jobs';
+    }
+
+    final job = postedJobs.firstWhere(
+      (j) => j.jobId == selectedJobId.value,
+      orElse: () => JobDropdownItemModel(
+        jobId: '',
+        displayName: 'Loading...',
+        status: '',
+      ),
+    );
+
+    return job.displayName;
   }
 
   /// 🎯 ទាញយកបញ្ជីបេក្ខជនតាម Status នៃ Tab នីមួយៗ
@@ -37,11 +88,13 @@ class CandidatesViewController extends GetxController {
 
     try {
       isLoading.value = true;
-      applicants.clear(); // លុបទិន្នន័យចាស់ពេលប្តូរ Tab
+      applicants.clear();
+
+      String activeStatus = tabs[tabController.index];
 
       final result = await _applicantService.getJobApplicants(
         jobId: selectedJobId.value,
-        status: currentStatus.value,
+        status: activeStatus,
       );
 
       applicants.assignAll(result);
@@ -59,54 +112,54 @@ class CandidatesViewController extends GetxController {
     }
   }
 
-  /// 🎯 ពេល Employer ចុចដូរ Tab (New -> Shortlisted -> Interviewed...)
   void changeTab(String status) {
-    // បើគាត់ចុច Tab ដដែល មិនបាច់ Load សារថ្មីទេ
-    if (currentStatus.value == status) return;
-
-    currentStatus.value = status;
     fetchApplicants();
   }
 
-  /// 🎯 មុខងារប្តូរស្ថានភាពបេក្ខជន (ឧ. Employer ចុចប៊ូតុង "Shortlist" លើកាត)
-  Future<void> updateApplicantStatus(
+  /// 🎯 មុខងារប្តូរស្ថានភាពបេក្ខជន (ផ្លាស់ប្តូរឱ្យ Return ជា bool វិញ)
+  Future<bool> updateApplicantStatus(
     String applicationId,
-    String newStatus,
-  ) async {
+    String newStatus, {
+    Map<String, dynamic>? interviewSchedule,
+    String? feedback,
+  }) async {
     try {
-      // បង្ហាញ Loading ដដែលៗកុំឱ្យគាត់ចុចផ្ទួនៗ
       Get.dialog(
         const Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
       );
 
+      // កុំភ្លេច Update Service របស់អ្នកឱ្យទទួលយក Parameter ២ នេះផងដែរ
       final success = await _applicantService.updateApplicationStatus(
         applicationId: applicationId,
         newStatus: newStatus,
+        interviewSchedule: interviewSchedule,
+        feedback: feedback,
       );
 
-      Get.back(); // បិទ Loading
+      Get.back(); // បិទ Loading Dialog
 
       if (success) {
-        // 🎯 ល្បិច UX: លុបបេក្ខជននេះចេញពី UI ភ្លាមៗ (ព្រោះគាត់ត្រូវរើទៅ Tab ផ្សេងហើយ) ដោយមិនបាច់ហៅ API ម្តងទៀត
+        // លុបបេក្ខជននេះចេញពី UI ភ្លាមៗ
         applicants.removeWhere((app) => app.applicationId == applicationId);
-
-        Get.snackbar(
-          "Success",
-          "Candidate has been moved to $newStatus.",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green.shade50,
-          colorText: Colors.green.shade800,
-        );
+        return true; // 🟢 បញ្ជាក់ថាជោគជ័យ
       }
+      return false;
     } catch (e) {
-      Get.back(); // បិទ Loading
+      Get.back(); // បិទ Loading Dialog
       Get.snackbar(
         "Action Failed",
         "Could not update status.",
         backgroundColor: Colors.red.shade50,
         colorText: Colors.red.shade700,
       );
+      return false;
     }
+  }
+
+  @override
+  void onClose() {
+    tabController.dispose();
+    super.onClose();
   }
 }

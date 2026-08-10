@@ -81,6 +81,10 @@ class JobDetailController extends GetxController {
         job.value!.hasApplied = true;
         Get.back(); // 🎯 បិទផ្ទាំង Bottom Sheet វិញពេលជោគជ័យ
 
+        if (Get.isRegistered<ApplicationViewController>()) {
+          Get.find<ApplicationViewController>().fetchApplications();
+        }
+
         Get.snackbar(
           "Application Sent! 🎉",
           "You have successfully applied to ${job.value!.companyName}.",
