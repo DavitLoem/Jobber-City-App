@@ -2,23 +2,25 @@ part of 'candidates_view.dart';
 
 class CandidatesViewController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  // 🎯 ហៅ Service ដែលយើងបានបង្កើត
-  final ApplicantEmployerService _applicantService = ApplicantEmployerService();
+  final ApplicantEmployerService applicantService = ApplicantEmployerService();
 
-  // 🎯 គ្រប់គ្រងស្ថានភាពនៃការ Load
   var isLoading = false.obs;
-  var isJobsLoading = false.obs; // 🟢 សម្រាប់ Load បញ្ជីការងារ
-
-  // 🎯 បញ្ជីរក្សាទុកទិន្នន័យបេក្ខជន
+  var isJobsLoading = false.obs;
   var applicants = <ApplicantModel>[].obs;
-
-  // 🟢 បញ្ជីរក្សាទុកការងារសម្រាប់ Bottom Sheet
   var postedJobs = <JobDropdownItemModel>[].obs;
-
-  // 🎯 Job ID សម្រាប់ការទាញយកបេក្ខជន
   var selectedJobId = ''.obs;
 
+  // 🟢 ១. អថេរថ្មីៗសម្រាប់ Pagination
+  var currentPage = 1.obs;
+  var isLoadMore = false.obs;
+  var hasMore = true.obs;
+  final int limit = 20;
+
+  final searchController = TextEditingController();
+  final _debouncer = Debouncer(milliseconds: 500);
+
   final List<String> tabs = [
+    'all',
     'pending',
     'shortlisted',
     'interview',
@@ -27,6 +29,20 @@ class CandidatesViewController extends GetxController
   ];
 
   late TabController tabController;
+
+  var statusSummary = ApplicantStatusSummaryModel(
+    all: 0,
+    pending: 0,
+    shortlisted: 0,
+    interview: 0,
+    hired: 0,
+    rejected: 0,
+  ).obs;
+
+  var selectedApplicantIds = <String>[].obs;
+  bool get isSelectionMode => selectedApplicantIds.isNotEmpty;
+
+  var currentSort = 'newest'.obs;
 
   @override
   void onInit() {
@@ -46,16 +62,15 @@ class CandidatesViewController extends GetxController
       }
     });
 
-    // 🟢 ហៅទិន្នន័យទាំង ២ ស្របពេលគ្នា
     fetchPostedJobs();
-    fetchApplicants();
+    fetchApplicants(isRefresh: true); // 🟢 ចាប់ផ្តើមដោយ Refresh
+    fetchStatusSummary();
   }
 
-  /// 🟢 ទាញយកបញ្ជីការងារសម្រាប់ដាក់ក្នុង Modal Bottom Sheet
   Future<void> fetchPostedJobs() async {
     try {
       isJobsLoading.value = true;
-      final result = await _applicantService.getJobDropdownList();
+      final result = await applicantService.getJobDropdownList();
       postedJobs.assignAll(result);
     } catch (e) {
       debugPrint("❌ Error fetching jobs for dropdown: $e");
@@ -64,12 +79,10 @@ class CandidatesViewController extends GetxController
     }
   }
 
-  /// 🟢 អនុគមន៍ជំនួយសម្រាប់បង្ហាញឈ្មោះការងារដែលបានរើសនៅលើប៊ូតុង
   String get selectedJobDisplayName {
     if (selectedJobId.value == 'all' || selectedJobId.value.isEmpty) {
       return 'All Jobs';
     }
-
     final job = postedJobs.firstWhere(
       (j) => j.jobId == selectedJobId.value,
       orElse: () => JobDropdownItemModel(
@@ -78,26 +91,69 @@ class CandidatesViewController extends GetxController
         status: '',
       ),
     );
-
     return job.displayName;
   }
 
-  /// 🎯 ទាញយកបញ្ជីបេក្ខជនតាម Status នៃ Tab នីមួយៗ
-  Future<void> fetchApplicants() async {
+  // 🟢 ២. មុខងារ Refresh (ទាញពីលើចុះក្រោម)
+  Future<void> refreshApplicants() async {
+    currentPage.value = 1;
+    hasMore.value = true;
+    await fetchApplicants(isRefresh: true);
+  }
+
+  // 🟢 ៣. មុខងារ Load More (អូសដល់ក្រោម)
+  Future<void> loadMoreApplicants() async {
+    if (isLoadMore.value || !hasMore.value) return;
+
+    isLoadMore.value = true;
+    currentPage.value++;
+    await fetchApplicants(isRefresh: false);
+    isLoadMore.value = false;
+  }
+
+  void changeSortOption(String newSort) {
+    if (currentSort.value == newSort) return;
+    currentSort.value = newSort;
+
+    // បង្ខំឱ្យ Reset ទៅទំព័រទី 1 និងទាញទិន្នន័យថ្មី
+    currentPage.value = 1;
+    hasMore.value = true;
+    fetchApplicants(isRefresh: true);
+  }
+
+  // 🟢 ៤. កែប្រែ fetchApplicants ដើម្បីគាំទ្រ Pagination
+  Future<void> fetchApplicants({bool isRefresh = true}) async {
     if (selectedJobId.value.isEmpty) return;
 
     try {
-      isLoading.value = true;
-      applicants.clear();
+      if (isRefresh) {
+        isLoading.value = true;
+        currentPage.value = 1;
+      }
 
       String activeStatus = tabs[tabController.index];
 
-      final result = await _applicantService.getJobApplicants(
+      final result = await applicantService.getJobApplicants(
         jobId: selectedJobId.value,
         status: activeStatus,
+        searchKeyword: searchController.text,
+        sortBy: currentSort.value,
+        page: currentPage.value,
+        limit: limit,
       );
 
-      applicants.assignAll(result);
+      // ឆែកថាតើអស់ទិន្នន័យឬនៅ
+      if (result.length < limit) {
+        hasMore.value = false;
+      } else {
+        hasMore.value = true;
+      }
+
+      if (isRefresh) {
+        applicants.assignAll(result);
+      } else {
+        applicants.addAll(result);
+      }
     } catch (e) {
       debugPrint("❌ Error in Controller: $e");
       Get.snackbar(
@@ -108,15 +164,129 @@ class CandidatesViewController extends GetxController
         colorText: Colors.red.shade700,
       );
     } finally {
-      isLoading.value = false;
+      if (isRefresh) isLoading.value = false;
     }
   }
 
-  void changeTab(String status) {
-    fetchApplicants();
+  Future<void> fetchStatusSummary() async {
+    if (selectedJobId.value.isEmpty) return;
+    try {
+      final result = await applicantService.getApplicantStatusSummary(
+        selectedJobId.value,
+      );
+      if (result != null) {
+        statusSummary.value = result;
+      }
+    } catch (e) {
+      debugPrint("❌ Error in Controller fetching summary: $e");
+    }
   }
 
-  /// 🎯 មុខងារប្តូរស្ថានភាពបេក្ខជន (ផ្លាស់ប្តូរឱ្យ Return ជា bool វិញ)
+  void toggleSelection(String applicationId) {
+    if (selectedApplicantIds.isEmpty) {
+      selectedApplicantIds.add(applicationId);
+    } else {
+      if (selectedApplicantIds.contains(applicationId)) {
+        selectedApplicantIds.remove(applicationId);
+      } else {
+        final newApplicant = applicants.firstWhere(
+          (app) => app.applicationId == applicationId,
+        );
+        final firstSelectedId = selectedApplicantIds.first;
+        final firstApplicant = applicants.firstWhere(
+          (app) => app.applicationId == firstSelectedId,
+        );
+
+        if (newApplicant.status != firstApplicant.status) {
+          Get.snackbar(
+            "Selection Error",
+            "You can only select candidates with the same status at a time.",
+            backgroundColor: Colors.orange.shade50,
+            colorText: Colors.orange.shade900,
+            snackPosition: SnackPosition.TOP,
+            icon: Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.orange.shade900,
+            ),
+          );
+          return;
+        }
+        selectedApplicantIds.add(applicationId);
+      }
+    }
+  }
+
+  void selectAllCurrentTab() {
+    final ids = applicants.map((app) => app.applicationId).toList();
+    selectedApplicantIds.assignAll(ids);
+  }
+
+  void clearSelection() {
+    selectedApplicantIds.clear();
+  }
+
+  void onSearchChanged(String query) {
+    _debouncer.run(() {
+      // 🟢 ពេល Search ត្រូវ Reset ទៅទំព័រទី 1 វិញ
+      currentPage.value = 1;
+      hasMore.value = true;
+      fetchApplicants(isRefresh: true);
+    });
+  }
+
+  void changeTab(String status) {
+    clearSelection();
+    // 🟢 ពេលដូរ Tab ត្រូវ Reset ទៅទំព័រទី 1 វិញ
+    hasMore.value = true;
+    currentPage.value = 1;
+    fetchApplicants(isRefresh: true);
+  }
+
+  Future<bool> bulkUpdateStatus(
+    String newStatus, {
+    Map<String, dynamic>? interviewSchedule,
+    String? feedback,
+  }) async {
+    if (selectedApplicantIds.isEmpty) return false;
+    try {
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
+      final success = await applicantService.bulkUpdateApplicationStatus(
+        applicationIds: selectedApplicantIds.toList(),
+        newStatus: newStatus,
+        interviewSchedule: interviewSchedule,
+        feedback: feedback,
+      );
+      Get.back();
+      if (success) {
+        applicants.removeWhere(
+          (app) => selectedApplicantIds.contains(app.applicationId),
+        );
+        clearSelection();
+        fetchStatusSummary();
+        Get.snackbar(
+          "Success",
+          "Candidates have been updated successfully.",
+          backgroundColor: Colors.green.shade50,
+          colorText: Colors.green.shade700,
+        );
+        return true;
+      }
+      return false;
+    } catch (e) {
+      Get.back();
+      Get.snackbar(
+        "Error",
+        "Could not process bulk action.",
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade700,
+      );
+      return false;
+    }
+  }
+
   Future<bool> updateApplicantStatus(
     String applicationId,
     String newStatus, {
@@ -128,28 +298,47 @@ class CandidatesViewController extends GetxController
         const Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
       );
-
-      // កុំភ្លេច Update Service របស់អ្នកឱ្យទទួលយក Parameter ២ នេះផងដែរ
-      final success = await _applicantService.updateApplicationStatus(
+      final success = await applicantService.updateApplicationStatus(
         applicationId: applicationId,
         newStatus: newStatus,
         interviewSchedule: interviewSchedule,
         feedback: feedback,
       );
-
-      Get.back(); // បិទ Loading Dialog
-
+      Get.back();
       if (success) {
-        // លុបបេក្ខជននេះចេញពី UI ភ្លាមៗ
-        applicants.removeWhere((app) => app.applicationId == applicationId);
-        return true; // 🟢 បញ្ជាក់ថាជោគជ័យ
+        final existingApplicantIndex = applicants.indexWhere(
+          (app) => app.applicationId == applicationId,
+        );
+        if (existingApplicantIndex != -1) {
+          final currentStatus = applicants[existingApplicantIndex].status
+              .toLowerCase();
+          if (currentStatus == newStatus.toLowerCase()) {
+            fetchApplicants(isRefresh: true); // 🟢 ទាញយកសាថ្មី ព្រោះវា Update
+            Get.snackbar(
+              "Success",
+              "Interview schedule has been updated.",
+              backgroundColor: Colors.green.shade50,
+              colorText: Colors.green.shade700,
+              snackPosition: SnackPosition.TOP,
+              margin: const EdgeInsets.all(16),
+              icon: Icon(
+                Icons.check_circle_outline,
+                color: Colors.green.shade700,
+              ),
+            );
+          } else {
+            applicants.removeAt(existingApplicantIndex);
+            fetchStatusSummary();
+          }
+        }
+        return true;
       }
       return false;
     } catch (e) {
-      Get.back(); // បិទ Loading Dialog
+      Get.back();
       Get.snackbar(
         "Action Failed",
-        "Could not update status.",
+        "Could not update data. Please try again.",
         backgroundColor: Colors.red.shade50,
         colorText: Colors.red.shade700,
       );
@@ -160,6 +349,7 @@ class CandidatesViewController extends GetxController
   @override
   void onClose() {
     tabController.dispose();
+    searchController.dispose();
     super.onClose();
   }
 }

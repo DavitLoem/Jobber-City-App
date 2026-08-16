@@ -74,7 +74,7 @@ class CandidateDetailViewController extends GetxController {
       // ២. ទាញយកឈ្មោះឯកសារក្រោយសញ្ញា / ចុងក្រោយគេ
       String fileName = cleanUrl.split('/').last;
 
-      // ៣. បំប្លែងកូដដូចជា %20 មកជាដកឃ្លា (Space) វិញឱ្យស្រួលអាន
+      // ៣. បំប្លែងកូដដូចជា %20 មកជាដកឃ្លា (Space)
       return Uri.decodeComponent(fileName);
     } catch (e) {
       return "Applicant_Resume.pdf"; // Fallback បើមាន Error

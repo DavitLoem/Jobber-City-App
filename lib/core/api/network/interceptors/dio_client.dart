@@ -37,8 +37,8 @@ class DioClient {
         PrettyDioLogger(
           requestHeader: true,
           requestBody:
-              true, // បើចង់លាក់ Password សូម្បីតែពេល Dev អាចប្តូរទៅ false
-          responseBody: true,
+              false, // បើចង់លាក់ Password សូម្បីតែពេល Dev អាចប្តូរទៅ false
+          responseBody: false,
           responseHeader: false,
           error: true,
           compact: true,
