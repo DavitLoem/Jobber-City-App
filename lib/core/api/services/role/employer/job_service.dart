@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/models/role/employer/job_model.dart';
 
@@ -18,6 +19,7 @@ class JobService {
   Future<JobListResponseModel> getJobs({
     String? status,
     String? searchKeyword,
+    String? sortBy,
     int page = 1,
     int limit = 10,
   }) async {
@@ -33,6 +35,10 @@ class JobService {
 
       if (searchKeyword != null && searchKeyword.trim().isNotEmpty) {
         queryParams['search'] = searchKeyword.trim();
+      }
+
+      if (sortBy != null && sortBy.isNotEmpty) {
+        queryParams['sort_by'] = sortBy;
       }
 
       final response = await _apiClient.get(
@@ -54,6 +60,19 @@ class JobService {
       return JobSingleResponseModel.fromJson(response);
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<Map<String, int>> getJobStatusSummary() async {
+    try {
+      final response = await _apiClient.get('$endpoint/summary/counts');
+      if (response['success'] == true) {
+        return Map<String, int>.from(response['data']);
+      }
+      return {};
+    } catch (e) {
+      debugPrint("Error fetching status summary: $e");
+      return {};
     }
   }
 

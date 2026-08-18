@@ -158,6 +158,8 @@ class JobDataModel {
   final String status;
   final String closingDate;
   final String createdAt;
+  final int applicantCount;
+  final List<String> applicantAvatars;
 
   JobDataModel({
     required this.id,
@@ -187,6 +189,8 @@ class JobDataModel {
     required this.customSkills,
     required this.districtId,
     required this.closingDate,
+    this.applicantCount = 0,
+    this.applicantAvatars = const [],
   });
 
   JobDataModel copyWith({
@@ -217,6 +221,8 @@ class JobDataModel {
     String? status,
     String? closingDate,
     String? createdAt,
+    int? applicantCount,
+    List<String>? applicantAvatars,
   }) {
     return JobDataModel(
       id: id ?? this.id,
@@ -246,6 +252,8 @@ class JobDataModel {
       customSkills: customSkills ?? this.customSkills,
       districtId: districtId ?? this.districtId,
       closingDate: closingDate ?? this.closingDate,
+      applicantCount: applicantCount ?? this.applicantCount,
+      applicantAvatars: applicantAvatars ?? this.applicantAvatars,
     );
   }
 
@@ -291,5 +299,9 @@ class JobDataModel {
     status: json["status"] ?? "",
     closingDate: json["closing_date"] ?? "",
     createdAt: json["created_at"] ?? "",
+    applicantCount: json["applicant_count"] ?? 0,
+    applicantAvatars: json["applicant_avatars"] != null
+        ? List<String>.from(json["applicant_avatars"])
+        : [],
   );
 }

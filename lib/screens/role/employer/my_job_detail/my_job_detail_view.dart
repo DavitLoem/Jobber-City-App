@@ -10,8 +10,9 @@ import '../../../../controllers/master_data_controller.dart';
 import '../../../../core/api/services/role/employer/job_service.dart';
 import '../../../../models/role/employer/company_model.dart';
 import '../../../../models/role/employer/job_model.dart';
+import '../../../../routes/app_routes.dart';
+import '../candidates/candidates_view.dart';
 import '../employer_profile/employer_profile_view.dart';
-import '../../../../widgets/confirm_dialog.dart';
 
 part 'my_job_detail_binding.dart';
 part 'my_job_detail_controller.dart';
@@ -39,11 +40,13 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              LucideIcons.edit,
-              color: theme.textTheme.bodyLarge?.color,
-            ),
-            onPressed: () {},
+            icon: const Icon(LucideIcons.edit, color: Colors.black87),
+            onPressed: () {
+              // Get.toNamed(
+              //   AppRoutes.newJob,
+              //   arguments: controller.jobData.value,
+              // );
+            },
           ),
           IconButton(
             icon: Icon(
@@ -256,7 +259,9 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
                       Expanded(
                         flex: 2,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Get.toNamed(AppRoutes.myJobApplicants,);
+                          },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             backgroundColor: AppColors.primary,

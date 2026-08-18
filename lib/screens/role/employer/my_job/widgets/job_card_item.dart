@@ -12,7 +12,9 @@ class JobCardItem extends StatelessWidget {
   final String status;
   final bool isUrgent;
   final int candidatesCount;
+  final List<String> avatars;
   final VoidCallback onTap;
+  final VoidCallback onCandidatesTap;
   final VoidCallback onMoreTap;
   final bool isDark;
   final ThemeData theme;
@@ -26,7 +28,9 @@ class JobCardItem extends StatelessWidget {
     required this.status,
     this.isUrgent = false,
     required this.candidatesCount,
+    this.avatars = const [],
     required this.onTap,
+    required this.onCandidatesTap,
     required this.onMoreTap,
     this.logoUrl,
     required this.isDark,
@@ -267,45 +271,43 @@ class JobCardItem extends StatelessWidget {
               ],
             ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Divider(
-                height: 1,
-                color: isDark ? AppColors.darkDivider : const Color(0xFFF3F4F6),
-              ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1, color: Color(0xFFF3F4F6)),
             ),
 
+            // ── 3. ផ្នែកខាងក្រោម (Candidates Avatars & Arrow) ──
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
+                    // 🎯 លក្ខខណ្ឌទី១: បង្ហាញរូប Profile លុះត្រាតែមានបេក្ខជន (candidatesCount > 0)
                     if (candidatesCount > 0) ...[
                       _buildOverlappingAvatars(),
                       const SizedBox(width: 12),
                     ],
+
+                    // 🎯 លក្ខខណ្ឌទី២: ប្តូរពណ៌អក្សរតាមចំនួនបេក្ខជន
                     Text(
                       candidatesCount == 0
-                          ? "No candidates yet"
-                                .tr // 🟢 Added .tr
-                          : "@count candidates".trParams({
-                              'count': candidatesCount.toString(),
-                            }), // 🟢 Added .trParams
+                          ? "No candidates yet" // ឬអ្នកអាចដាក់ "0 candidates" ដូចដើមក៏បាន
+                          : "$candidatesCount candidates",
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: candidatesCount == 0
-                            ? (isDark
-                                  ? AppColors.darkTextTertiary
-                                  : Colors.grey.shade500)
-                            : AppColors.primary,
+                            ? Colors
+                                  .grey
+                                  .shade500 // ពណ៌ប្រផេះពេលគ្មានមនុស្ស
+                            : const Color(0xFF4f7df7), // ពណ៌ខៀវពេលមានមនុស្ស
                       ),
                     ),
                   ],
                 ),
-                Icon(
+                const Icon(
                   LucideIcons.chevronRight,
-                  color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                  color: Colors.grey,
                   size: 18,
                 ),
               ],
@@ -316,35 +318,40 @@ class JobCardItem extends StatelessWidget {
     );
   }
 
+  // មុខងារសម្រាប់គូររូប Avatar ត្រួតលើគ្នា (B, C, D)
   Widget _buildOverlappingAvatars() {
     if (candidatesCount == 0) return const SizedBox.shrink();
 
+    // 🎯 លក្ខខណ្ឌទី៣: កំណត់ចំនួនរូបដែលត្រូវបង្ហាញ (អតិបរមាគឺ ៣ រូប)
     final displayCount = candidatesCount > 3 ? 3 : candidatesCount;
-
-    final colors = [
+    final fallbackColors = [
       const Color(0xFF6366F1),
       const Color(0xFF8B5CF6),
       const Color(0xFF3B82F6),
     ];
-    final letters = ['A', 'B', 'C'];
+    final letters = [
+      'A',
+      'B',
+      'C',
+    ]; // អាចប្តូរជាអក្សរទី១នៃឈ្មោះបេក្ខជននៅថ្ងៃក្រោយ
 
     return SizedBox(
       width: 26.0 + ((displayCount - 1) * 18.0),
       height: 26,
       child: Stack(
         children: List.generate(displayCount, (index) {
+          // ឆែកមើលថាតើមាន URL សម្រាប់ Index នេះឬអត់
+          final hasImage = index < avatars.length && avatars[index].isNotEmpty;
+
           return Positioned(
             left: index * 18.0,
             child: Container(
               width: 26,
               height: 26,
               decoration: BoxDecoration(
-                color: colors[index],
+                color: hasImage ? Colors.white : fallbackColors[index],
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: isDark ? AppColors.darkSurface : Colors.white,
-                  width: 2,
-                ),
+                border: Border.all(color: Colors.white, width: 2),
               ),
               child: Center(
                 child: Text(

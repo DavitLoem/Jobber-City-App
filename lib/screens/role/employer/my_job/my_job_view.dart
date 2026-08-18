@@ -13,7 +13,9 @@ import 'package:jobber_city/widgets/confirm_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/utils/debouncer.dart';
+import '../candidates/candidates_view.dart';
 import '../employer_profile/employer_profile_view.dart';
+import '../main_screen_emloyer/main_screen_emloyer_controller.dart';
 import 'widgets/job_action_bottom_sheet.dart';
 import 'widgets/job_card_skeleton.dart';
 
@@ -31,17 +33,22 @@ class MyJobView extends GetView<MyJobViewController> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
-          'My Jobs'.tr, // 🟢 Added .tr
+        title: const Text(
+          'My Jobs',
           style: TextStyle(
-            color: theme.textTheme.bodyLarge?.color,
+            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.w700,
           ),
         ),
-        actions: [_buildNewJobButton()],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(child: _buildNewJobButton()),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -49,28 +56,16 @@ class MyJobView extends GetView<MyJobViewController> {
             searchController: controller.searchController,
             onChanged: controller.onSearchChanged,
             onSortTap: () {},
-            isDark: isDark,
-            theme: theme,
           ),
           const SizedBox(height: 10),
           Obx(() {
-            final allCount = controller.jobs.length;
-            final activeCount = controller.jobs
-                .where((j) => j.status.toLowerCase() == 'active')
-                .length;
-            final pausedCount = controller.jobs
-                .where(
-                  (j) =>
-                      j.status.toLowerCase() == 'inactive' ||
-                      j.status.toLowerCase() == 'paused',
-                )
-                .length;
-            final draftCount = controller.jobs
-                .where((j) => j.status.toLowerCase() == 'draft')
-                .length;
-            final closedCount = controller.jobs
-                .where((j) => j.status.toLowerCase() == 'closed')
-                .length;
+            // 🟢 ៤. ប្រើប្រាស់ statusSummary ជំនួសឱ្យការរាប់ពី controller.jobs
+            final summary = controller.statusSummary;
+            final allCount = summary['all'] ?? 0;
+            final activeCount = summary['active'] ?? 0;
+            final pausedCount = summary['paused'] ?? 0;
+            final closedCount = summary['closed'] ?? 0;
+            final draftCount = summary['draft'] ?? 0;
 
             final tabList = [
               '${'All'.tr} ($allCount)', // 🟢 Translated dynamically
@@ -95,15 +90,26 @@ class MyJobView extends GetView<MyJobViewController> {
             );
           }),
           const SizedBox(height: 20),
-          Expanded(child: _buildJobList(isDark, theme)),
+
+          // ── ប្រើប្រាស់ Function ដើម្បីបង្ហាញបញ្ជីការងារ ──
+          Expanded(child: _buildJobList()),
         ],
       ),
     );
   }
 
-  Widget _buildJobList(bool isDark, ThemeData theme) {
+  // ==========================================
+  // ── 1. Function សម្រាប់សាងសង់បញ្ជីការងារ (List View)
+  // ==========================================
+  Widget _buildJobList() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Obx(() {
       final currentList = controller.displayJobs;
+
+      // 🎯 ដំណោះស្រាយ៖ ទាញយក Profile នៅទីនេះ (ក្រៅ ListView តែក្នុង Obx)
+      // ធ្វើបែបនេះ GetX នឹងដឹងថាពេល Profile ដើរចប់ វាត្រូវ Rebuild UI បង្ហាញ Logo ភ្លាមៗ
       final profileCtrl = Get.find<EmployerProfileViewController>();
       final profile = profileCtrl.companyProfile.value;
 
@@ -128,22 +134,11 @@ class MyJobView extends GetView<MyJobViewController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                LucideIcons.inbox,
-                size: 48,
-                color: isDark
-                    ? AppColors.darkIconSecondary
-                    : Colors.grey.shade300,
-              ),
+              Icon(LucideIcons.inbox, size: 48, color: Colors.grey.shade300),
               const SizedBox(height: 16),
               Text(
-                "No jobs found in this status".tr, // 🟢 Added .tr
-                style: TextStyle(
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : Colors.grey.shade500,
-                  fontSize: 16,
-                ),
+                "No jobs found in this status",
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
               ),
             ],
           ),
@@ -163,7 +158,7 @@ class MyJobView extends GetView<MyJobViewController> {
               child: Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppColors.primary,
+                  color: Color(0xFF4f7df7),
                 ),
               ),
             );
@@ -173,15 +168,13 @@ class MyJobView extends GetView<MyJobViewController> {
 
           return JobCardItem(
             title: job.title,
-            logoUrl: logoUrl,
+            logoUrl: logoUrl, // 🟢 ប្រើប្រាស់អថេរដែលបានទាញនៅខាងលើ
             department: _getDepartmentName(job.categoryId),
             location: _getLocationName(job.provinceId),
             timeAgo: _getTimeAgo(job.createdAt),
             status: job.status.isEmpty ? 'draft' : job.status,
             isUrgent: false,
             candidatesCount: 0,
-            isDark: isDark,
-            theme: theme,
             onTap: () {
               Get.toNamed(AppRoutes.myJobDetail, arguments: job.id);
             },
@@ -350,6 +343,7 @@ class MyJobView extends GetView<MyJobViewController> {
     return "Just now".tr; // 🟢 Added .tr
   }
 
+  // ── ប៊ូតុង + New Job ──
   InkWell _buildNewJobButton() {
     return InkWell(
       onTap: () => Get.toNamed(AppRoutes.newJob),
@@ -357,16 +351,16 @@ class MyJobView extends GetView<MyJobViewController> {
         margin: const EdgeInsets.symmetric(horizontal: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: const Color(0xFF4f7df7),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
+        child: const Row(
           children: [
-            const Icon(LucideIcons.plus, color: Colors.white, size: 18),
-            const SizedBox(width: 4),
+            Icon(LucideIcons.plus, color: Colors.white, size: 18),
+            SizedBox(width: 4),
             Text(
-              'New Job'.tr, // 🟢 Added .tr
-              style: const TextStyle(
+              'New Job',
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,

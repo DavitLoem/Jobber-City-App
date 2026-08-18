@@ -296,13 +296,92 @@ class NewJobViewController extends GetxController {
                 .toIso8601String(),
       );
 
+      // ── 🎯 ដំណោះស្រាយ Update ចេញកាតថ្មី ──
       if (isEditing) {
+        // ប្រើ updateJob ប្រសិនបើជាការ Edit
         await _jobService.updateJob(editJobData!.id, requestData);
-      } else {
-        await _jobService.createJob(requestData);
-      }
 
-      Get.back();
+        // ២. បិទទំព័រ Edit Job
+        Get.back();
+
+        // ៣. 🟢 [Optimistic Update] Update សម្រាប់បញ្ជីខាងក្រៅ (My Jobs List)
+        if (Get.isRegistered<MyJobViewController>()) {
+          final listCtrl = Get.find<MyJobViewController>();
+          final index = listCtrl.jobs.indexWhere(
+            (j) => j.id == editJobData!.id,
+          );
+
+          if (index != -1) {
+            listCtrl.jobs[index] = listCtrl.jobs[index].copyWith(
+              title: requestData.title,
+              minSalary: requestData.minSalary,
+              maxSalary: requestData.maxSalary,
+              salaryPeriod: requestData.salaryPeriod,
+              isNegotiable: requestData.isNegotiable,
+              headcount: requestData.headcount,
+              experience: requestData.experience,
+              workingDays: requestData.workingDays,
+              workingHours: requestData.workingHours,
+              categoryId: requestData.categoryId,
+              jobLevelId: requestData.jobLevelId,
+              workTypeId: requestData.workTypeId,
+              employmentTypeId: requestData.employmentTypeId,
+              educationLevelId: requestData.educationLevelId,
+              provinceId: requestData.provinceId,
+              districtId: requestData.districtId,
+              closingDate: requestData.closingDate,
+            );
+            listCtrl.jobs.refresh();
+          }
+        }
+
+        // ៤. 🟢 [បន្ថែមថ្មី] Optimistic Update សម្រាប់ទំព័រ Detail ខាងក្នុង!
+        if (Get.isRegistered<MyJobDetailViewController>()) {
+          final detailCtrl = Get.find<MyJobDetailViewController>();
+          if (detailCtrl.jobData.value != null &&
+              detailCtrl.jobData.value!.id == editJobData!.id) {
+            detailCtrl.jobData.value = detailCtrl.jobData.value!.copyWith(
+              title: requestData.title,
+              description: requestData.description,
+              requirements: requestData.requirements,
+              benefits: requestData.benefits,
+              minSalary: requestData.minSalary,
+              maxSalary: requestData.maxSalary,
+              salaryPeriod: requestData.salaryPeriod,
+              isNegotiable: requestData.isNegotiable,
+              headcount: requestData.headcount,
+              experience: requestData.experience,
+              workingDays: requestData.workingDays,
+              workingHours: requestData.workingHours,
+              specificSchedule: requestData.specificSchedule,
+              categoryId: requestData.categoryId,
+              jobLevelId: requestData.jobLevelId,
+              workTypeId: requestData.workTypeId,
+              employmentTypeId: requestData.employmentTypeId,
+              educationLevelId: requestData.educationLevelId,
+              provinceId: requestData.provinceId,
+              districtId: requestData.districtId,
+              requiredSkills: requestData.requiredSkills,
+              customSkills: requestData.customSkills,
+              closingDate: requestData.closingDate,
+            );
+          }
+        }
+      } else {
+        // ប្រើ createJob ប្រសិនបើជាការបង្កើតថ្មី
+        await _jobService.createJob(requestData);
+
+        // ២. បិទទំព័រ Create Job
+        Get.back();
+
+        // ៣. 🟢 បើបង្កើតថ្មី ហៅ fetchJobs(isRefresh: true) ដើម្បីឱ្យវាលោតមកលើគេ
+        if (Get.isRegistered<MyJobViewController>()) {
+          final listCtrl = Get.find<MyJobViewController>();
+          listCtrl.fetchJobs(isRefresh: true);
+          listCtrl
+              .fetchStatusSummary(); // ធ្វើបច្ចុប្បន្នភាពតួលេខនៅលើ Tab ផងដែរ
+        }
+      }
 
       Get.snackbar(
         'Success'.tr, // 🟢 Added .tr
@@ -312,10 +391,6 @@ class NewJobViewController extends GetxController {
         backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
-
-      if (Get.isRegistered<MyJobViewController>()) {
-        Get.find<MyJobViewController>().fetchJobs(isRefresh: true);
-      }
     } on ApiException catch (e) {
       Get.snackbar(
         "Failed".tr, // 🟢 Added .tr

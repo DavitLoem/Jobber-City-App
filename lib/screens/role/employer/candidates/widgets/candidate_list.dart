@@ -15,7 +15,12 @@ class CandidateList extends GetView<CandidatesViewController> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Obx(() {
-      if (controller.isLoading.value) {
+      final isLoading = controller.isLoading.value;
+      final applicants = controller.applicants;
+      final isSelectionMode = controller.isSelectionMode;
+      final isLoadMore = controller.isLoadMore.value;
+
+      if (isLoading) {
         return ListView.separated(
           padding: const EdgeInsets.all(20),
           itemCount: 4,
@@ -24,27 +29,76 @@ class CandidateList extends GetView<CandidatesViewController> {
         );
       }
 
-      if (controller.applicants.isEmpty) {
-        return Center(
-          child: Text(
-            "No candidates found for this status.".tr, // 🟢 Added .tr
-            style: TextStyle(
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : Colors.grey.shade500, // 🟢 Dynamic Text
-              fontSize: 15,
-            ),
+      if (applicants.isEmpty) {
+        return RefreshIndicator(
+          onRefresh: controller.refreshApplicants,
+          color: const Color(0xFF4f7df7),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+              Center(
+                child: Text(
+                  "No candidates found for this status.".tr,
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade500,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       }
 
-      return ListView.separated(
-        padding: const EdgeInsets.all(20),
-        itemCount: controller.applicants.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          return CandidateCard(applicant: controller.applicants[index]);
-        },
+      return RefreshIndicator(
+        onRefresh: controller.refreshApplicants,
+        color: const Color(0xFF4f7df7),
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            if (!isLoadMore &&
+                scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent - 50) {
+              controller.loadMoreApplicants();
+            }
+            return false;
+          },
+          child: ListView.separated(
+            padding: const EdgeInsets.all(20),
+            itemCount: applicants.length + (isLoadMore ? 1 : 0),
+            separatorBuilder: (_, _) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              if (index == applicants.length) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: CircularProgressIndicator(color: Color(0xFF4f7df7)),
+                  ),
+                );
+              }
+
+              final applicant = applicants[index];
+              final isSelected = controller.selectedApplicantIds.contains(
+                applicant.applicationId,
+              );
+
+              return CandidateCard(
+                applicant: applicant,
+                isSelected: isSelected,
+                onTap: () {
+                  if (isSelectionMode) {
+                    controller.toggleSelection(applicant.applicationId);
+                  }
+                },
+                onLongPress: () {
+                  controller.toggleSelection(applicant.applicationId);
+                },
+              );
+            },
+          ),
+        ),
       );
     });
   }

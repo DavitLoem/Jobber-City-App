@@ -13,6 +13,8 @@ class ApplicantModel {
   final String? coverLetter;
   final String status;
   final DateTime? appliedAt;
+  final Map<String, dynamic>? interviewSchedule;
+  final String? feedback;
 
   ApplicantModel({
     required this.applicationId,
@@ -29,6 +31,8 @@ class ApplicantModel {
     this.coverLetter,
     required this.status,
     this.appliedAt,
+    this.interviewSchedule,
+    this.feedback,
   });
 
   factory ApplicantModel.fromJson(Map<String, dynamic> json) {
@@ -51,6 +55,8 @@ class ApplicantModel {
       appliedAt: json['applied_at'] != null
           ? DateTime.tryParse(json['applied_at'].toString())?.toLocal()
           : null,
+      interviewSchedule: json['interview_schedule'],
+      feedback: json['feedback'],
     );
   }
 

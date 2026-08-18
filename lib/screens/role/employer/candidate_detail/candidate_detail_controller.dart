@@ -67,6 +67,8 @@ class CandidateDetailViewController extends GetxController {
     try {
       String cleanUrl = url.split('?').first;
       String fileName = cleanUrl.split('/').last;
+
+      // ៣. បំប្លែងកូដដូចជា %20 មកជាដកឃ្លា (Space) វិញឱ្យស្រួលអាន
       return Uri.decodeComponent(fileName);
     } catch (e) {
       return "Applicant_Resume.pdf";
