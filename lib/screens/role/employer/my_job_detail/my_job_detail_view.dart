@@ -9,7 +9,10 @@ import '../../../../controllers/master_data_controller.dart';
 import '../../../../core/api/services/role/employer/job_service.dart';
 import '../../../../models/role/employer/company_model.dart';
 import '../../../../models/role/employer/job_model.dart';
+import '../../../../routes/app_routes.dart';
+import '../candidates/candidates_view.dart';
 import '../employer_profile/employer_profile_view.dart';
+import '../main_screen_emloyer/main_screen_emloyer_controller.dart';
 
 part 'my_job_detail_binding.dart';
 part 'my_job_detail_controller.dart';
@@ -33,10 +36,10 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
           IconButton(
             icon: const Icon(LucideIcons.edit, color: Colors.black87),
             onPressed: () {
-              // Get.toNamed(
-              //   AppRoutes.newJob,
-              //   arguments: controller.jobData.value,
-              // );
+              Get.toNamed(
+                AppRoutes.newJob,
+                arguments: controller.jobData.value,
+              );
             },
           ),
           IconButton(
@@ -215,7 +218,33 @@ class MyJobDetailView extends GetView<MyJobDetailViewController> {
                         flex: 2,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Get.toNamed(AppRoutes.myJobApplicants,);
+                            // 🟢 ១. ថយក្រោយ (Pop) ចេញពីទំព័រ Job Detail ដើម្បីត្រលប់ទៅ Main Screen វិញ
+                            Get.back();
+
+                            // 🟢 ២. បញ្ជាឱ្យ Main Screen ប្តូរ Tab ទៅកាន់ Candidates (Index 2)
+                            if (Get.isRegistered<
+                              MainScreenEmloyerController
+                            >()) {
+                              final mainCtrl =
+                                  Get.find<MainScreenEmloyerController>();
+                              mainCtrl.changeTab(2);
+                            }
+
+                            // 🟢 ៣. បោះ Job ID ទៅឱ្យ Candidates Controller ហើយទាញយកទិន្នន័យ
+                            if (Get.isRegistered<CandidatesViewController>()) {
+                              final candidateCtrl =
+                                  Get.find<CandidatesViewController>();
+                              candidateCtrl.selectedJobId.value = job.id;
+
+                              // បង្ខំឱ្យទាញយកទិន្នន័យថ្មី
+                              candidateCtrl.fetchApplicants(isRefresh: true);
+                              candidateCtrl.fetchStatusSummary();
+                            } else {
+                              Get.put(CandidatesViewController());
+                              final candidateCtrl =
+                                  Get.find<CandidatesViewController>();
+                              candidateCtrl.selectedJobId.value = job.id;
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),

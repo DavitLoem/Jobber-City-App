@@ -165,6 +165,9 @@ class MyJobDetailViewController extends GetxController {
               status: newStatus,
             );
             listCtrl.jobs.refresh();
+
+            // 🟢 [បន្ថែមថ្មី]: ធ្វើបច្ចុប្បន្នភាពតួលេខនៅលើ Tab (All, Active, Paused...)
+            listCtrl.fetchStatusSummary();
           }
         }
 

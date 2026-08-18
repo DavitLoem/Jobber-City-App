@@ -261,9 +261,22 @@ class Step4Schedule extends GetView<NewJobViewController> {
                       firstDate: DateTime.now(),
                       lastDate: DateTime.now().add(const Duration(days: 365)),
                     );
+
                     if (pickedDate != null) {
-                      controller.selectedClosingDate.value = pickedDate;
-                      // Format បង្ហាញជាទម្រង់ ថ្ងៃ-ខែ-ឆ្នាំ (ឧ. 15-08-2026)
+                      // 🟢 ដំណោះស្រាយ៖ កំណត់ម៉ោងទៅជាចុងបញ្ចប់នៃថ្ងៃ (23:59:59)
+                      final endOfDayDate = DateTime(
+                        pickedDate.year,
+                        pickedDate.month,
+                        pickedDate.day,
+                        23,
+                        59,
+                        59, // ម៉ោង ១១:៥៩:៥៩ យប់
+                      );
+
+                      // រក្សាទុកថ្ងៃដែលបានកែម៉ោងរួចចូលទៅ Controller
+                      controller.selectedClosingDate.value = endOfDayDate;
+
+                      // Format បង្ហាញជាទម្រង់ ថ្ងៃ-ខែ-ឆ្នាំ (ឧ. 15-08-2026) ទុកធម្មតា
                       controller.closingDateCtrl.text =
                           "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
                     }

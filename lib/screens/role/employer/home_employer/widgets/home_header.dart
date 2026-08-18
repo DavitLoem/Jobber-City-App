@@ -9,7 +9,6 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 ចាប់យក Controller
     final controller = Get.put(HomeEmployerViewController());
 
     return Container(
@@ -20,9 +19,8 @@ class HomeHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Left: Logo + greeting
+              // Left: Logo + greeting[cite: 11]
               Obx(() {
-                // 🎯 ទាញយកទិន្នន័យពី Controller
                 final profile = controller.companyProfile.value;
                 final companyName = profile?.companyName ?? 'Company Name';
                 final hasLogo =
@@ -47,19 +45,13 @@ class HomeHeader extends StatelessWidget {
                         ],
                       ),
                       alignment: Alignment.center,
-                      clipBehavior:
-                          Clip.hardEdge, // 🎯 កាត់រូបភាពកុំឱ្យចេញក្រៅគែមសងខាង
+                      clipBehavior: Clip.hardEdge,
                       child: hasLogo
                           ? Image.network(
                               profile.logoUrl!,
                               fit: BoxFit.cover,
                               width: 48,
                               height: 48,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    LucideIcons.building,
-                                    color: Color(0xFF4f7df7),
-                                  ),
                             )
                           : const Icon(
                               LucideIcons.building,
@@ -82,7 +74,7 @@ class HomeHeader extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          companyName, // 🎯 បង្ហាញឈ្មោះពិតប្រាកដ
+                          companyName,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -97,7 +89,7 @@ class HomeHeader extends StatelessWidget {
                 );
               }),
 
-              // Right: actions ទុកដដែល[cite: 7]
+              // Right: actions[cite: 11]
               Row(
                 children: [
                   _RoundIconButton(
@@ -116,16 +108,216 @@ class HomeHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          const Text(
-            "Here's your hiring overview today.",
-            style: TextStyle(
-              fontSize: 13,
-              color: Color(0xFF697386),
-              fontWeight: FontWeight.w400,
-            ),
+
+          const SizedBox(height: 24),
+
+          // ── ផ្នែកដែលបានបន្ថែមថ្មី: Interactive Filter Header ──
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Overview",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFF1A1F36),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              // 🟢 Filter Pill with Arrows
+              Obx(
+                () => Container(
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (controller.isMonthFilter.value)
+                        GestureDetector(
+                          onTap: controller.prevMonth,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            child: Icon(
+                              LucideIcons.chevronLeft,
+                              size: 16,
+                              color: Color(0xFF697386),
+                            ),
+                          ),
+                        ),
+
+                      GestureDetector(
+                        onTap: () =>
+                            _showFilterBottomSheet(context, controller),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: controller.isMonthFilter.value ? 4 : 14,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                controller.filterLabel.value,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF4F7DF7),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                LucideIcons.chevronDown,
+                                size: 14,
+                                color: Color(0xFF4F7DF7),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      if (controller.isMonthFilter.value)
+                        GestureDetector(
+                          onTap: controller.nextMonth,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            child: Icon(
+                              LucideIcons.chevronRight,
+                              size: 16,
+                              color: Color(0xFF697386),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showFilterBottomSheet(
+    BuildContext context,
+    HomeEmployerViewController controller,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  "Filter Dashboard",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Quick Presets
+              _buildFilterOption("Today", () {
+                controller.setQuickFilter("Today");
+                Get.back();
+              }),
+              _buildFilterOption("This Week", () {
+                controller.setQuickFilter("This Week");
+                Get.back();
+              }),
+              _buildFilterOption("This Month", () {
+                controller.setQuickFilter("This Month");
+                Get.back();
+              }),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                child: Divider(color: Color(0xFFF3F4F6), height: 1),
+              ),
+
+              // Custom Month
+              _buildFilterOption("Select Specific Month...", () async {
+                Get.back();
+                // បង្ហាញ DatePicker ឱ្យរើសថ្ងៃ រួចទាញយកតែខែ
+                DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: controller.selectedDate.value,
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null) {
+                  controller.setMonthFilter(picked);
+                }
+              }, icon: LucideIcons.calendar),
+
+              // Custom Range
+              _buildFilterOption("Custom Date Range...", () async {
+                Get.back();
+                // បង្ហាញ DateRangePicker
+                DateTimeRange? range = await showDateRangePicker(
+                  context: context,
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime.now(),
+                );
+                if (range != null) {
+                  // កាត់យកទម្រង់ខ្លី ឧ. "Aug 15 - Aug 20"
+                  controller.setQuickFilter(
+                    "${range.start.day}/${range.start.month} - ${range.end.day}/${range.end.month}",
+                  );
+                }
+              }, icon: LucideIcons.calendarRange),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFilterOption(
+    String label,
+    VoidCallback onTap, {
+    IconData? icon,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        child: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 18, color: const Color(0xFF697386)),
+              const SizedBox(width: 12),
+            ],
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

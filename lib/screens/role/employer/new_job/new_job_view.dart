@@ -13,6 +13,7 @@ import 'package:jobber_city/screens/role/employer/new_job/steps/step_2_salary.da
 import 'package:jobber_city/screens/role/employer/new_job/steps/step_3_details.dart';
 import 'package:jobber_city/screens/role/employer/new_job/steps/step_4_schedule.dart';
 
+import '../my_job_detail/my_job_detail_view.dart';
 import 'widgets/job_stepper_header.dart';
 
 part 'new_job_binding.dart';
