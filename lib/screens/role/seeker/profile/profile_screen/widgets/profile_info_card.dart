@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-
-// កុំភ្លេច Import Controller របស់អ្នក
 import '../profile_screen_view.dart';
 
 class ProfileInfoCard extends StatelessWidget {
@@ -13,16 +11,21 @@ class ProfileInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasPosition = controller.position.value.isNotEmpty;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder, width: 1),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -31,14 +34,15 @@ class ProfileInfoCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Avatar
           Obx(
             () => Container(
               width: 56,
               height: 56,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryLight,
+                color: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : AppColors.primaryLight,
                 border: Border.all(color: AppColors.primary, width: 2),
               ),
               child: ClipOval(
@@ -56,8 +60,6 @@ class ProfileInfoCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-
-          // Name and Position
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,10 +67,10 @@ class ProfileInfoCard extends StatelessWidget {
                 Text(
                   "${controller.lastName.value} ${controller.firstName.value}"
                       .trim(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -80,7 +82,7 @@ class ProfileInfoCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -92,22 +94,25 @@ class ProfileInfoCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.warningBackground,
+                      color: isDark
+                          ? AppColors.warning.withValues(alpha: 0.15)
+                          : AppColors.warningBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.info_outline,
                           size: 13,
                           color: AppColors.warning,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Flexible(
                           child: Text(
-                            "No position added — tap to fill",
-                            style: TextStyle(
+                            "No position added — tap to fill"
+                                .tr, // 🟢 Ensured .tr is present
+                            style: const TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w600,
                               color: AppColors.warning,
@@ -122,14 +127,14 @@ class ProfileInfoCard extends StatelessWidget {
               ],
             ),
           ),
-
-          // Edit Button
           GestureDetector(
             onTap: () => controller.goToEditProfile(),
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F6FA),
+                color: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : const Color(0xFFF5F6FA),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(

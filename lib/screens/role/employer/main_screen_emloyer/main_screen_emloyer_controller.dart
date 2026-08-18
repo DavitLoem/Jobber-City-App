@@ -7,7 +7,7 @@ import 'package:jobber_city/screens/role/employer/home_employer/home_employer_vi
 import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 
 class MainScreenEmloyerController extends GetxController {
-var currentIndex = 0.obs;
+  var currentIndex = 0.obs;
 
   void changeTab(int index) {
     currentIndex.value = index;
@@ -21,10 +21,7 @@ var currentIndex = 0.obs;
           page: () => const HomeEmployerView(),
         );
       case AppRoutes.myJob:
-        return GetPageRoute(
-          settings: settings,
-          page: () => const MyJobView(),
-        );
+        return GetPageRoute(settings: settings, page: () => const MyJobView());
       case AppRoutes.candidates:
         return GetPageRoute(
           settings: settings,

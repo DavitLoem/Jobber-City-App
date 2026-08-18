@@ -33,6 +33,7 @@ class AppRoutes {
   static const String biography = '/biography';
   static const String skill = '/skill';
   static const String applicationDetail = '/application-detail';
+  static const String appearance = '/Appearance';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES

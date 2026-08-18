@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/profile/sub_profile/education/education_view.dart';
 
 class EducationFormView extends GetView<EducationViewController> {
@@ -8,23 +9,26 @@ class EducationFormView extends GetView<EducationViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87),
+          icon: Icon(Icons.close, color: theme.textTheme.bodyLarge?.color),
           onPressed: () => Get.back(),
         ),
-        // 🎯 ប្រើ Obx ដូរ Title
         title: Obx(
           () => Text(
             controller.editingId.value == null
                 ? 'Add Education'
-                : 'Edit Education',
-            style: const TextStyle(
-              color: Colors.black87,
+                      .tr // 🟢 Added .tr
+                : 'Edit Education'.tr, // 🟢 Added .tr
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -36,20 +40,26 @@ class EducationFormView extends GetView<EducationViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabel('School / University Name *'),
+            _buildLabel('School / University Name *'.tr, theme), // 🟢 Added .tr
             _buildTextField(
-              'e.g., Norton University',
+              context,
+              'e.g., Norton University'.tr, // 🟢 Added .tr
               ctrl: controller.schoolNameCtrl,
             ),
             const SizedBox(height: 16),
 
-            _buildLabel('Degree *'),
-            _buildDropdownField('Select Degree', ctrl: controller.degreeCtrl),
+            _buildLabel('Degree *'.tr, theme), // 🟢 Added .tr
+            _buildDropdownField(
+              context,
+              'Select Degree'.tr, // 🟢 Added .tr
+              ctrl: controller.degreeCtrl,
+            ),
             const SizedBox(height: 16),
 
-            _buildLabel('Field of Study'),
+            _buildLabel('Field of Study'.tr, theme), // 🟢 Added .tr
             _buildTextField(
-              'e.g., Computer Science',
+              context,
+              'e.g., Computer Science'.tr, // 🟢 Added .tr
               ctrl: controller.fieldOfStudyCtrl,
             ),
             const SizedBox(height: 16),
@@ -60,10 +70,10 @@ class EducationFormView extends GetView<EducationViewController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel('Start Date *'),
+                      _buildLabel('Start Date *'.tr, theme), // 🟢 Added .tr
                       _buildDateField(
                         context,
-                        'YYYY-MM-DD',
+                        'YYYY-MM-DD'.tr, // 🟢 Added .tr
                         ctrl: controller.startDateCtrl,
                       ),
                     ],
@@ -74,10 +84,13 @@ class EducationFormView extends GetView<EducationViewController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel('End Date (Optional)'),
+                      _buildLabel(
+                        'End Date (Optional)'.tr,
+                        theme,
+                      ), // 🟢 Added .tr
                       _buildDateField(
                         context,
-                        'YYYY-MM-DD',
+                        'YYYY-MM-DD'.tr, // 🟢 Added .tr
                         ctrl: controller.endDateCtrl,
                       ),
                     ],
@@ -94,12 +107,14 @@ class EducationFormView extends GetView<EducationViewController> {
           padding: const EdgeInsets.all(24.0),
           child: Obx(
             () => ElevatedButton(
-              // 🎯 Disable button ពេលកំពុង Save
               onPressed: controller.isSaving.value
                   ? null
                   : () => controller.saveEducation(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade300,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -111,7 +126,8 @@ class EducationFormView extends GetView<EducationViewController> {
                   : Text(
                       controller.editingId.value == null
                           ? 'Save Education'
-                          : 'Update Education',
+                                .tr // 🟢 Added .tr
+                          : 'Update Education'.tr, // 🟢 Added .tr
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -125,26 +141,25 @@ class EducationFormView extends GetView<EducationViewController> {
     );
   }
 
-  // ─── Reusable Helper Methods ───
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
+          color: theme.textTheme.bodyLarge?.color,
         ),
       ),
     );
   }
 
-  // 🎯 មុខងារថ្មីសម្រាប់ Dropdown Degree
   Widget _buildDropdownField(
+    BuildContext context,
     String hint, {
     required TextEditingController ctrl,
   }) {
-    // បញ្ជីសញ្ញាបត្រទូទៅ
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final List<String> degrees = [
       'High School Diploma',
       'Associate\'s Degree',
@@ -154,98 +169,134 @@ class EducationFormView extends GetView<EducationViewController> {
       'Other',
     ];
 
-    // ត្រួតពិនិត្យក្រែងលោទិន្នន័យចាស់ (ពេល Edit) អត់មានក្នុង List ខាងលើ
     String? currentValue = ctrl.text.isNotEmpty ? ctrl.text : null;
     if (currentValue != null && !degrees.contains(currentValue)) {
-      degrees.add(
-        currentValue,
-      ); // បន្ថែមចូល List បណ្តោះអាសន្ន ដើម្បីកុំឱ្យ Error
+      degrees.add(currentValue);
     }
 
     return DropdownButtonFormField<String>(
       initialValue: currentValue,
+      dropdownColor: Theme.of(context).cardColor,
+      style: TextStyle(
+        fontSize: 16,
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
       icon: Icon(
         Icons.keyboard_arrow_down_rounded,
-        color: Colors.grey.shade600,
+        color: isDark ? AppColors.darkIconSecondary : AppColors.iconSecondary,
       ),
       items: degrees.map((String degree) {
-        return DropdownMenuItem<String>(value: degree, child: Text(degree));
+        return DropdownMenuItem<String>(
+          value: degree,
+          child: Text(degree.tr), // 🟢 Added .tr to translate dropdown items
+        );
       }).toList(),
       onChanged: (newValue) {
         if (newValue != null) {
-          ctrl.text = newValue; // ភ្ជាប់តម្លៃដែលរើសបានទៅកាន់ Controller ដើម
+          ctrl.text = newValue;
         }
       },
     );
   }
 
-  // 🎯 បន្ថែម Parameter TextEditingController
   Widget _buildTextField(
+    BuildContext context,
     String hint, {
     IconData? icon,
     TextEditingController? ctrl,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       controller: ctrl,
+      style: TextStyle(
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         suffixIcon: icon != null
-            ? Icon(icon, color: Colors.grey.shade500, size: 20)
+            ? Icon(
+                icon,
+                color: isDark
+                    ? AppColors.darkIconSecondary
+                    : AppColors.iconSecondary,
+                size: 20,
+              )
             : null,
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
     );
   }
 
-  // 🎯 Date Picker Function
   Widget _buildDateField(
     BuildContext context,
     String hint, {
     required TextEditingController ctrl,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       controller: ctrl,
       readOnly: true,
+      style: TextStyle(
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
@@ -259,29 +310,37 @@ class EducationFormView extends GetView<EducationViewController> {
       },
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         suffixIcon: Icon(
           Icons.calendar_today,
-          color: Colors.grey.shade500,
+          color: isDark ? AppColors.darkIconSecondary : AppColors.iconSecondary,
           size: 20,
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
     );

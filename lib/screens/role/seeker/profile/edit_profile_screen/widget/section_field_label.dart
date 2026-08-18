@@ -12,12 +12,14 @@ class SectionFieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.textHint,
+          title, // 🟢 Translation is handled by the parent widget passing the string
+          style: TextStyle(
+            color: isDark ? AppColors.darkTextHint : AppColors.textHint,
             fontWeight: FontWeight.w700,
             fontSize: 13,
           ),

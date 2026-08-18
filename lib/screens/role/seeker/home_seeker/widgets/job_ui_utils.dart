@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class JobUiUtils {
   static String periodShort(String period) {
     final p = period.toLowerCase();
-    if (p.contains('year')) return 'yr';
-    if (p.contains('week')) return 'wk';
-    if (p.contains('month')) return 'mo';
-    return p.isEmpty ? 'mo' : p;
+    if (p.contains('year')) return 'yr'.tr; // 🟢 Optional: Add .tr for periods
+    if (p.contains('week')) return 'wk'.tr;
+    if (p.contains('month')) return 'mo'.tr;
+    return p.isEmpty ? 'mo'.tr : p.tr;
   }
 
   static Widget buildSectionHeader(String title, {VoidCallback? onSeeAll}) {
+    final isDark = Get.theme.brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          title,
-          style: const TextStyle(
+          title, // Translations applied in parent
+          style: TextStyle(
             fontSize: 19,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: isDark ? Colors.white : AppColors.textPrimary,
           ),
         ),
         GestureDetector(
@@ -27,9 +30,9 @@ class JobUiUtils {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "See All",
-                style: TextStyle(
+              Text(
+                "See All".tr, // 🟢 Added .tr
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
@@ -51,13 +54,17 @@ class JobUiUtils {
     required bool isSaved,
     required VoidCallback onTap,
   }) {
+    final isDark = Get.theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: AppColors.lightSurfaceVariant,
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : AppColors.lightSurfaceVariant,
           borderRadius: BorderRadius.circular(9),
         ),
         child: AnimatedSwitcher(
@@ -68,7 +75,9 @@ class JobUiUtils {
             isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
             key: ValueKey(isSaved),
             size: 17,
-            color: isSaved ? AppColors.primary : AppColors.textHint,
+            color: isSaved
+                ? AppColors.primary
+                : (isDark ? AppColors.darkTextHint : AppColors.textHint),
           ),
         ),
       ),
@@ -80,13 +89,19 @@ class JobUiUtils {
     String companyName, {
     double size = 46,
   }) {
+    final isDark = Get.theme.brightness == Brightness.dark;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.lightSurfaceVariant,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : AppColors.lightSurfaceVariant,
         borderRadius: BorderRadius.circular(size * 0.26),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(size * 0.26),
@@ -118,28 +133,43 @@ class JobUiUtils {
   static Widget buildTag(String text) {
     if (text.isEmpty) return const SizedBox.shrink();
     final lower = text.toLowerCase();
+    final isDark = Get.theme.brightness == Brightness.dark;
+
     Color bg;
     Color fg;
 
+    // 🟢 Updated all .withOpacity to .withValues
     if (lower.contains('remote')) {
-      bg = AppColors.infoBackground;
-      fg = AppColors.info;
+      bg = isDark
+          ? AppColors.info.withValues(alpha: 0.15)
+          : AppColors.infoBackground;
+      fg = isDark ? Colors.blueAccent : AppColors.info;
     } else if (lower.contains('onsite') || lower.contains('on-site')) {
-      bg = AppColors.warningBackground;
-      fg = AppColors.warning;
+      bg = isDark
+          ? AppColors.warning.withValues(alpha: 0.15)
+          : AppColors.warningBackground;
+      fg = isDark ? Colors.orangeAccent : AppColors.warning;
     } else if (lower.contains('hybrid') || lower.contains('full')) {
-      bg = AppColors.successBackground;
-      fg = AppColors.success;
+      bg = isDark
+          ? AppColors.success.withValues(alpha: 0.15)
+          : AppColors.successBackground;
+      fg = isDark ? Colors.greenAccent : AppColors.success;
     } else if (lower.contains('part') ||
         lower.contains('contract') ||
         lower.contains('senior')) {
-      bg = AppColors.warningBackground;
-      fg = AppColors.warning;
+      bg = isDark
+          ? AppColors.warning.withValues(alpha: 0.15)
+          : AppColors.warningBackground;
+      fg = isDark ? Colors.orangeAccent : AppColors.warning;
     } else if (lower.contains('junior') || lower.contains('entry')) {
-      bg = AppColors.successBackground;
-      fg = AppColors.success;
+      bg = isDark
+          ? AppColors.success.withValues(alpha: 0.15)
+          : AppColors.successBackground;
+      fg = isDark ? Colors.greenAccent : AppColors.success;
     } else {
-      bg = AppColors.primaryLight;
+      bg = isDark
+          ? AppColors.primary.withValues(alpha: 0.2)
+          : AppColors.primaryLight;
       fg = AppColors.primary;
     }
 
@@ -150,29 +180,35 @@ class JobUiUtils {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        text,
+        text.tr, // 🟢 Translated Job Tag Text
         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: fg),
       ),
     );
   }
 
   static Widget buildInlineEmptyState(String message, {double topPadding = 0}) {
+    final isDark = Get.theme.brightness == Brightness.dark;
+
     return Center(
       child: Padding(
         padding: EdgeInsets.only(top: topPadding, bottom: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.search_off_rounded,
               size: 32,
-              color: AppColors.textDisabled,
+              color: isDark
+                  ? AppColors.darkTextDisabled
+                  : AppColors.textDisabled,
             ),
             const SizedBox(height: 10),
             Text(
-              message,
-              style: const TextStyle(
-                color: AppColors.textTertiary,
+              message, // Parent handles .tr
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : AppColors.textTertiary,
                 fontSize: 13.5,
               ),
             ),

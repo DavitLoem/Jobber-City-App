@@ -17,27 +17,30 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Grab active theme
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
           child: Column(
             children: [
               const HomeHeader(),
-              SizedBox(height: 16),
-              StatsGrid(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+              const StatsGrid(),
+              const SizedBox(height: 16),
               const ApplicantPipelineCard(
                 screening: 34,
                 review: 21,
                 interview: 18,
                 offer: 12,
               ),
-              SizedBox(height: 16),
-              RecentApplicantsSection(),
-              SizedBox(height: 16),
-              QuickActionsSection(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+              const RecentApplicantsSection(),
+              const SizedBox(height: 16),
+              const QuickActionsSection(),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -45,10 +48,3 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
     );
   }
 }
-
-          // IconButton(
-          //   onPressed: () {
-          //     Get.find<AuthController>().logout();
-          //   },
-          //   icon: const Icon(Icons.logout),
-          // ),

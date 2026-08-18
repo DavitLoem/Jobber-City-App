@@ -23,43 +23,52 @@ class NewJobView extends GetView<NewJobViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          controller.isEditing ? "Edit Job" : "Post a Job",
+          controller.isEditing
+              ? "Edit Job".tr
+              : "Post a Job".tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: theme.textTheme.bodyLarge?.color),
       ),
       body: Column(
         children: [
           Obx(
             () => JobStepperHeader(currentStep: controller.currentStep.value),
           ),
-
           Expanded(
             child: Obx(() {
               if (controller.isPrefilling.value) {
-                return const Center(
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(
-                        color: Color(0xFF4f7df7),
+                      const CircularProgressIndicator(
+                        color: AppColors.primary,
                         strokeWidth: 3,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
-                        "Preparing job details...",
-                        style: TextStyle(color: Colors.grey, fontSize: 15),
+                        "Preparing job details...".tr, // 🟢 Added .tr
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey,
+                          fontSize: 15,
+                        ),
                       ),
                     ],
                   ),
@@ -69,7 +78,7 @@ class NewJobView extends GetView<NewJobViewController> {
               return PageView(
                 controller: controller.pageController,
                 physics: const NeverScrollableScrollPhysics(),
-                children: [
+                children: const [
                   Step1BasicInfo(),
                   Step2Salary(),
                   Step3Details(),
@@ -80,12 +89,15 @@ class NewJobView extends GetView<NewJobViewController> {
           ),
         ],
       ),
-
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+          color: theme.scaffoldBackgroundColor,
+          border: Border(
+            top: BorderSide(
+              color: isDark ? AppColors.darkDivider : Colors.grey.shade200,
+            ),
+          ),
         ),
         child: SafeArea(
           child: Obx(() {
@@ -94,7 +106,6 @@ class NewJobView extends GetView<NewJobViewController> {
 
             return Row(
               children: [
-                // បង្ហាញប៊ូតុង Back តែពេលមិនមែននៅជំហានទី 1
                 if (!isFirstStep) ...[
                   Expanded(
                     flex: 1,
@@ -104,19 +115,24 @@ class NewJobView extends GetView<NewJobViewController> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.darkCardBorder
+                              : Colors.grey.shade300,
+                        ),
                       ),
                       onPressed: controller.previousStep,
-                      child: const Text(
-                        "Back",
-                        style: TextStyle(color: Colors.black87),
+                      child: Text(
+                        "Back".tr, // 🟢 Added .tr
+                        style: TextStyle(
+                          color: theme.textTheme.bodyLarge?.color,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                 ],
 
-                // ប៊ូតុង Next / Post Job
                 Expanded(
                   flex: 2,
                   child: Obx(
@@ -129,7 +145,6 @@ class NewJobView extends GetView<NewJobViewController> {
                         ),
                         elevation: 0,
                       ),
-                      // បើកំពុង Load យើងដាក់ null ដើម្បី Disable ប៊ូតុងកុំឱ្យចុចជាន់គ្នា
                       onPressed: controller.isLoading.value
                           ? null
                           : controller.nextStep,
@@ -146,8 +161,9 @@ class NewJobView extends GetView<NewJobViewController> {
                               isLastStep
                                   ? (controller.isEditing
                                         ? "Update Job"
-                                        : "Post Job")
-                                  : "Next Step",
+                                              .tr // 🟢 Added .tr
+                                        : "Post Job".tr) // 🟢 Added .tr
+                                  : "Next Step".tr, // 🟢 Added .tr
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

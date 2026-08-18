@@ -58,12 +58,24 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
     super.dispose();
   }
 
-  Color get _accentColor => !widget.enabled
-      ? AppColors.iconDisabled
-      : (_isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText);
+  // 🟢 Helper to determine icon and hint colors dynamically
+  Color _getAccentColor(bool isDark) {
+    if (!widget.enabled) {
+      return isDark ? AppColors.darkTextDisabled : AppColors.iconDisabled;
+    }
+    if (_isFocused) {
+      return isDark ? AppColors.primary : AppColors.inputFocusedBorder;
+    }
+    return isDark ? AppColors.darkTextHint : AppColors.inputIconText;
+  }
 
   @override
   Widget build(BuildContext context) {
+    // 🟢 Grab the active theme data
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accentColor = _getAccentColor(isDark);
+
     return AnimatedScale(
       scale: _isFocused ? 1.01 : 1.0,
       duration: const Duration(milliseconds: 180),
@@ -82,15 +94,23 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
         style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
-          color: widget.enabled ? AppColors.inputText : AppColors.textDisabled,
+          color: widget.enabled
+              ? (isDark ? AppColors.darkInputText : AppColors.inputText)
+              : (isDark ? AppColors.darkTextDisabled : AppColors.textDisabled),
         ),
         decoration: InputDecoration(
           filled: true,
           fillColor: !widget.enabled
-              ? AppColors.inputDisabledBackground
+              ? (isDark
+                    ? AppColors.darkInputBackground.withOpacity(0.5)
+                    : AppColors.inputDisabledBackground)
               : (_isFocused
-                    ? AppColors.inputFocusedBackground
-                    : AppColors.inputBackground),
+                    ? (isDark
+                          ? AppColors.darkInputFocusedBackground
+                          : AppColors.inputFocusedBackground)
+                    : (isDark
+                          ? AppColors.darkInputBackground
+                          : AppColors.inputBackground)),
           contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -102,8 +122,8 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(
-              color: AppColors.inputFocusedBorder,
+            borderSide: BorderSide(
+              color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
               width: 1.5,
             ),
           ),
@@ -119,11 +139,11 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
               ? null
               : Padding(
                   padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-                  child: Icon(widget.prefixIcon, size: 20, color: _accentColor),
+                  child: Icon(widget.prefixIcon, size: 20, color: accentColor),
                 ),
           hintText: widget.hintText,
           hintStyle: TextStyle(
-            color: _accentColor,
+            color: accentColor,
             fontSize: 15,
             fontWeight: FontWeight.w400,
           ),

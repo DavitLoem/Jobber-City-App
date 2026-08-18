@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jobber_city/core/api/services/role/seeker/profile_crud_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/sub_profile/education/education_form_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/sub_profile/widgets/custom_info_card.dart';
@@ -15,10 +16,9 @@ part 'education_controller.dart';
 class EducationView extends GetView<EducationViewController> {
   const EducationView({super.key});
 
-  // 🎯 មុខងារជំនួយសម្រាប់ Format Date បង្ហាញលើកាត
   String _formatDateForDisplay(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) {
-      return 'Present'; // បើអត់មាន End Date ដាក់ Present
+      return 'Present'.tr; // 🟢 Added .tr
     }
     try {
       final DateTime parsed = DateTime.parse(dateStr);
@@ -30,29 +30,34 @@ class EducationView extends GetView<EducationViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
           ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Education Background',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'Education Background'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
-      // 🎯 រុំដោយ Obx ទីនេះ
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.blueAccent),
+            child: CircularProgressIndicator(color: AppColors.primary),
           );
         }
 
@@ -64,12 +69,17 @@ class EducationView extends GetView<EducationViewController> {
                 Icon(
                   Icons.school_outlined,
                   size: 64,
-                  color: Colors.grey.shade400,
+                  color: isDark ? AppColors.darkTextHint : Colors.grey.shade400,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No education background added yet.',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  'No education background added yet.'.tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade600,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -88,22 +98,22 @@ class EducationView extends GetView<EducationViewController> {
 
             return CustomInfoCard(
               title: edu.schoolName,
-              // ផ្គុំ Degree និង Field of Study បញ្ចូលគ្នា
+              // 🟢 Translated degree and 'in'
               subtitle: edu.fieldOfStudy != null && edu.fieldOfStudy!.isNotEmpty
-                  ? '${edu.degree} in ${edu.fieldOfStudy}'
-                  : edu.degree,
+                  ? '${edu.degree.tr} ' + 'in'.tr + ' ${edu.fieldOfStudy}'
+                  : edu.degree.tr,
               dateText: '$startDate - $endDate',
               onEdit: () {
-                // 🎯 បញ្ចូលទិន្នន័យចាស់ទៅ Form មុននឹងបើក
                 controller.populateForm(edu);
                 Get.to(() => const EducationFormView());
               },
               onDelete: () {
                 Get.dialog(
                   CustomConfirmDialog(
-                    title: 'Delete Education',
+                    title: 'Delete Education'.tr, // 🟢 Added .tr
                     description:
-                        'Are you sure you want to delete this education background? This action cannot be undone.',
+                        'Are you sure you want to delete this education background? This action cannot be undone.'
+                            .tr, // 🟢 Added .tr
                     onConfirm: () {
                       if (edu.id != null) {
                         controller.deleteEducation(edu.id!);
@@ -120,10 +130,12 @@ class EducationView extends GetView<EducationViewController> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.3 : 0.05,
+              ), // 🟢 Updated to withValues
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -131,12 +143,11 @@ class EducationView extends GetView<EducationViewController> {
         ),
         child: ElevatedButton.icon(
           onPressed: () {
-            // 🎯 Clear Form ឱ្យទទេស្អាតមុននឹង Add ថ្មី
             controller.clearForm();
             Get.to(() => const EducationFormView());
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: AppColors.primary,
             minimumSize: const Size(double.infinity, 56),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -144,9 +155,9 @@ class EducationView extends GetView<EducationViewController> {
             elevation: 0,
           ),
           icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            'Add Education',
-            style: TextStyle(
+          label: Text(
+            'Add Education'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,

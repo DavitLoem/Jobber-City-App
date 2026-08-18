@@ -21,8 +21,12 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -36,16 +40,15 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildHeader(),
+                  _buildHeader(theme, isDark), // 🟢 Passed Context
                   const SizedBox(height: 32),
                   _buildLoginForm(),
                   const SizedBox(height: 5),
-                  _buildForgotPassword(),
+                  _buildForgotPassword(isDark), // 🟢 Passed Context
                   const SizedBox(height: 20),
                   Obx(() {
                     return CustomButton(
                       onPressed: () {
-                        // Prevent clicking if it is already loading
                         if (!controller.isLoading.value) {
                           controller.login();
                         }
@@ -56,7 +59,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     );
                   }),
                   const SizedBox(height: 25),
-                  _buildDivider(),
+                  _buildDivider(isDark), // 🟢 Passed Context
                   const SizedBox(height: 25),
                   SocialLogin(
                     onPressed: () {
@@ -66,7 +69,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     iconPath: AppAssets.google,
                   ),
                   const SizedBox(height: 20),
-                  _buildSignUpLink(),
+                  _buildSignUpLink(isDark), // 🟢 Passed Context
                 ],
               ),
             ),
@@ -76,7 +79,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildSignUpLink() {
+  Widget _buildSignUpLink(bool isDark) {
     return SizedBox(
       width: double.infinity,
       child: Row(
@@ -86,7 +89,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             'Don\'t have an account?',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary, // 🟢 Dynamic Text
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -99,10 +104,12 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               'Sign up',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.primary,
+                color: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Link
                 fontWeight: FontWeight.w500,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.primary,
+                decorationColor: isDark ? Colors.blueAccent : AppColors.primary,
                 decorationThickness: 1.5,
               ),
             ),
@@ -112,37 +119,47 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 8,
       children: [
-        Expanded(child: Divider(thickness: 1.4, color: AppColors.line)),
+        Expanded(
+          child: Divider(
+            thickness: 1.4,
+            color: isDark ? AppColors.darkDivider : AppColors.line,
+          ),
+        ), // 🟢 Dynamic Divider
         Text(
           'Or',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.normal,
-            color: AppColors.textSecondary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary, // 🟢 Dynamic Text
           ),
         ),
-        Expanded(child: Divider(thickness: 1.4, color: AppColors.line)),
+        Expanded(
+          child: Divider(
+            thickness: 1.4,
+            color: isDark ? AppColors.darkDivider : AppColors.line,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildForgotPassword() {
+  Widget _buildForgotPassword(bool isDark) {
     return SizedBox(
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // នៅក្នុង login_screen_view.dart
           Expanded(
             child: Obx(
               () => CustomAnimatedCheckbox(
                 value: controller.rememberMe.value,
-                // ប្រើ () => ដើម្បីបញ្ជូនទៅជា VoidCallback ដែល CustomAnimatedCheckbox ត្រូវការ
                 onTap: () => controller.toggleRememberMe(),
                 label: 'Remember me',
               ),
@@ -155,10 +172,12 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             child: Text(
               'Forgot Password?',
               style: TextStyle(
-                color: AppColors.primary,
+                color: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Link
                 fontWeight: FontWeight.w600,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.primary,
+                decorationColor: isDark ? Colors.blueAccent : AppColors.primary,
                 decorationThickness: 2,
               ),
             ),
@@ -172,14 +191,13 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     return Column(
       children: [
         CustomTextfield(
-          // Use the controller's hashCode to force a new widget if the controller changes
           key: ValueKey('email_field_${controller.hashCode}'),
           controller: controller.emailCtrl,
           hintText: 'Email',
           prefixIcon: Icons.email,
           validator: AuthValidator.validateEmail,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         CustomTextfield(
           key: ValueKey('password_field_${controller.hashCode}'),
           controller: controller.passwordCtrl,
@@ -192,7 +210,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme, bool isDark) {
     return Column(
       children: [
         const Logo(size: 110),
@@ -202,14 +220,19 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
           ),
         ),
         const SizedBox(height: 5),
         Text(
           'Sign in to continue to your account',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+          style: TextStyle(
+            fontSize: 16,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary, // 🟢 Dynamic Subtitle
+          ),
         ),
       ],
     );

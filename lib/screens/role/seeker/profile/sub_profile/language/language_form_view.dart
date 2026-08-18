@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/profile/sub_profile/language/language_view.dart';
 
 class LanguageFormView extends GetView<LanguageViewController> {
@@ -7,22 +8,26 @@ class LanguageFormView extends GetView<LanguageViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87),
+          icon: Icon(Icons.close, color: theme.textTheme.bodyLarge?.color),
           onPressed: () => Get.back(),
         ),
         title: Obx(
           () => Text(
             controller.editingId.value == null
                 ? 'Add Language'
-                : 'Edit Language',
-            style: const TextStyle(
-              color: Colors.black87,
+                      .tr // 🟢 Added .tr
+                : 'Edit Language'.tr, // 🟢 Added .tr
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -34,16 +39,18 @@ class LanguageFormView extends GetView<LanguageViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabel('Language *'),
+            _buildLabel('Language *'.tr, theme), // 🟢 Added .tr
             _buildTextField(
-              'e.g., English, Khmer, French',
+              context,
+              'e.g., English, Khmer, French'.tr, // 🟢 Added .tr
               ctrl: controller.languageNameCtrl,
             ),
             const SizedBox(height: 24),
 
-            _buildLabel('Proficiency Level *'),
+            _buildLabel('Proficiency Level *'.tr, theme), // 🟢 Added .tr
             _buildDropdownField(
-              'Select Level',
+              context,
+              'Select Level'.tr, // 🟢 Added .tr
               ctrl: controller.proficiencyCtrl,
             ),
           ],
@@ -58,7 +65,10 @@ class LanguageFormView extends GetView<LanguageViewController> {
                   ? null
                   : () => controller.saveLanguage(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade300,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -70,7 +80,8 @@ class LanguageFormView extends GetView<LanguageViewController> {
                   : Text(
                       controller.editingId.value == null
                           ? 'Save Language'
-                          : 'Update Language',
+                                .tr // 🟢 Added .tr
+                          : 'Update Language'.tr, // 🟢 Added .tr
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -84,50 +95,68 @@ class LanguageFormView extends GetView<LanguageViewController> {
     );
   }
 
-  Widget _buildLabel(String text) => Padding(
+  Widget _buildLabel(String text, ThemeData theme) => Padding(
     padding: const EdgeInsets.only(bottom: 8.0),
     child: Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: theme.textTheme.bodyLarge?.color,
       ),
     ),
   );
 
-  Widget _buildTextField(String hint, {required TextEditingController ctrl}) {
+  Widget _buildTextField(
+    BuildContext context,
+    String hint, {
+    required TextEditingController ctrl,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       controller: ctrl,
+      style: TextStyle(
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
     );
   }
 
-  // 🎯 Dropdown សម្រាប់ Proficiency Level
   Widget _buildDropdownField(
+    BuildContext context,
     String hint, {
     required TextEditingController ctrl,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final List<String> levels = [
       'Beginner',
       'Intermediate',
@@ -142,36 +171,51 @@ class LanguageFormView extends GetView<LanguageViewController> {
 
     return DropdownButtonFormField<String>(
       initialValue: currentValue,
+      dropdownColor: Theme.of(context).cardColor,
+      style: TextStyle(
+        fontSize: 16,
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
       icon: Icon(
         Icons.keyboard_arrow_down_rounded,
-        color: Colors.grey.shade600,
+        color: isDark ? AppColors.darkIconSecondary : AppColors.iconSecondary,
       ),
       items: levels
           .map(
-            (String level) =>
-                DropdownMenuItem<String>(value: level, child: Text(level)),
+            (String level) => DropdownMenuItem<String>(
+              value: level,
+              child: Text(level.tr), // 🟢 Added .tr to translate dropdown item
+            ),
           )
           .toList(),
       onChanged: (newValue) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ApplicantPipelineCard extends StatelessWidget {
@@ -17,9 +19,10 @@ class ApplicantPipelineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // គណនាចំនួនបេក្ខជនសរុប
-    final int total = screening + review + interview + offer;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
+    final int total = screening + review + interview + offer;
     final double progressWidth = 3;
 
     const Color colorScreening = Color(0xFF64748B);
@@ -30,11 +33,16 @@ class ApplicantPipelineCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.2 : 0.04, // 🟢 Updated opacity
+            ),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -43,7 +51,6 @@ class ApplicantPipelineCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── ផ្នែកទី ១៖ ចំណងជើង និងប៊ូតុង Details ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,34 +58,41 @@ class ApplicantPipelineCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Applicant Pipeline",
+                  Text(
+                    "Applicant Pipeline".tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF1E293B),
+                      color: theme.textTheme.bodyLarge?.color,
                       letterSpacing: -0.3,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "$total active candidates",
-                    style: const TextStyle(
+                    "@total active candidates".trParams({
+                      'total': total.toString(),
+                    }), // 🟢 Added .trParams
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF64748B),
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : const Color(0xFF64748B),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-              // ប៊ូតុង Details
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
+                  color: isDark
+                      ? AppColors.primary.withValues(
+                          alpha: 0.15,
+                        ) // 🟢 Updated opacity
+                      : const Color(0xFFEEF2FF),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -86,15 +100,15 @@ class ApplicantPipelineCard extends StatelessWidget {
                     const Icon(
                       LucideIcons.barChart2,
                       size: 16,
-                      color: Color(0xFF4F7DF7),
+                      color: AppColors.primary,
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      "Details",
-                      style: TextStyle(
+                    Text(
+                      "Details".tr, // 🟢 Added .tr
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF4F7DF7),
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
@@ -104,11 +118,16 @@ class ApplicantPipelineCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── ផ្នែកទី ២៖ របារពណ៌ Dynamic Progress Bar ──
           Row(
             children: [
               if (total == 0)
-                Expanded(child: _buildSegment(Colors.grey.shade200))
+                Expanded(
+                  child: _buildSegment(
+                    isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.grey.shade200,
+                  ),
+                )
               else ...[
                 if (screening > 0) ...[
                   Expanded(
@@ -138,21 +157,28 @@ class ApplicantPipelineCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // ── ផ្នែកទី ៣៖ តួលេខលម្អិត (Legend Grid) ──
           Column(
             children: [
               Row(
                 children: [
                   Expanded(
                     child: _buildLegendItem(
-                      "Screening",
+                      "Screening".tr, // 🟢 Added .tr
                       screening,
                       colorScreening,
+                      theme,
+                      isDark,
                     ),
                   ),
                   const SizedBox(width: 24),
                   Expanded(
-                    child: _buildLegendItem("Review", review, colorReview),
+                    child: _buildLegendItem(
+                      "Review".tr, // 🟢 Added .tr
+                      review,
+                      colorReview,
+                      theme,
+                      isDark,
+                    ),
                   ),
                 ],
               ),
@@ -161,13 +187,23 @@ class ApplicantPipelineCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _buildLegendItem(
-                      "Interview",
+                      "Interview".tr, // 🟢 Added .tr
                       interview,
                       colorInterview,
+                      theme,
+                      isDark,
                     ),
                   ),
                   const SizedBox(width: 24),
-                  Expanded(child: _buildLegendItem("Offer", offer, colorOffer)),
+                  Expanded(
+                    child: _buildLegendItem(
+                      "Offer".tr, // 🟢 Added .tr
+                      offer,
+                      colorOffer,
+                      theme,
+                      isDark,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -177,7 +213,6 @@ class ApplicantPipelineCard extends StatelessWidget {
     );
   }
 
-  // អនុគមន៍គូររបារពណ៌កាត់កង់ៗ
   Widget _buildSegment(Color color) {
     return Container(
       height: 10,
@@ -188,8 +223,13 @@ class ApplicantPipelineCard extends StatelessWidget {
     );
   }
 
-  // អនុគមន៍គូរអក្សរ និងតួលេខ
-  Widget _buildLegendItem(String title, int value, Color color) {
+  Widget _buildLegendItem(
+    String title,
+    int value,
+    Color color,
+    ThemeData theme,
+    bool isDark,
+  ) {
     return Row(
       children: [
         Container(
@@ -200,19 +240,21 @@ class ApplicantPipelineCard extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF64748B),
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : const Color(0xFF64748B),
           ),
         ),
         const Spacer(),
         Text(
           value.toString(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1E293B),
+            color: theme.textTheme.bodyLarge?.color,
           ),
         ),
       ],

@@ -14,24 +14,29 @@ class ApplicationView extends GetView<ApplicationViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FB),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.scaffoldBackgroundColor,
           elevation: 0,
-          title: const Text(
-            'My Applications',
+          title: Text(
+            'My Applications'.tr, // 🟢 Added .tr
             style: TextStyle(
-              color: Colors.black87,
+              color: theme.textTheme.bodyLarge?.color,
               fontWeight: FontWeight.bold,
               fontSize: 22,
             ),
           ),
           bottom: TabBar(
             labelColor: AppColors.primary,
-            unselectedLabelColor: Colors.grey,
+            unselectedLabelColor: isDark
+                ? AppColors.darkTextSecondary
+                : Colors.grey,
             indicatorColor: AppColors.primary,
             indicatorWeight: 3,
             labelStyle: const TextStyle(
@@ -39,20 +44,32 @@ class ApplicationView extends GetView<ApplicationViewController> {
               fontSize: 15,
             ),
             tabs: [
-              // 🎯 រុំ Obx លើ Text នីមួយៗដើម្បីឲ្យចំនួន (Count) លោតដោយស្វ័យប្រវត្តិ
               Tab(
                 child: Obx(
-                  () => Text('Pending (${controller.pendingApps.length})'),
+                  // 🟢 Used trParams for dynamic count values
+                  () => Text(
+                    'Pending (@count)'.trParams({
+                      'count': controller.pendingApps.length.toString(),
+                    }),
+                  ),
                 ),
               ),
               Tab(
                 child: Obx(
-                  () => Text('Interview (${controller.interviewApps.length})'),
+                  () => Text(
+                    'Interview (@count)'.trParams({
+                      'count': controller.interviewApps.length.toString(),
+                    }),
+                  ),
                 ),
               ),
               Tab(
                 child: Obx(
-                  () => Text('Closed (${controller.closedApps.length})'),
+                  () => Text(
+                    'Closed (@count)'.trParams({
+                      'count': controller.closedApps.length.toString(),
+                    }),
+                  ),
                 ),
               ),
             ],
@@ -65,28 +82,27 @@ class ApplicationView extends GetView<ApplicationViewController> {
             );
           }
 
-          // 🎯 បន្ថែម RefreshIndicator នៅទីនេះ
           return RefreshIndicator(
             color: AppColors.primary,
             onRefresh: () async {
-              await controller
-                  .fetchApplications(); // ហៅមុខងារទាញយកទិន្នន័យឡើងវិញ
+              await controller.fetchApplications();
             },
             child: TabBarView(
               children: [
                 _buildApplicationList(
                   apps: controller.pendingApps,
-                  emptyMessage: "No pending applications",
+                  emptyMessage: "No pending applications".tr, // 🟢 Added .tr
                   context: context,
                 ),
                 _buildApplicationList(
                   apps: controller.interviewApps,
-                  emptyMessage: "No interviews scheduled yet",
+                  emptyMessage:
+                      "No interviews scheduled yet".tr, // 🟢 Added .tr
                   context: context,
                 ),
                 _buildApplicationList(
                   apps: controller.closedApps,
-                  emptyMessage: "No closed applications",
+                  emptyMessage: "No closed applications".tr, // 🟢 Added .tr
                   context: context,
                 ),
               ],
@@ -97,12 +113,13 @@ class ApplicationView extends GetView<ApplicationViewController> {
     );
   }
 
-  // 🎯 អនុគមន៍ _buildApplicationList រក្សាទុកដូចដើម
   Widget _buildApplicationList({
     required List<MyApplicationModel> apps,
     required String emptyMessage,
     required BuildContext context,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (apps.isEmpty) {
       return SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -115,13 +132,15 @@ class ApplicationView extends GetView<ApplicationViewController> {
                 Icon(
                   LucideIcons.folderOpen,
                   size: 60,
-                  color: Colors.grey.shade300,
+                  color: isDark ? AppColors.darkTextHint : Colors.grey.shade300,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   emptyMessage,
                   style: TextStyle(
-                    color: Colors.grey.shade500,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade500,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -138,45 +157,62 @@ class ApplicationView extends GetView<ApplicationViewController> {
       itemCount: apps.length,
       itemBuilder: (context, index) {
         final app = apps[index];
-        return _buildApplicationCard(app);
+        return _buildApplicationCard(app, context);
       },
     );
   }
 
-  // ពណ៌ត្រូវបានបែងចែកត្រឹមត្រូវតាម Status ទាំង ៦ រួចរាល់ហើយ
-  Widget _buildApplicationCard(MyApplicationModel app) {
+  Widget _buildApplicationCard(MyApplicationModel app, BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     Color statusColor;
     Color statusBgColor;
     String displayStatus = app.status.capitalizeFirst ?? app.status;
 
+    // 🟢 Updated all Opacity to withValues
     switch (app.status.toLowerCase()) {
       case 'pending':
       case 'reviewed':
       case 'shortlisted':
-        statusColor = Colors.orange.shade700;
-        statusBgColor = Colors.orange.shade50;
+        statusColor = isDark ? Colors.orangeAccent : Colors.orange.shade700;
+        statusBgColor = isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50;
         break;
       case 'interview':
-        statusColor = AppColors.success;
-        statusBgColor = AppColors.success.withValues(alpha: 0.1);
+        statusColor = isDark ? Colors.greenAccent : AppColors.success;
+        statusBgColor = isDark
+            ? Colors.greenAccent.withValues(alpha: 0.15)
+            : AppColors.success.withValues(alpha: 0.1);
         break;
       case 'rejected':
-        statusColor = Colors.red.shade700;
-        statusBgColor = Colors.red.shade50;
+        statusColor = isDark ? Colors.redAccent : Colors.red.shade700;
+        statusBgColor = isDark
+            ? Colors.redAccent.withValues(alpha: 0.15)
+            : Colors.red.shade50;
         break;
       case 'hired':
-        statusColor = Colors.green.shade700;
-        statusBgColor = Colors.green.shade50;
+        statusColor = isDark ? Colors.greenAccent : Colors.green.shade700;
+        statusBgColor = isDark
+            ? Colors.greenAccent.withValues(alpha: 0.15)
+            : Colors.green.shade50;
         break;
       default:
-        statusColor = Colors.grey.shade700;
-        statusBgColor = Colors.grey.shade100;
+        statusColor = isDark
+            ? AppColors.darkTextSecondary
+            : Colors.grey.shade700;
+        statusBgColor = isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.grey.shade100;
     }
 
     final daysAgo = DateTime.now().difference(app.appliedAt).inDays;
+
+    // 🟢 Used trParams for Dynamic Date logic
     final appliedDateText = daysAgo == 0
-        ? "Applied Today"
-        : "Applied $daysAgo days ago";
+        ? "Applied Today".tr
+        : "Applied @days days ago".trParams({'days': daysAgo.toString()});
 
     return GestureDetector(
       onTap: () {
@@ -186,12 +222,16 @@ class ApplicationView extends GetView<ApplicationViewController> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.2 : 0.02,
+              ), // 🟢 Updated to withValues
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -207,7 +247,9 @@ class ApplicationView extends GetView<ApplicationViewController> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: isDark
+                        ? AppColors.darkInputBackground
+                        : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   clipBehavior: Clip.hardEdge,
@@ -218,10 +260,17 @@ class ApplicationView extends GetView<ApplicationViewController> {
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Icon(
                             LucideIcons.building,
-                            color: Colors.grey.shade400,
+                            color: isDark
+                                ? AppColors.darkIconSecondary
+                                : Colors.grey.shade400,
                           ),
                         )
-                      : Icon(LucideIcons.building, color: Colors.grey.shade400),
+                      : Icon(
+                          LucideIcons.building,
+                          color: isDark
+                              ? AppColors.darkIconSecondary
+                              : Colors.grey.shade400,
+                        ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -230,10 +279,10 @@ class ApplicationView extends GetView<ApplicationViewController> {
                     children: [
                       Text(
                         app.jobTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: theme.textTheme.bodyLarge?.color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -244,7 +293,7 @@ class ApplicationView extends GetView<ApplicationViewController> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Colors.grey.shade600,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -256,7 +305,10 @@ class ApplicationView extends GetView<ApplicationViewController> {
             ),
 
             const SizedBox(height: 16),
-            const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.darkDivider : const Color(0xFFEEEEEE),
+            ),
             const SizedBox(height: 16),
 
             Row(
@@ -270,14 +322,18 @@ class ApplicationView extends GetView<ApplicationViewController> {
                         Icon(
                           Icons.access_time_rounded,
                           size: 14,
-                          color: Colors.grey.shade500,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey.shade500,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           appliedDateText,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : Colors.grey.shade600,
                           ),
                         ),
                       ],
@@ -294,7 +350,8 @@ class ApplicationView extends GetView<ApplicationViewController> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    displayStatus,
+                    displayStatus
+                        .tr, // 🟢 Added .tr to automatically translate the status mapped from the API
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

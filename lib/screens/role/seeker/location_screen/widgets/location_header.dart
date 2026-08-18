@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
@@ -30,14 +31,14 @@ class LocationHeader extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.cardBackground, // ជំនួស _Tok.surfaceEl
+                      color: AppColors.cardBackground,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.cardBorder),
                     ),
                     child: const Icon(
                       Icons.arrow_back_ios_new_rounded,
                       size: 16,
-                      color: AppColors.textPrimary, // ជំនួស _Tok.ink
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -45,8 +46,8 @@ class LocationHeader extends StatelessWidget {
               ],
 
               Text(
-                title,
-                style: TextStyle(
+                title, // 🟢 Translation is handled by the parent View passing this title
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
                   color: LocationColors.ink,
@@ -58,9 +59,9 @@ class LocationHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Select your province to find jobs near you',
-            style: TextStyle(
+          Text(
+            'Select your province to find jobs near you'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 14,
               color: LocationColors.sub,
               fontWeight: FontWeight.w400,

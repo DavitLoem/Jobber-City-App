@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
 class LocationSearchBar extends StatelessWidget {
@@ -28,7 +29,7 @@ class LocationSearchBar extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
-          hintText: 'Search province…',
+          hintText: 'Search province…'.tr, // 🟢 Added .tr
           hintStyle: const TextStyle(fontSize: 14, color: LocationColors.muted),
           prefixIcon: const Icon(
             Icons.search_rounded,

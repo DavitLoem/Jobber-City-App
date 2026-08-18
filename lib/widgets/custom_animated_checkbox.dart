@@ -6,8 +6,6 @@ class CustomAnimatedCheckbox extends StatefulWidget {
   final bool value;
   final VoidCallback onTap;
   final String label;
-
-  // Made optional with "?" so it works seamlessly for simple text rows too
   final String? linkText;
   final String? labelText;
   final String? linkText2;
@@ -53,6 +51,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -72,7 +73,6 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Custom Animated Checkbox box
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
@@ -81,13 +81,17 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
               margin: const EdgeInsets.only(top: 2),
               decoration: BoxDecoration(
                 color: widget.value
-                    ? AppColors.buttonPrimary
-                    : Colors.transparent,
+                    ? AppColors.primary
+                    : Colors.transparent, // 🟢 Switched to brand primary
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: widget.value
-                      ? AppColors.buttonPrimary
-                      : Colors.grey.shade400,
+                      ? AppColors.primary
+                      : (isDark
+                            ? AppColors.darkCardBorder
+                            : Colors
+                                  .grey
+                                  .shade400), // 🟢 Dynamic Checkbox Border
                   width: 2,
                 ),
               ),
@@ -99,10 +103,8 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
               ),
             ),
             const SizedBox(width: 12),
-            // Flexibly generated Text Label
             Expanded(
               child: Text.rich(
-                // textAlign: TextAlign.justify,
                 TextSpan(
                   children: [
                     TextSpan(
@@ -110,7 +112,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary, // 🟢 Dynamic Text
                       ),
                     ),
                     if (widget.linkText != null)
@@ -119,7 +123,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textLink,
+                          color: isDark
+                              ? Colors.blueAccent
+                              : AppColors.textLink, // 🟢 Dynamic Link
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
@@ -132,7 +138,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary, // 🟢 Dynamic Text
                         ),
                       ),
                     if (widget.linkText2 != null)
@@ -141,7 +149,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textLink,
+                          color: isDark
+                              ? Colors.blueAccent
+                              : AppColors.textLink, // 🟢 Dynamic Link
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {

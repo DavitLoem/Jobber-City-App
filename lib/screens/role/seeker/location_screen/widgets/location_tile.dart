@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
@@ -59,7 +60,9 @@ class LocationTile extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                location.nameEn,
+                location
+                    .nameEn
+                    .tr, // 🟢 Added .tr (In case dynamic locations are translated)
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,

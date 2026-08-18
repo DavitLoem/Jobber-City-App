@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// Shown when the employer hasn't posted any jobs yet.
 class JobEmptyState extends StatelessWidget {
   const JobEmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -15,7 +18,11 @@ class JobEmptyState extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: isDark
+                  ? AppColors.primary.withValues(
+                      alpha: 0.15,
+                    ) // 🟢 Updated to withValues
+                  : AppColors.primaryLight,
               borderRadius: BorderRadius.circular(24),
             ),
             child: const Icon(
@@ -25,18 +32,23 @@ class JobEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No jobs posted yet',
+          Text(
+            'No jobs posted yet'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Tap "New Job" above to post your first job.',
-            style: TextStyle(fontSize: 14, color: AppColors.textTertiary),
+          Text(
+            'Tap "New Job" above to post your first job.'.tr, // 🟢 Added .tr
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -44,34 +56,44 @@ class JobEmptyState extends StatelessWidget {
   }
 }
 
-/// Shown when a search/filter combination returns nothing.
 class JobNoResultsState extends StatelessWidget {
   const JobNoResultsState({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.search_off_rounded,
             size: 48,
-            color: AppColors.iconSecondary,
+            color: isDark
+                ? AppColors.darkIconSecondary
+                : AppColors.textTertiary,
           ),
           const SizedBox(height: 16),
-          const Text(
-            'No jobs match your search',
+          Text(
+            'No matching jobs found'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Try a different keyword or filter.',
-            style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
+          Text(
+            'Try searching with different keywords or filters.'
+                .tr, // 🟢 Added .tr
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -79,7 +101,6 @@ class JobNoResultsState extends StatelessWidget {
   }
 }
 
-/// Shown when the job list failed to load.
 class JobErrorState extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -92,40 +113,45 @@ class JobErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.wifi_off_rounded,
               size: 48,
-              color: AppColors.error,
+              color: isDark ? Colors.redAccent : AppColors.error,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Failed to load jobs',
+            Text(
+              'Failed to load jobs'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: theme.textTheme.bodyLarge?.color,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textTertiary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textTertiary,
               ),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
+              label: Text('Retry'.tr), // 🟢 Added .tr
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.white,

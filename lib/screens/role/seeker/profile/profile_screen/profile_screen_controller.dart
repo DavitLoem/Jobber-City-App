@@ -30,7 +30,10 @@ class ProfileScreenViewController extends GetxController {
         profileData.value = response.data; // Update UI ទាំងអស់ដែលស្តាប់អថេរនេះ
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch profile: $e');
+      Get.snackbar(
+        'Error'.tr,
+        'Failed to fetch profile:'.tr + ' $e',
+      ); // 🟢 Added .tr
     } finally {
       isProfileLoading.value = false;
     }
@@ -107,7 +110,7 @@ class ProfileScreenViewController extends GetxController {
       );
     } catch (e) {
       AppLogger.i("Failed to fetch Profile: $e");
-      Get.snackbar("Error", "Cannot fetch Profile");
+      Get.snackbar("Error".tr, "Cannot fetch Profile".tr); // 🟢 Added .tr
     } finally {
       isLoading.value = false;
     }

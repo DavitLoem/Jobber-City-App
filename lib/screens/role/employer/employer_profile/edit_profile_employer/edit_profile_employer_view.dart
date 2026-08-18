@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/core/theme/theme_controller.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../controllers/location_controller.dart';
@@ -19,28 +22,40 @@ class EditProfileEmployerView
     extends GetView<EditProfileEmployerViewController> {
   const EditProfileEmployerView({super.key});
 
+  bool get _isDark {
+    final mode = controller.themeController.themeMode.value;
+    if (mode == ThemeMode.dark) return true;
+    if (mode == ThemeMode.light) return false;
+    return Get.isPlatformDarkMode;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Edit Profile',
+        title: Text(
+          'Edit Profile'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         actions: [
-          // 🎯 រុំ Obx ដើម្បីបង្ហាញ Loading ពេលចុច Save
           Obx(
             () => TextButton(
               onPressed: controller.isLoading.value
@@ -52,13 +67,13 @@ class EditProfileEmployerView
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Color(0xFF4f7df7),
+                        color: AppColors.primary,
                       ),
                     )
-                  : const Text(
-                      "Save",
-                      style: TextStyle(
-                        color: Color(0xFF4f7df7),
+                  : Text(
+                      "Save".tr, // 🟢 Added .tr
+                      style: const TextStyle(
+                        color: AppColors.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -72,35 +87,38 @@ class EditProfileEmployerView
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── ១. ផ្នែកប្តូររូបភាព Cover និង Logo ──
-            _buildImageEditor(),
+            _buildImageEditor(isDark),
 
             const SizedBox(height: 30),
 
-            // ── ២. ផ្នែកទម្រង់បញ្ចូលព័ត៌មាន (Form Fields) ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle("Basic Information"),
+                  _buildSectionTitle(
+                    "Basic Information".tr,
+                    theme,
+                  ), // 🟢 Added .tr
                   const SizedBox(height: 16),
 
                   _buildTextField(
-                    label: "Company Name",
-                    hint: "e.g. Tech Job Co., Ltd",
+                    label: "Company Name".tr, // 🟢 Added .tr
+                    hint: "e.g. Tech Job Co., Ltd".tr, // 🟢 Added .tr
                     icon: LucideIcons.building,
-                    textController:
-                        controller.companyNameCtrl, // 🎯 ភ្ជាប់ Controller
+                    textController: controller.companyNameCtrl,
+                    theme: theme,
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 16),
 
-                  // 🎯 ប្រើប្រាស់ Dropdown សម្រាប់វាលដែលត្រូវការ ID
                   _buildDropdownField(
-                    label: "Industry",
-                    hint: "Select Industry",
+                    label: "Industry".tr, // 🟢 Added .tr
+                    hint: "Select Industry".tr, // 🟢 Added .tr
                     icon: LucideIcons.briefcase,
                     value: controller.selectedIndustryId,
+                    theme: theme,
+                    isDark: isDark,
                     itemsBuilder: () {
                       final list =
                           controller.masterCtrl.masterDataCache['industries'] ??
@@ -109,7 +127,9 @@ class EditProfileEmployerView
                           .map(
                             (ind) => DropdownMenuItem<String>(
                               value: ind.id,
-                              child: Text(ind.name),
+                              child: Text(
+                                ind.name,
+                              ), // 🟢 Typically dynamic data
                             ),
                           )
                           .toList();
@@ -118,69 +138,89 @@ class EditProfileEmployerView
                   const SizedBox(height: 16),
 
                   _buildDropdownField(
-                    label: "Company Size",
-                    hint: "Select Size",
+                    label: "Company Size".tr, // 🟢 Added .tr
+                    hint: "Select Size".tr, // 🟢 Added .tr
                     icon: LucideIcons.users,
                     value: controller.selectedCompanySize,
+                    theme: theme,
+                    isDark: isDark,
                     itemsBuilder: () => controller.companySizeList
                         .map(
                           (size) => DropdownMenuItem(
                             value: size,
-                            child: Text("$size Employees"),
+                            child: Text(
+                              "@size Employees".trParams({'size': size}),
+                            ), // 🟢 Added .trParams
                           ),
                         )
                         .toList(),
                   ),
                   const SizedBox(height: 30),
 
-                  _buildSectionTitle("Contact Information"),
+                  _buildSectionTitle(
+                    "Contact Information".tr,
+                    theme,
+                  ), // 🟢 Added .tr
                   const SizedBox(height: 16),
 
                   _buildTextField(
-                    label: "Email Address",
-                    hint: "e.g. contact@company.com",
+                    label: "Email Address".tr, // 🟢 Added .tr
+                    hint:
+                        "e.g. contact@company.com", // Usually emails don't need translation
                     icon: LucideIcons.mail,
                     textController: controller.emailCtrl,
                     keyboardType: TextInputType.emailAddress,
+                    theme: theme,
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 16),
 
                   _buildTextField(
-                    label: "Phone Number",
+                    label: "Phone Number".tr, // 🟢 Added .tr
                     hint: "e.g. 012 345 678",
                     icon: LucideIcons.phone,
                     textController: controller.phoneCtrl,
                     keyboardType: TextInputType.phone,
+                    theme: theme,
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 16),
 
                   _buildTextField(
-                    label: "Website (Optional)",
+                    label: "Website (Optional)".tr, // 🟢 Added .tr
                     hint: "e.g. www.techjob.com",
                     icon: LucideIcons.globe,
                     textController: controller.websiteCtrl,
                     keyboardType: TextInputType.url,
+                    theme: theme,
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 30),
 
-                  _buildSectionTitle("Location Details"),
+                  _buildSectionTitle(
+                    "Location Details".tr,
+                    theme,
+                  ), // 🟢 Added .tr
                   const SizedBox(height: 16),
 
                   Row(
                     children: [
                       Expanded(
                         child: _buildDropdownField(
-                          label: "Province",
-                          hint: "Select Province",
+                          label: "Province".tr, // 🟢 Added .tr
+                          hint: "Select Province".tr, // 🟢 Added .tr
                           value: controller.selectedProvinceId,
+                          theme: theme,
+                          isDark: isDark,
+                          onChanged: controller.onProvinceChanged,
                           itemsBuilder: () => controller.locationCtrl.provinces
                               .map(
                                 (prov) => DropdownMenuItem<String>(
                                   value: prov.id,
                                   child: Text(
                                     prov.nameEn,
-                                    overflow: TextOverflow.ellipsis, // 👈 Added
-                                    maxLines: 1, // 👈 Added
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                 ),
                               )
@@ -190,17 +230,19 @@ class EditProfileEmployerView
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildDropdownField(
-                          label: "District",
-                          hint: "Select District",
+                          label: "District".tr, // 🟢 Added .tr
+                          hint: "Select District".tr, // 🟢 Added .tr
                           value: controller.selectedDistrictId,
+                          theme: theme,
+                          isDark: isDark,
                           itemsBuilder: () => controller.districtsList
                               .map(
                                 (dist) => DropdownMenuItem<String>(
                                   value: dist.id,
                                   child: Text(
                                     dist.nameEn,
-                                    overflow: TextOverflow.ellipsis, // 👈 Added
-                                    maxLines: 1, // 👈 Added
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                 ),
                               )
@@ -212,22 +254,27 @@ class EditProfileEmployerView
                   const SizedBox(height: 16),
 
                   _buildTextField(
-                    label: "Address Detail",
-                    hint: "House number, Street, etc.",
+                    label: "Address Detail".tr, // 🟢 Added .tr
+                    hint: "House number, Street, etc.".tr, // 🟢 Added .tr
                     icon: LucideIcons.mapPin,
                     textController: controller.addressCtrl,
+                    theme: theme,
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 30),
 
-                  _buildSectionTitle("About Company"),
+                  _buildSectionTitle("About Company".tr, theme), // 🟢 Added .tr
                   const SizedBox(height: 16),
 
                   _buildTextField(
-                    label: "Company Description",
+                    label: "Company Description".tr, // 🟢 Added .tr
                     hint:
-                        "Tell candidates about your company's mission, vision, and culture...",
+                        "Tell candidates about your company's mission, vision, and culture..."
+                            .tr, // 🟢 Added .tr
                     maxLines: 5,
                     textController: controller.descCtrl,
+                    theme: theme,
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -239,27 +286,29 @@ class EditProfileEmployerView
     );
   }
 
-  // ==========================================
-  // ── មុខងារជំនួយ (Helper Widgets) ──
-  // ==========================================
-
-  Widget _buildImageEditor() {
+  Widget _buildImageEditor(bool isDark) {
     return SizedBox(
       height: 190,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          // ── ផ្ទាំង Cover ──
           GestureDetector(
-            onTap: () {
-              // មុខងារប្តូរ Cover
-            },
+            onTap: () {},
             child: Container(
               height: 140,
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF4f7df7), Color(0xFF8faaf9)],
+                  colors: isDark
+                      ? [
+                          AppColors.primary.withValues(
+                            alpha: 0.8,
+                          ), // 🟢 Updated opacity
+                          AppColors.primary.withValues(
+                            alpha: 0.4,
+                          ), // 🟢 Updated opacity
+                        ]
+                      : [const Color(0xFF4f7df7), const Color(0xFF8faaf9)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -268,7 +317,9 @@ class EditProfileEmployerView
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: Colors.black.withValues(
+                      alpha: 0.3,
+                    ), // 🟢 Updated opacity
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -280,28 +331,26 @@ class EditProfileEmployerView
               ),
             ),
           ),
-
-          // ── 🎯 ផ្ទាំង Logo ──
           Positioned(
             bottom: -5,
             child: GestureDetector(
-              onTap: controller.pickAndUploadLogo, // ឥឡូវនេះអាចចុចបាន 100%
-              behavior: HitTestBehavior.opaque, // ធានាថាចាប់ការចុចបានល្អ
+              onTap: controller.pickAndUploadLogo,
+              behavior: HitTestBehavior.opaque,
               child: Stack(
                 alignment: Alignment.bottomRight,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurface : Colors.white,
                       shape: BoxShape.circle,
                     ),
                     child: Obx(
                       () => CircleAvatar(
                         radius: 45,
-                        backgroundColor: const Color(0xFFF0F4FF),
-
-                        // 🎯 ឆែករូបថ្មីសិន បើគ្មានចាំឆែករូបចាស់ (URL)
+                        backgroundColor: isDark
+                            ? AppColors.darkSurfaceElevated
+                            : const Color(0xFFF0F4FF),
                         backgroundImage: controller.logoImage.value != null
                             ? FileImage(controller.logoImage.value!)
                                   as ImageProvider
@@ -311,31 +360,31 @@ class EditProfileEmployerView
                                         )
                                         as ImageProvider
                                   : null),
-
-                        // 🎯 ឆែក Loading និង Icon
                         child: controller.isUploadingLogo.value
                             ? const CircularProgressIndicator(
-                                color: Color(0xFF4f7df7),
+                                color: AppColors.primary,
                               )
                             : (controller.logoImage.value == null &&
                                       controller.existingLogoUrl.value.isEmpty
                                   ? const Icon(
                                       LucideIcons.building,
                                       size: 40,
-                                      color: Color(0xFF4f7df7),
+                                      color: AppColors.primary,
                                     )
                                   : null),
                       ),
                     ),
                   ),
-                  // Icon កាមេរ៉ាតូចលើ Logo
                   Container(
                     margin: const EdgeInsets.only(bottom: 4, right: 4),
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4f7df7),
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(
+                        color: isDark ? AppColors.darkSurface : Colors.white,
+                        width: 2,
+                      ),
                     ),
                     child: const Icon(
                       LucideIcons.pencil,
@@ -352,18 +401,17 @@ class EditProfileEmployerView
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, ThemeData theme) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: theme.textTheme.bodyLarge?.color,
       ),
     );
   }
 
-  // 🎯 Update ទទួលយក TextEditingController
   Widget _buildTextField({
     required String label,
     required String hint,
@@ -371,6 +419,8 @@ class EditProfileEmployerView
     IconData? icon,
     int maxLines = 1,
     TextInputType? keyboardType,
+    required ThemeData theme,
+    required bool isDark,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,7 +430,7 @@ class EditProfileEmployerView
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
+            color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade700,
           ),
         ),
         const SizedBox(height: 8),
@@ -388,30 +438,48 @@ class EditProfileEmployerView
           controller: textController,
           maxLines: maxLines,
           keyboardType: keyboardType,
+          style: TextStyle(
+            color: isDark ? AppColors.darkInputText : AppColors.inputText,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+            hintStyle: TextStyle(
+              color: isDark ? AppColors.darkTextHint : Colors.grey.shade400,
+              fontSize: 15,
+            ),
             prefixIcon: icon != null
-                ? Icon(icon, color: Colors.grey.shade400, size: 20)
+                ? Icon(
+                    icon,
+                    color: isDark
+                        ? AppColors.darkIconSecondary
+                        : Colors.grey.shade400,
+                    size: 20,
+                  )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: isDark
+                ? AppColors.darkInputBackground
+                : Colors.grey.shade50,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(
+                color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(
+                color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFF4f7df7),
+                color: AppColors.primary,
                 width: 1.5,
               ),
             ),
@@ -421,7 +489,6 @@ class EditProfileEmployerView
     );
   }
 
-  // 🎯 ១. អាប់ដេត Widget Dropdown
   Widget _buildDropdownField({
     required String label,
     required String hint,
@@ -429,6 +496,8 @@ class EditProfileEmployerView
     required RxString value,
     required List<DropdownMenuItem<String>> Function() itemsBuilder,
     void Function(String?)? onChanged,
+    required ThemeData theme,
+    required bool isDark,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,7 +507,7 @@ class EditProfileEmployerView
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
+            color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade700,
           ),
         ),
         const SizedBox(height: 8),
@@ -450,9 +519,8 @@ class EditProfileEmployerView
           if (!valueExists) currentValue = null;
 
           return DropdownButtonFormField<String>(
-            isExpanded:
-                true, // 👈 បន្ថែមបន្ទាត់នេះជាដាច់ខាត ដើម្បីដោះស្រាយការ Overflow
-            initialValue: currentValue,
+            isExpanded: true,
+            value: currentValue,
             items: items,
             onChanged: (newValue) {
               if (newValue != null) value.value = newValue;
@@ -460,30 +528,54 @@ class EditProfileEmployerView
                 onChanged(newValue);
               }
             },
+            dropdownColor: theme.cardColor,
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color,
+              fontSize: 16,
+            ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+              hintStyle: TextStyle(
+                color: isDark ? AppColors.darkTextHint : Colors.grey.shade400,
+                fontSize: 15,
+              ),
               prefixIcon: icon != null
-                  ? Icon(icon, color: Colors.grey.shade400, size: 20)
+                  ? Icon(
+                      icon,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors.grey.shade400,
+                      size: 20,
+                    )
                   : null,
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: isDark
+                  ? AppColors.darkInputBackground
+                  : Colors.grey.shade50,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 14,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : Colors.grey.shade200,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : Colors.grey.shade200,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
-                  color: Color(0xFF4f7df7),
+                  color: AppColors.primary,
                   width: 1.5,
                 ),
               ),

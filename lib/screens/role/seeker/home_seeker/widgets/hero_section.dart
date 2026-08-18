@@ -4,7 +4,7 @@ import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
-import '../home_seeker_view.dart'; // សម្រាប់ទាញយក Controller
+import '../home_seeker_view.dart';
 import 'avatar_tap_scale.dart';
 import 'shimmer_box.dart';
 
@@ -26,7 +26,7 @@ class HeroSection extends GetView<HomeSeekerViewController> {
               end: Alignment.bottomRight,
               colors: [
                 AppColors.primary,
-                AppColors.primary.withValues(alpha: 0.78),
+                AppColors.primary.withValues(alpha: 0.78), // 🟢 Updated opacity
               ],
             ),
             borderRadius: const BorderRadius.only(
@@ -35,7 +35,9 @@ class HeroSection extends GetView<HomeSeekerViewController> {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.25),
+                color: AppColors.primary.withValues(
+                  alpha: 0.25,
+                ), // 🟢 Updated opacity
                 blurRadius: 24,
                 offset: const Offset(0, 10),
               ),
@@ -43,7 +45,12 @@ class HeroSection extends GetView<HomeSeekerViewController> {
           ),
           child: _buildHeroTopRow(),
         ),
-        Positioned(left: 20, right: 20, bottom: -28, child: _buildSearchBar()),
+        Positioned(
+          left: 20,
+          right: 20,
+          bottom: -28,
+          child: _buildSearchBar(context),
+        ),
       ],
     );
   }
@@ -71,7 +78,9 @@ class HeroSection extends GetView<HomeSeekerViewController> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: Colors.white.withValues(
+                    alpha: 0.6,
+                  ), // 🟢 Updated opacity
                   width: 1.6,
                 ),
               ),
@@ -123,7 +132,9 @@ class HeroSection extends GetView<HomeSeekerViewController> {
                   "${controller.getGreeting()} 👋",
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Colors.white.withValues(
+                      alpha: 0.85,
+                    ), // 🟢 Updated opacity
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -131,7 +142,7 @@ class HeroSection extends GetView<HomeSeekerViewController> {
                 Text(
                   controller.firstName.value.isNotEmpty
                       ? "${controller.lastName.value} ${controller.firstName.value}"
-                      : "Guest",
+                      : "Guest".tr, // 🟢 Added .tr
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -150,7 +161,7 @@ class HeroSection extends GetView<HomeSeekerViewController> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
+              color: Colors.white.withValues(alpha: 0.18), // 🟢 Updated opacity
               borderRadius: BorderRadius.circular(13),
             ),
             child: const Icon(
@@ -182,21 +193,25 @@ class HeroSection extends GetView<HomeSeekerViewController> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.search),
       child: Hero(
-        tag: 'search_bar_hero', // 🎯 ដាក់ Hero Tag ទី១
+        tag: 'search_bar_hero',
         child: Material(
           color: Colors.transparent,
           child: Container(
-            height: 52, // កំណត់កម្ពស់ឱ្យស្មើគ្នា
+            height: 52,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppColors.darkInputBackground : Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.3 : 0.08, // 🟢 Updated opacity
+                  ),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -205,28 +220,23 @@ class HeroSection extends GetView<HomeSeekerViewController> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(Icons.search, color: AppColors.textHint, size: 22),
-                SizedBox(width: 12),
+                Icon(
+                  Icons.search,
+                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Search for a job or Company...',
-                    style: TextStyle(color: AppColors.textHint, fontSize: 14.5),
+                    'Search for a job or Company...'.tr, // 🟢 Added .tr
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.textHint,
+                      fontSize: 14.5,
+                    ),
                   ),
                 ),
-
-                // Container(
-                //   margin: const EdgeInsets.all(6),
-                //   padding: const EdgeInsets.all(10),
-                //   decoration: BoxDecoration(
-                //     color: AppColors.primary,
-                //     borderRadius: BorderRadius.circular(10),
-                //   ),
-                //   child: const Icon(
-                //     Icons.tune_rounded,
-                //     color: Colors.white,
-                //     size: 18,
-                //   ),
-                // ),
               ],
             ),
           ),

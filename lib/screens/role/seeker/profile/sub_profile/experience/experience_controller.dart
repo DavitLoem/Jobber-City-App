@@ -3,6 +3,7 @@ part of 'experience_view.dart';
 class ExperienceViewController extends GetxController {
   final ProfileCrudService _profileService = ProfileCrudService();
   final _parentController = Get.find<ProfileScreenViewController>();
+
   // 🎯 ១. អថេរគ្រប់គ្រង State
   final isLoading = false.obs;
   final isSaving = false.obs;
@@ -31,7 +32,7 @@ class ExperienceViewController extends GetxController {
 
   // 🎯 ៥. មុខងារបញ្ចូលទិន្នន័យចាស់ទៅក្នុង Form (ហៅពេលចុច Icon "Edit" លើកាត)
   void populateForm(ExperienceModel exp) {
-    editingId.value = exp.id; // ត្រូវការ Id របស់ Item ដើម្បីបាញ់ API កែ
+    editingId.value = exp.id;
     jobTitleCtrl.text = exp.jobTitle;
     companyNameCtrl.text = exp.companyName;
     startDateCtrl.text = _formatDateForInput(exp.startDate);
@@ -45,10 +46,10 @@ class ExperienceViewController extends GetxController {
     if (jobTitleCtrl.text.trim().isEmpty ||
         companyNameCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Required Fields',
-        'Job Title and Company Name cannot be empty!',
+        'Required Fields'.tr, // 🟢 Added .tr
+        'Job Title and Company Name cannot be empty!'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange,
+        backgroundColor: AppColors.warning,
         colorText: Colors.white,
       );
       return;
@@ -65,7 +66,6 @@ class ExperienceViewController extends GetxController {
         startDate: startDateCtrl.text.trim().isEmpty
             ? null
             : startDateCtrl.text.trim(),
-        // បើគាត់រើសយក Current Job, End Date ត្រូវតែ null
         endDate: isCurrentJob.value || endDateCtrl.text.trim().isEmpty
             ? null
             : endDateCtrl.text.trim(),
@@ -84,16 +84,16 @@ class ExperienceViewController extends GetxController {
 
       Get.back();
       Get.snackbar(
-        'Success',
-        'Experience saved successfully.',
-        backgroundColor: Colors.green,
+        'Success'.tr, // 🟢 Added .tr
+        'Experience saved successfully.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to save: $e',
-        backgroundColor: Colors.redAccent,
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to save: '.tr + '$e', // 🟢 Added .tr
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     } finally {
@@ -104,33 +104,27 @@ class ExperienceViewController extends GetxController {
   // 🎯 ៧. មុខងារលុប
   Future<void> deleteExperience(String id) async {
     try {
-      // បើក Loading State ពេលកំពុងលុប
       isLoading.value = true;
 
-      // ១. ហៅ API លុប (DELETE Request) ទៅកាន់ Backend
       await _profileService.deleteExperience(id);
-
-      // ២. ប្រាប់ Controller មេឱ្យទាញយកទិន្នន័យ Profile ថ្មីដើម្បី Update UI ភ្លាមៗ
       await _parentController.fetchCompleteProfile();
 
-      // ៣. បង្ហាញសារជោគជ័យ
       Get.snackbar(
-        'Deleted',
-        'Experience has been removed successfully.',
+        'Deleted'.tr, // 🟢 Added .tr
+        'Experience has been removed successfully.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green, // ដាក់ពណ៌បៃតងព្រោះវាលុបជោគជ័យ
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to delete: $e',
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to delete: '.tr + '$e', // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     } finally {
-      // បិទ Loading State វិញទោះជោគជ័យ ឬបរាជ័យ
       isLoading.value = false;
     }
   }
@@ -138,18 +132,15 @@ class ExperienceViewController extends GetxController {
   String _formatDateForInput(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) return '';
     try {
-      // បំប្លែងពី 2020-01-15T00:00:00 ទៅជា 2020-01-15
       final DateTime parsed = DateTime.parse(dateStr);
       return DateFormat('yyyy-MM-dd').format(parsed);
     } catch (e) {
-      // បើ Error, យកត្រឹមអក្សរ T
       return dateStr.split('T').first;
     }
   }
 
   @override
   void onClose() {
-    // លុបចោលដើម្បីកុំឱ្យស៊ី Memory
     jobTitleCtrl.dispose();
     companyNameCtrl.dispose();
     startDateCtrl.dispose();

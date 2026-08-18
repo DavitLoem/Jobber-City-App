@@ -15,19 +15,25 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Application Details',
+        title: Text(
+          'Application Details'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -42,7 +48,12 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
 
         final detail = controller.applicationDetail.value;
         if (detail == null) {
-          return const Center(child: Text("Details not found."));
+          return Center(
+            child: Text(
+              "Details not found.".tr, // 🟢 Added .tr
+              style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+            ),
+          );
         }
 
         return SingleChildScrollView(
@@ -50,48 +61,64 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeaderCard(detail),
+              _buildHeaderCard(detail, theme, isDark),
               const SizedBox(height: 24),
 
-              // ប្រវត្តិ Timeline
-              const Text(
-                "Status History",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Text(
+                "Status History".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color,
+                ),
               ),
               const SizedBox(height: 16),
-              _buildTimeline(detail),
+              _buildTimeline(detail, theme, isDark),
 
-              // ព័ត៌មានសម្ភាសន៍ (លោតចេញតែពេល Status ដល់ Interview)
               if (detail.interviewSchedule != null) ...[
                 const SizedBox(height: 24),
-                const Text(
-                  "Interview Schedule",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  "Interview Schedule".tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ),
                 ),
                 const SizedBox(height: 12),
-                _buildInterviewCard(detail.interviewSchedule!),
+                _buildInterviewCard(detail.interviewSchedule!, isDark),
               ],
 
-              // Cover Letter
               if (detail.coverLetter.isNotEmpty) ...[
                 const SizedBox(height: 24),
-                const Text(
-                  "Cover Letter",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  "Cover Letter".tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade200,
+                    ),
                   ),
                   child: Text(
                     detail.coverLetter,
                     textAlign: TextAlign.justify,
-                    style: const TextStyle(height: 1.5, color: Colors.black87),
+                    style: TextStyle(
+                      height: 1.5,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
                   ),
                 ),
               ],
@@ -102,13 +129,15 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
     );
   }
 
-  Widget _buildHeaderCard(dynamic detail) {
+  Widget _buildHeaderCard(dynamic detail, ThemeData theme, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ),
       ),
       child: Row(
         children: [
@@ -116,14 +145,21 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: isDark
+                  ? AppColors.darkInputBackground
+                  : Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12),
             ),
             clipBehavior: Clip.hardEdge,
             child:
                 (detail.companyLogo != null && detail.companyLogo!.isNotEmpty)
                 ? Image.network(detail.companyLogo!, fit: BoxFit.cover)
-                : Icon(LucideIcons.building, color: Colors.grey.shade400),
+                : Icon(
+                    LucideIcons.building,
+                    color: isDark
+                        ? AppColors.darkIconSecondary
+                        : Colors.grey.shade400,
+                  ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -132,9 +168,10 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
               children: [
                 Text(
                   detail.jobTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -142,7 +179,7 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
                   detail.companyName,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: theme.textTheme.bodyMedium?.color,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -154,25 +191,26 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
     );
   }
 
-  Widget _buildTimeline(dynamic detail) {
+  Widget _buildTimeline(dynamic detail, ThemeData theme, bool isDark) {
     final history = detail.statusHistory;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ),
       ),
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero, // 🎯 លុប Padding ដើមរបស់ ListView ចោល
+        padding: EdgeInsets.zero,
         itemCount: history.length,
         itemBuilder: (context, index) {
           final item = history[index];
           final isLast = index == history.length - 1;
 
-          // 🎯 បំប្លែងម៉ោង UTC ទៅជាម៉ោង Local (ម៉ោងនៅកម្ពុជា) ហើយ Format ឱ្យស្អាត
           final localDate = item.date.toLocal();
           final formattedDate = DateFormat(
             'dd MMM yyyy, hh:mm a',
@@ -192,30 +230,36 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
                     Container(
                       width: 2,
                       height: 30,
-                      color: AppColors.primary.withValues(alpha: 0.3),
+                      color: AppColors.primary.withValues(
+                        alpha: 0.3,
+                      ), // 🟢 Updated opacity
                     ),
                 ],
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Padding(
-                  // 🎯 លក្ខខណ្ឌឆ្លាតវៃ៖ បើជា Status ចុងក្រោយគេ គឺឱ្យ Padding ខាងក្រោម = 0
                   padding: EdgeInsets.only(bottom: isLast ? 0 : 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item.status.toString().capitalizeFirst ?? item.status,
-                        style: const TextStyle(
+                        // 🟢 Translating the status string dynamically
+                        item.status.toString().capitalizeFirst?.tr ??
+                            item.status.toString().tr,
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
+                          color: theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        formattedDate, // 🎯 បង្ហាញម៉ោងដែលបាន Format រួច
+                        formattedDate,
                         style: TextStyle(
-                          color: Colors.grey.shade500,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey.shade500,
                           fontSize: 12,
                         ),
                       ),
@@ -230,29 +274,35 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
     );
   }
 
-  Widget _buildInterviewCard(dynamic schedule) {
+  Widget _buildInterviewCard(dynamic schedule, bool isDark) {
+    final successColor = isDark ? Colors.greenAccent : AppColors.success;
+    final successBgColor = isDark
+        ? Colors.greenAccent.withValues(alpha: 0.15) // 🟢 Updated opacity
+        : AppColors.successBackground;
+    final messageBgColor = isDark
+        ? Colors.black.withValues(alpha: 0.2) // 🟢 Updated opacity
+        : Colors.white.withValues(alpha: 0.5); // 🟢 Updated opacity
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.successBackground,
+        color: successBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: successColor.withValues(alpha: 0.3),
+        ), // 🟢 Updated opacity
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                LucideIcons.calendarCheck,
-                color: AppColors.success,
-                size: 18,
-              ),
+              Icon(LucideIcons.calendarCheck, color: successColor, size: 18),
               const SizedBox(width: 8),
               Text(
                 schedule.date.toLocal().toString().split('.')[0],
-                style: const TextStyle(
-                  color: AppColors.success,
+                style: TextStyle(
+                  color: successColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -262,16 +312,12 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                LucideIcons.mapPin,
-                color: AppColors.success,
-                size: 18,
-              ),
+              Icon(LucideIcons.mapPin, color: successColor, size: 18),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   schedule.location,
-                  style: const TextStyle(color: AppColors.success),
+                  style: TextStyle(color: successColor),
                 ),
               ),
             ],
@@ -281,13 +327,13 @@ class ApplicationDetailView extends GetView<ApplicationDetailViewController> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: messageBgColor,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 schedule.message,
-                style: const TextStyle(
-                  color: AppColors.success,
+                style: TextStyle(
+                  color: successColor,
                   fontStyle: FontStyle.italic,
                 ),
               ),

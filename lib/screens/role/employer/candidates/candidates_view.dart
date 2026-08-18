@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/role/employer/applicant_employer_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/models/role/employer/job_dropdown_item_model.dart';
 
@@ -15,16 +16,19 @@ class CandidatesView extends GetView<CandidatesViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Candidates',
+        title: Text(
+          'Candidates'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -32,57 +36,52 @@ class CandidatesView extends GetView<CandidatesViewController> {
       ),
       body: Column(
         children: [
-          const JobFilterDropdown(), // 🎯 ហៅ Widget ជ្រើសរើស Job
-
+          const JobFilterDropdown(),
           Container(
-            color: Colors.white,
-            // 🎯 ប្រើប្រាស់ TabBar ដោយភ្ជាប់ជាមួយ tabController ពី GetX
+            color: theme.scaffoldBackgroundColor,
             child: TabBar(
               controller: controller.tabController,
               isScrollable: true,
-              labelColor: const Color(0xFF4f7df7),
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: const Color(0xFF4f7df7),
+              labelColor: AppColors.primary,
+              unselectedLabelColor: isDark
+                  ? AppColors.darkTextSecondary
+                  : Colors.grey,
+              indicatorColor: AppColors.primary,
               indicatorWeight: 3,
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
-              dividerColor: Colors.grey.shade200,
+              dividerColor: isDark
+                  ? AppColors.darkDivider
+                  : Colors.grey.shade200,
               tabAlignment: TabAlignment.start,
-              // 🎯 ប្រើ List ពី Controller ដើម្បីគូរ Tab បូកជាមួយចំនួន (Count)
               tabs: controller.tabs.map((tabStatus) {
-                return Tab(
-                  // ឧ. ប្រែពាក្យ 'pending' ទៅជា 'New'
-                  text: _getTabDisplayName(tabStatus),
-                );
+                return Tab(text: _getTabDisplayName(tabStatus));
               }).toList(),
             ),
           ),
-
-          // ── ផ្នែកបញ្ជីបេក្ខជន ──
-          // 🎯 ហៅ CandidateList តែមួយគត់! វានឹង Refresh ខ្លួនឯងពេល controller.applicants ប្រែប្រួល
           const Expanded(child: CandidateList()),
         ],
       ),
     );
   }
 
-  // អនុគមន៍ជំនួយសម្រាប់ប្តូរឈ្មោះ Status ទៅជាពាក្យបង្ហាញលើ UI
   String _getTabDisplayName(String status) {
     switch (status) {
       case 'pending':
-        return 'New';
+        return 'New'.tr; // 🟢 Added .tr
       case 'shortlisted':
-        return 'Shortlisted';
+        return 'Shortlisted'.tr; // 🟢 Added .tr
       case 'interview':
-        return 'Interviewed';
+        return 'Interviewed'.tr; // 🟢 Added .tr
       case 'rejected':
-        return 'Rejected';
+        return 'Rejected'.tr; // 🟢 Added .tr
       case 'hired':
-        return 'Hired'; // 🟢 បន្ថែម Hired
+        return 'Hired'.tr; // 🟢 Added .tr
       default:
-        return status.capitalizeFirst ?? status;
+        return status.capitalizeFirst?.tr ??
+            status.tr; // 🟢 Added fallback translation
     }
   }
 }

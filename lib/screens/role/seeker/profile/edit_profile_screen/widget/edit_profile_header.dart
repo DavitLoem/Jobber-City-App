@@ -10,6 +10,9 @@ class EditProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 26),
@@ -18,8 +21,14 @@ class EditProfileHeader extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primaryLight.withValues(alpha: 0.55),
-            Colors.white,
+            isDark
+                ? AppColors.primary.withValues(
+                    alpha: 0.15,
+                  ) // 🟢 Updated Opacity
+                : AppColors.primaryLight.withValues(
+                    alpha: 0.55,
+                  ), // 🟢 Updated Opacity
+            theme.scaffoldBackgroundColor,
           ],
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
@@ -34,36 +43,42 @@ class EditProfileHeader extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorder),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : AppColors.cardBorder,
+                    ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 18,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
               ),
-              const Text(
-                'Edit Profile',
+              Text(
+                'Edit Profile'.tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: Colors.black87,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(width: 40),
             ],
           ),
           const SizedBox(height: 18),
-          _buildAvatarHeader(),
+          _buildAvatarHeader(context),
         ],
       ),
     );
   }
 
-  Widget _buildAvatarHeader() {
+  Widget _buildAvatarHeader(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Center(
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.0, end: 1.0),
@@ -94,21 +109,25 @@ class EditProfileHeader extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             AppColors.primary,
-                            AppColors.primary.withValues(alpha: 0.4),
+                            AppColors.primary.withValues(
+                              alpha: 0.4,
+                            ), // 🟢 Updated Opacity
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.25),
+                            color: AppColors.primary.withValues(
+                              alpha: 0.25,
+                            ), // 🟢 Updated Opacity
                             blurRadius: 16,
                             offset: const Offset(0, 6),
                           ),
                         ],
                       ),
                       child: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          color: theme.scaffoldBackgroundColor,
                         ),
                         padding: const EdgeInsets.all(3),
                         child: ClipOval(
@@ -118,7 +137,6 @@ class EditProfileHeader extends StatelessWidget {
                               opacity: anim,
                               child: ScaleTransition(scale: anim, child: child),
                             ),
-                            // 🎯 ឆែកមើលបើមាន Link រូប ទើបបង្ហាញ Image.network
                             child: imageUrl.isNotEmpty
                                 ? Image.network(
                                     imageUrl,
@@ -127,10 +145,10 @@ class EditProfileHeader extends StatelessWidget {
                                     height: 82,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return _buildPlaceholderAvatar();
+                                      return _buildPlaceholderAvatar(context);
                                     },
                                   )
-                                : _buildPlaceholderAvatar(),
+                                : _buildPlaceholderAvatar(context),
                           ),
                         ),
                       ),
@@ -144,10 +162,15 @@ class EditProfileHeader extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.primary,
-                          border: Border.all(color: Colors.white, width: 2.5),
+                          border: Border.all(
+                            color: theme.scaffoldBackgroundColor,
+                            width: 2.5,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
+                              color: Colors.black.withValues(
+                                alpha: 0.15,
+                              ), // 🟢 Updated Opacity
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -165,7 +188,6 @@ class EditProfileHeader extends StatelessWidget {
               }),
             ),
             const SizedBox(height: 12),
-
             AnimatedBuilder(
               animation: Listenable.merge([
                 controller.firstNameCtrl,
@@ -177,11 +199,11 @@ class EditProfileHeader extends StatelessWidget {
                         .trim();
 
                 return Text(
-                  fullName.isEmpty ? "Loading..." : fullName,
-                  style: const TextStyle(
+                  fullName.isEmpty ? "Loading...".tr : fullName, // 🟢 Added .tr
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 );
               },
@@ -192,13 +214,13 @@ class EditProfileHeader extends StatelessWidget {
     );
   }
 
-  // 🎯 បំបែកមុខងារគូរ Placeholder (រូបមនុស្ស) ឱ្យងាយស្រួលហៅប្រើ
-  Widget _buildPlaceholderAvatar() {
+  Widget _buildPlaceholderAvatar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       key: const ValueKey('avatar_placeholder'),
       width: 82,
       height: 82,
-      color: AppColors.primaryLight,
+      color: isDark ? AppColors.darkSurfaceElevated : AppColors.primaryLight,
       child: const Icon(
         Icons.person_rounded,
         size: 42,
@@ -210,19 +232,15 @@ class EditProfileHeader extends StatelessWidget {
 
 class _AvatarTapScale extends StatefulWidget {
   const _AvatarTapScale({required this.onTap, required this.child});
-
   final VoidCallback onTap;
   final Widget child;
-
   @override
   State<_AvatarTapScale> createState() => _AvatarTapScaleState();
 }
 
 class _AvatarTapScaleState extends State<_AvatarTapScale> {
   double _scale = 1.0;
-
   void _setScale(double value) => setState(() => _scale = value);
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

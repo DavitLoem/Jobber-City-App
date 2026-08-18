@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../candidates_view.dart';
@@ -9,37 +10,43 @@ class JobFilterDropdown extends GetView<CandidatesViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      color: Colors.white,
+      color: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: InkWell(
-        onTap: () =>
-            _showJobBottomSheet(context), // 🎯 ចុចដើម្បីបើក Bottom Sheet
+        onTap: () => _showJobBottomSheet(context, isDark, theme),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: isDark
+                ? AppColors.darkInputBackground
+                : Colors.grey.shade50, // 🟢 Dynamic Box BG
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(
+              color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+            ), // 🟢 Dynamic Border
           ),
           child: Row(
             children: [
               Icon(
                 LucideIcons.briefcase,
+                color: isDark ? AppColors.darkIconSecondary : Colors.grey,
                 size: 20,
-                color: Colors.grey.shade500,
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Obx(
                   () => Text(
                     controller
-                        .selectedJobDisplayName, // 🟢 បង្ហាញឈ្មោះដែលបានរើសពី Controller
-                    style: const TextStyle(
+                        .selectedJobDisplayName, // Already translated in controller
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -48,8 +55,8 @@ class JobFilterDropdown extends GetView<CandidatesViewController> {
               ),
               Icon(
                 LucideIcons.chevronDown,
+                color: isDark ? AppColors.darkIconSecondary : Colors.grey,
                 size: 20,
-                color: Colors.grey.shade400,
               ),
             ],
           ),
@@ -58,74 +65,72 @@ class JobFilterDropdown extends GetView<CandidatesViewController> {
     );
   }
 
-  // 🎯 អនុគមន៍សម្រាប់គូរផ្ទាំង Bottom Sheet
-  void _showJobBottomSheet(BuildContext context) {
+  void _showJobBottomSheet(BuildContext context, bool isDark, ThemeData theme) {
     Get.bottomSheet(
       Container(
-        height:
-            MediaQuery.of(context).size.height *
-            0.65, // កំណត់កម្ពស់ 65% នៃអេក្រង់
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        padding: const EdgeInsets.only(top: 16),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Header ──
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Select Job Post",
+                  Text(
+                    "Select Job".tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.black54,
+                    icon: Icon(
+                      LucideIcons.x,
+                      color: isDark ? AppColors.darkIconSecondary : Colors.grey,
                     ),
                     onPressed: () => Get.back(),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFEEEEEE)),
-
-            // ── បញ្ជីការងារ ──
+            Divider(
+              color: isDark ? AppColors.darkDivider : Colors.grey.shade200,
+            ),
             Expanded(
               child: Obx(() {
-                // ពេលកំពុង Load API
                 if (controller.isJobsLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
                 }
 
                 return ListView(
-                  padding: const EdgeInsets.only(bottom: 24),
+                  physics: const BouncingScrollPhysics(),
                   children: [
-                    // 🟢 ជម្រើស "All Jobs" នៅលើគេជានិច្ច
                     _buildJobTile(
                       jobId: 'all',
-                      displayName: 'All Jobs',
+                      displayName: 'All Jobs'.tr, // 🟢 Added .tr
                       status: 'active',
                       isSelected:
                           controller.selectedJobId.value == 'all' ||
                           controller.selectedJobId.value.isEmpty,
+                      isDark: isDark,
+                      theme: theme,
                     ),
-                    const Divider(height: 1, indent: 20, endIndent: 20),
-
-                    // 🟢 បញ្ជីការងារពិតប្រាកដដែលទាញពី Backend
                     ...controller.postedJobs.map((job) {
                       return _buildJobTile(
                         jobId: job.jobId,
                         displayName: job.displayName,
                         status: job.status,
                         isSelected: controller.selectedJobId.value == job.jobId,
+                        isDark: isDark,
+                        theme: theme,
                       );
                     }),
                   ],
@@ -135,24 +140,27 @@ class JobFilterDropdown extends GetView<CandidatesViewController> {
           ],
         ),
       ),
-      isScrollControlled: true, // អនុញ្ញាតឱ្យ Bottom Sheet ឡើងខ្ពស់បាន
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
   }
 
-  // 🎯 អនុគមន៍គូរ Item នីមួយៗក្នុងបញ្ជី
   Widget _buildJobTile({
     required String jobId,
     required String displayName,
     required String status,
     required bool isSelected,
+    required bool isDark,
+    required ThemeData theme,
   }) {
     final bool isClosed = status.toLowerCase() != 'active' && jobId != 'all';
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       tileColor: isSelected
-          ? const Color(0xFF4f7df7).withValues(alpha: 0.05)
+          ? AppColors.primary.withValues(
+              alpha: isDark ? 0.15 : 0.05, // 🟢 Updated opacity
+            ) // 🟢 Dynamic Selection Tint
           : Colors.transparent,
       title: Text(
         displayName,
@@ -160,18 +168,33 @@ class JobFilterDropdown extends GetView<CandidatesViewController> {
           fontSize: 15,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           color: isClosed
-              ? Colors.grey.shade500
-              : (isSelected ? const Color(0xFF4f7df7) : Colors.black87),
+              ? (isDark
+                    ? AppColors.darkTextDisabled
+                    : Colors.grey.shade500) // 🟢 Dynamic Text Colors
+              : (isSelected
+                    ? AppColors.primary
+                    : theme.textTheme.bodyLarge?.color),
         ),
       ),
+      subtitle: jobId != 'all'
+          ? Text(
+              isClosed ? "Closed".tr : "Active".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 12,
+                color: isClosed
+                    ? Colors.redAccent
+                    : (isDark ? Colors.greenAccent : Colors.green),
+              ),
+            )
+          : null,
       trailing: isSelected
-          ? const Icon(Icons.check_circle_rounded, color: Color(0xFF4f7df7))
+          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
           : null,
       onTap: () {
-        Get.back(); // បិទ Bottom Sheet សិន
+        Get.back();
         if (controller.selectedJobId.value != jobId) {
           controller.selectedJobId.value = jobId;
-          controller.fetchApplicants(); // ហៅ API ទាញបេក្ខជនសារថ្មី
+          controller.fetchApplicants();
         }
       },
     );

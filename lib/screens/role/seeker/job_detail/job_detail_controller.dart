@@ -86,8 +86,10 @@ class JobDetailController extends GetxController {
         }
 
         Get.snackbar(
-          "Application Sent! 🎉",
-          "You have successfully applied to ${job.value!.companyName}.",
+          "Application Sent! 🎉".tr, // 🟢 Added .tr
+          "You have successfully applied to @company.".trParams({
+            'company': job.value!.companyName,
+          }), // 🟢 Added .trParams for dynamic company name
           snackPosition: SnackPosition.TOP,
           backgroundColor: AppColors.successBackground,
           colorText: AppColors.success,
@@ -97,7 +99,7 @@ class JobDetailController extends GetxController {
     } catch (e) {
       // 🎯 បង្ហាញ Error ពេលគាត់ដាក់ពាក្យលើស ១០ ដង ឬ Error ផ្សេងៗ
       Get.snackbar(
-        "Application Failed",
+        "Application Failed".tr, // 🟢 Added .tr
         e.toString().replaceAll("Exception: ", ""),
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red.shade50,

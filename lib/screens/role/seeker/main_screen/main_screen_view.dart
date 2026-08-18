@@ -1,6 +1,7 @@
 import 'package:cuberto_bottom_bar/cuberto_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors import
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_controller.dart';
 
@@ -9,9 +10,12 @@ class MainScreenView extends GetView<MainScreenController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+    // 🟢 Grab the active theme data
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic Scaffold BG
       // 🎯 ប្រើ IndexedStack ផ្ទុក Navigators ទាំង ៤
       body: Obx(
         () => IndexedStack(
@@ -28,29 +32,32 @@ class MainScreenView extends GetView<MainScreenController> {
       bottomNavigationBar: Obx(
         () => CubertoBottomBar(
           key: const Key("BottomBar"),
-          inactiveIconColor: Colors.grey.shade400,
+          // 🟢 Dynamic inactive icon color depending on theme mode
+          inactiveIconColor: isDark
+              ? AppColors.darkTextSecondary
+              : Colors.grey.shade400,
           tabStyle: CubertoTabStyle.styleFadedBackground,
           selectedTab: controller.currentIndex.value,
           tabs: [
             TabData(
               iconData: Icons.home_rounded,
-              title: "Home",
-              tabColor: Colors.blue,
+              title: "Home".tr, // 🟢 Added .tr
+              tabColor: AppColors.primary,
             ),
             TabData(
               iconData: Icons.bookmark_rounded,
-              title: "Saved",
-              tabColor: Colors.blue,
+              title: "Saved".tr, // 🟢 Added .tr
+              tabColor: AppColors.primary,
             ),
             TabData(
               iconData: Icons.description_rounded,
-              title: "Applications",
-              tabColor: Colors.blue,
+              title: "Applications".tr, // 🟢 Added .tr
+              tabColor: AppColors.primary,
             ),
             TabData(
               iconData: Icons.person_rounded,
-              title: "Profile",
-              tabColor: Colors.blue,
+              title: "Profile".tr, // 🟢 Added .tr
+              tabColor: AppColors.primary,
             ),
           ],
           onTabChangedListener: (position, title, color) {
@@ -63,8 +70,8 @@ class MainScreenView extends GetView<MainScreenController> {
 
   Widget _buildNavigator(int nestedId, String initialRoute) {
     return Navigator(
-      key: Get.nestedKey(nestedId), // កំណត់ ID ផ្តាច់មុខឱ្យ Tab នីមួយៗ
-      initialRoute: initialRoute, // តម្រុយទៅកាន់ onGenerateRoute (ឧ. /home)
+      key: Get.nestedKey(nestedId),
+      initialRoute: initialRoute,
       onGenerateRoute: controller.onGenerateRoute,
     );
   }

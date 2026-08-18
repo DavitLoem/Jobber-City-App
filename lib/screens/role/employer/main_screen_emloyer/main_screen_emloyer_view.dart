@@ -8,33 +8,37 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class MainScreenEmloyerView extends GetView<MainScreenEmloyerController> {
   const MainScreenEmloyerView({super.key});
 
-  final List<_NavItem> _navItems = const [
+  // Note: We use a getter here so .tr evaluates correctly on context changes
+  List<_NavItem> get _navItems => [
     _NavItem(
       icon: LucideIcons.home,
       activeIcon: LucideIcons.home,
-      label: 'Home',
+      label: 'Home'.tr, // 🟢 Added .tr
     ),
     _NavItem(
       icon: LucideIcons.briefcase,
       activeIcon: LucideIcons.briefcase,
-      label: 'My Jobs',
+      label: 'My Jobs'.tr, // 🟢 Added .tr
     ),
     _NavItem(
       icon: LucideIcons.users,
       activeIcon: LucideIcons.users,
-      label: 'Candidates',
+      label: 'Candidates'.tr, // 🟢 Added .tr
     ),
     _NavItem(
       icon: LucideIcons.user,
       activeIcon: LucideIcons.user,
-      label: 'Profile',
+      label: 'Profile'.tr, // 🟢 Added .tr
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
 
       body: Obx(
         () => IndexedStack(
@@ -53,6 +57,8 @@ class MainScreenEmloyerView extends GetView<MainScreenEmloyerController> {
           currentIndex: controller.currentIndex.value,
           items: _navItems,
           onTap: controller.changeTab,
+          theme: theme, // 🟢 Passed Context
+          isDark: isDark, // 🟢 Passed Context
         ),
       ),
     );
@@ -83,26 +89,39 @@ class _BottomNav extends StatelessWidget {
   final int currentIndex;
   final List<_NavItem> items;
   final ValueChanged<int> onTap;
+  final ThemeData theme;
+  final bool isDark;
 
   const _BottomNav({
     required this.currentIndex,
     required this.items,
     required this.onTap,
+    required this.theme,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.scaffoldBackgroundColor, // 🟢 Dynamic Nav Bar BG
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.06, // 🟢 Updated to withValues
+            ), // 🟢 Dynamic Shadow
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
         ],
-        border: Border(top: BorderSide(color: Colors.transparent, width: 1)),
+        border: Border(
+          top: BorderSide(
+            color: isDark
+                ? AppColors.darkDivider
+                : Colors.transparent, // 🟢 Dynamic Top Border
+            width: 1,
+          ),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -129,7 +148,11 @@ class _BottomNav extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: active
-                              ? AppColors.primary.withValues(alpha: 0.10)
+                              ? AppColors.primary.withValues(
+                                  alpha: isDark
+                                      ? 0.15
+                                      : 0.10, // 🟢 Updated to withValues
+                                ) // 🟢 Dynamic Active BG Tint
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -138,7 +161,10 @@ class _BottomNav extends StatelessWidget {
                           size: 24,
                           color: active
                               ? AppColors.primary
-                              : AppColors.navBarInactive,
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors
+                                          .navBarInactive), // 🟢 Dynamic Inactive Icon
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -151,7 +177,10 @@ class _BottomNav extends StatelessWidget {
                               : FontWeight.w500,
                           color: active
                               ? AppColors.primary
-                              : AppColors.navBarInactive,
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors
+                                          .navBarInactive), // 🟢 Dynamic Inactive Text
                         ),
                         child: Text(item.label),
                       ),

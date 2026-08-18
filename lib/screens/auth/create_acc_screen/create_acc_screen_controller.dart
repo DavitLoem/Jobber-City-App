@@ -43,7 +43,8 @@ class CreateAccScreenViewController extends GetxController {
       Get.snackbar(
         "Notice",
         "Please agree to the Terms and Conditions",
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: AppColors.warning, // 🟢 Updated to AppColors
+        colorText: Colors.white,
       );
       return;
     }

@@ -20,8 +20,10 @@ class JobDetailView extends GetView<JobDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -38,11 +40,8 @@ class JobDetailView extends GetView<JobDetailController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CompanyInfoCard(),
-                        // SizedBox(height: 22),
-                        JobContentSections(), // 🎯 ព័ត៌មានទាំងអស់នៅទីនេះ
-                        SizedBox(
-                          height: 110,
-                        ), // ទុករន្ធចន្លោះសម្រាប់ Bottom Bar
+                        JobContentSections(),
+                        SizedBox(height: 110),
                       ],
                     ),
                   ),

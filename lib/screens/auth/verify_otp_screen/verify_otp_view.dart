@@ -22,13 +22,17 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
+        foregroundColor:
+            theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Appbar Text/Icon
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
@@ -39,129 +43,161 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                Image.asset(
-                  AppAssets.imageOtp,
-                  fit: BoxFit.contain,
-                  height: 180,
-                ),
-                const SizedBox(height: 30),
-                const Text(
-                  "Check Your Email",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "We have sent an OTP code to ",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      controller.maskedEmail.isNotEmpty
-                          ? controller.maskedEmail
-                          : "your email",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                // ប្រឡោះបញ្ចូលលេខកូដទាំង ៤ ខ្ទង់
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(
-                    4,
-                    (index) => _buildOtpTextField(index),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // ប៊ូតុងផ្ញើឡើងវិញ និងការបង្ហាញការរាប់ថយក្រោយ
-                Obx(() {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          children: [
+            Center(
+              child: Image.asset(
+                AppAssets.imageOtp,
+                fit: BoxFit.cover,
+                height: 350,
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Didn't receive code? ",
-                        style: TextStyle(color: AppColors.textSecondary),
-                      ),
-                      GestureDetector(
-                        onTap: controller.remainingSeconds.value == 0
-                            ? () => controller.resendOtp()
-                            : null,
-                        child: Text(
-                          controller.remainingSeconds.value == 0
-                              ? "Resend OTP"
-                              : "Resend in ${controller.remainingSeconds.value}s",
-                          style: TextStyle(
-                            color: controller.remainingSeconds.value == 0
-                                ? AppColors.primary
-                                : Colors.grey,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      const SizedBox(height: 30),
+                      Text(
+                        "Check Your Email",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: theme
+                              .textTheme
+                              .bodyLarge
+                              ?.color, // 🟢 Dynamic Title
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "We have sent an OTP code to ",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors
+                                        .textSecondary, // 🟢 Dynamic Subtitle
+                            ),
+                          ),
+                          Text(
+                            controller.maskedEmail.isNotEmpty
+                                ? controller.maskedEmail
+                                : "your email",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: theme
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.color, // 🟢 Dynamic Highlight
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(
+                          4,
+                          (index) => _buildOtpTextField(
+                            index,
+                            isDark,
+                          ), // 🟢 Passed Context (isDark)
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      Obx(() {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Didn't receive code? ",
+                              style: TextStyle(
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors
+                                          .textSecondary, // 🟢 Dynamic Subtext
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: controller.remainingSeconds.value == 0
+                                  ? () => controller.resendOtp()
+                                  : null,
+                              child: Text(
+                                controller.remainingSeconds.value == 0
+                                    ? "Resend OTP"
+                                    : "Resend in ${controller.remainingSeconds.value}s",
+                                style: TextStyle(
+                                  color: controller.remainingSeconds.value == 0
+                                      ? AppColors.primary
+                                      : (isDark
+                                            ? AppColors.darkTextHint
+                                            : Colors
+                                                  .grey), // 🟢 Dynamic Hint Text
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+
+                      const Spacer(),
+
+                      Obx(() {
+                        return CustomButton(
+                          onPressed: () {
+                            if (!controller.isLoading.value) {
+                              controller.verifyOtp();
+                            }
+                          },
+                          text: controller.isLoading.value
+                              ? "Verifying..."
+                              : "Verify & Proceed",
+                        );
+                      }),
+                      const SizedBox(height: 20),
                     ],
-                  );
-                }),
-
-                const Spacer(),
-
-                Obx(() {
-                  return CustomButton(
-                    onPressed: () {
-                      // ប្រសិនបើមិនកំពុង Loading ទេ ទើបអនុញ្ញាតឱ្យហៅ verifyOtp()
-                      if (!controller.isLoading.value) {
-                        controller.verifyOtp();
-                      }
-                    },
-                    text: controller.isLoading.value
-                        ? "Verifying..."
-                        : "Verify & Proceed",
-                  );
-                }),
-                const SizedBox(height: 20),
-              ],
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  // Widget សម្រាប់ប្រឡោះ OTP នីមួយៗ
-  Widget _buildOtpTextField(int index) {
+  Widget _buildOtpTextField(int index, bool isDark) {
     return SizedBox(
       width: 60,
       height: 60,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.inputBackground,
-          border: Border.all(color: AppColors.buttonOutlineBorder, width: 2),
+          color: isDark
+              ? AppColors.darkInputBackground
+              : AppColors.inputBackground, // 🟢 Dynamic BG
+          border: Border.all(
+            color: isDark
+                ? AppColors.darkCardBorder
+                : AppColors.buttonOutlineBorder, // 🟢 Dynamic Border
+            width: 2,
+          ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textTertiary.withValues(alpha: 0.2),
+              color: Colors.black.withOpacity(
+                isDark ? 0.2 : 0.05,
+              ), // 🟢 Adjusted shadow
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -179,10 +215,12 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                 controller.focusNodes[index - 1].requestFocus();
               }
             },
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: isDark
+                  ? AppColors.darkInputText
+                  : AppColors.textPrimary, // 🟢 Dynamic Input Text
             ),
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,

@@ -10,7 +10,6 @@ class TrainingViewController extends GetxController {
       _parentController.profileData.value?.trainings ?? [];
   final editingId = Rx<String?>(null);
 
-  // ─── Text Controllers ───
   final courseNameCtrl = TextEditingController();
   final institutionCtrl = TextEditingController();
   final startDateCtrl = TextEditingController();
@@ -27,7 +26,6 @@ class TrainingViewController extends GetxController {
     }
   }
 
-  // ─── រៀបចំ Form ───
   void clearForm() {
     editingId.value = null;
     courseNameCtrl.clear();
@@ -40,7 +38,6 @@ class TrainingViewController extends GetxController {
 
   void populateForm(TrainingModel training) {
     editingId.value = training.id;
-    // 💡 សន្មតថា TrainingModel មាន Fields ទាំងនេះ
     courseNameCtrl.text = training.courseName;
     institutionCtrl.text = training.institution;
     startDateCtrl.text = _formatDateForInput(training.startDate);
@@ -49,14 +46,13 @@ class TrainingViewController extends GetxController {
     descriptionCtrl.text = training.description ?? '';
   }
 
-  // ─── រក្សាទុក (Save / Update) ───
   Future<void> saveTraining() async {
     if (courseNameCtrl.text.trim().isEmpty ||
         institutionCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Required',
-        'Course Name and Institution are required.',
-        backgroundColor: Colors.orange,
+        'Required'.tr, // 🟢 Added .tr
+        'Course Name and Institution are required.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.warning,
         colorText: Colors.white,
       );
       return;
@@ -89,41 +85,40 @@ class TrainingViewController extends GetxController {
 
       Get.back();
       Get.snackbar(
-        'Success',
-        'Training saved successfully.',
-        backgroundColor: Colors.green,
+        'Success'.tr, // 🟢 Added .tr
+        'Training saved successfully.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
     } catch (e) {
-      _showErrorSnackbar('Failed to save: $e');
+      _showErrorSnackbar('Failed to save: '.tr + '$e'); // 🟢 Added .tr
     } finally {
       isSaving.value = false;
     }
   }
 
-  // ─── លុប (Delete) ───
   Future<void> deleteTraining(String id) async {
     try {
       isLoading.value = true;
       await _profileService.deleteTraining(id);
       await _parentController.fetchCompleteProfile();
       Get.snackbar(
-        'Deleted',
-        'Training removed.',
-        backgroundColor: Colors.green,
+        'Deleted'.tr, // 🟢 Added .tr
+        'Training removed.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
     } catch (e) {
-      _showErrorSnackbar('Failed to delete: $e');
+      _showErrorSnackbar('Failed to delete: '.tr + '$e'); // 🟢 Added .tr
     } finally {
       isLoading.value = false;
     }
   }
 
   void _showErrorSnackbar(String msg) => Get.snackbar(
-    'Error',
+    'Error'.tr, // 🟢 Added .tr
     msg,
-    backgroundColor: Colors.redAccent,
+    backgroundColor: AppColors.error,
     colorText: Colors.white,
   );
 }

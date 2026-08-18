@@ -114,7 +114,9 @@ class CompanyDetailViewController extends GetxController {
       final types = masterCtrl.masterDataCache['employment-types'];
       if (types != null) {
         final type = types.firstWhere((t) => t.id == typeId);
-        return type.name;
+        return type
+            .name
+            .tr; // 🟢 Added .tr (if you translate dynamic data types)
       }
     } catch (_) {}
 
@@ -122,19 +124,21 @@ class CompanyDetailViewController extends GetxController {
   }
 
   String getIndustryName(String? industryId) {
-    if (industryId == null || industryId.isEmpty) return 'Unknown Industry';
+    if (industryId == null || industryId.isEmpty)
+      return 'Unknown Industry'.tr; // 🟢 Added .tr
     try {
       final industries = masterCtrl.masterDataCache['industries'];
       if (industries != null) {
         final industry = industries.firstWhere((i) => i.id == industryId);
-        return industry.name; // ឈ្មោះ Field តាម Model របស់អ្នក
+        return industry.name.tr; // 🟢 Added .tr
       }
     } catch (_) {}
-    return 'Unknown Industry';
+    return 'Unknown Industry'.tr; // 🟢 Added .tr
   }
 
   String getLocationName(String? provId, String? distId) {
-    if (provId == null || provId.isEmpty) return 'Unknown Location';
+    if (provId == null || provId.isEmpty)
+      return 'Unknown Location'.tr; // 🟢 Added .tr
     String location = '';
 
     try {
@@ -151,7 +155,7 @@ class CompanyDetailViewController extends GetxController {
       }
     } catch (_) {}
 
-    return location.isEmpty ? 'Unknown Location' : location;
+    return location.isEmpty ? 'Unknown Location'.tr : location; // 🟢 Added .tr
   }
 
   // 🎯 មុខងារថ្មីសម្រាប់ទាញយក District មកញាត់ចូលក្នុង Cache

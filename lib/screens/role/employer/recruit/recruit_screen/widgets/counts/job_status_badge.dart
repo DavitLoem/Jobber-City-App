@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// Small colored pill showing the normalized status group
-/// (Active / Paused / Draft / Closed).
 class JobStatusBadge extends StatelessWidget {
   final String group;
 
@@ -10,25 +9,39 @@ class JobStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     late final Color bg;
     late final Color fg;
 
     switch (group) {
       case 'Active':
-        bg = AppColors.successBackground;
-        fg = AppColors.success;
+        bg = isDark
+            ? Colors.greenAccent.withValues(
+                alpha: 0.15,
+              ) // 🟢 Updated to withValues
+            : AppColors.successBackground;
+        fg = isDark ? Colors.greenAccent : AppColors.success;
         break;
       case 'Paused':
-        bg = AppColors.warningBackground;
-        fg = AppColors.warning;
+        bg = isDark
+            ? Colors.orangeAccent.withValues(
+                alpha: 0.15,
+              ) // 🟢 Updated to withValues
+            : AppColors.warningBackground;
+        fg = isDark ? Colors.orangeAccent : AppColors.warning;
         break;
       case 'Closed':
-        bg = AppColors.errorBackground;
-        fg = AppColors.error;
+        bg = isDark
+            ? Colors.redAccent.withValues(
+                alpha: 0.15,
+              ) // 🟢 Updated to withValues
+            : AppColors.errorBackground;
+        fg = isDark ? Colors.redAccent : AppColors.error;
         break;
       default:
-        bg = AppColors.infoBackground;
-        fg = AppColors.info;
+        bg = isDark ? AppColors.darkSurfaceElevated : AppColors.infoBackground;
+        fg = isDark ? AppColors.darkTextHint : AppColors.info;
     }
 
     return Container(
@@ -38,13 +51,8 @@ class JobStatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        group.toUpperCase(),
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          color: fg,
-          letterSpacing: 0.3,
-        ),
+        group.tr, // 🟢 Added .tr for localized group label
+        style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.w700),
       ),
     );
   }

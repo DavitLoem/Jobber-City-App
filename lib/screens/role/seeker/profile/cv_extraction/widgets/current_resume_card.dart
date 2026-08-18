@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class CurrentResumeCard extends StatelessWidget {
@@ -15,19 +16,26 @@ class CurrentResumeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F0),
+        color: isDark
+            ? Colors.redAccent.withValues(alpha: 0.08) // 🟢 Fixed Opacity
+            : const Color(0xFFFFF0F0),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: Colors.redAccent.withValues(alpha: 0.3),
+        ), // 🟢 Fixed Opacity
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -43,18 +51,21 @@ class CurrentResumeCard extends StatelessWidget {
               children: [
                 Text(
                   filename,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Uploaded Document",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  "Uploaded Document".tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    color: theme.textTheme.bodyMedium?.color,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),

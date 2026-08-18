@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// Horizontal scrollable status filter (All / Active / Paused / Draft / Closed)
-/// with a live count badge on each chip.
 class JobFilterChipBar extends StatelessWidget {
   final List<String> options;
   final String selected;
@@ -20,7 +19,7 @@ class JobFilterChipBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.white,
+      color: Colors.transparent, // 🟢 Blend with scaffold
       padding: const EdgeInsets.only(bottom: 16),
       child: SizedBox(
         height: 36,
@@ -61,6 +60,9 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -69,12 +71,23 @@ class _FilterChip extends StatelessWidget {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.chipUnselected,
+          color: isSelected
+              ? AppColors.primary
+              : (isDark
+                    ? AppColors.darkSurfaceElevated
+                    : AppColors.chipUnselected), // 🟢 Dynamic Chip BG
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark && !isSelected
+                ? AppColors.darkCardBorder
+                : Colors.transparent,
+          ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.shadowBlue,
+                    color: AppColors.shadowBlue.withValues(
+                      alpha: isDark ? 0.3 : 0.5,
+                    ), // 🟢 Updated to withValues
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -83,11 +96,18 @@ class _FilterChip extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          '$label ($count)',
+          '@label (@count)'.trParams({
+            'label': label.tr,
+            'count': count.toString(),
+          }), // 🟢 Added .trParams
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isSelected ? AppColors.white : AppColors.chipUnselectedText,
+            color: isSelected
+                ? AppColors.white
+                : (isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.chipUnselectedText), // 🟢 Dynamic Text
           ),
         ),
       ),

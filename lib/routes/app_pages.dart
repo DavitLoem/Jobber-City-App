@@ -161,7 +161,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.setting,
       page: () => SettingScreenView(),
-      binding: SettingScreenViewBinding(),
+      binding: SettingScreenBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),

@@ -7,8 +7,10 @@ import '../job_detail_view.dart';
 class BottomApplyBar extends GetView<JobDetailController> {
   const BottomApplyBar({super.key});
 
-  // 🎯 មុខងារសម្រាប់ហៅផ្ទាំង Bottom Sheet មកបង្ហាញ
   void _showApplyBottomSheet(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.only(
@@ -17,9 +19,9 @@ class BottomApplyBar extends GetView<JobDetailController> {
           top: 24,
           bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -29,12 +31,12 @@ class BottomApplyBar extends GetView<JobDetailController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Apply for this job",
+                  Text(
+                    "Apply for this job".tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
                   GestureDetector(
@@ -42,12 +44,16 @@ class BottomApplyBar extends GetView<JobDetailController> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: isDark
+                            ? AppColors.darkSurfaceElevated
+                            : Colors.grey.shade100,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textTertiary,
                         size: 20,
                       ),
                     ),
@@ -56,27 +62,41 @@ class BottomApplyBar extends GetView<JobDetailController> {
               ),
               const SizedBox(height: 16),
 
-              // 🎯 ផ្នែកបង្ហាញស្ថានភាព CV (Resume Status Card)
               Obx(() {
                 if (controller.isLoadingProfile.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
                 bool hasCv = controller.resumeUrl.value.isNotEmpty;
-                // 🎯 យកឈ្មោះ CV មកបង្ហាញ បើគ្មានដាក់ "Attached Resume/CV"
                 String displayName = controller.resumeFilename.value.isNotEmpty
                     ? controller.resumeFilename.value
-                    : "Attached Resume/CV";
+                    : "Attached Resume/CV".tr; // 🟢 Added .tr
 
                 return Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: hasCv ? AppColors.primaryLight : Colors.red.shade50,
+                    color: hasCv
+                        ? (isDark
+                              ? AppColors.primary.withValues(
+                                  alpha: 0.15,
+                                ) // 🟢 Updated opacity
+                              : AppColors.primaryLight)
+                        : (isDark
+                              ? Colors.redAccent.withValues(
+                                  alpha: 0.15,
+                                ) // 🟢 Updated opacity
+                              : Colors.red.shade50),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: hasCv
-                          ? AppColors.primary.withValues(alpha: 0.3)
-                          : Colors.red.shade200,
+                          ? AppColors.primary.withValues(
+                              alpha: 0.3,
+                            ) // 🟢 Updated opacity
+                          : (isDark
+                                ? Colors.redAccent.withValues(
+                                    alpha: 0.4,
+                                  ) // 🟢 Updated opacity
+                                : Colors.red.shade200),
                     ),
                   ),
                   child: Row(
@@ -84,7 +104,13 @@ class BottomApplyBar extends GetView<JobDetailController> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: hasCv ? Colors.white : Colors.red.shade100,
+                          color: hasCv
+                              ? (isDark ? AppColors.darkSurface : Colors.white)
+                              : (isDark
+                                    ? Colors.redAccent.withValues(
+                                        alpha: 0.3,
+                                      ) // 🟢 Updated opacity
+                                    : Colors.red.shade100),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -93,7 +119,9 @@ class BottomApplyBar extends GetView<JobDetailController> {
                               : Icons.warning_rounded,
                           color: hasCv
                               ? AppColors.primary
-                              : Colors.red.shade700,
+                              : (isDark
+                                    ? Colors.redAccent
+                                    : Colors.red.shade700),
                           size: 20,
                         ),
                       ),
@@ -105,28 +133,37 @@ class BottomApplyBar extends GetView<JobDetailController> {
                             Text(
                               hasCv
                                   ? displayName
-                                  : "No Resume/CV Found", // 🎯 បង្ហាញឈ្មោះឯកសារនៅទីនេះ
+                                  : "No Resume/CV Found".tr, // 🟢 Added .tr
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: hasCv
                                     ? AppColors.primary
-                                    : Colors.red.shade700,
+                                    : (isDark
+                                          ? Colors.redAccent
+                                          : Colors.red.shade700),
                               ),
                               maxLines: 1,
-                              overflow: TextOverflow
-                                  .ellipsis, // ការពារករណីឈ្មោះវែងពេក
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
                             Text(
                               hasCv
                                   ? "This document will be sent to the employer."
-                                  : "Please upload a CV in your profile first.",
+                                        .tr // 🟢 Added .tr
+                                  : "Please upload a CV in your profile first."
+                                        .tr, // 🟢 Added .tr
                               style: TextStyle(
                                 fontSize: 12,
                                 color: hasCv
-                                    ? AppColors.primary.withValues(alpha: 0.8)
-                                    : Colors.red.shade600,
+                                    ? AppColors.primary.withValues(
+                                        alpha: 0.8,
+                                      ) // 🟢 Updated opacity
+                                    : (isDark
+                                          ? Colors.redAccent.withValues(
+                                              alpha: 0.8,
+                                            ) // 🟢 Updated opacity
+                                          : Colors.red.shade600),
                               ),
                             ),
                           ],
@@ -139,27 +176,35 @@ class BottomApplyBar extends GetView<JobDetailController> {
 
               const SizedBox(height: 24),
 
-              const Text(
-                "Cover Letter (Optional)",
+              Text(
+                "Cover Letter (Optional)".tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: controller.coverLetterController,
                 maxLines: 4,
+                style: TextStyle(
+                  color: isDark ? AppColors.darkInputText : AppColors.inputText,
+                ),
                 decoration: InputDecoration(
                   hintText:
-                      "Write a short message explaining why you are a great fit...",
+                      "Write a short message explaining why you are a great fit..."
+                          .tr, // 🟢 Added .tr
                   hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: isDark
+                        ? AppColors.darkTextHint
+                        : Colors.grey.shade400,
                     fontSize: 13,
                   ),
                   filled: true,
-                  fillColor: AppColors.lightSurfaceVariant,
+                  fillColor: isDark
+                      ? AppColors.darkInputBackground
+                      : AppColors.lightSurfaceVariant,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -170,7 +215,6 @@ class BottomApplyBar extends GetView<JobDetailController> {
 
               const SizedBox(height: 24),
 
-              // 🎯 ប៊ូតុង Submit
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -181,14 +225,14 @@ class BottomApplyBar extends GetView<JobDetailController> {
                       controller.isApplying.value;
 
                   return ElevatedButton(
-                    // 🎯 បិទប៊ូតុងបើអត់មាន CV ឬកំពុង Load
                     onPressed: (hasCv && !isLoading)
                         ? () => controller.submitApplication()
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      disabledBackgroundColor:
-                          Colors.grey.shade300, // ពណ៌ប៊ូតុងពេលត្រូវបិទ
+                      disabledBackgroundColor: isDark
+                          ? AppColors.darkSurfaceElevated
+                          : Colors.grey.shade300,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -203,9 +247,9 @@ class BottomApplyBar extends GetView<JobDetailController> {
                               strokeWidth: 2.5,
                             ),
                           )
-                        : const Text(
-                            "Submit Application",
-                            style: TextStyle(
+                        : Text(
+                            "Submit Application".tr, // 🟢 Added .tr
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -225,13 +269,18 @@ class BottomApplyBar extends GetView<JobDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 26),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowLight,
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05, // 🟢 Updated opacity
+            ),
             blurRadius: 20,
             offset: const Offset(0, -6),
           ),
@@ -239,7 +288,6 @@ class BottomApplyBar extends GetView<JobDetailController> {
       ),
       child: Row(
         children: [
-          // ប៊ូតុង Save (Bookmark)
           Obx(
             () => GestureDetector(
               onTap: controller.toggleSave,
@@ -247,7 +295,9 @@ class BottomApplyBar extends GetView<JobDetailController> {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.lightSurfaceVariant,
+                  color: isDark
+                      ? AppColors.darkSurfaceElevated
+                      : AppColors.lightSurfaceVariant,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -256,15 +306,12 @@ class BottomApplyBar extends GetView<JobDetailController> {
                       : Icons.bookmark_border_rounded,
                   color: controller.job.value?.isSaved == true
                       ? AppColors.primary
-                      : AppColors.textHint,
+                      : (isDark ? AppColors.darkTextHint : AppColors.textHint),
                 ),
               ),
             ),
           ),
-
           const SizedBox(width: 12),
-
-          // ប៊ូតុង Apply Now
           Expanded(
             child: Obx(
               () => GestureDetector(
@@ -275,9 +322,8 @@ class BottomApplyBar extends GetView<JobDetailController> {
                   duration: const Duration(milliseconds: 300),
                   height: 52,
                   decoration: BoxDecoration(
-                    // ប្តូរពណ៌ទៅពណ៌បៃតងពេលដាក់ពាក្យរួច
                     color: controller.hasApplied.value
-                        ? AppColors.success
+                        ? (isDark ? Colors.greenAccent : AppColors.success)
                         : AppColors.primary,
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -294,7 +340,9 @@ class BottomApplyBar extends GetView<JobDetailController> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        controller.hasApplied.value ? "Applied" : "Apply Now",
+                        controller.hasApplied.value
+                            ? "Applied".tr
+                            : "Apply Now".tr, // 🟢 Added .tr
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,

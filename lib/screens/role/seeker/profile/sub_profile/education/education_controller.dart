@@ -2,10 +2,8 @@ part of 'education_view.dart';
 
 class EducationViewController extends GetxController {
   final ProfileCrudService _profileService = ProfileCrudService();
-
   final _parentController = Get.find<ProfileScreenViewController>();
 
-  // ─── State Variables ───
   final isLoading = false.obs;
   final isSaving = false.obs;
   final Rx<String?> editingId = Rx<String?>(null);
@@ -13,14 +11,12 @@ class EducationViewController extends GetxController {
   List<EducationModel> get educationList =>
       _parentController.profileData.value?.educations ?? [];
 
-  // ─── Text Controllers ───
   final schoolNameCtrl = TextEditingController();
   final degreeCtrl = TextEditingController();
   final fieldOfStudyCtrl = TextEditingController();
   final startDateCtrl = TextEditingController();
   final endDateCtrl = TextEditingController();
 
-  // ─── Helper: ទម្រង់កាលបរិច្ឆេទសម្រាប់ Form ───
   String _formatDateForInput(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) return '';
     try {
@@ -31,7 +27,6 @@ class EducationViewController extends GetxController {
     }
   }
 
-  // ─── 1. រៀបចំ Form សម្រាប់ការ Add ថ្មី ───
   void clearForm() {
     editingId.value = null;
     schoolNameCtrl.clear();
@@ -41,7 +36,6 @@ class EducationViewController extends GetxController {
     endDateCtrl.clear();
   }
 
-  // ─── 2. រៀបចំ Form សម្រាប់ការ Edit ───
   void populateForm(EducationModel edu) {
     editingId.value = edu.id;
     schoolNameCtrl.text = edu.schoolName;
@@ -51,14 +45,12 @@ class EducationViewController extends GetxController {
     endDateCtrl.text = _formatDateForInput(edu.endDate);
   }
 
-  // ─── 3. មុខងារ Save (Add & Update) ───
   Future<void> saveEducation() async {
-    // Validation ងាយៗ
     if (schoolNameCtrl.text.trim().isEmpty || degreeCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Validation Error',
-        'School Name and Degree are required.',
-        backgroundColor: Colors.orange,
+        'Validation Error'.tr, // 🟢 Added .tr
+        'School Name and Degree are required.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.warning,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -68,7 +60,6 @@ class EducationViewController extends GetxController {
     try {
       isSaving.value = true;
 
-      // រៀបចំទិន្នន័យ (Payload)
       final payload = EducationModel(
         id: editingId.value,
         schoolName: schoolNameCtrl.text.trim(),
@@ -82,32 +73,30 @@ class EducationViewController extends GetxController {
             : null,
       );
 
-      // បាញ់ API ទៅតាមលក្ខខណ្ឌ
       if (editingId.value != null) {
-        // UPDATE
         await _profileService.updateEducation(editingId.value!, payload);
       } else {
-        // ADD NEW
         await _profileService.addEducation(payload);
       }
 
       await _parentController.fetchCompleteProfile();
 
-      Get.back(); // បិទ Form
+      Get.back();
       Get.snackbar(
-        'Success',
+        'Success'.tr, // 🟢 Added .tr
         editingId.value == null
             ? 'Education added successfully.'
-            : 'Education updated successfully.',
-        backgroundColor: Colors.green,
+                  .tr // 🟢 Added .tr
+            : 'Education updated successfully.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to save: $e',
-        backgroundColor: Colors.redAccent,
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to save: '.tr + '$e', // 🟢 Added .tr
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -116,7 +105,6 @@ class EducationViewController extends GetxController {
     }
   }
 
-  // ─── 4. មុខងារ Delete ───
   Future<void> deleteEducation(String id) async {
     try {
       isLoading.value = true;
@@ -125,18 +113,18 @@ class EducationViewController extends GetxController {
       await _parentController.fetchCompleteProfile();
 
       Get.snackbar(
-        'Deleted',
-        'Education background has been removed.',
+        'Deleted'.tr, // 🟢 Added .tr
+        'Education background has been removed.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to delete: $e',
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to delete: '.tr + '$e', // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     } finally {
@@ -145,11 +133,12 @@ class EducationViewController extends GetxController {
   }
 
   @override
-  onClose() {
+  void onClose() {
     schoolNameCtrl.dispose();
     degreeCtrl.dispose();
     fieldOfStudyCtrl.dispose();
     startDateCtrl.dispose();
     endDateCtrl.dispose();
+    super.onClose();
   }
 }

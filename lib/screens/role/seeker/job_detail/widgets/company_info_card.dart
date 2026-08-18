@@ -9,15 +9,22 @@ class CompanyInfoCard extends GetView<JobDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowLight,
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.2 : 0.03, // 🟢 Updated to withValues
+            ),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -26,14 +33,17 @@ class CompanyInfoCard extends GetView<JobDetailController> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Logo
           Container(
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: AppColors.lightSurfaceVariant,
+              color: isDark
+                  ? AppColors.darkSurfaceElevated
+                  : AppColors.lightSurfaceVariant,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.cardBorder),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+              ),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -52,7 +62,6 @@ class CompanyInfoCard extends GetView<JobDetailController> {
             ),
           ),
           const SizedBox(width: 14),
-          // Info
           Expanded(
             child: Obx(() {
               final job = controller.job.value;
@@ -62,10 +71,10 @@ class CompanyInfoCard extends GetView<JobDetailController> {
                 children: [
                   Text(
                     job.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -80,18 +89,22 @@ class CompanyInfoCard extends GetView<JobDetailController> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_rounded,
                         size: 14,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextTertiary
+                            : AppColors.textTertiary,
                       ),
                       const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          job.location,
-                          style: const TextStyle(
+                          job.location.tr, // 🟢 Translated Location
+                          style: TextStyle(
                             fontSize: 12.5,
-                            color: AppColors.textTertiary,
+                            color: isDark
+                                ? AppColors.darkTextTertiary
+                                : AppColors.textTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -103,7 +116,6 @@ class CompanyInfoCard extends GetView<JobDetailController> {
               );
             }),
           ),
-          // Bookmark
           Obx(
             () => GestureDetector(
               onTap: controller.toggleSave,
@@ -111,7 +123,9 @@ class CompanyInfoCard extends GetView<JobDetailController> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.lightSurfaceVariant,
+                  color: isDark
+                      ? AppColors.darkSurfaceElevated
+                      : AppColors.lightSurfaceVariant,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: AnimatedSwitcher(
@@ -126,7 +140,9 @@ class CompanyInfoCard extends GetView<JobDetailController> {
                     size: 19,
                     color: controller.job.value?.isSaved == true
                         ? AppColors.primary
-                        : AppColors.textHint,
+                        : (isDark
+                              ? AppColors.darkTextHint
+                              : AppColors.textHint),
                   ),
                 ),
               ),

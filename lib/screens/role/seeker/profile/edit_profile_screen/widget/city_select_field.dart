@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// A text-field-styled selector for City / Province (or any other
-/// API-backed single-select list).
 class CitySelectField<T> extends StatefulWidget {
   const CitySelectField({
     super.key,
@@ -41,7 +40,6 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
   final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
   bool _isOpen = false;
-  // 🟢 បន្ថែមអថេរសម្រាប់តាមដានថាមានទិន្នន័យ (អក្សរ) ត្រូវបានជ្រើសរើសឬអត់
   bool _hasText = false;
 
   late final AnimationController _arrowController = AnimationController(
@@ -52,14 +50,10 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
   @override
   void initState() {
     super.initState();
-    _hasText =
-        widget.controller.text.isNotEmpty; // ឆែកមើលពេលបើកមកដំបូង[cite: 48]
-
+    _hasText = widget.controller.text.isNotEmpty;
     _focusNode.addListener(() {
       setState(() => _isFocused = _focusNode.hasFocus);
     });
-
-    // 🟢 ស្តាប់រាល់ពេលមានការផ្លាស់ប្តូរនៅក្នុង Controller[cite: 48]
     widget.controller.addListener(() {
       if (mounted) {
         setState(() {
@@ -108,18 +102,21 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
     }
   }
 
-  // 🟢 កែប្រែ Logic ពណ៌ Icon ត្រង់នេះឲ្យដូចទៅនឹង ProfileTextField[cite: 48]
-  Color get _accentColor {
-    if (!widget.enabled) return AppColors.iconDisabled;
-    if (_isFocused || _isOpen) return AppColors.inputFocusedBorder;
+  Color _accentColor(bool isDark) {
+    if (!widget.enabled)
+      return isDark ? AppColors.darkTextDisabled : AppColors.iconDisabled;
+    if (_isFocused || _isOpen) return AppColors.primary;
     if (_hasText) {
-      return AppColors.inputIconText; // ប្តូរទៅពណ៌ខ្មៅពេលមានទិន្នន័យជ្រើសរើសរួច
+      return isDark ? AppColors.darkInputText : AppColors.inputIconText;
     }
-    return AppColors.inputIconText;
+    return isDark ? AppColors.darkTextHint : AppColors.inputIconText;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return AnimatedScale(
       scale: (_isFocused || _isOpen) ? 1.01 : 1.0,
       duration: const Duration(milliseconds: 180),
@@ -135,15 +132,25 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: widget.enabled ? Colors.black87 : Colors.grey,
+          color: widget.enabled
+              ? theme.textTheme.bodyLarge?.color
+              : theme.disabledColor,
         ),
         decoration: InputDecoration(
           filled: true,
           fillColor: widget.enabled
               ? ((_isFocused || _isOpen)
-                    ? AppColors.inputFocusedBackground
-                    : AppColors.inputBackground)
-              : AppColors.inputDisabledBackground,
+                    ? (isDark
+                          ? AppColors.darkInputFocusedBackground
+                          : AppColors.inputFocusedBackground)
+                    : (isDark
+                          ? AppColors.darkInputBackground
+                          : AppColors.inputBackground))
+              : (isDark
+                    ? AppColors.darkInputBackground.withValues(
+                        alpha: 0.5,
+                      ) // 🟢 Updated
+                    : AppColors.inputDisabledBackground),
           contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -156,7 +163,7 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide(
-              color: AppColors.inputFocusedBorder,
+              color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
               width: 1.5,
             ),
           ),
@@ -174,9 +181,8 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
               duration: const Duration(milliseconds: 180),
               child: Icon(
                 widget.prefixIcon,
-                // 🟢 បន្ថែម _hasText ចូលក្នុង Key ដើម្បីឲ្យវា Animates ដូរពណ៌
                 key: ValueKey('$_isFocused-$_isOpen-$_hasText'),
-                color: _accentColor,
+                color: _accentColor(isDark),
               ),
             ),
           ),
@@ -186,16 +192,17 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
               turns: Tween(begin: 0.0, end: 0.5).animate(_arrowController),
               child: Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: _accentColor,
+                color: _accentColor(isDark),
               ),
             ),
           ),
           hintText: widget.hintText,
           hintStyle: TextStyle(
-            // 🟢 Hint Text នៅតែជាពណ៌ប្រផេះធម្មតា
             color: widget.enabled
-                ? AppColors.inputIconText
-                : AppColors.iconDisabled,
+                ? (isDark ? AppColors.darkTextHint : AppColors.inputIconText)
+                : (isDark
+                      ? AppColors.darkTextDisabled
+                      : AppColors.iconDisabled),
             fontSize: 16,
             fontWeight: FontWeight.w400,
           ),
@@ -205,8 +212,6 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
   }
 }
 
-/// Bottom sheet that loads the option list from the API and lets the user
-/// search + pick one.
 class _OptionPickerSheet<T> extends StatefulWidget {
   const _OptionPickerSheet({
     required this.fetchOptions,
@@ -230,7 +235,6 @@ class _OptionPickerSheet<T> extends StatefulWidget {
 
 class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
   final TextEditingController _searchCtrl = TextEditingController();
-
   List<T> _allOptions = [];
   List<T> _filteredOptions = [];
   bool _isLoading = true;
@@ -264,7 +268,8 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to load list. Please try again.';
+        _errorMessage =
+            'Failed to load list. Please try again.'.tr; // 🟢 Added .tr
         _isLoading = false;
       });
     }
@@ -284,6 +289,9 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.72,
       minChildSize: 0.4,
@@ -291,9 +299,9 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
       expand: false,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -302,7 +310,7 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: isDark ? AppColors.darkDivider : Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -314,10 +322,10 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                     Expanded(
                       child: Text(
                         widget.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.inputIconText,
+                          color: theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                     ),
@@ -326,10 +334,16 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: AppColors.inputBackground,
+                          color: isDark
+                              ? AppColors.darkInputBackground
+                              : AppColors.inputBackground,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.close_rounded, size: 18),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 18,
+                          color: theme.textTheme.bodyLarge?.color,
+                        ),
                       ),
                     ),
                   ],
@@ -340,11 +354,19 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                 padding: const EdgeInsets.symmetric(horizontal: 18.0),
                 child: TextField(
                   controller: _searchCtrl,
+                  style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                   decoration: InputDecoration(
                     hintText: widget.searchHint,
-                    prefixIcon: const Icon(
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.textHint,
+                    ),
+                    prefixIcon: Icon(
                       Icons.search_rounded,
-                      color: AppColors.inputIconText,
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.inputIconText,
                     ),
                     suffixIcon: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 150),
@@ -353,13 +375,19 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                       child: _hasQuery
                           ? IconButton(
                               key: const ValueKey('clear'),
-                              icon: const Icon(Icons.close_rounded, size: 18),
+                              icon: Icon(
+                                Icons.close_rounded,
+                                size: 18,
+                                color: theme.iconTheme.color,
+                              ),
                               onPressed: () => _searchCtrl.clear(),
                             )
                           : const SizedBox.shrink(key: ValueKey('empty')),
                     ),
                     filled: true,
-                    fillColor: AppColors.inputBackground,
+                    fillColor: isDark
+                        ? AppColors.darkInputBackground
+                        : AppColors.inputBackground,
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
@@ -367,8 +395,10 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: const BorderSide(
-                        color: AppColors.inputFocusedBorder,
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.primary
+                            : AppColors.inputFocusedBorder,
                         width: 1.5,
                       ),
                     ),
@@ -376,7 +406,7 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
                 ),
               ),
               const SizedBox(height: 10),
-              Expanded(child: _buildBody(scrollController)),
+              Expanded(child: _buildBody(scrollController, isDark)),
             ],
           ),
         );
@@ -384,17 +414,20 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
     );
   }
 
-  Widget _buildBody(ScrollController scrollController) {
+  Widget _buildBody(ScrollController scrollController, bool isDark) {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: AppColors.inputFocusedBorder),
-            SizedBox(height: 12),
+            const CircularProgressIndicator(color: AppColors.primary),
+            const SizedBox(height: 12),
             Text(
-              'Loading options...',
-              style: TextStyle(color: AppColors.textHint, fontSize: 13),
+              'Loading options...'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -420,7 +453,7 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
             TextButton.icon(
               onPressed: _loadOptions,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry'),
+              label: Text('Retry'.tr), // 🟢 Added .tr
             ),
           ],
         ),
@@ -428,15 +461,21 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
     }
 
     if (_filteredOptions.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 36, color: AppColors.textHint),
-            SizedBox(height: 10),
+            Icon(
+              Icons.search_off_rounded,
+              size: 36,
+              color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+            ),
+            const SizedBox(height: 10),
             Text(
-              'No results found',
-              style: TextStyle(color: AppColors.textHint),
+              'No results found'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+              ),
             ),
           ],
         ),
@@ -448,7 +487,10 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       itemCount: _filteredOptions.length,
       separatorBuilder: (_, __) => widget.showSeparators
-          ? const Divider(height: 1)
+          ? Divider(
+              height: 1,
+              color: isDark ? AppColors.darkDivider : Colors.grey.shade200,
+            )
           : const SizedBox(height: 2),
       itemBuilder: (context, index) {
         final option = _filteredOptions[index];
@@ -462,7 +504,9 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
           margin: const EdgeInsets.symmetric(vertical: 2),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.inputFocusedBorder.withOpacity(0.08)
+                ? AppColors.primary.withValues(
+                    alpha: 0.15,
+                  ) // 🟢 Updated Opacity
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
@@ -473,14 +517,20 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
             leading: CircleAvatar(
               radius: 16,
               backgroundColor: isSelected
-                  ? AppColors.inputFocusedBorder
-                  : AppColors.inputBackground,
+                  ? AppColors.primary
+                  : (isDark
+                        ? AppColors.darkSurfaceElevated
+                        : AppColors.inputBackground),
               child: Text(
                 label.isNotEmpty ? label[0].toUpperCase() : '?',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? Colors.white : AppColors.inputIconText,
+                  color: isSelected
+                      ? Colors.white
+                      : (isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.inputIconText),
                 ),
               ),
             ),
@@ -489,13 +539,17 @@ class _OptionPickerSheetState<T> extends State<_OptionPickerSheet<T>> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: AppColors.inputIconText,
+                color: isSelected
+                    ? (isDark ? Colors.white : Colors.black87)
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.inputIconText),
               ),
             ),
             trailing: isSelected
                 ? const Icon(
                     Icons.check_circle_rounded,
-                    color: AppColors.inputFocusedBorder,
+                    color: AppColors.primary,
                   )
                 : null,
             onTap: () {

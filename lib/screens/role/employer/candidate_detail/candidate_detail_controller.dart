@@ -26,7 +26,6 @@ class CandidateDetailViewController extends GetxController {
     }
   }
 
-  // 🎯 មុខងារប្តូរ Status
   Future<void> changeApplicantStatus(
     String newStatus, {
     Map<String, dynamic>? interviewSchedule,
@@ -34,7 +33,6 @@ class CandidateDetailViewController extends GetxController {
   }) async {
     isUpdating.value = true;
 
-    // ១. រង់ចាំលទ្ធផលពី Controller មេ
     final success = await _listController.updateApplicantStatus(
       applicant.applicationId,
       newStatus,
@@ -44,18 +42,18 @@ class CandidateDetailViewController extends GetxController {
 
     isUpdating.value = false;
 
-    // ២. ប្រសិនបើជោគជ័យ ទើបយើងបិទទំព័រ និងបង្ហាញ Snackbar
     if (success) {
-      Get.back(); // 🎯 បិទទំព័រ Detail (ត្រឡប់ទៅកាន់បញ្ជីវិញ)
+      Get.back();
 
-      // 🎯 ប្រើប្រាស់ Delay បន្តិច ដើម្បីឱ្យ Animation បិទទំព័រដើរចប់សិន ទើបបញ្ចេញ Snackbar
       Future.delayed(const Duration(milliseconds: 400), () {
         Get.snackbar(
-          "Success",
-          "Candidate has been moved to ${newStatus.capitalizeFirst}.",
+          "Success".tr, // 🟢 Added .tr
+          "Candidate has been moved to @status.".trParams({
+            'status': newStatus.capitalizeFirst ?? newStatus,
+          }), // 🟢 Added .trParams
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green.shade50,
-          colorText: Colors.green.shade800,
+          backgroundColor: AppColors.successBackground,
+          colorText: AppColors.success,
           duration: const Duration(seconds: 3),
           margin: const EdgeInsets.all(16),
         );
@@ -63,21 +61,15 @@ class CandidateDetailViewController extends GetxController {
     }
   }
 
-  // 🎯 អនុគមន៍សម្រាប់ទាញយកឈ្មោះ CV ចេញពី URL
   String getCvFileName(String? url) {
-    if (url == null || url.isEmpty) return "No CV Attached";
+    if (url == null || url.isEmpty) return "No CV Attached".tr; // 🟢 Added .tr
 
     try {
-      // ១. កាត់ចោល Query Parameters (បើមាន ឧ. ?alt=media...)
       String cleanUrl = url.split('?').first;
-
-      // ២. ទាញយកឈ្មោះឯកសារក្រោយសញ្ញា / ចុងក្រោយគេ
       String fileName = cleanUrl.split('/').last;
-
-      // ៣. បំប្លែងកូដដូចជា %20 មកជាដកឃ្លា (Space) វិញឱ្យស្រួលអាន
       return Uri.decodeComponent(fileName);
     } catch (e) {
-      return "Applicant_Resume.pdf"; // Fallback បើមាន Error
+      return "Applicant_Resume.pdf";
     }
   }
 

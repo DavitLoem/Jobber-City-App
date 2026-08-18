@@ -7,6 +7,9 @@ class CategoryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       child: Column(
@@ -20,24 +23,28 @@ class CategoryHeader extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.cardBackground, // ជំនួស _Tok.surfaceEl
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorder),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : AppColors.cardBorder,
+                    ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 16,
-                    color: AppColors.textPrimary, // ជំនួស _Tok.ink
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
               ),
               const SizedBox(width: 16),
-              const Text(
-                'Your Expertise',
+              Text(
+                'Your Expertise'.tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: theme.textTheme.bodyLarge?.color,
                   letterSpacing: -0.6,
                   height: 1.1,
                 ),
@@ -47,10 +54,10 @@ class CategoryHeader extends StatelessWidget {
           const SizedBox(height: 20),
 
           Text(
-            'Select up to 5 fields that match your skills',
+            'Select up to 5 fields that match your skills'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: theme.textTheme.bodyMedium?.color,
               fontWeight: FontWeight.w400,
             ),
           ),

@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/widgets/arrow_key_back.dart';
 
-/// Top header for the "My Jobs" screen.
-///
-/// Shows the back arrow, screen title, a live post count, and the primary
-/// "New Job" action. Kept dumb/presentational — all data comes in as
-/// plain params so it never needs to know about GetX or the controller.
 class RecruitAppHeader extends StatelessWidget {
   final int totalJobs;
   final VoidCallback onNewJob;
@@ -19,9 +15,12 @@ class RecruitAppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      color: AppColors.white,
+      color: Colors.transparent,
       child: Row(
         children: [
           const ArrowKeyBack(),
@@ -30,27 +29,35 @@ class RecruitAppHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'My Jobs',
+                Text(
+                  'My Jobs'.tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: theme.textTheme.bodyLarge?.color,
                     letterSpacing: -0.3,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$totalJobs total post${totalJobs == 1 ? '' : 's'}',
-                  style: const TextStyle(
+                  totalJobs == 1
+                      ? '@total total post'.trParams({
+                          'total': totalJobs.toString(),
+                        })
+                      : '@total total posts'.trParams({
+                          'total': totalJobs.toString(),
+                        }), // 🟢 Added .trParams
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.textTertiary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textTertiary,
                   ),
                 ),
               ],
             ),
           ),
-          _NewJobButton(onTap: onNewJob),
+          _NewJobButton(onTap: onNewJob, isDark: isDark),
         ],
       ),
     );
@@ -59,8 +66,9 @@ class RecruitAppHeader extends StatelessWidget {
 
 class _NewJobButton extends StatelessWidget {
   final VoidCallback onTap;
+  final bool isDark;
 
-  const _NewJobButton({required this.onTap});
+  const _NewJobButton({required this.onTap, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -70,28 +78,39 @@ class _NewJobButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.primary, AppColors.secondary],
+          gradient: LinearGradient(
+            colors: isDark
+                ? [
+                    AppColors.primary.withValues(
+                      alpha: 0.8,
+                    ), // 🟢 Updated to withValues
+                    AppColors.secondary.withValues(
+                      alpha: 0.8,
+                    ), // 🟢 Updated to withValues
+                  ]
+                : [AppColors.primary, AppColors.secondary],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowBlue,
+              color: AppColors.shadowBlue.withValues(
+                alpha: isDark ? 0.3 : 0.5, // 🟢 Updated to withValues
+              ),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add_rounded, size: 18, color: AppColors.white),
-            SizedBox(width: 6),
+            const Icon(Icons.add_rounded, size: 18, color: AppColors.white),
+            const SizedBox(width: 6),
             Text(
-              'New Job',
-              style: TextStyle(
+              'New Job'.tr, // 🟢 Added .tr
+              style: const TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,

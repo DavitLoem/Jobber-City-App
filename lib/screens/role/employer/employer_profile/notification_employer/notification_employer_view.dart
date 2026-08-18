@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'notification_employer_binding.dart';
@@ -11,82 +12,98 @@ class NotificationEmployerView
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: theme.textTheme.bodyLarge?.color,
+          ), // 🟢 Dynamic Back Icon
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Notifications',
+        title: Text(
+          'Notifications'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.checkCheck, color: Color(0xFF4f7df7)),
-            tooltip: 'Mark all as read',
-            onPressed: () {
-              // មុខងារ Mark all as read
-            },
+            icon: const Icon(LucideIcons.checkCheck, color: AppColors.primary),
+            tooltip: 'Mark all as read'.tr, // 🟢 Added .tr
+            onPressed: () {},
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 10),
         children: [
-          _buildDateHeader("Today"),
+          _buildDateHeader("Today".tr, isDark), // 🟢 Added .tr
           _buildNotificationItem(
             icon: LucideIcons.userPlus,
-            iconColor: Colors.green,
-            title: "New Candidate Application",
+            iconColor: isDark ? Colors.greenAccent : Colors.green,
+            title: "New Candidate Application".tr, // 🟢 Added .tr
+            // 🟢 In a real app, use .trParams for dynamic names and roles
             message:
-                "Sok Dara has applied for the Senior Flutter Developer position.",
-            time: "2 mins ago",
+                "Sok Dara has applied for the Senior Flutter Developer position."
+                    .tr,
+            time: "2 mins ago".tr, // 🟢 Added .tr
             isUnread: true,
+            theme: theme,
+            isDark: isDark,
           ),
           _buildNotificationItem(
             icon: LucideIcons.briefcase,
-            iconColor: const Color(0xFF4f7df7),
-            title: "Job Post Approved",
+            iconColor: AppColors.primary,
+            title: "Job Post Approved".tr, // 🟢 Added .tr
             message:
-                "Your job post 'UI/UX Designer' is now live and visible to candidates.",
-            time: "3 hours ago",
+                "Your job post 'UI/UX Designer' is now live and visible to candidates."
+                    .tr, // 🟢 Added .tr
+            time: "3 hours ago".tr, // 🟢 Added .tr
             isUnread: true,
+            theme: theme,
+            isDark: isDark,
           ),
-
-          _buildDateHeader("Yesterday"),
+          _buildDateHeader("Yesterday".tr, isDark), // 🟢 Added .tr
           _buildNotificationItem(
             icon: LucideIcons.alertCircle,
-            iconColor: Colors.orange,
-            title: "Subscription Expiring Soon",
+            iconColor: isDark ? Colors.orangeAccent : Colors.orange,
+            title: "Subscription Expiring Soon".tr, // 🟢 Added .tr
             message:
-                "Your premium plan will expire in 3 days. Renew now to keep posting.",
-            time: "1 day ago",
+                "Your premium plan will expire in 3 days. Renew now to keep posting."
+                    .tr, // 🟢 Added .tr
+            time: "1 day ago".tr, // 🟢 Added .tr
             isUnread: false,
+            theme: theme,
+            isDark: isDark,
           ),
           _buildNotificationItem(
             icon: LucideIcons.users,
-            iconColor: Colors.purple,
-            title: "Interview Reminder",
+            iconColor: isDark ? Colors.purpleAccent : Colors.purple,
+            title: "Interview Reminder".tr, // 🟢 Added .tr
             message:
-                "You have an interview scheduled with Chan Minea at 2:00 PM.",
-            time: "1 day ago",
+                "You have an interview scheduled with Chan Minea at 2:00 PM."
+                    .tr, // 🟢 Added .tr
+            time: "1 day ago".tr, // 🟢 Added .tr
             isUnread: false,
+            theme: theme,
+            isDark: isDark,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDateHeader(String text) {
+  Widget _buildDateHeader(String text, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 8),
       child: Text(
@@ -94,7 +111,9 @@ class NotificationEmployerView
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.grey.shade500,
+          color: isDark
+              ? AppColors.darkTextHint
+              : Colors.grey.shade500, // 🟢 Dynamic Date Text
           letterSpacing: 1.2,
         ),
       ),
@@ -108,27 +127,30 @@ class NotificationEmployerView
     required String message,
     required String time,
     required bool isUnread,
+    required ThemeData theme,
+    required bool isDark,
   }) {
     return Container(
       color: isUnread
-          ? const Color(0xFFF0F4FF)
-          : Colors.white, // ពណ៌ផ្ទៃខុសគ្នាសម្រាប់ Unread
+          ? (isDark
+                ? AppColors.primary.withValues(alpha: 0.1) // 🟢 Updated opacity
+                : const Color(0xFFF0F4FF)) // 🟢 Dynamic Unread BG Highlight
+          : Colors.transparent,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon Box
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withValues(
+                alpha: isDark ? 0.2 : 0.1, // 🟢 Updated opacity
+              ), // 🟢 Dynamic Tint
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: 20),
           ),
           const SizedBox(width: 16),
-
-          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +166,10 @@ class NotificationEmployerView
                               ? FontWeight.bold
                               : FontWeight.w600,
                           fontSize: 15,
-                          color: Colors.black87,
+                          color: theme
+                              .textTheme
+                              .bodyLarge
+                              ?.color, // 🟢 Dynamic Title
                         ),
                       ),
                     ),
@@ -154,7 +179,7 @@ class NotificationEmployerView
                         height: 8,
                         margin: const EdgeInsets.only(left: 8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF4f7df7),
+                          color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -164,7 +189,11 @@ class NotificationEmployerView
                 Text(
                   message,
                   style: TextStyle(
-                    color: isUnread ? Colors.black87 : Colors.grey.shade600,
+                    color: isUnread
+                        ? (isDark ? Colors.white70 : Colors.black87)
+                        : (isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey.shade600), // 🟢 Dynamic Subtitle
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -173,7 +202,9 @@ class NotificationEmployerView
                 Text(
                   time,
                   style: TextStyle(
-                    color: Colors.grey.shade500,
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : Colors.grey.shade500, // 🟢 Dynamic Time
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),

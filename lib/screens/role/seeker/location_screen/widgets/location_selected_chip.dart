@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
 class LocationSelectedChip extends StatelessWidget {
@@ -16,9 +17,9 @@ class LocationSelectedChip extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          const Text(
-            'Selected:',
-            style: TextStyle(
+          Text(
+            'Selected:'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 12,
               color: LocationColors.sub,
               fontWeight: FontWeight.w500,
@@ -41,7 +42,8 @@ class LocationSelectedChip extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  cityName,
+                  cityName
+                      .tr, // 🟢 Added .tr (In case dynamic locations are translated)
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

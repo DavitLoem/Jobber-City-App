@@ -17,13 +17,10 @@ class JobFilterBottomSheet extends StatefulWidget {
 class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
   final SearchButtonViewController searchCtrl =
       Get.find<SearchButtonViewController>();
-
-  // 🎯 ទាញយក Controllers ដែលបាន Put នៅក្នុង Search Controller
   final CategoryController categoryCtrl = Get.find<CategoryController>();
   final LocationController locationCtrl = Get.find<LocationController>();
   final MasterDataController masterDataCtrl = Get.find<MasterDataController>();
 
-  // ── អថេរផ្ទុកទិន្នន័យបណ្ដោះអាសន្ន ──
   String? _selectedCategoryId;
   String? _selectedIndustryId;
   double? _minSalary;
@@ -32,7 +29,6 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
   String? _selectedEmploymentTypeId;
   String? _selectedProvinceId;
 
-  // ── អថេរសម្រាប់ផ្ទុកទិន្នន័យពី MasterDataController ──
   List<Map<String, String>> industries = [];
   List<Map<String, String>> jobLevels = [];
   List<Map<String, String>> empTypes = [];
@@ -41,7 +37,6 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
   @override
   void initState() {
     super.initState();
-    // ១. ទាញយកតម្លៃចាស់ដែលគាត់បានរើសមកបង្ហាញវិញ (បើមាន)
     _selectedCategoryId = searchCtrl.selectedCategoryId.value;
     _selectedIndustryId = searchCtrl.selectedIndustryId.value;
     _minSalary = searchCtrl.minSalary.value;
@@ -50,7 +45,6 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
     _selectedEmploymentTypeId = searchCtrl.selectedEmploymentTypeId.value;
     _selectedProvinceId = searchCtrl.selectedProvinceId.value;
 
-    // ២. ហៅទិន្នន័យពី Master Data API
     _loadMasterData();
   }
 
@@ -63,7 +57,6 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
 
     if (mounted) {
       setState(() {
-        // 🎯 បំប្លែង MasterDataModel ទៅជា Map ដើម្បីងាយស្រួលគូរ UI
         industries = indRes
             .map((e) => {'id': e.id.toString(), 'name': e.name.toString()})
             .toList();
@@ -80,23 +73,26 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      height: Get.height * 0.88, // តម្លើងកម្ពស់បន្តិច
-      decoration: const BoxDecoration(
-        color: AppColors.lightBackground,
-        borderRadius: BorderRadius.only(
+      height: Get.height * 0.88,
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
       ),
       child: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(theme, isDark),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               children: [
-                _buildSectionTitle('Category'),
+                _buildSectionTitle('Category'.tr, theme), // 🟢 Added .tr
                 Obx(() {
                   if (categoryCtrl.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
@@ -109,18 +105,23 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                         },
                       )
                       .toList();
-                  // 🎯 ហៅ _buildSelector ជំនួសវិញ
                   return _buildSelector(
-                    title: 'Category',
+                    title:
+                        'Category', // Translation is handled inside the method
                     selectedId: _selectedCategoryId,
                     items: items,
+                    theme: theme,
+                    isDark: isDark,
                     onSelected: (val) =>
                         setState(() => _selectedCategoryId = val),
                   );
                 }),
                 const SizedBox(height: 20),
 
-                _buildSectionTitle('Location (Province)'),
+                _buildSectionTitle(
+                  'Location (Province)'.tr,
+                  theme,
+                ), // 🟢 Added .tr
                 Obx(() {
                   if (locationCtrl.isLoadingProvinces.value) {
                     return const Center(child: CircularProgressIndicator());
@@ -137,35 +138,45 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                     title: 'Location',
                     selectedId: _selectedProvinceId,
                     items: items,
+                    theme: theme,
+                    isDark: isDark,
                     onSelected: (val) =>
                         setState(() => _selectedProvinceId = val),
                   );
                 }),
                 const SizedBox(height: 20),
 
-                _buildSectionTitle('Salary Range (Monthly)'),
-                _buildSalaryRangeSlider(),
+                _buildSectionTitle(
+                  'Salary Range (Monthly)'.tr,
+                  theme,
+                ), // 🟢 Added .tr
+                _buildSalaryRangeSlider(isDark),
                 const SizedBox(height: 24),
 
-                _buildSectionTitle('Employment Type'),
+                _buildSectionTitle('Employment Type'.tr, theme), // 🟢 Added .tr
                 isMasterDataLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _buildChips(
                         _selectedEmploymentTypeId,
                         empTypes,
+                        theme,
+                        isDark,
                         (val) =>
                             setState(() => _selectedEmploymentTypeId = val),
                       ),
                 const SizedBox(height: 32),
 
-                // ── ផ្នែក Advanced Filters ──
-                const Divider(color: AppColors.cardBorder),
+                Divider(
+                  color: isDark ? AppColors.darkDivider : AppColors.cardBorder,
+                ),
                 const SizedBox(height: 16),
-                const Center(
+                Center(
                   child: Text(
-                    'Advanced Filters',
+                    'Advanced Filters'.tr, // 🟢 Added .tr
                     style: TextStyle(
-                      color: AppColors.textTertiary,
+                      color: isDark
+                          ? AppColors.darkTextTertiary
+                          : AppColors.textTertiary,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -173,58 +184,64 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                 ),
                 const SizedBox(height: 16),
 
-                _buildSectionTitle('Industry'),
+                _buildSectionTitle('Industry'.tr, theme), // 🟢 Added .tr
                 isMasterDataLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _buildSelector(
                         title: 'Industry',
                         selectedId: _selectedIndustryId,
                         items: industries,
+                        theme: theme,
+                        isDark: isDark,
                         onSelected: (val) =>
                             setState(() => _selectedIndustryId = val),
                       ),
                 const SizedBox(height: 20),
 
-                _buildSectionTitle('Job Level'),
+                _buildSectionTitle('Job Level'.tr, theme), // 🟢 Added .tr
                 isMasterDataLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _buildChips(
                         _selectedJobLevelId,
                         jobLevels,
+                        theme,
+                        isDark,
                         (val) => setState(() => _selectedJobLevelId = val),
                       ),
                 const SizedBox(height: 40),
               ],
             ),
           ),
-          _buildActionButtons(),
+          _buildActionButtons(theme, isDark),
         ],
       ),
     );
   }
 
-  // ─── UI Components ───
-
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
-        border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppColors.darkDivider : AppColors.cardBorder,
+          ),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Filter Jobs',
+          Text(
+            'Filter Jobs'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           GestureDetector(
@@ -232,12 +249,16 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.lightSurfaceVariant,
+                color: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : AppColors.lightSurfaceVariant,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.close_rounded,
-                color: AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
                 size: 20,
               ),
             ),
@@ -247,29 +268,29 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
-        title,
-        style: const TextStyle(
+        title, // Translated in the build method
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
+          color: theme.textTheme.bodyLarge?.color,
         ),
       ),
     );
   }
 
-  // 🎯 ១. ប្រអប់សម្រាប់ចុចឱ្យលោតផ្ទាំងរើស (ជំនួស Dropdown ចាស់)
   Widget _buildSelector({
     required String title,
     required String? selectedId,
     required List<Map<String, String>> items,
+    required ThemeData theme,
+    required bool isDark,
     required Function(String?) onSelected,
   }) {
-    // ស្វែងរកឈ្មោះដើម្បីបង្ហាញ បើគាត់បានរើសរួច
-    String displayValue = 'Select option';
+    String displayValue = 'Select option'.tr; // 🟢 Added .tr
     if (selectedId != null) {
       final selectedItem = items.firstWhereOrNull(
         (item) => item['id'] == selectedId,
@@ -281,17 +302,25 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
 
     return GestureDetector(
       onTap: () {
-        // កុំឲ្យចុចលោតផ្ទាំង បើទិន្នន័យមិនទាន់ Load ចប់
         if (items.isNotEmpty) {
-          _showSelectionModal(title, selectedId, items, onSelected);
+          _showSelectionModal(
+            title,
+            selectedId,
+            items,
+            theme,
+            isDark,
+            onSelected,
+          );
         }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -301,17 +330,19 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                 displayValue,
                 style: TextStyle(
                   color: selectedId == null
-                      ? AppColors.textHint
-                      : AppColors.textPrimary,
+                      ? (isDark ? AppColors.darkTextHint : AppColors.textHint)
+                      : theme.textTheme.bodyLarge?.color,
                   fontSize: 14,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(
+            Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.darkTextTertiary
+                  : AppColors.textTertiary,
             ),
           ],
         ),
@@ -319,52 +350,62 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
     );
   }
 
-  // 🎯 ២. ផ្ទាំងបញ្ជីដែលលោតឡើងមកពេលចុចរើស
   void _showSelectionModal(
     String title,
     String? selectedId,
     List<Map<String, String>> items,
+    ThemeData theme,
+    bool isDark,
     Function(String?) onSelected,
   ) {
     Get.bottomSheet(
       Container(
-        height: Get.height * 0.6, // យកកម្ពស់ត្រឹម 60%
-        decoration: const BoxDecoration(
-          color: AppColors.lightBackground,
-          borderRadius: BorderRadius.only(
+        height: Get.height * 0.6,
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
         ),
         child: Column(
           children: [
-            // ── Header របស់ Modal ──
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? AppColors.darkDivider
+                        : AppColors.cardBorder,
+                  ),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Select $title',
-                    style: const TextStyle(
+                    'Select @title'.trParams({
+                      'title': title.tr,
+                    }), // 🟢 Dynamic parameter translation
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
                   GestureDetector(
                     onTap: () => Get.back(),
-                    child: const Icon(
+                    child: Icon(
                       Icons.close_rounded,
-                      color: AppColors.textSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            // ── បញ្ជីទិន្នន័យ (ListView) ──
             Expanded(
               child: ListView.builder(
                 itemCount: items.length,
@@ -381,7 +422,7 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                             : FontWeight.normal,
                         color: isSelected
                             ? AppColors.primary
-                            : AppColors.textPrimary,
+                            : theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                     trailing: isSelected
@@ -392,7 +433,7 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                         : null,
                     onTap: () {
                       onSelected(item['id']);
-                      Get.back(); // រើសរួច បិទផ្ទាំងនេះភ្លាម
+                      Get.back();
                     },
                   );
                 },
@@ -406,7 +447,7 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
     );
   }
 
-  Widget _buildSalaryRangeSlider() {
+  Widget _buildSalaryRangeSlider(bool isDark) {
     double min = _minSalary ?? 100;
     double max = _maxSalary ?? 1500;
 
@@ -437,7 +478,9 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
           max: 3000,
           divisions: 29,
           activeColor: AppColors.primary,
-          inactiveColor: AppColors.primaryLight,
+          inactiveColor: isDark
+              ? AppColors.primary.withValues(alpha: 0.2) // 🟢 Updated opacity
+              : AppColors.primaryLight,
           onChanged: (RangeValues values) {
             setState(() {
               _minSalary = values.start;
@@ -452,6 +495,8 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
   Widget _buildChips(
     String? selectedValue,
     List<Map<String, String>> items,
+    ThemeData theme,
+    bool isDark,
     Function(String?) onChanged,
   ) {
     return Wrap(
@@ -465,15 +510,17 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
           onSelected: (selected) => onChanged(selected ? item['id'] : null),
           selectedColor: AppColors.primary,
           labelStyle: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
+            color: isSelected ? Colors.white : theme.textTheme.bodyLarge?.color,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 13,
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: theme.cardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.cardBorder,
+              color: isSelected
+                  ? AppColors.primary
+                  : (isDark ? AppColors.darkCardBorder : AppColors.cardBorder),
             ),
           ),
         );
@@ -481,14 +528,16 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(ThemeData theme, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05, // 🟢 Updated opacity
+            ),
             offset: const Offset(0, -4),
             blurRadius: 10,
           ),
@@ -500,19 +549,26 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
             flex: 1,
             child: OutlinedButton(
               onPressed: () {
-                searchCtrl.resetFilters(); // 🎯 ហៅមុខងារ Reset ក្នុង Controller
-                Get.back(); // បិទ BottomSheet
+                searchCtrl.resetFilters();
+                Get.back();
               },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                side: const BorderSide(color: AppColors.cardBorder),
+                side: BorderSide(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : AppColors.cardBorder,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'Reset',
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
+              child: Text(
+                'Reset'.tr, // 🟢 Added .tr
+                style: TextStyle(
+                  color: theme.textTheme.bodyLarge?.color,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
@@ -521,7 +577,6 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
             flex: 2,
             child: ElevatedButton(
               onPressed: () {
-                // 🎯 បោះតម្លៃដែលបានរើសទៅឱ្យ Controller ដើម្បីធ្វើការ Search
                 searchCtrl.applyFilters(
                   categoryId: _selectedCategoryId,
                   industryId: _selectedIndustryId,
@@ -531,7 +586,7 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                   empTypeId: _selectedEmploymentTypeId,
                   provId: _selectedProvinceId,
                 );
-                Get.back(); // បិទ BottomSheet
+                Get.back();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -541,9 +596,9 @@ class _JobFilterBottomSheetState extends State<JobFilterBottomSheet> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'Apply Filter',
-                style: TextStyle(
+              child: Text(
+                'Apply Filter'.tr, // 🟢 Added .tr
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

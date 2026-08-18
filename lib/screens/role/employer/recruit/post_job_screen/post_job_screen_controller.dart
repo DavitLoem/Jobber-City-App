@@ -11,29 +11,24 @@ class PostJobScreenViewController extends GetxController {
 
   final isLoading = false.obs;
 
-  // ---- Wizard step state ----
   final currentStep = 0.obs;
   final totalSteps = 4;
   final PageController pageController = PageController();
 
-  // ---- Basic Info ----
   final titleCtrl = TextEditingController();
   final provinceCtrl = TextEditingController();
   final districtCtrl = TextEditingController();
 
-  // ---- Salary & Requirements ----
   final minSalaryCtrl = TextEditingController();
   final maxSalaryCtrl = TextEditingController();
   final headCountCtrl = TextEditingController(text: '1');
   final experienceCtrl = TextEditingController(text: '1-3 Years');
 
-  // ---- Schedule ----
   final workingDaysCtrl = TextEditingController(text: 'Mon - Fri');
   final workingHoursCtrl = TextEditingController(text: '8:00 AM - 5:00 PM');
   final emailCtrl = TextEditingController();
   final telegramCtrl = TextEditingController();
 
-  // ---- Details ----
   final descCtrl = TextEditingController();
   final reqCtrl = TextEditingController();
   final aboutCompanyCtrl = TextEditingController();
@@ -64,21 +59,20 @@ class PostJobScreenViewController extends GetxController {
 
   final companyLogoUrl = ''.obs;
 
-  // Static option sets (not fetched from API)
   final experienceOptions = <DropdownItem>[
-    DropdownItem(id: 'no_exp', name: 'No Experience'),
-    DropdownItem(id: 'under_1', name: 'Under 1 Year'),
-    DropdownItem(id: '1_3', name: '1-3 Years'),
-    DropdownItem(id: '3_5', name: '3-5 Years'),
-    DropdownItem(id: '5_plus', name: '5+ Years'),
+    DropdownItem(id: 'no_exp', name: 'No Experience'.tr),
+    DropdownItem(id: 'under_1', name: 'Under 1 Year'.tr),
+    DropdownItem(id: '1_3', name: '1-3 Years'.tr),
+    DropdownItem(id: '3_5', name: '3-5 Years'.tr),
+    DropdownItem(id: '5_plus', name: '5+ Years'.tr),
   ];
 
   final workingDaysOptions = <DropdownItem>[
-    DropdownItem(id: 'mon_fri', name: 'Mon - Fri'),
-    DropdownItem(id: 'mon_sat', name: 'Mon - Sat'),
-    DropdownItem(id: 'sun_thu', name: 'Sun - Thu'),
-    DropdownItem(id: 'all_days', name: 'All Days'),
-    DropdownItem(id: 'custom', name: 'Custom'),
+    DropdownItem(id: 'mon_fri', name: 'Mon - Fri'.tr),
+    DropdownItem(id: 'mon_sat', name: 'Mon - Sat'.tr),
+    DropdownItem(id: 'sun_thu', name: 'Sun - Thu'.tr),
+    DropdownItem(id: 'all_days', name: 'All Days'.tr),
+    DropdownItem(id: 'custom', name: 'Custom'.tr),
   ];
 
   final workingHoursOptions = <DropdownItem>[
@@ -86,8 +80,8 @@ class PostJobScreenViewController extends GetxController {
     DropdownItem(id: '9:00 AM - 6:00 PM', name: '9:00 AM - 6:00 PM'),
     DropdownItem(id: '7:00 AM - 4:00 PM', name: '7:00 AM - 4:00 PM'),
     DropdownItem(id: '10:00 AM - 7:00 PM', name: '10:00 AM - 7:00 PM'),
-    DropdownItem(id: 'flexible', name: 'Flexible'),
-    DropdownItem(id: 'shift_based', name: 'Shift Based'),
+    DropdownItem(id: 'flexible', name: 'Flexible'.tr),
+    DropdownItem(id: 'shift_based', name: 'Shift Based'.tr),
   ];
 
   final salaryPeriodOptions = const ['Monthly', 'Weekly', 'Yearly'];
@@ -101,10 +95,6 @@ class PostJobScreenViewController extends GetxController {
     await _prefillContactEmail();
   }
 
-  // Email comes from the logged-in user (same source as Company Profile
-  // screen). The backend has no GET for company profile, so we read it from
-  // the saved company profile first, then login arguments, then the email
-  // stored at registration.
   Future<void> _prefillContactEmail() async {
     final args = Get.arguments;
     if (args != null && args is Map && args['email'] != null) {
@@ -127,19 +117,6 @@ class PostJobScreenViewController extends GetxController {
       companyLogoUrl.value = logoUrl;
     }
   }
-
-  // Lazy loaders for the picker sheets (same pattern as provinces).
-  // Future<List<MasterDataItem>> fetchCategories() =>
-  //     _masterDataServices.getCategories();
-  // Future<List<MasterDataItem>> fetchJobLevels() =>
-  //     _masterDataServices.getJobLevels();
-  // Future<List<MasterDataItem>> fetchEducationLevels() =>
-  //     _masterDataServices.getEducationLevels();
-  // Future<List<MasterDataItem>> fetchEmploymentTypes() =>
-  //     _masterDataServices.getEmploymentTypes();
-  // Future<List<MasterDataItem>> fetchWorkTypes() =>
-  //     _masterDataServices.getWorkTypes();
-  // Future<List<MasterDataItem>> fetchSkills() => _masterDataServices.getSkills();
 
   Future<void> selectClosingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -180,21 +157,16 @@ class PostJobScreenViewController extends GetxController {
         .toList();
   }
 
-  // ---- Step navigation with per-step validation ----
   bool _validateStep(int step) {
     switch (step) {
       case 0:
         if (titleCtrl.text.trim().isEmpty ||
             provinceId.value.isEmpty ||
-            districtId.value.isEmpty ||
-            categoryId.value.isEmpty ||
-            jobLevelId.value.isEmpty ||
-            employmentTypeId.value.isEmpty ||
-            workTypeId.value.isEmpty) {
+            districtId.value.isEmpty) {
           Get.snackbar(
-            'Notice',
-            'Please fill Job Title, Province, District, Category, Job Level, Employment Type, and Work Type.',
-            backgroundColor: Colors.orange,
+            'Notice'.tr,
+            'Please fill Job Title, Province, and District.'.tr,
+            backgroundColor: AppColors.warning,
             colorText: Colors.white,
           );
           return false;
@@ -203,12 +175,11 @@ class PostJobScreenViewController extends GetxController {
       case 1:
         if (minSalaryCtrl.text.trim().isEmpty ||
             maxSalaryCtrl.text.trim().isEmpty ||
-            headCountCtrl.text.trim().isEmpty ||
-            educationLevelId.value.isEmpty) {
+            headCountCtrl.text.trim().isEmpty) {
           Get.snackbar(
-            'Notice',
-            'Please fill Salary Range, Number of Vacancies and Education Required.',
-            backgroundColor: Colors.orange,
+            'Notice'.tr,
+            'Please fill Salary Range and Number of Vacancies.'.tr,
+            backgroundColor: AppColors.warning,
             colorText: Colors.white,
           );
           return false;
@@ -217,9 +188,9 @@ class PostJobScreenViewController extends GetxController {
       case 2:
         if (descCtrl.text.trim().isEmpty || reqCtrl.text.trim().isEmpty) {
           Get.snackbar(
-            'Notice',
-            'Please fill Job Description and Minimum Qualifications.',
-            backgroundColor: Colors.orange,
+            'Notice'.tr,
+            'Please fill Job Description and Minimum Qualifications.'.tr,
+            backgroundColor: AppColors.warning,
             colorText: Colors.white,
           );
           return false;
@@ -257,9 +228,9 @@ class PostJobScreenViewController extends GetxController {
     if (workingDaysCtrl.text.trim().isEmpty ||
         workingHoursCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Notice',
-        'Please fill Working Days and Working Hours!',
-        backgroundColor: Colors.orange,
+        'Notice'.tr,
+        'Please fill Working Days and Working Hours!'.tr,
+        backgroundColor: AppColors.warning,
         colorText: Colors.white,
       );
       return;
@@ -267,9 +238,9 @@ class PostJobScreenViewController extends GetxController {
 
     if (selectedSkillIds.isEmpty) {
       Get.snackbar(
-        'Notice',
-        'Please select at least one required skill.',
-        backgroundColor: Colors.orange,
+        'Notice'.tr,
+        'Please select at least one required skill.'.tr,
+        backgroundColor: AppColors.warning,
         colorText: Colors.white,
       );
       return;
@@ -282,7 +253,7 @@ class PostJobScreenViewController extends GetxController {
           .toList();
       final benefitsList = realBenefits.isNotEmpty
           ? realBenefits
-          : ['Not specified'];
+          : ['Not specified'.tr];
       final skillsList = selectedSkillIds.toList();
 
       final requestData = JobPostModel(
@@ -322,17 +293,17 @@ class PostJobScreenViewController extends GetxController {
       await _jobServices.postJob(requestData);
 
       Get.snackbar(
-        'Success',
-        'Job Posted Successfully!',
-        backgroundColor: Colors.green,
+        'Success'.tr,
+        'Job Posted Successfully!'.tr,
+        backgroundColor: AppColors.success,
         colorText: Colors.white,
       );
       Get.back(result: true);
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to post job: $e',
-        backgroundColor: Colors.red,
+        'Error'.tr,
+        'Failed to post job: @error'.trParams({'error': e.toString()}),
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     } finally {

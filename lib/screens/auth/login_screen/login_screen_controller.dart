@@ -56,12 +56,16 @@ class LoginScreenViewController extends GetxController {
 
       await Get.find<AuthController>().checkLoginStatus();
 
-      Get.snackbar("Success", "Login Successfully");
+      Get.snackbar(
+        "Success",
+        "Login Successfully",
+        backgroundColor: AppColors.success, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
 
       String userEmail = emailCtrl.text.trim();
       clearFields();
 
-      // Use the data from the response model for navigation
       final user = response.user;
 
       if (user.role == 'employer') {
@@ -78,17 +82,26 @@ class LoginScreenViewController extends GetxController {
         }
       }
     } on ApiException catch (e) {
-      Get.snackbar("Error", e.message);
+      Get.snackbar(
+        "Error",
+        e.message,
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
     } catch (e, stacktrace) {
       debugPrint("❌ Login Runtime Crash Log: $e\n$stacktrace");
-      Get.snackbar("Error", "An unexpected error occurred");
+      Get.snackbar(
+        "Error",
+        "An unexpected error occurred",
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
     } finally {
       if (!isClosed) isLoading.value = false;
     }
   }
 
   void loginWithGoogle() {
-    // 🎯 មិនបោះ Role ទេ ព្រោះយើងចង់ Login សុទ្ធ
     Get.find<AuthController>().loginWithGoogle();
   }
 }

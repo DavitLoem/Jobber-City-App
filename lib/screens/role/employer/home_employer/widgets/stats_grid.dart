@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class StatItem {
@@ -19,38 +20,40 @@ class StatItem {
   });
 }
 
-const List<StatItem> kStats = [
+// Ensure the data list can be passed or dynamically generated to support translations.
+// We use a getter method here so GetX (.tr) works efficiently at build time.
+List<StatItem> get kStats => [
   StatItem(
-    label: "Jobs Posted",
+    label: "Jobs Posted".tr, // 🟢 Added .tr
     value: "24",
     delta: "+3",
     up: true,
     icon: LucideIcons.briefcase,
-    gradient: [Color(0xFF4F7DF7), Color(0xFF78A8FF)],
+    gradient: const [Color(0xFF4F7DF7), Color(0xFF78A8FF)],
   ),
   StatItem(
-    label: "Total Applications",
+    label: "Total Applications".tr, // 🟢 Added .tr
     value: "863",
     delta: "+48",
     up: true,
     icon: LucideIcons.users,
-    gradient: [Color(0xFF8B5CF6), Color(0xFFC4B5FD)],
+    gradient: const [Color(0xFF8B5CF6), Color(0xFFC4B5FD)],
   ),
   StatItem(
-    label: "Interviews",
+    label: "Interviews".tr, // 🟢 Added .tr
     value: "39",
     delta: "+7",
     up: true,
     icon: LucideIcons.checkCircle,
-    gradient: [Color(0xFF22C55E), Color(0xFF86EFAC)],
+    gradient: const [Color(0xFF22C55E), Color(0xFF86EFAC)],
   ),
   StatItem(
-    label: "Hired This Month",
+    label: "Hired This Month".tr, // 🟢 Added .tr
     value: "12",
     delta: "+2",
     up: true,
     icon: LucideIcons.trendingUp,
-    gradient: [Color(0xFFF59E0B), Color(0xFFFCD34D)],
+    gradient: const [Color(0xFFF59E0B), Color(0xFFFCD34D)],
   ),
 ];
 
@@ -80,6 +83,8 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
@@ -90,7 +95,9 @@ class _StatCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.08, // 🟢 Updated opacity
+            ),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -108,11 +115,12 @@ class _StatCard extends StatelessWidget {
                 height: 90,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white.withValues(
+                    alpha: 0.1,
+                  ), // 🟢 Updated opacity
                 ),
               ),
             ),
-
             Positioned.fill(
               child: Padding(
                 padding: const EdgeInsets.only(
@@ -127,7 +135,9 @@ class _StatCard extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.22),
+                        color: Colors.white.withValues(
+                          alpha: 0.22,
+                        ), // 🟢 Updated opacity
                         borderRadius: BorderRadius.circular(10),
                       ),
                       alignment: Alignment.center,
@@ -149,7 +159,9 @@ class _StatCard extends StatelessWidget {
                       stat.label,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withValues(
+                          alpha: 0.9,
+                        ), // 🟢 Updated opacity
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -157,7 +169,6 @@ class _StatCard extends StatelessWidget {
                 ),
               ),
             ),
-
             Positioned(
               bottom: 16,
               right: 12,
@@ -169,7 +180,9 @@ class _StatCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
+                    color: Colors.white.withValues(
+                      alpha: 0.22,
+                    ), // 🟢 Updated opacity
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(

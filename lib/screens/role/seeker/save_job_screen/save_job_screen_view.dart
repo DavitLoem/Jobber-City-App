@@ -14,26 +14,22 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
-          // 🎯 បន្ថែមមុខងារ Pull-to-Refresh
           color: AppColors.primary,
           onRefresh: () => controller.fetchSavedJobs(isRefresh: true),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
-              // const SizedBox(height: 18),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 20),
-              //   child: Obx(() => _buildFilterChips()),
-              // ),
+              _buildHeader(theme, isDark),
               const SizedBox(height: 14),
               Expanded(
                 child: Obx(() {
-                  // ── ១. ពេលកំពុង Load លើកដំបូង ──
                   if (controller.isLoading.value &&
                       controller.savedJobs.isEmpty) {
                     return const Center(
@@ -43,7 +39,6 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
                     );
                   }
 
-                  // ── ២. ពេលអត់មានការងារសោះ ──
                   final jobs = controller.filteredJobs;
                   if (jobs.isEmpty) {
                     return SingleChildScrollView(
@@ -51,15 +46,13 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.6,
                         alignment: Alignment.center,
-                        child: _buildEmptyState(),
+                        child: _buildEmptyState(isDark),
                       ),
                     );
                   }
 
-                  // ── ៣. បង្ហាញបញ្ជីការងារ និងភ្ជាប់ NotificationListener សម្រាប់ Pagination ──
                   return NotificationListener<ScrollNotification>(
                     onNotification: (ScrollNotification scrollInfo) {
-                      // 🎯 អូសសល់ 150px ដល់ក្រោម ឱ្យវាទាញយកទំព័របន្ទាប់
                       if (!controller.isLoadingMore.value &&
                           scrollInfo.metrics.pixels >=
                               scrollInfo.metrics.maxScrollExtent - 150) {
@@ -76,7 +69,6 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
                           jobs.length + (controller.hasMoreData.value ? 1 : 0),
                       separatorBuilder: (_, _) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
-                        // 🎯 បង្ហាញរង្វង់ Loading នៅចុងបញ្ជី
                         if (index == jobs.length) {
                           return const Center(
                             child: Padding(
@@ -90,7 +82,6 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
 
                         final job = jobs[index];
 
-                        // 🎯 ប្រើប្រាស់ Shared Widget ជំនួសការសរសេរកាតថ្មី
                         return JobCardVertical(
                           job: job,
                           onTap: () {
@@ -98,7 +89,6 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
                               AppRoutes.jobDetail,
                               arguments: job,
                             )?.then((updatedJob) {
-                              // បើគាត់ចូលទៅ Unsave ក្នុង Job Detail ពេលថយក្រោយវិញ ឱ្យលុបចេញពីបញ្ជី
                               if (updatedJob != null &&
                                   updatedJob.isSaved == false) {
                                 controller.savedJobs.removeWhere(
@@ -107,8 +97,7 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
                               }
                             });
                           },
-                          onBookmarkTap: () =>
-                              controller.removeJob(job.id), // ហៅមុខងារ Unsave
+                          onBookmarkTap: () => controller.removeJob(job.id),
                         );
                       },
                     ),
@@ -122,8 +111,7 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
     );
   }
 
-  // ── Header: back button + title + saved count ──
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme, bool isDark) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       child: Row(
@@ -133,23 +121,28 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Saved Jobs',
+                Text(
+                  'Saved Jobs'.tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Obx(
                   () => Text(
-                    '${controller.savedJobs.length} job${controller.savedJobs.length == 1 ? '' : 's'} saved',
-                    style: const TextStyle(
+                    // 🟢 Replaced logic with scalable .trParams
+                    '@count job(s) saved'.trParams({
+                      'count': controller.savedJobs.length.toString(),
+                    }),
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textHint,
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.textHint,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -162,57 +155,7 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
     );
   }
 
-  // ── Filter chips (All / Remote / Onsite / Hybrid — derived from data) ──
-  // Widget _buildFilterChips() {
-  //   final options = controller.filterOptions;
-  //   if (controller.savedJobs.isEmpty) return const SizedBox.shrink();
-  //   return SizedBox(
-  //     height: 38,
-  //     child: ListView.separated(
-  //       scrollDirection: Axis.horizontal,
-  //       itemCount: options.length,
-  //       separatorBuilder: (_, __) => const SizedBox(width: 10),
-  //       itemBuilder: (context, index) {
-  //         final isSelected = controller.selectedFilterIndex.value == index;
-  //         return GestureDetector(
-  //           onTap: () => controller.selectedFilterIndex.value = index,
-  //           child: AnimatedContainer(
-  //             duration: const Duration(milliseconds: 200),
-  //             padding: const EdgeInsets.symmetric(horizontal: 18),
-  //             decoration: BoxDecoration(
-  //               color: isSelected ? AppColors.primary : Colors.white,
-  //               borderRadius: BorderRadius.circular(20),
-  //               border: Border.all(
-  //                 color: isSelected ? AppColors.primary : AppColors.cardBorder,
-  //               ),
-  //               boxShadow: isSelected
-  //                   ? [
-  //                       BoxShadow(
-  //                         color: AppColors.primary.withValues(alpha: 0.25),
-  //                         blurRadius: 10,
-  //                         offset: const Offset(0, 4),
-  //                       ),
-  //                     ]
-  //                   : [],
-  //             ),
-  //             alignment: Alignment.center,
-  //             child: Text(
-  //               options[index],
-  //               style: TextStyle(
-  //                 color: isSelected ? Colors.white : AppColors.primary,
-  //                 fontWeight: FontWeight.w600,
-  //                 fontSize: 13.5,
-  //               ),
-  //             ),
-  //           ),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // ── Empty state ──
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     final hasAnySaved = controller.savedJobs.isNotEmpty;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -220,8 +163,10 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
         Container(
           width: 88,
           height: 88,
-          decoration: const BoxDecoration(
-            color: AppColors.primaryLight,
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.primary.withValues(alpha: 0.2) // 🟢 Updated Opacity
+                : AppColors.primaryLight,
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -232,22 +177,28 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
         ),
         const SizedBox(height: 20),
         Text(
-          hasAnySaved ? 'No jobs match this filter' : 'No Saved Jobs Yet',
-          style: const TextStyle(
+          hasAnySaved
+              ? 'No jobs match this filter'.tr
+              : 'No Saved Jobs Yet'.tr, // 🟢 Added .tr
+          style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
+            color: isDark ? Colors.white : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           hasAnySaved
               ? 'Try a different filter, or clear it to see everything you\'ve saved.'
-              : 'Tap the bookmark icon on any job to save it here for later.',
+                    .tr // 🟢 Added .tr
+              : 'Tap the bookmark icon on any job to save it here for later.'
+                    .tr, // 🟢 Added .tr
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
-            color: AppColors.textTertiary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textTertiary,
             height: 1.4,
           ),
         ),
@@ -255,7 +206,7 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
         if (!hasAnySaved)
           GestureDetector(
             onTap: () {
-              Get.back(); // ឬ Get.offNamed(AppRoutes.home);
+              Get.back();
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
@@ -264,15 +215,17 @@ class SaveJobScreenView extends GetView<SaveJobScreenViewController> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.28),
+                    color: AppColors.primary.withValues(
+                      alpha: 0.28,
+                    ), // 🟢 Updated Opacity
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
                 ],
               ),
-              child: const Text(
-                'Browse Jobs',
-                style: TextStyle(
+              child: Text(
+                'Browse Jobs'.tr, // 🟢 Added .tr
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   fontSize: 14,

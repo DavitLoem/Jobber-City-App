@@ -12,28 +12,34 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 ទាញយក Controllers ដើម្បីយកឈ្មោះរបស់ ID នីមួយៗ
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final categoryCtrl = Get.find<CategoryController>();
     final locationCtrl = Get.find<LocationController>();
     final masterDataCtrl = Get.find<MasterDataController>();
 
     return Obx(() {
-      // បើអត់មាន Filter ទេ មិនបាច់បង្ហាញរបារនេះឡើយ
       if (controller.activeFiltersCount.value == 0) {
         return const SizedBox.shrink();
       }
 
       List<Widget> chips = [];
 
-      // អនុគមន៍ជំនួយសម្រាប់គូរ Chip នីមួយៗ
       Widget buildChip(String label, String filterType) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.primaryLight,
+            color: isDark
+                ? AppColors.primary.withValues(
+                    alpha: 0.15,
+                  ) // 🟢 Updated opacity
+                : AppColors.primaryLight,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.15),
+              color: AppColors.primary.withValues(
+                alpha: 0.2,
+              ), // 🟢 Updated opacity
             ),
           ),
           child: Row(
@@ -41,20 +47,19 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.5,
-                  color: AppColors.primary,
+                  color: isDark ? Colors.white : AppColors.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(width: 6),
               GestureDetector(
-                onTap: () =>
-                    controller.removeFilter(filterType), // 🎯 ហៅមុខងារលុប
-                child: const Icon(
+                onTap: () => controller.removeFilter(filterType),
+                child: Icon(
                   Icons.close_rounded,
                   size: 16,
-                  color: AppColors.primary,
+                  color: isDark ? Colors.white : AppColors.primary,
                 ),
               ),
             ],
@@ -62,7 +67,6 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
         );
       }
 
-      // ១. Category
       if (controller.selectedCategoryId.value != null) {
         final cat = categoryCtrl.categories.firstWhereOrNull(
           (c) => c.id.toString() == controller.selectedCategoryId.value,
@@ -70,7 +74,6 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
         if (cat != null) chips.add(buildChip(cat.name.toString(), 'category'));
       }
 
-      // ២. Location (Province)
       if (controller.selectedProvinceId.value != null) {
         final prov = locationCtrl.provinces.firstWhereOrNull(
           (p) => p.id.toString() == controller.selectedProvinceId.value,
@@ -80,7 +83,6 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
         }
       }
 
-      // ៣. Salary Range
       if (controller.minSalary.value != null ||
           controller.maxSalary.value != null) {
         double min = controller.minSalary.value ?? 100;
@@ -91,7 +93,6 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
         chips.add(buildChip(label, 'salary'));
       }
 
-      // ៤. Employment Type
       if (controller.selectedEmploymentTypeId.value != null) {
         final name = masterDataCtrl.getMasterDataName(
           'employment-types',
@@ -100,7 +101,6 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
         chips.add(buildChip(name, 'employmentType'));
       }
 
-      // ៥. Industry
       if (controller.selectedIndustryId.value != null) {
         final name = masterDataCtrl.getMasterDataName(
           'industries',
@@ -109,7 +109,6 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
         chips.add(buildChip(name, 'industry'));
       }
 
-      // ៦. Job Level
       if (controller.selectedJobLevelId.value != null) {
         final name = masterDataCtrl.getMasterDataName(
           'job-levels',

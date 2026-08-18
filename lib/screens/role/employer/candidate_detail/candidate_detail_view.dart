@@ -15,23 +15,28 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
   @override
   Widget build(BuildContext context) {
     final applicant = controller.applicant;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Applicant Details',
+        title: Text(
+          'Applicant Details'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
           onPressed: () => Get.back(),
         ),
       ),
@@ -40,13 +45,14 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── ១. ផ្នែក Header (រូបថត និង ឈ្មោះ) ──
             Center(
               child: Column(
                 children: [
                   CircleAvatar(
                     radius: 45,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.grey.shade200,
                     backgroundImage:
                         applicant.profileImageUrl != null &&
                             applicant.profileImageUrl!.isNotEmpty
@@ -55,26 +61,30 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                     child:
                         applicant.profileImageUrl == null ||
                             applicant.profileImageUrl!.isEmpty
-                        ? const Icon(
+                        ? Icon(
                             LucideIcons.user,
                             size: 40,
-                            color: Colors.grey,
+                            color: isDark
+                                ? AppColors.darkIconSecondary
+                                : Colors.grey,
                           )
                         : null,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     applicant.fullName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: theme.textTheme.bodyLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "Applied for: ${applicant.jobTitle}",
-                    style: TextStyle(
+                    "Applied for: @job".trParams({
+                      'job': applicant.jobTitle,
+                    }), // 🟢 Added .trParams
+                    style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -83,13 +93,15 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
 
-            // ── ២. ផ្នែកព័ត៌មានទូទៅ (Experience & Skills) ──
-            const Text(
-              "Skills & Experience",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              "Skills & Experience".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -98,81 +110,110 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
               children: [
                 if (applicant.yearsOfExperience > 0)
                   _buildChip(
-                    "${applicant.yearsOfExperience} Yrs Exp",
+                    "@years Yrs Exp".trParams({
+                      'years': applicant.yearsOfExperience.toString(),
+                    }), // 🟢 Added .trParams
                     isHighlight: true,
+                    isDark: isDark,
                   ),
-                ...applicant.skills.map((s) => _buildChip(s)),
+                ...applicant.skills.map((s) => _buildChip(s, isDark: isDark)),
                 if (applicant.skills.isEmpty &&
                     applicant.yearsOfExperience == 0)
                   Text(
-                    "No specific skills provided.",
+                    "No specific skills provided.".tr, // 🟢 Added .tr
                     style: TextStyle(
-                      color: Colors.grey.shade500,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : Colors.grey.shade500,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
               ],
             ),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: isDark ? AppColors.darkDivider : const Color(0xFFEEEEEE),
+              ),
             ),
 
-            // ── ៣. ផ្នែក Cover Letter ──
-            const Text(
-              "Cover Letter",
+            Text(
+              "Cover Letter".tr, // 🟢 Added .tr
               textAlign: TextAlign.justify,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : Colors.grey.shade200,
+                ),
               ),
               child: Text(
                 applicant.coverLetter != null &&
                         applicant.coverLetter!.isNotEmpty
                     ? applicant.coverLetter!
-                    : "No cover letter provided.",
+                    : "No cover letter provided.".tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.6,
-                  color: Colors.grey.shade700,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.grey.shade700,
                 ),
               ),
             ),
 
             const SizedBox(height: 24),
 
-            // ── ៤. ផ្នែក Resume/CV ──
-            const Text(
-              "Resume / CV",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              "Resume / CV".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : Colors.grey.shade200,
+                ),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: isDark
+                          ? Colors.redAccent.withValues(
+                              alpha: 0.15,
+                            ) // 🟢 Updated opacity
+                          : Colors.red.shade50,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       LucideIcons.fileText,
-                      color: Colors.red.shade600,
+                      color: isDark ? Colors.redAccent : Colors.red.shade600,
                       size: 24,
                     ),
                   ),
@@ -185,18 +226,21 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                           applicant.resumeFilename != null &&
                                   applicant.resumeFilename!.isNotEmpty
                               ? applicant.resumeFilename!
-                              : "Applicant_Resume.pdf", // Fallback បើគ្មានឈ្មោះ
-                          style: const TextStyle(
+                              : "Applicant_Resume.pdf",
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          "PDF Document",
+                          "PDF Document".tr, // 🟢 Added .tr
                           style: TextStyle(
-                            color: Colors.grey.shade500,
+                            color: isDark
+                                ? AppColors.darkTextTertiary
+                                : Colors.grey.shade500,
                             fontSize: 12,
                           ),
                         ),
@@ -208,7 +252,6 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                         applicant.resumeUrl != null &&
                             applicant.resumeUrl!.isNotEmpty
                         ? () {
-                            // 🎯 លោតទៅកាន់ទំព័រមើល CV
                             Get.to(
                               () => CvViewerView(
                                 pdfUrl: applicant.resumeUrl!,
@@ -220,13 +263,15 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: BorderSide(
-                        color: AppColors.primary.withValues(alpha: 0.5),
+                        color: AppColors.primary.withValues(
+                          alpha: 0.5,
+                        ), // 🟢 Updated opacity
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text("View"),
+                    child: Text("View".tr), // 🟢 Added .tr
                   ),
                 ],
               ),
@@ -234,41 +279,58 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           ],
         ),
       ),
-      // ── ៥. ប៊ូតុង Action ផ្នែកខាងក្រោម (Bottom Navigation Bar) ──
-      bottomNavigationBar: _buildBottomActionBar(context),
+      bottomNavigationBar: _buildBottomActionBar(context, isDark, theme),
     );
   }
 
-  // 🎯 មុខងារជំនួយសម្រាប់គូរ UI
-  Widget _buildChip(String label, {bool isHighlight = false}) {
+  Widget _buildChip(
+    String label, {
+    bool isHighlight = false,
+    required bool isDark,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isHighlight ? const Color(0xFFE0E7FF) : const Color(0xFFF0F4FF),
+        color: isHighlight
+            ? (isDark
+                  ? const Color(0xFFE0E7FF).withValues(
+                      alpha: 0.1,
+                    ) // 🟢 Updated opacity
+                  : const Color(0xFFE0E7FF))
+            : (isDark
+                  ? AppColors.darkSurfaceElevated
+                  : const Color(0xFFF0F4FF)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 13,
-          color: isHighlight ? const Color(0xFF3730A3) : AppColors.primary,
+          color: isHighlight
+              ? (isDark ? Colors.indigoAccent : const Color(0xFF3730A3))
+              : AppColors.primary,
           fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 
-  // 🎯 មុខងារបង្កើត Bottom Action Bar ទៅតាម Status របស់បេក្ខជន
-  Widget _buildBottomActionBar(BuildContext context) {
+  Widget _buildBottomActionBar(
+    BuildContext context,
+    bool isDark,
+    ThemeData theme,
+  ) {
     final status = controller.applicant.status.toLowerCase();
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05, // 🟢 Updated opacity
+            ),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -287,22 +349,28 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
             children: [
               Expanded(
                 child: _buildActionBtn(
-                  "Reject",
-                  Colors.red.shade600,
-                  Colors.red.shade50,
-                  () => _showRejectBottomSheet(context), // 🟢 ប្រើ Bottom Sheet
+                  "Reject".tr, // 🟢 Added .tr
+                  isDark ? Colors.redAccent : Colors.red.shade600,
+                  isDark
+                      ? Colors.redAccent.withValues(
+                          alpha: 0.1,
+                        ) // 🟢 Updated opacity
+                      : Colors.red.shade50,
+                  () => _showRejectBottomSheet(context, isDark, theme),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildActionBtn(
-                  "Shortlist",
+                  "Shortlist".tr, // 🟢 Added .tr
                   Colors.white,
                   AppColors.primary,
                   () => _showConfirmationDialog(
-                    "Shortlist",
+                    "Shortlist".tr, // 🟢 Added .tr
                     'shortlisted',
                     AppColors.primary,
+                    theme,
+                    isDark,
                   ),
                 ),
               ),
@@ -313,21 +381,23 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
             children: [
               Expanded(
                 child: _buildActionBtn(
-                  "Reject",
-                  Colors.red.shade600,
-                  Colors.red.shade50,
-                  () => _showRejectBottomSheet(context), // 🟢 ប្រើ Bottom Sheet
+                  "Reject".tr, // 🟢 Added .tr
+                  isDark ? Colors.redAccent : Colors.red.shade600,
+                  isDark
+                      ? Colors.redAccent.withValues(
+                          alpha: 0.1,
+                        ) // 🟢 Updated opacity
+                      : Colors.red.shade50,
+                  () => _showRejectBottomSheet(context, isDark, theme),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildActionBtn(
-                  "Interview",
+                  "Interview".tr, // 🟢 Added .tr
                   Colors.white,
-                  const Color(0xFF10B981),
-                  () => _showInterviewBottomSheet(
-                    context,
-                  ), // 🟢 ប្រើ Bottom Sheet សម្រាប់រៀបចំការសម្ភាសន៍
+                  isDark ? Colors.greenAccent : const Color(0xFF10B981),
+                  () => _showInterviewBottomSheet(context, isDark, theme),
                 ),
               ),
             ],
@@ -337,25 +407,29 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
             children: [
               Expanded(
                 child: _buildActionBtn(
-                  "Reject",
-                  Colors.red.shade600,
-                  Colors.red.shade50,
-                  () => _showRejectBottomSheet(
-                    context,
-                  ), // 🟢 ដោះស្រាយ Bug: ឈប់ហៅផ្ទាល់
+                  "Reject".tr, // 🟢 Added .tr
+                  isDark ? Colors.redAccent : Colors.red.shade600,
+                  isDark
+                      ? Colors.redAccent.withValues(
+                          alpha: 0.1,
+                        ) // 🟢 Updated opacity
+                      : Colors.red.shade50,
+                  () => _showRejectBottomSheet(context, isDark, theme),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildActionBtn(
-                  "Hire Candidate",
+                  "Hire Candidate".tr, // 🟢 Added .tr
                   Colors.white,
-                  const Color(0xFF059669),
+                  isDark ? Colors.greenAccent : const Color(0xFF059669),
                   () => _showConfirmationDialog(
-                    "Hire",
+                    "Hire".tr, // 🟢 Added .tr
                     'hired',
-                    const Color(0xFF059669),
-                  ), // 🟢 ដោះស្រាយ Bug
+                    isDark ? Colors.greenAccent : const Color(0xFF059669),
+                    theme,
+                    isDark,
+                  ),
                 ),
               ),
             ],
@@ -367,15 +441,19 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
             child: ElevatedButton(
               onPressed: null,
               style: ElevatedButton.styleFrom(
-                disabledBackgroundColor: Colors.grey.shade200,
+                disabledBackgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade200,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Text(
-                "Application Closed",
+                "Application Closed".tr, // 🟢 Added .tr
                 style: TextStyle(
-                  color: Colors.grey.shade500,
+                  color: isDark
+                      ? AppColors.darkTextDisabled
+                      : Colors.grey.shade500,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -387,48 +465,72 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
     );
   }
 
-  void _showRejectBottomSheet(BuildContext context) {
+  void _showRejectBottomSheet(
+    BuildContext context,
+    bool isDark,
+    ThemeData theme,
+  ) {
     controller.feedbackController.clear();
 
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Reject Candidate",
+            Text(
+              "Reject Candidate".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.red,
+                color: isDark ? Colors.redAccent : Colors.red,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              "Provide a reason or feedback (Optional):",
-              style: TextStyle(fontWeight: FontWeight.w500),
+            Text(
+              "Provide a reason or feedback (Optional):".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: controller.feedbackController,
               maxLines: 3,
+              style: TextStyle(
+                color: isDark ? AppColors.darkInputText : AppColors.inputText,
+              ),
               decoration: InputDecoration(
-                hintText: "E.g., Not enough experience in Flutter...",
+                hintText: "E.g., Not enough experience in Flutter..."
+                    .tr, // 🟢 Added .tr
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.darkTextHint : Colors.grey,
+                ),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: isDark
+                    ? AppColors.darkInputBackground
+                    : Colors.grey.shade50,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? AppColors.darkCardBorder
+                        : Colors.grey.shade200,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? AppColors.darkCardBorder
+                        : Colors.grey.shade200,
+                  ),
                 ),
               ),
             ),
@@ -438,13 +540,16 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                 Expanded(
                   child: TextButton(
                     onPressed: () => Get.back(),
-                    child: const Text("Cancel"),
+                    child: Text(
+                      "Cancel".tr, // 🟢 Added .tr
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                    ),
                   ),
                 ),
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: isDark ? Colors.redAccent : Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -456,9 +561,9 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                         feedback: controller.feedbackController.text,
                       );
                     },
-                    child: const Text(
-                      "Confirm Reject",
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      "Confirm Reject".tr, // 🟢 Added .tr
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -471,7 +576,11 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
     );
   }
 
-  void _showInterviewBottomSheet(BuildContext context) {
+  void _showInterviewBottomSheet(
+    BuildContext context,
+    bool isDark,
+    ThemeData theme,
+  ) {
     controller.locationController.clear();
     controller.messageController.clear();
     controller.selectedInterviewDate.value = null;
@@ -482,33 +591,33 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           left: 24,
           right: 24,
           top: 24,
-          bottom:
-              MediaQuery.of(context).viewInsets.bottom +
-              24, // ការពារ Keyboard បាំង
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Schedule Interview",
+              Text(
+                "Schedule Interview".tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF10B981),
+                  color: isDark ? Colors.greenAccent : const Color(0xFF10B981),
                 ),
               ),
               const SizedBox(height: 16),
 
-              // Date Picker (សាមញ្ញ)
-              const Text(
-                "Interview Date & Time",
-                style: TextStyle(fontWeight: FontWeight.w500),
+              Text(
+                "Interview Date & Time".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: theme.textTheme.bodyLarge?.color,
+                ),
               ),
               const SizedBox(height: 8),
               Obx(
@@ -520,8 +629,9 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                       firstDate: DateTime.now(),
                       lastDate: DateTime(2030),
                     );
-                    if (date != null)
+                    if (date != null) {
                       controller.selectedInterviewDate.value = date;
+                    }
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -529,7 +639,11 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                       vertical: 16,
                     ),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkCardBorder
+                            : Colors.grey.shade300,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -539,9 +653,19 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                           controller.selectedInterviewDate.value
                                   ?.toString()
                                   .split(' ')[0] ??
-                              "Select Date",
+                              "Select Date".tr, // 🟢 Added .tr
+                          style: TextStyle(
+                            color: isDark
+                                ? AppColors.darkInputText
+                                : AppColors.inputText,
+                          ),
                         ),
-                        const Icon(LucideIcons.calendar, color: Colors.grey),
+                        Icon(
+                          LucideIcons.calendar,
+                          color: isDark
+                              ? AppColors.darkIconSecondary
+                              : Colors.grey,
+                        ),
                       ],
                     ),
                   ),
@@ -549,34 +673,80 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
               ),
 
               const SizedBox(height: 16),
-              const Text(
-                "Location / Link",
-                style: TextStyle(fontWeight: FontWeight.w500),
+              Text(
+                "Location / Link".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: theme.textTheme.bodyLarge?.color,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: controller.locationController,
+                style: TextStyle(
+                  color: isDark ? AppColors.darkInputText : AppColors.inputText,
+                ),
                 decoration: InputDecoration(
-                  hintText: "E.g., Floor 5, Jobber City HQ or Zoom Link",
+                  hintText: "E.g., Floor 5, Jobber City HQ or Zoom Link"
+                      .tr, // 🟢 Added .tr
+                  hintStyle: TextStyle(
+                    color: isDark ? AppColors.darkTextHint : Colors.grey,
+                  ),
+                  filled: true,
+                  fillColor: isDark
+                      ? AppColors.darkInputBackground
+                      : Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? AppColors.darkCardBorder : Colors.grey,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? AppColors.darkCardBorder : Colors.grey,
+                    ),
                   ),
                 ),
               ),
 
               const SizedBox(height: 16),
-              const Text(
-                "Message to Candidate (Optional)",
-                style: TextStyle(fontWeight: FontWeight.w500),
+              Text(
+                "Message to Candidate (Optional)".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: theme.textTheme.bodyLarge?.color,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: controller.messageController,
                 maxLines: 2,
+                style: TextStyle(
+                  color: isDark ? AppColors.darkInputText : AppColors.inputText,
+                ),
                 decoration: InputDecoration(
-                  hintText: "E.g., Please prepare a small presentation.",
+                  hintText: "E.g., Please prepare a small presentation."
+                      .tr, // 🟢 Added .tr
+                  hintStyle: TextStyle(
+                    color: isDark ? AppColors.darkTextHint : Colors.grey,
+                  ),
+                  filled: true,
+                  fillColor: isDark
+                      ? AppColors.darkInputBackground
+                      : Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? AppColors.darkCardBorder : Colors.grey,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? AppColors.darkCardBorder : Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -587,24 +757,33 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   Expanded(
                     child: TextButton(
                       onPressed: () => Get.back(),
-                      child: const Text("Cancel"),
+                      child: Text(
+                        "Cancel".tr, // 🟢 Added .tr
+                        style: TextStyle(
+                          color: theme.textTheme.bodyLarge?.color,
+                        ),
+                      ),
                     ),
                   ),
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
+                        backgroundColor: isDark
+                            ? Colors.greenAccent
+                            : const Color(0xFF10B981),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       onPressed: () {
-                        // Validate Date & Location here...
                         if (controller.selectedInterviewDate.value == null ||
                             controller.locationController.text.isEmpty) {
                           Get.snackbar(
-                            "Required",
-                            "Please select a date and enter a location.",
+                            "Required".tr, // 🟢 Added .tr
+                            "Please select a date and enter a location."
+                                .tr, // 🟢 Added .tr
+                            backgroundColor: AppColors.warning,
+                            colorText: Colors.white,
                           );
                           return;
                         }
@@ -619,9 +798,9 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                           },
                         );
                       },
-                      child: const Text(
-                        "Schedule",
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        "Schedule".tr, // 🟢 Added .tr
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -635,7 +814,6 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
     );
   }
 
-  // ជំនួយគូរប៊ូតុង
   Widget _buildActionBtn(
     String title,
     Color textColor,
@@ -665,41 +843,56 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
     );
   }
 
-  // 🎯 អនុគមន៍សម្រាប់លោតផ្ទាំងសួរបញ្ជាក់
   void _showConfirmationDialog(
     String actionName,
     String newStatus,
     Color actionColor,
+    ThemeData theme,
+    bool isDark,
   ) {
     Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(LucideIcons.alertCircle, color: actionColor),
             const SizedBox(width: 10),
-            const Text(
-              "Confirm Action",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Text(
+              "Confirm Action".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
             ),
           ],
         ),
         content: Text(
-          "Are you sure you want to $actionName this candidate?",
-          style: const TextStyle(fontSize: 15),
+          "Are you sure you want to @action this candidate?".trParams({
+            'action': actionName,
+          }), // 🟢 Added .trParams
+          style: TextStyle(
+            fontSize: 15,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
+          ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(), // បិទ Dialog
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            onPressed: () => Get.back(),
+            child: Text(
+              "Cancel".tr, // 🟢 Added .tr
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextHint : Colors.grey,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
-              Get.back(); // បិទ Dialog មុនសិន
-              controller.changeApplicantStatus(
-                newStatus,
-              ); // ដំណើរការផ្លាស់ប្តូរ Status
+              Get.back();
+              controller.changeApplicantStatus(newStatus);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: actionColor,
@@ -708,7 +901,9 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
               ),
             ),
             child: Text(
-              "Yes, $actionName",
+              "Yes, @action".trParams({
+                'action': actionName,
+              }), // 🟢 Added .trParams
               style: const TextStyle(color: Colors.white),
             ),
           ),

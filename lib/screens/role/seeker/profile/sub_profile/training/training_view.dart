@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jobber_city/core/api/services/role/seeker/profile_crud_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/seeker/profile_model.dart';
 import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/sub_profile/widgets/custom_info_card.dart';
@@ -16,7 +17,7 @@ class TrainingView extends GetView<TrainingViewController> {
   const TrainingView({super.key});
 
   String _formatDateForDisplay(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return 'Present';
+    if (dateStr == null || dateStr.isEmpty) return 'Present'.tr; // 🟢 Added .tr
     try {
       return DateFormat('MMM yyyy').format(DateTime.parse(dateStr));
     } catch (e) {
@@ -26,28 +27,34 @@ class TrainingView extends GetView<TrainingViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
           ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Trainings & Certificates',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'Trainings & Certificates'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.blueAccent),
+            child: CircularProgressIndicator(color: AppColors.primary),
           );
         }
 
@@ -59,12 +66,17 @@ class TrainingView extends GetView<TrainingViewController> {
                 Icon(
                   Icons.workspace_premium_outlined,
                   size: 64,
-                  color: Colors.grey.shade400,
+                  color: isDark ? AppColors.darkTextHint : Colors.grey.shade400,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No trainings added yet.',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  'No trainings added yet.'.tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade600,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -91,9 +103,10 @@ class TrainingView extends GetView<TrainingViewController> {
               onDelete: () {
                 Get.dialog(
                   CustomConfirmDialog(
-                    title: 'Delete Training',
+                    title: 'Delete Training'.tr, // 🟢 Added .tr
                     description:
-                        'Are you sure you want to delete this training?',
+                        'Are you sure you want to delete this training?'
+                            .tr, // 🟢 Added .tr
                     onConfirm: () {
                       if (training.id != null) {
                         controller.deleteTraining(training.id!);
@@ -109,10 +122,12 @@ class TrainingView extends GetView<TrainingViewController> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.3 : 0.05,
+              ), // 🟢 Updated opacity
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -124,7 +139,7 @@ class TrainingView extends GetView<TrainingViewController> {
             Get.to(() => const TrainingFormView());
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: AppColors.primary,
             minimumSize: const Size(double.infinity, 56),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -132,9 +147,9 @@ class TrainingView extends GetView<TrainingViewController> {
             elevation: 0,
           ),
           icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            'Add Training',
-            style: TextStyle(
+          label: Text(
+            'Add Training'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,

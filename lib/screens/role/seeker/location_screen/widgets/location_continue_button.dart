@@ -48,7 +48,8 @@ class _LocationContinueButtonState extends State<LocationContinueButton>
       // 🎯 ៣. កំណត់អក្សរពេល Disable ឱ្យត្រូវនឹងទំព័រ
       final disableText = isProvincePage
           ? 'Select a City to Continue'
-          : 'Select a District to Continue';
+                .tr // 🟢 Added .tr
+          : 'Select a District to Continue'.tr; // 🟢 Added .tr
 
       return Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -96,7 +97,9 @@ class _LocationContinueButtonState extends State<LocationContinueButton>
                   children: [
                     Text(
                       // 🎯 ៤. ប្តូរអក្សរនៅទីនេះ
-                      hasSelection ? 'Continue' : disableText,
+                      hasSelection
+                          ? 'Continue'.tr
+                          : disableText, // 🟢 Added .tr
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

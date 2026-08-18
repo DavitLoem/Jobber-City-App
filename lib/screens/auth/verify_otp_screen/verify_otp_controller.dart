@@ -8,7 +8,6 @@ class VerifyOtpController extends GetxController {
   String maskedEmail = '';
   String fromScreen = '';
 
-  // Countdown timer setup
   var remainingSeconds = 30.obs;
   Timer? _timer;
 
@@ -70,25 +69,26 @@ class VerifyOtpController extends GetxController {
   void verifyOtp() async {
     String otp = completeOtp;
 
-    //១. ពិនិត្យភាពត្រឹមត្រូវ (Validation) តាមរយៈ AuthValidator
     String? validationError = AuthValidator.validateOtp(otpCode: otp);
     if (validationError != null) {
-      Get.snackbar('Error', validationError);
+      Get.snackbar(
+        'Error',
+        validationError,
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
       return;
     }
 
     isLoading.value = true;
 
     try {
-      // ផ្លូវទី ១៖ សម្រាប់អ្នកភ្លេចលេខសម្ងាត់ (Forgot Password Flow)
       if (fromScreen == 'forgot_password') {
         Get.toNamed(
           AppRoutes.resetPassword,
           arguments: {'email': userEmail, 'otp': otp},
         );
-      }
-      // ផ្លូវទី ២៖ សម្រាប់អ្នកចុះឈ្មោះគណនីថ្មី (Register Flow)
-      else {
+      } else {
         final response = await _authServices.verifyOtp(
           email: userEmail,
           otp: otp,
@@ -104,7 +104,12 @@ class VerifyOtpController extends GetxController {
 
         await Get.find<AuthController>().checkLoginStatus();
 
-        Get.snackbar('Success', 'Your account has been verified successfully!');
+        Get.snackbar(
+          'Success',
+          'Your account has been verified successfully!',
+          backgroundColor: AppColors.success, // 🟢 Updated to AppColors
+          colorText: Colors.white,
+        );
 
         if (response.user.role == 'employer') {
           if (response.user.isProfileCompleted == true) {
@@ -121,12 +126,19 @@ class VerifyOtpController extends GetxController {
         }
       }
     } on ApiException catch (e) {
-      Get.snackbar('Error', e.message);
+      Get.snackbar(
+        'Error',
+        e.message,
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
     } catch (e) {
       debugPrint("Verify OTP Crash Log: $e");
       Get.snackbar(
         'Error',
         'There is a system error. Please check your internet connection.',
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;
@@ -149,15 +161,24 @@ class VerifyOtpController extends GetxController {
       Get.snackbar(
         'Success',
         response["message"] ?? 'OTP has been resent to your email.',
+        backgroundColor: AppColors.success, // 🟢 Updated to AppColors
+        colorText: Colors.white,
       );
 
       startTimer();
     } on ApiException catch (e) {
-      Get.snackbar('Error', e.message);
+      Get.snackbar(
+        'Error',
+        e.message,
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
     } catch (e) {
       Get.snackbar(
         'Error',
         'There is a system error. Please check your internet connection.',
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;

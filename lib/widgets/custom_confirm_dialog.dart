@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CustomConfirmDialog extends StatelessWidget {
@@ -24,51 +25,49 @@ class CustomConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.cardColor, // 🟢 Dynamic Dialog BG
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🎯 Icon ផ្នែកខាងលើ (រចនាជារង្វង់)
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: confirmColor.withValues(alpha: 0.1),
+                color: confirmColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: confirmColor, size: 36),
             ),
             const SizedBox(height: 20),
-
-            // 🎯 ចំណងជើង
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-
-            // 🎯 អត្ថបទពិពណ៌នា
             Text(
               description,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade600, // 🟢 Dynamic Subtitle
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-
-            // 🎯 ប៊ូតុងទាំង ២
             Row(
               children: [
                 Expanded(
@@ -79,12 +78,19 @@ class CustomConfirmDialog extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(
+                        color: isDark
+                            ? AppColors.darkCardBorder
+                            : Colors.grey.shade300,
+                      ), // 🟢 Dynamic Border
                     ),
                     child: Text(
                       cancelText,
-                      style: const TextStyle(
-                        color: Colors.black87,
+                      style: TextStyle(
+                        color: theme
+                            .textTheme
+                            .bodyLarge
+                            ?.color, // 🟢 Dynamic Cancel Text
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -95,8 +101,8 @@ class CustomConfirmDialog extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.back(); // បិទ Dialog សិន
-                      onConfirm(); // ដំណើរការមុខងារលុប
+                      Get.back();
+                      onConfirm();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: confirmColor,

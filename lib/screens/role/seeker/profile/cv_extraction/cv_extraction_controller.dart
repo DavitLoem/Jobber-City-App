@@ -21,7 +21,7 @@ class CvExtractionViewController extends GetxController {
 
   void cancelScanning() {
     if (_cancelToken != null && !_cancelToken!.isCancelled) {
-      _cancelToken!.cancel("User cancelled the upload.");
+      _cancelToken!.cancel("User cancelled the upload.".tr); // 🟢 Added .tr
     }
     isScanning.value = false;
   }
@@ -33,8 +33,6 @@ class CvExtractionViewController extends GetxController {
         var data = response['data'];
         currentResumeUrl.value = data['resume_url'] ?? '';
 
-        // 🎯 ៣. ទាញយកឈ្មោះ File ពី Response ដែល Backend បោះមក
-        // បើអត់មានឈ្មោះ (ឯកសារចាស់) យើងបង្ហាញពាក្យ "Uploaded_Resume.pdf" សិន
         currentResumeFilename.value =
             data['resume_filename'] != null &&
                 data['resume_filename'].toString().isNotEmpty
@@ -52,24 +50,31 @@ class CvExtractionViewController extends GetxController {
     final Uri url = Uri.parse(currentResumeUrl.value);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       Get.snackbar(
-        'Error',
-        'Could not open the document.',
+        'Error'.tr, // 🟢 Added .tr
+        'Could not open the document.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
 
-  // 🎯 មុខងារលុប CV
   Future<void> deleteCurrentResume() async {
+    final theme = Get.theme;
+
     bool? confirm = await Get.defaultDialog<bool>(
-      title: "Delete Resume",
-      titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-      middleText: "Are you sure you want to remove your current resume?",
-      textConfirm: "Delete",
-      textCancel: "Cancel",
+      backgroundColor: theme.cardColor,
+      title: "Delete Resume".tr, // 🟢 Added .tr
+      titleStyle: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: theme.textTheme.bodyLarge?.color,
+      ),
+      middleText: "Are you sure you want to remove your current resume?"
+          .tr, // 🟢 Added .tr
+      middleTextStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+      textConfirm: "Delete".tr, // 🟢 Added .tr
+      textCancel: "Cancel".tr, // 🟢 Added .tr
       confirmTextColor: Colors.white,
       buttonColor: Colors.redAccent,
-      cancelTextColor: Colors.black87,
+      cancelTextColor: theme.textTheme.bodyLarge?.color,
       onConfirm: () => Get.back(result: true),
       onCancel: () => Get.back(result: false),
     );
@@ -78,16 +83,14 @@ class CvExtractionViewController extends GetxController {
 
     try {
       isScanning.value = true;
-
       await _service.deleteCv();
 
-      // 🎯 ៤. Clear ទិន្នន័យទាំង URL ទាំងឈ្មោះ File ពេលលុបជោគជ័យ
       currentResumeUrl.value = '';
       currentResumeFilename.value = '';
 
       Get.snackbar(
-        'Deleted',
-        'Your resume has been removed.',
+        'Deleted'.tr, // 🟢 Added .tr
+        'Your resume has been removed.'.tr, // 🟢 Added .tr
         backgroundColor: Colors.green,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -122,7 +125,6 @@ class CvExtractionViewController extends GetxController {
 
       await fetchCurrentResumeUrl();
     } catch (e) {
-      // 🎯 ៥. ឆែកមើលថាតើ Error នេះមកពីការចុច Cancel ដែរឬទេ បើពិតមែនមិនបាច់លោត Snackbar ទេ
       if (e is DioException && e.type == DioExceptionType.cancel) {
         debugPrint("Upload was cancelled by user.");
       } else {
@@ -130,7 +132,7 @@ class CvExtractionViewController extends GetxController {
       }
     } finally {
       isScanning.value = false;
-      _cancelToken = null; // destroy the cancel token after operation
+      _cancelToken = null;
     }
   }
 }

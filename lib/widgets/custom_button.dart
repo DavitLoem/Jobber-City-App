@@ -43,13 +43,10 @@ class _CustomButtonState extends State<CustomButton>
   }
 
   void _onButtonPressed() {
-    // 🎯 2. បើកំពុង Loading មិនអនុញ្ញាតឱ្យមានចលនា ឬដំណើរការ Function ទេ
     if (widget.isLoading) return;
 
-    // Animate down
     _animationController.forward();
-
-    widget.onPressed!(); // 4. Call with '!' since we checked for null above
+    widget.onPressed!();
 
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) {
@@ -60,6 +57,8 @@ class _CustomButtonState extends State<CustomButton>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
       width: double.infinity,
       height: 53,
@@ -68,23 +67,17 @@ class _CustomButtonState extends State<CustomButton>
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            // 🎯 3. ពេល Disable ប៊ូតុង ពណ៌អក្សរនឹងប្តូរដោយស្វ័យប្រវត្តិ
-            disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+            disabledBackgroundColor: AppColors.primary.withOpacity(0.6),
             foregroundColor: AppColors.buttonPrimaryText,
-            shadowColor: const Color.fromARGB(
-              255,
-              1,
-              64,
-              239,
-            ).withValues(alpha: 0.7),
-            elevation: widget.isLoading ? 0 : 3, // ដកស្រមោលចេញពេលកំពុង Loading
+            shadowColor: isDark
+                ? Colors.black.withOpacity(0.5) // 🟢 Dynamic Shadow
+                : const Color.fromARGB(255, 1, 64, 239).withOpacity(0.7),
+            elevation: widget.isLoading ? 0 : 3,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          // 🎯 4. បើ isLoading = true ដាក់ null ដើម្បី Disable ប៊ូតុង
           onPressed: widget.isLoading ? null : _onButtonPressed,
-          // 🎯 5. ផ្លាស់ប្តូរ UI ទៅតាមស្ថានភាព Loading
           child: widget.isLoading
               ? const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -94,12 +87,12 @@ class _CustomButtonState extends State<CustomButton>
                       height: 20,
                       child: CircularProgressIndicator(
                         color: Colors.white,
-                        strokeWidth: 2.5, // ធ្វើឱ្យរង្វង់រាងស្តើង និងស្អាត
+                        strokeWidth: 2.5,
                       ),
                     ),
                     SizedBox(width: 12),
                     Text(
-                      'Processing...', // ពាក្យ Professional ជំនួសឱ្យ Loading
+                      'Processing...',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

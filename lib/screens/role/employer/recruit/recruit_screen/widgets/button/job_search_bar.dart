@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// Search field + sort-order toggle for the job list.
-/// Pure/presentational: caller owns the actual state.
 class JobSearchBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final bool sortAscending;
@@ -17,8 +16,11 @@ class JobSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      color: AppColors.white,
+      color: Colors.transparent,
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: Row(
         children: [
@@ -26,29 +28,38 @@ class JobSearchBar extends StatelessWidget {
             child: Container(
               height: 46,
               decoration: BoxDecoration(
-                color: AppColors.inputBackground,
+                color: isDark
+                    ? AppColors.darkInputBackground
+                    : AppColors.inputBackground,
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+                ),
               ),
               child: TextField(
                 onChanged: onChanged,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.inputText,
+                  color: isDark ? AppColors.darkInputText : AppColors.inputText,
                 ),
-                decoration: const InputDecoration(
-                  hintText: 'Search jobs...',
+                decoration: InputDecoration(
+                  hintText: 'Search jobs...'.tr, // 🟢 Added .tr
                   hintStyle: TextStyle(
-                    color: AppColors.inputHint,
+                    color: isDark
+                        ? AppColors.darkTextHint
+                        : AppColors.inputHint,
                     fontSize: 14,
                   ),
                   prefixIcon: Icon(
                     Icons.search_rounded,
-                    color: AppColors.iconSecondary,
+                    color: isDark
+                        ? AppColors.darkIconSecondary
+                        : AppColors.iconSecondary,
                     size: 20,
                   ),
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
@@ -61,14 +72,21 @@ class JobSearchBar extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: AppColors.inputBackground,
+                color: isDark
+                    ? AppColors.darkInputBackground
+                    : AppColors.inputBackground,
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+                ),
               ),
               child: Icon(
                 sortAscending
                     ? Icons.arrow_upward_rounded
                     : Icons.swap_vert_rounded,
-                color: AppColors.iconSecondary,
+                color: isDark
+                    ? AppColors.darkIconSecondary
+                    : AppColors.iconSecondary,
                 size: 20,
               ),
             ),

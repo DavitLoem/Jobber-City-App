@@ -58,14 +58,24 @@ class CategoryScreenViewController extends GetxController {
       if (selectedCategoryIds.length < 5) {
         selectedCategoryIds.add(id);
       } else {
-        Get.snackbar('Notice', 'You can only select up to 5 categories.');
+        Get.snackbar(
+          'Notice'.tr, // 🟢 Added .tr
+          'You can only select up to 5 categories.'.tr, // 🟢 Added .tr
+          backgroundColor: AppColors.warning,
+          colorText: Colors.white,
+        );
       }
     }
   }
 
   Future<void> continueToNextScreen() async {
     if (selectedCategoryIds.isEmpty) {
-      Get.snackbar('Action Required', 'Please select at least one expertise.');
+      Get.snackbar(
+        'Action Required'.tr, // 🟢 Added .tr
+        'Please select at least one expertise.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.warning,
+        colorText: Colors.white,
+      );
       return;
     }
 
@@ -77,7 +87,6 @@ class CategoryScreenViewController extends GetxController {
         categoryIds: selectedCategoryIds.toList(),
       );
 
-      // 🎯 អាប់ដេត Token Storage ថាគាត់បានបំពេញ Onboarding រួចរាល់
       await TokenStorage.saveTokens(
         accessToken: (await TokenStorage.getAccessToken()) ?? '',
         refreshToken: (await TokenStorage.getRefreshToken()) ?? '',
@@ -86,12 +95,16 @@ class CategoryScreenViewController extends GetxController {
         isProfileCompleted: false,
       );
 
-      // ប្រាប់ AuthController ឱ្យអាន State ថ្មី
       await Get.find<AuthController>().checkLoginStatus();
 
       Get.offAllNamed(AppRoutes.mainScreenSeeker);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to complete setup. Please try again.');
+      Get.snackbar(
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to complete setup. Please try again.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
       debugPrint("Onboarding Submit Error: $e");
     } finally {
       isSubmitting.value = false;

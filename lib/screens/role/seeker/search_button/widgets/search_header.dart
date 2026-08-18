@@ -12,37 +12,46 @@ class SearchHeader extends GetView<SearchButtonViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.fromLTRB(20, topInset > 0 ? 12 : 20, 20, 16),
-      decoration: const BoxDecoration(
-        color: AppColors.lightSurface,
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
         border: Border(
-          bottom: BorderSide(color: AppColors.cardBorder, width: 0.5),
+          bottom: BorderSide(
+            color: isDark ? AppColors.darkDivider : AppColors.cardBorder,
+            width: 0.5,
+          ),
         ),
       ),
       child: Row(
         children: [
-          // 🔙 Back Button
           GestureDetector(
             onTap: () => Get.back(),
             child: Container(
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.lightSurfaceVariant,
+                color: theme.cardColor,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.cardBorder, width: 1),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : AppColors.cardBorder,
+                  width: 1,
+                ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_back_rounded,
-                color: AppColors.textPrimary,
+                color: theme.textTheme.bodyLarge?.color,
                 size: 22,
               ),
             ),
           ),
           const SizedBox(width: 14),
 
-          // 🔍 Search Input Field ជាមួយ Hero Animation
           Expanded(
             child: Hero(
               tag: 'search_bar_hero',
@@ -51,9 +60,16 @@ class SearchHeader extends GetView<SearchButtonViewController> {
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.inputBackground,
+                    color: isDark
+                        ? AppColors.darkInputBackground
+                        : AppColors.inputBackground,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.inputBorder, width: 1),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : AppColors.inputBorder,
+                      width: 1,
+                    ),
                   ),
                   child: Obx(
                     () => TextField(
@@ -64,24 +80,31 @@ class SearchHeader extends GetView<SearchButtonViewController> {
                         controller.performSearch(isRefresh: true);
                       },
                       textAlignVertical: TextAlignVertical.center,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.darkInputText
+                            : AppColors.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         isDense: true,
-                        hintText: 'Search jobs, companies...',
-                        hintStyle: const TextStyle(
-                          color: AppColors.textHint,
+                        hintText:
+                            'Search jobs, companies...'.tr, // 🟢 Added .tr
+                        hintStyle: TextStyle(
+                          color: isDark
+                              ? AppColors.darkTextHint
+                              : AppColors.textHint,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                         ),
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.only(left: 12, right: 8),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 12, right: 8),
                           child: Icon(
                             Icons.search_rounded,
-                            color: AppColors.textTertiary,
+                            color: isDark
+                                ? AppColors.darkIconSecondary
+                                : AppColors.textTertiary,
                             size: 22,
                           ),
                         ),
@@ -93,8 +116,12 @@ class SearchHeader extends GetView<SearchButtonViewController> {
                                 onTap: () => controller.clearSearch(),
                                 child: Container(
                                   margin: const EdgeInsets.all(8),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primaryLight,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.primary.withValues(
+                                            alpha: 0.2,
+                                          ) // 🟢 Updated opacity
+                                        : AppColors.primaryLight,
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
@@ -122,9 +149,7 @@ class SearchHeader extends GetView<SearchButtonViewController> {
           ),
           const SizedBox(width: 14),
 
-          // 🎛️ Filter Button ជាមួយ Dynamic Badge
           GestureDetector(
-            // onTap: () => controller.openFilterModal(),
             onTap: () => Get.bottomSheet(
               const JobFilterBottomSheet(),
               isScrollControlled: true,
@@ -164,7 +189,10 @@ class SearchHeader extends GetView<SearchButtonViewController> {
                         decoration: BoxDecoration(
                           color: AppColors.error,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(
+                            color: theme.scaffoldBackgroundColor,
+                            width: 2,
+                          ),
                         ),
                         child: Text(
                           '${controller.activeFiltersCount.value}',

@@ -9,6 +9,9 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Obx(() {
       if (controller.recentSearches.isEmpty &&
           controller.popularSearches.isEmpty) {
@@ -22,7 +25,11 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
+                    color: isDark
+                        ? AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ) // 🟢 Updated opacity
+                        : AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: const Icon(
@@ -32,21 +39,24 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'What are you looking for?',
+                Text(
+                  'What are you looking for?'.tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Search for jobs, companies, or specific skills to discover your next opportunity.',
+                Text(
+                  'Search for jobs, companies, or specific skills to discover your next opportunity.'
+                      .tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.5,
-                    color: AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -71,7 +81,11 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
+                            color: isDark
+                                ? AppColors.primary.withValues(
+                                    alpha: 0.2,
+                                  ) // 🟢 Updated opacity
+                                : AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
@@ -81,24 +95,26 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Text(
-                          'Recent Searches',
+                        Text(
+                          'Recent Searches'.tr, // 🟢 Added .tr
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                       ],
                     ),
                     GestureDetector(
                       onTap: () => controller.clearAllRecentSearches(),
-                      child: const Text(
-                        'Clear',
+                      child: Text(
+                        'Clear'.tr, // 🟢 Added .tr
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textTertiary,
+                          color: isDark
+                              ? AppColors.darkTextTertiary
+                              : AppColors.textTertiary,
                         ),
                       ),
                     ),
@@ -112,7 +128,7 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final search = controller.recentSearches[index];
-                    return _buildRecentSearchItem(search);
+                    return _buildRecentSearchItem(search, theme, isDark);
                   },
                 ),
                 const SizedBox(height: 32),
@@ -123,7 +139,11 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
+                        color: isDark
+                            ? AppColors.primary.withValues(
+                                alpha: 0.2,
+                              ) // 🟢 Updated opacity
+                            : AppColors.primaryLight,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -133,12 +153,12 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Popular Searches',
+                    Text(
+                      'Popular Searches'.tr, // 🟢 Added .tr
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                   ],
@@ -148,7 +168,7 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
                   spacing: 10,
                   runSpacing: 12,
                   children: controller.popularSearches.map((search) {
-                    return _buildPopularSearchChip(search);
+                    return _buildPopularSearchChip(search, isDark);
                   }).toList(),
                 ),
               ],
@@ -159,39 +179,44 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
     });
   }
 
-  Widget _buildRecentSearchItem(String search) {
+  Widget _buildRecentSearchItem(String search, ThemeData theme, bool isDark) {
     return GestureDetector(
       onTap: () => controller.selectSearchQuery(search),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.lightSurface,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.cardBorder, width: 1),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+            width: 1,
+          ),
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.history_rounded,
-              color: AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.darkTextTertiary
+                  : AppColors.textTertiary,
               size: 18,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 search,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(
+            Icon(
               Icons.north_west_rounded,
-              color: AppColors.textHint,
+              color: isDark ? AppColors.darkTextHint : AppColors.textHint,
               size: 16,
             ),
           ],
@@ -200,30 +225,43 @@ class SearchSuggestions extends GetView<SearchButtonViewController> {
     );
   }
 
-  Widget _buildPopularSearchChip(String search) {
+  Widget _buildPopularSearchChip(String search, bool isDark) {
     return GestureDetector(
       onTap: () => controller.selectSearchQuery(search),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              AppColors.primaryLight,
-              AppColors.primaryLight.withValues(alpha: 0.5),
-            ],
+            colors: isDark
+                ? [
+                    AppColors.primary.withValues(
+                      alpha: 0.2,
+                    ), // 🟢 Updated opacity
+                    AppColors.primary.withValues(
+                      alpha: 0.1,
+                    ), // 🟢 Updated opacity
+                  ]
+                : [
+                    AppColors.primaryLight,
+                    AppColors.primaryLight.withValues(
+                      alpha: 0.5,
+                    ), // 🟢 Updated opacity
+                  ],
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.2),
+            color: AppColors.primary.withValues(
+              alpha: 0.2,
+            ), // 🟢 Updated opacity
             width: 1,
           ),
         ),
         child: Text(
           search,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.primary,
+            color: isDark ? Colors.white : AppColors.primary,
           ),
         ),
       ),

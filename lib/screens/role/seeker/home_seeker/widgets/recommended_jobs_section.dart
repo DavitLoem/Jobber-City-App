@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/models/role/seeker/job_feed_model.dart'; // 🎯 ប្រើប្រាស់ Model ថ្មី
+import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 import '../home_seeker_view.dart';
@@ -16,19 +16,18 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
     return SizedBox(
       height: 226,
       child: Obx(() {
-        // 🟢 បង្ហាញ Shimmer តែពេល Load ដំបូងគេប៉ុណ្ណោះ
         if (controller.isRecommendedLoading.value &&
             controller.recommendedJobs.isEmpty) {
           return _buildRecommendedSkeleton();
         }
         if (controller.recommendedJobs.isEmpty) {
-          return JobUiUtils.buildInlineEmptyState('No recommended jobs found');
+          return JobUiUtils.buildInlineEmptyState(
+            'No recommended jobs found'.tr,
+          ); // 🟢 Added .tr
         }
 
-        // 🟢 ប្រើ NotificationListener សម្រាប់ចាប់ការអូស (Scroll)
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
-            // បើអូសជិតដល់ចុងបញ្ជី (សល់ 50 pixels) ហៅ API ទាញយកបន្ត
             if (!controller.isRecommendedLoadingMore.value &&
                 scrollInfo.metrics.pixels >=
                     scrollInfo.metrics.maxScrollExtent - 50) {
@@ -38,19 +37,16 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
           },
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            // 🟢 បូក 1 តែពេលនៅមានទិន្នន័យ (hasMoreRecommended) ប៉ុណ្ណោះ
             itemCount:
                 controller.recommendedJobs.length +
                 (controller.hasMoreRecommended.value ? 1 : 0),
             separatorBuilder: (_, _) => const SizedBox(width: 14),
             itemBuilder: (context, index) {
-              // 🟢 បង្ហាញរង្វង់ Loading នៅចុងបញ្ជី
               if (index == controller.recommendedJobs.length) {
                 return _buildLoadingIndicator();
               }
-
               final job = controller.recommendedJobs[index];
-              return _buildRecommendedJobCard(job, index, index);
+              return _buildRecommendedJobCard(job, index, index, context);
             },
           ),
         );
@@ -72,7 +68,11 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
     JobFeedModel job,
     int index,
     int staggerIndex,
+    BuildContext context,
   ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 350 + (staggerIndex * 80).clamp(0, 320)),
@@ -96,12 +96,16 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
           width: 250,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.cardBorder),
+            border: Border.all(
+              color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadowLight,
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.2 : 0.04, // 🟢 Updated opacity
+                ),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -128,10 +132,10 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
               const SizedBox(height: 12),
               Text(
                 job.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -150,18 +154,22 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_on_rounded,
                     size: 13,
-                    color: AppColors.textTertiary,
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : AppColors.textTertiary,
                   ),
                   const SizedBox(width: 3),
                   Expanded(
                     child: Text(
-                      job.location,
-                      style: const TextStyle(
+                      job.location.tr, // 🟢 Translated Location
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextTertiary
+                            : AppColors.textTertiary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -174,10 +182,10 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
               const Spacer(),
               Text(
                 "\$${job.minSalary.toInt()} - \$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod)}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: theme.textTheme.bodyLarge?.color,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

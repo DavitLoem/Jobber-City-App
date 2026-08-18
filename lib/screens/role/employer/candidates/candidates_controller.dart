@@ -2,20 +2,13 @@ part of 'candidates_view.dart';
 
 class CandidatesViewController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  // 🎯 ហៅ Service ដែលយើងបានបង្កើត
   final ApplicantEmployerService _applicantService = ApplicantEmployerService();
 
-  // 🎯 គ្រប់គ្រងស្ថានភាពនៃការ Load
   var isLoading = false.obs;
-  var isJobsLoading = false.obs; // 🟢 សម្រាប់ Load បញ្ជីការងារ
+  var isJobsLoading = false.obs;
 
-  // 🎯 បញ្ជីរក្សាទុកទិន្នន័យបេក្ខជន
   var applicants = <ApplicantModel>[].obs;
-
-  // 🟢 បញ្ជីរក្សាទុកការងារសម្រាប់ Bottom Sheet
   var postedJobs = <JobDropdownItemModel>[].obs;
-
-  // 🎯 Job ID សម្រាប់ការទាញយកបេក្ខជន
   var selectedJobId = ''.obs;
 
   final List<String> tabs = [
@@ -46,12 +39,10 @@ class CandidatesViewController extends GetxController
       }
     });
 
-    // 🟢 ហៅទិន្នន័យទាំង ២ ស្របពេលគ្នា
     fetchPostedJobs();
     fetchApplicants();
   }
 
-  /// 🟢 ទាញយកបញ្ជីការងារសម្រាប់ដាក់ក្នុង Modal Bottom Sheet
   Future<void> fetchPostedJobs() async {
     try {
       isJobsLoading.value = true;
@@ -64,17 +55,16 @@ class CandidatesViewController extends GetxController
     }
   }
 
-  /// 🟢 អនុគមន៍ជំនួយសម្រាប់បង្ហាញឈ្មោះការងារដែលបានរើសនៅលើប៊ូតុង
   String get selectedJobDisplayName {
     if (selectedJobId.value == 'all' || selectedJobId.value.isEmpty) {
-      return 'All Jobs';
+      return 'All Jobs'.tr; // 🟢 Added .tr
     }
 
     final job = postedJobs.firstWhere(
       (j) => j.jobId == selectedJobId.value,
       orElse: () => JobDropdownItemModel(
         jobId: '',
-        displayName: 'Loading...',
+        displayName: 'Loading...'.tr, // 🟢 Added .tr
         status: '',
       ),
     );
@@ -82,7 +72,6 @@ class CandidatesViewController extends GetxController
     return job.displayName;
   }
 
-  /// 🎯 ទាញយកបញ្ជីបេក្ខជនតាម Status នៃ Tab នីមួយៗ
   Future<void> fetchApplicants() async {
     if (selectedJobId.value.isEmpty) return;
 
@@ -101,11 +90,11 @@ class CandidatesViewController extends GetxController
     } catch (e) {
       debugPrint("❌ Error in Controller: $e");
       Get.snackbar(
-        "Error",
-        "Failed to load candidates. Please try again.",
+        "Error".tr, // 🟢 Added .tr
+        "Failed to load candidates. Please try again.".tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;
@@ -116,7 +105,6 @@ class CandidatesViewController extends GetxController
     fetchApplicants();
   }
 
-  /// 🎯 មុខងារប្តូរស្ថានភាពបេក្ខជន (ផ្លាស់ប្តូរឱ្យ Return ជា bool វិញ)
   Future<bool> updateApplicantStatus(
     String applicationId,
     String newStatus, {
@@ -125,11 +113,12 @@ class CandidatesViewController extends GetxController
   }) async {
     try {
       Get.dialog(
-        const Center(child: CircularProgressIndicator()),
+        const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
         barrierDismissible: false,
       );
 
-      // កុំភ្លេច Update Service របស់អ្នកឱ្យទទួលយក Parameter ២ នេះផងដែរ
       final success = await _applicantService.updateApplicationStatus(
         applicationId: applicationId,
         newStatus: newStatus,
@@ -137,21 +126,20 @@ class CandidatesViewController extends GetxController
         feedback: feedback,
       );
 
-      Get.back(); // បិទ Loading Dialog
+      Get.back();
 
       if (success) {
-        // លុបបេក្ខជននេះចេញពី UI ភ្លាមៗ
         applicants.removeWhere((app) => app.applicationId == applicationId);
-        return true; // 🟢 បញ្ជាក់ថាជោគជ័យ
+        return true;
       }
       return false;
     } catch (e) {
-      Get.back(); // បិទ Loading Dialog
+      Get.back();
       Get.snackbar(
-        "Action Failed",
-        "Could not update status.",
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        "Action Failed".tr, // 🟢 Added .tr
+        "Could not update status.".tr, // 🟢 Added .tr
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
       );
       return false;
     }

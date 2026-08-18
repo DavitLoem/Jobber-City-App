@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_screen_view.dart';
 
 part 'biography_binding.dart';
@@ -11,18 +12,25 @@ class BiographyView extends GetView<BiographyViewController> {
 
   @override
   Widget build(BuildContext context) {
+    // 🟢 Grab the active theme data
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87),
+          icon: Icon(Icons.close, color: theme.textTheme.bodyLarge?.color),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'About Me',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'About Me'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -31,14 +39,19 @@ class BiographyView extends GetView<BiographyViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Professional Summary',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              'Professional Summary'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Write a brief summary of your background, achievements, and career goals.',
-              style: TextStyle(color: Colors.grey.shade600),
+              'Write a brief summary of your background, achievements, and career goals.'
+                  .tr, // 🟢 Added .tr
+              style: TextStyle(color: theme.textTheme.bodyMedium?.color),
             ),
             const SizedBox(height: 24),
 
@@ -46,25 +59,42 @@ class BiographyView extends GetView<BiographyViewController> {
             TextField(
               controller: controller.biographyCtrl,
               maxLines: 10,
-              maxLength: 500, // ដាក់ការកំណត់ចំនួនតួអក្សរបើចង់
+              maxLength: 500,
+              style: TextStyle(
+                color: isDark ? AppColors.darkInputText : AppColors.inputText,
+              ),
               decoration: InputDecoration(
                 hintText:
-                    'e.g., Highly motivated software engineer with 3+ years of experience in Flutter...',
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                    'e.g., Highly motivated software engineer with 3+ years of experience in Flutter...'
+                        .tr, // 🟢 Added .tr
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                  fontSize: 14,
+                ),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: isDark
+                    ? AppColors.darkInputBackground
+                    : AppColors.inputBackground,
                 contentPadding: const EdgeInsets.all(16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: const BorderSide(
+                    color: Colors.transparent,
+                    width: 1.5,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.blueAccent),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? AppColors.primary
+                        : AppColors.inputFocusedBorder,
+                    width: 1.5,
+                  ),
                 ),
               ),
             ),
@@ -80,7 +110,10 @@ class BiographyView extends GetView<BiographyViewController> {
                   ? null
                   : () => controller.saveBiography(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade300,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -89,9 +122,9 @@ class BiographyView extends GetView<BiographyViewController> {
               ),
               child: controller.isSaving.value
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                      'Save Changes',
-                      style: TextStyle(
+                  : Text(
+                      'Save Changes'.tr, // 🟢 Added .tr
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

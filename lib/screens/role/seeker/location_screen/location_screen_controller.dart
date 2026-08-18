@@ -41,12 +41,13 @@ class LocationScreenController extends GetxController {
       provincesList.assignAll(data);
 
       if (data.isEmpty) {
-        provinceError.value = 'No provinces found';
+        provinceError.value = 'No provinces found'.tr; // 🟢 Added .tr
       }
     } catch (e) {
       debugPrint('Error fetching provinces: $e');
       provinceError.value =
-          'Failed to load provinces. Please check your connection.';
+          'Failed to load provinces. Please check your connection.'
+              .tr; // 🟢 Added .tr
       provincesList.clear();
     } finally {
       isProvinceLoading.value = false;
@@ -82,12 +83,13 @@ class LocationScreenController extends GetxController {
       districtsList.assignAll(data);
 
       if (data.isEmpty) {
-        districtError.value = 'No districts found';
+        districtError.value = 'No districts found'.tr; // 🟢 Added .tr
       }
     } catch (e) {
       debugPrint('Error fetching districts: $e');
       districtError.value =
-          'Failed to load districts. Please check your connection.';
+          'Failed to load districts. Please check your connection.'
+              .tr; // 🟢 Added .tr
       districtsList.clear();
     } finally {
       isDistrictLoading.value = false;
@@ -122,7 +124,10 @@ class LocationScreenController extends GetxController {
       }
     } else {
       if (selectedDistrictId.value.isEmpty) {
-        Get.snackbar('Action Required', 'Please select a district.');
+        Get.snackbar(
+          'Action Required'.tr, // 🟢 Added .tr
+          'Please select a district.'.tr, // 🟢 Added .tr
+        );
         return;
       }
 
@@ -165,7 +170,8 @@ class LocationScreenController extends GetxController {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         currentLocationError.value =
-            'Location services are disabled. Please enable them.';
+            'Location services are disabled. Please enable them.'
+                .tr; // 🟢 Added .tr
         return;
       }
 
@@ -174,14 +180,15 @@ class LocationScreenController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          currentLocationError.value = 'Location permissions are denied.';
+          currentLocationError.value =
+              'Location permissions are denied.'.tr; // 🟢 Added .tr
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         currentLocationError.value =
-            'Location permissions are permanently denied.';
+            'Location permissions are permanently denied.'.tr; // 🟢 Added .tr
         return;
       }
 
@@ -194,8 +201,11 @@ class LocationScreenController extends GetxController {
       // In a real implementation, you would reverse geocode the coordinates
       // to get the province/district and auto-select them
       Get.snackbar(
-        'Location Found',
-        'Lat: ${position.latitude.toStringAsFixed(4)}, Lng: ${position.longitude.toStringAsFixed(4)}',
+        'Location Found'.tr, // 🟢 Added .tr
+        'Lat: @lat, Lng: @lng'.trParams({
+          'lat': position.latitude.toStringAsFixed(4),
+          'lng': position.longitude.toStringAsFixed(4),
+        }), // 🟢 Added .trParams
         snackPosition: SnackPosition.BOTTOM,
       );
 
@@ -205,7 +215,8 @@ class LocationScreenController extends GetxController {
     } catch (e) {
       debugPrint('Error getting current location: $e');
       currentLocationError.value =
-          'Failed to get current location. Please try again.';
+          'Failed to get current location. Please try again.'
+              .tr; // 🟢 Added .tr
     } finally {
       isGettingCurrentLocation.value = false;
     }

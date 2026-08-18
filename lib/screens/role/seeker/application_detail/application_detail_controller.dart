@@ -1,7 +1,7 @@
 part of 'application_detail_view.dart';
 
 class ApplicationDetailViewController extends GetxController {
-final SeekerApplicationService _service = SeekerApplicationService();
+  final SeekerApplicationService _service = SeekerApplicationService();
 
   var isLoading = true.obs;
   var applicationDetail = Rxn<MyApplicationDetailModel>();
@@ -10,7 +10,6 @@ final SeekerApplicationService _service = SeekerApplicationService();
   @override
   void onInit() {
     super.onInit();
-    // ទទួលយក ID ពីទំព័រមុនពេលចុចលើកាត (Get.toNamed(..., arguments: app.applicationId))
     applicationId = Get.arguments as String;
     fetchDetail();
   }
@@ -23,10 +22,10 @@ final SeekerApplicationService _service = SeekerApplicationService();
     } catch (e) {
       debugPrint("Error fetching application detail: $e");
       Get.snackbar(
-        "Error",
-        "Could not load application details.",
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        "Error".tr, // 🟢 Added .tr
+        "Could not load application details.".tr, // 🟢 Added .tr
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;

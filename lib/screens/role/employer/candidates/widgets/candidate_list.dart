@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 
 import '../candidates_view.dart';
 import 'candidate_card.dart';
 import 'candidate_shimmer.dart';
 
 class CandidateList extends GetView<CandidatesViewController> {
-  // 🎯 ១. លុប final String status; និង required this.status ចេញ
   const CandidateList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      // 🎯 ២. លុបលក្ខខណ្ឌដែលឆែក status ចាស់ៗចេញ
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-      // បង្ហាញ Shimmer ពេលកំពុង Load API
+    return Obx(() {
       if (controller.isLoading.value) {
         return ListView.separated(
           padding: const EdgeInsets.all(20),
@@ -24,24 +24,26 @@ class CandidateList extends GetView<CandidatesViewController> {
         );
       }
 
-      // បង្ហាញ UI ទទេ ពេលគ្មានទិន្នន័យ
       if (controller.applicants.isEmpty) {
         return Center(
           child: Text(
-            "No candidates found for this status.",
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 15),
+            "No candidates found for this status.".tr, // 🟢 Added .tr
+            style: TextStyle(
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : Colors.grey.shade500, // 🟢 Dynamic Text
+              fontSize: 15,
+            ),
           ),
         );
       }
 
-      // បង្ហាញបញ្ជីទិន្នន័យពិត
       return ListView.separated(
         padding: const EdgeInsets.all(20),
         itemCount: controller.applicants.length,
         separatorBuilder: (_, _) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
-          final applicant = controller.applicants[index];
-          return CandidateCard(applicant: applicant);
+          return CandidateCard(applicant: controller.applicants[index]);
         },
       );
     });

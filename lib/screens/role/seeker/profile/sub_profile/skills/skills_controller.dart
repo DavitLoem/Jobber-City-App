@@ -8,10 +8,7 @@ class SkillsViewController extends GetxController {
   final isLoading = false.obs;
   final isSaving = false.obs;
 
-  // 🎯 បញ្ជីជំនាញសម្រាប់បង្ហាញលើ UI
   final skillsList = <String>[].obs;
-
-  // 🎯 ប្រអប់វាយបញ្ចូល
   final skillInputCtrl = TextEditingController();
 
   @override
@@ -20,7 +17,6 @@ class SkillsViewController extends GetxController {
     _loadExistingSkills();
   }
 
-  // ទាញយក Skill ចាស់ៗពី Profile មេមកបង្ហាញ
   void _loadExistingSkills() {
     final currentProfile = _parentController.profileData.value;
     if (currentProfile != null && currentProfile.skills.isNotEmpty) {
@@ -28,35 +24,32 @@ class SkillsViewController extends GetxController {
     }
   }
 
-  // 🎯 មុខងារបន្ថែម Skill ចូលទៅក្នុង List (Local)
   void addSkill() {
     final newSkill = skillInputCtrl.text.trim();
     if (newSkill.isNotEmpty && !skillsList.contains(newSkill)) {
       skillsList.add(newSkill);
-      skillInputCtrl.clear(); // លុបអក្សរក្នុងប្រអប់ចោលបន្ទាប់ពី Add
+      skillInputCtrl.clear();
     } else if (skillsList.contains(newSkill)) {
       Get.snackbar(
-        'Notice',
-        'This skill is already added.',
+        'Notice'.tr, // 🟢 Added .tr
+        'This skill is already added.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
 
-  // 🎯 មុខងារលុប Skill ចេញពី List (Local)
   void removeSkill(String skill) {
     skillsList.remove(skill);
   }
 
-  // 🎯 មុខងារ Save ទៅកាន់ Backend
   Future<void> saveSkills() async {
     final currentProfile = _parentController.profileData.value;
 
     if (currentProfile == null) {
       Get.snackbar(
-        'Error',
-        'Profile data is missing. Please try again.',
-        backgroundColor: Colors.redAccent,
+        'Error'.tr, // 🟢 Added .tr
+        'Profile data is missing. Please try again.'.tr, // 🟢 Added .tr
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
       return;
@@ -65,7 +58,6 @@ class SkillsViewController extends GetxController {
     try {
       isSaving.value = true;
 
-      // 🎯 រៀបចំ Request Object ដោយចម្លងទិន្នន័យចាស់ទាំងអស់ ហើយដូរតែ skills
       final updateRequest = SeekerCoreUpdateRequest(
         firstName: currentProfile.firstName,
         lastName: currentProfile.lastName,
@@ -87,39 +79,37 @@ class SkillsViewController extends GetxController {
         expectedSalaryMax: currentProfile.expectedSalaryMax,
         jobTypePreferences: currentProfile.jobTypePreferences,
         expertiseCategoryIds: currentProfile.expertiseCategoryIds,
-        skills: skillsList.toList(), // 🟢 បញ្ចូល List Skills ថ្មីនៅទីនេះ
+        skills: skillsList.toList(),
         portfolioUrl: currentProfile.portfolioUrl,
         linkedinUrl: currentProfile.linkedinUrl,
         onboardingCompleted: currentProfile.onboardingCompleted,
       );
 
-      // បាញ់ API Update Core Profile
       final success = await _profileServices.updateCoreProfile(updateRequest);
 
       if (success) {
-        // Refresh Profile ទំព័រមេ
         await _parentController.fetchCompleteProfile();
 
         Get.back();
         Get.snackbar(
-          'Success',
-          'Skills updated successfully.',
-          backgroundColor: Colors.green,
+          'Success'.tr, // 🟢 Added .tr
+          'Skills updated successfully.'.tr, // 🟢 Added .tr
+          backgroundColor: AppColors.success,
           colorText: Colors.white,
         );
       } else {
         Get.snackbar(
-          'Error',
-          'Failed to update skills.',
-          backgroundColor: Colors.redAccent,
+          'Error'.tr, // 🟢 Added .tr
+          'Failed to update skills.'.tr, // 🟢 Added .tr
+          backgroundColor: AppColors.error,
           colorText: Colors.white,
         );
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'An error occurred: $e',
-        backgroundColor: Colors.redAccent,
+        'Error'.tr, // 🟢 Added .tr
+        'An error occurred: '.tr + '$e', // 🟢 Added .tr
+        backgroundColor: AppColors.error,
         colorText: Colors.white,
       );
     } finally {

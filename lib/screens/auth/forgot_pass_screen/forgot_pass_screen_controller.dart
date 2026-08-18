@@ -35,16 +35,31 @@ class ForgotPassScreenViewController extends GetxController {
       String message =
           response["message"] ??
           "Verification code has been sent to your email.";
-      Get.snackbar("Success", message);
+      Get.snackbar(
+        "Success",
+        message,
+        backgroundColor: AppColors.success, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
 
       Get.toNamed(
         AppRoutes.verifyOtp,
         arguments: {'email': email, 'from': 'forgot_password'},
       );
     } on ApiException catch (e) {
-      Get.snackbar("Error", e.message);
+      Get.snackbar(
+        "Error",
+        e.message,
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
     } catch (e) {
-      Get.snackbar("Error", "Something wrong. Please check your connection");
+      Get.snackbar(
+        "Error",
+        "Something wrong. Please check your connection",
+        backgroundColor: AppColors.error, // 🟢 Updated to AppColors
+        colorText: Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }

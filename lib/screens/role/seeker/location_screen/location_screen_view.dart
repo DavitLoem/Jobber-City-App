@@ -32,7 +32,8 @@ class LocationScreenView extends GetView<LocationScreenController> {
               () => LocationHeader(
                 title: controller.currentPage.value == 0
                     ? 'Your City'
-                    : 'Your District',
+                          .tr // 🟢 Added .tr
+                    : 'Your District'.tr, // 🟢 Added .tr
                 onBackPressed: controller.goBack,
                 showBackButton: controller.currentPage.value != 0,
               ),
@@ -219,7 +220,7 @@ class LocationScreenView extends GetView<LocationScreenController> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline_rounded,
             size: 48,
             color: LocationColors.border,
@@ -245,7 +246,7 @@ class LocationScreenView extends GetView<LocationScreenController> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Retry'),
+            child: Text('Retry'.tr), // 🟢 Added .tr
           ),
         ],
       ),

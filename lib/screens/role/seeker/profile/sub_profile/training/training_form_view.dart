@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/profile/sub_profile/training/training_view.dart';
 
 class TrainingFormView extends GetView<TrainingViewController> {
@@ -8,22 +9,26 @@ class TrainingFormView extends GetView<TrainingViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87),
+          icon: Icon(Icons.close, color: theme.textTheme.bodyLarge?.color),
           onPressed: () => Get.back(),
         ),
         title: Obx(
           () => Text(
             controller.editingId.value == null
                 ? 'Add Training'
-                : 'Edit Training',
-            style: const TextStyle(
-              color: Colors.black87,
+                      .tr // 🟢 Added .tr
+                : 'Edit Training'.tr, // 🟢 Added .tr
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -35,16 +40,24 @@ class TrainingFormView extends GetView<TrainingViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabel('Course / Certificate Name *'),
+            _buildLabel(
+              'Course / Certificate Name *'.tr,
+              theme,
+            ), // 🟢 Added .tr
             _buildTextField(
-              'e.g., AWS Cloud Practitioner',
+              context,
+              'e.g., AWS Cloud Practitioner'.tr, // 🟢 Added .tr
               ctrl: controller.courseNameCtrl,
             ),
             const SizedBox(height: 16),
 
-            _buildLabel('Institution / Organization *'),
+            _buildLabel(
+              'Institution / Organization *'.tr,
+              theme,
+            ), // 🟢 Added .tr
             _buildTextField(
-              'e.g., AWS Academy',
+              context,
+              'e.g., AWS Academy'.tr, // 🟢 Added .tr
               ctrl: controller.institutionCtrl,
             ),
             const SizedBox(height: 16),
@@ -55,10 +68,10 @@ class TrainingFormView extends GetView<TrainingViewController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel('Start Date *'),
+                      _buildLabel('Start Date *'.tr, theme), // 🟢 Added .tr
                       _buildDateField(
                         context,
-                        'YYYY-MM-DD',
+                        'YYYY-MM-DD'.tr, // 🟢 Added .tr
                         ctrl: controller.startDateCtrl,
                       ),
                     ],
@@ -69,10 +82,10 @@ class TrainingFormView extends GetView<TrainingViewController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel('End Date'),
+                      _buildLabel('End Date'.tr, theme), // 🟢 Added .tr
                       _buildDateField(
                         context,
-                        'YYYY-MM-DD',
+                        'YYYY-MM-DD'.tr, // 🟢 Added .tr
                         ctrl: controller.endDateCtrl,
                       ),
                     ],
@@ -82,16 +95,18 @@ class TrainingFormView extends GetView<TrainingViewController> {
             ),
             const SizedBox(height: 16),
 
-            _buildLabel('Certificate URL (Optional)'),
+            _buildLabel('Certificate URL (Optional)'.tr, theme), // 🟢 Added .tr
             _buildTextField(
-              'https://example.com/cert',
+              context,
+              'https://example.com/cert', // URLs typically don't translate
               ctrl: controller.certificateUrlCtrl,
             ),
             const SizedBox(height: 16),
 
-            _buildLabel('Description (Optional)'),
+            _buildLabel('Description (Optional)'.tr, theme), // 🟢 Added .tr
             _buildTextField(
-              'What did you learn?',
+              context,
+              'What did you learn?'.tr, // 🟢 Added .tr
               maxLines: 4,
               ctrl: controller.descriptionCtrl,
             ),
@@ -108,7 +123,10 @@ class TrainingFormView extends GetView<TrainingViewController> {
                   ? null
                   : () => controller.saveTraining(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade300,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -120,7 +138,8 @@ class TrainingFormView extends GetView<TrainingViewController> {
                   : Text(
                       controller.editingId.value == null
                           ? 'Save Training'
-                          : 'Update Training',
+                                .tr // 🟢 Added .tr
+                          : 'Update Training'.tr, // 🟢 Added .tr
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -134,45 +153,59 @@ class TrainingFormView extends GetView<TrainingViewController> {
     );
   }
 
-  Widget _buildLabel(String text) => Padding(
+  Widget _buildLabel(String text, ThemeData theme) => Padding(
     padding: const EdgeInsets.only(bottom: 8.0),
     child: Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: theme.textTheme.bodyLarge?.color,
       ),
     ),
   );
 
   Widget _buildTextField(
+    BuildContext context,
     String hint, {
     TextEditingController? ctrl,
     int maxLines = 1,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       controller: ctrl,
       maxLines: maxLines,
+      style: TextStyle(
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
     );
@@ -183,9 +216,14 @@ class TrainingFormView extends GetView<TrainingViewController> {
     String hint, {
     required TextEditingController ctrl,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       controller: ctrl,
       readOnly: true,
+      style: TextStyle(
+        color: isDark ? AppColors.darkInputText : AppColors.inputText,
+      ),
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
@@ -199,29 +237,37 @@ class TrainingFormView extends GetView<TrainingViewController> {
       },
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: TextStyle(
+          color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+          fontSize: 14,
+        ),
         suffixIcon: Icon(
           Icons.calendar_today,
-          color: Colors.grey.shade500,
+          color: isDark ? AppColors.darkIconSecondary : AppColors.iconSecondary,
           size: 20,
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: const BorderSide(color: Colors.transparent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: BorderSide(
+            color: isDark ? AppColors.primary : AppColors.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
       ),
     );

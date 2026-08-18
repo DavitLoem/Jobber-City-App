@@ -29,6 +29,7 @@ class HomeSeekerViewController extends GetxController {
   // Selected filter index for Recent Jobs
   var selectedRecentFilterIndex = 0.obs;
   var selectedCategoryId = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -44,7 +45,7 @@ class HomeSeekerViewController extends GetxController {
     }
   }
 
-  /// 🎯 ២. ការទាញយក Profile ដោយប្រើប្រាស់ API ផ្ទាល់ (បោះបង់ AuthServices)[cite: 10]
+  /// 🎯 ២. ការទាញយក Profile ដោយប្រើប្រាស់ API ផ្ទាល់ (បោះបង់ AuthServices)
   void fetchProfileRaw() async {
     try {
       isLoadingProfile.value = true;
@@ -148,11 +149,11 @@ class HomeSeekerViewController extends GetxController {
   String getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) {
-      return "Good morning";
+      return "Good morning".tr; // 🟢 Added .tr
     } else if (hour < 17) {
-      return "Good afternoon";
+      return "Good afternoon".tr; // 🟢 Added .tr
     } else {
-      return "Good evening";
+      return "Good evening".tr; // 🟢 Added .tr
     }
   }
 

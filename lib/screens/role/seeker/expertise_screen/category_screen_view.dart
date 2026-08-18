@@ -23,8 +23,11 @@ class CategoryScreenView extends GetView<CategoryScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,13 +42,15 @@ class CategoryScreenView extends GetView<CategoryScreenViewController> {
                   ),
                   const SizedBox(height: 15),
 
-                  const Divider(color: AppColors.line, thickness: 1.8),
+                  Divider(
+                    color: isDark ? AppColors.darkDivider : AppColors.line,
+                    thickness: 1.8,
+                  ),
                   const SizedBox(height: 10),
                   Expanded(child: CategoryList(controller: controller)),
                 ],
               ),
             ),
-
             CategoryFooter(controller: controller),
           ],
         ),

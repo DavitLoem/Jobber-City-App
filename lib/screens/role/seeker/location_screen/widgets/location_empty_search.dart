@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX Import
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
 class LocationEmptySearch extends StatelessWidget {
@@ -6,28 +7,28 @@ class LocationEmptySearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.search_off_rounded,
             size: 48,
             color: LocationColors.border,
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
-            'No cities found',
-            style: TextStyle(
+            'No cities found'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: LocationColors.sub,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
-            'Try a different search term',
-            style: TextStyle(fontSize: 13, color: LocationColors.muted),
+            'Try a different search term'.tr, // 🟢 Added .tr
+            style: const TextStyle(fontSize: 13, color: LocationColors.muted),
           ),
         ],
       ),

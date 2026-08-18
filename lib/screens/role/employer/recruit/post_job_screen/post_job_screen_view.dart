@@ -13,13 +13,11 @@ import 'package:jobber_city/widgets/arrow_key_back.dart';
 part 'post_job_screen_binding.dart';
 part 'post_job_screen_controller.dart';
 
-// Color mapping to match the new UI snippets with your project
 const _outlineLight = Color(0xFFE2E8F0);
 const _onSurfaceMuted = Color(0xFF64748B);
 const _onSurfaceSecondary = Color(0xFF475569);
 const _surfaceVariantLight = Color(0xFFF1F5F9);
 const _primaryContainer = Color(0xFFEEF2FF);
-const _backgroundLight = Color(0xFFF8FAFC);
 
 class PostJobScreenView extends GetView<PostJobScreenViewController> {
   const PostJobScreenView({super.key});
@@ -27,34 +25,43 @@ class PostJobScreenView extends GetView<PostJobScreenViewController> {
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: _backgroundLight,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: const Padding(
           padding: EdgeInsets.all(8.0),
           child: ArrowKeyBack(),
         ),
-        title: const Text(
-          "Post a Job",
+        title: Text(
+          "Post a Job".tr,
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         centerTitle: true,
         elevation: 0,
-        surfaceTintColor: Colors.white,
-        shadowColor: Colors.black.withAlpha(20),
-        shape: const Border(bottom: BorderSide(color: _outlineLight, width: 1)),
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black.withValues(
+          alpha: 0.05,
+        ), // 🟢 Updated to withValues
+        shape: Border(
+          bottom: BorderSide(
+            color: isDark ? AppColors.darkDivider : _outlineLight,
+            width: 1,
+          ),
+        ),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
             alignment: Alignment.center,
             child: InkWell(
-              onTap: () {}, // Handle Save Draft if needed
+              onTap: () {},
               borderRadius: BorderRadius.circular(8),
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -62,12 +69,16 @@ class PostJobScreenView extends GetView<PostJobScreenViewController> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _primaryContainer,
+                  color: isDark
+                      ? AppColors.primary.withValues(
+                          alpha: 0.15,
+                        ) // 🟢 Updated to withValues
+                      : _primaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  'Save Draft',
-                  style: TextStyle(
+                child: Text(
+                  'Save Draft'.tr,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primary,
@@ -87,9 +98,8 @@ class PostJobScreenView extends GetView<PostJobScreenViewController> {
           }
           return Column(
             children: [
-              // 1. Stepper Widget
               Container(
-                color: Colors.white,
+                color: theme.scaffoldBackgroundColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 16,
@@ -97,7 +107,6 @@ class PostJobScreenView extends GetView<PostJobScreenViewController> {
                 child: StepperWidget(currentStep: controller.currentStep.value),
               ),
 
-              // 2. Step Content
               Expanded(
                 child: PageView(
                   controller: controller.pageController,
@@ -123,17 +132,13 @@ class PostJobScreenView extends GetView<PostJobScreenViewController> {
                 ),
               ),
 
-              // 3. Sticky NavBar Widget
-              // 3. Sticky NavBar Widget
               StickyNavBarWidget(
                 currentStep: controller.currentStep.value,
                 isPosting: controller.isLoading.value,
                 onPrevious: controller.currentStep.value > 0
-                    ? () => controller
-                          .previousStep() // Uses your controller's logic!
+                    ? () => controller.previousStep()
                     : null,
-                onNext: () => controller
-                    .nextStep(), // Uses your controller's validation and submitJob!
+                onNext: () => controller.nextStep(),
               ),
             ],
           );
@@ -160,9 +165,6 @@ class PostJobScreenView extends GetView<PostJobScreenViewController> {
   }
 }
 
-// ==========================================
-// STEP 1: BASIC INFO
-// ==========================================
 class Step1BasicInfoWidget extends StatelessWidget {
   final PostJobScreenViewController controller;
   const Step1BasicInfoWidget({super.key, required this.controller});
@@ -174,24 +176,28 @@ class Step1BasicInfoWidget extends StatelessWidget {
       children: [
         _buildStepHeader(
           context,
-          'Basic Information',
-          'Tell us about the role and where it\'s based',
+          'Basic Information'.tr,
+          'Tell us about the role and where it\'s based'.tr,
         ),
         const SizedBox(height: 16),
         StepSectionCard(
-          title: 'Company & Position',
+          title: 'Company & Position'.tr,
           icon: Icons.business_center_outlined,
           children: [
-            _buildLogoSection(), // Automatically displays the caught logo!
+            _buildLogoSection(context),
             const SizedBox(height: 16),
             FormFieldWrapper(
-              label: 'Job Title',
+              label: 'Job Title'.tr,
               required: true,
               child: TextFormField(
                 controller: controller.titleCtrl,
-                style: const TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
-                  hint: 'e.g. Senior Product Designer',
+                  context,
+                  hint: 'e.g. Senior Product Designer'.tr,
                   icon: Icons.work_outline_rounded,
                 ),
               ),
@@ -199,20 +205,19 @@ class Step1BasicInfoWidget extends StatelessWidget {
           ],
         ),
         StepSectionCard(
-          title: 'Location',
+          title: 'Location'.tr,
           icon: Icons.location_on_outlined,
           children: [
             FormFieldWrapper(
-              label: 'Province / State',
+              label: 'Province / State'.tr,
               required: true,
               child: CitySelectField<LocationModel>(
                 controller: controller.provinceCtrl,
-                // fetchOptions: () => LocationServices().getProvinces(),
                 fetchOptions: () => Future.value([]),
                 labelOf: (loc) => loc.nameEn,
-                hintText: "Select province",
-                sheetTitle: "Select Province",
-                searchHint: "Search province...",
+                hintText: "Select province".tr,
+                sheetTitle: "Select Province".tr,
+                searchHint: "Search province...".tr,
                 prefixIcon: Icons.map_outlined,
                 onSelected: (loc) {
                   controller.provinceId.value = loc.id;
@@ -224,7 +229,7 @@ class Step1BasicInfoWidget extends StatelessWidget {
             const SizedBox(height: 14),
             Obx(
               () => FormFieldWrapper(
-                label: 'District / City',
+                label: 'District / City'.tr,
                 required: true,
                 child: CitySelectField<LocationModel>(
                   controller: controller.districtCtrl,
@@ -235,10 +240,10 @@ class Step1BasicInfoWidget extends StatelessWidget {
                         ),
                   labelOf: (dist) => dist.nameEn,
                   hintText: controller.provinceId.value.isEmpty
-                      ? "Select province first"
-                      : "Select district",
-                  sheetTitle: "Select District",
-                  searchHint: "Search district...",
+                      ? "Select province first".tr
+                      : "Select district".tr,
+                  sheetTitle: "Select District".tr,
+                  searchHint: "Search district...".tr,
                   prefixIcon: Icons.location_city_outlined,
                   enabled: controller.provinceId.value.isNotEmpty,
                   onSelected: (dist) {
@@ -249,116 +254,56 @@ class Step1BasicInfoWidget extends StatelessWidget {
             ),
           ],
         ),
-        // StepSectionCard(
-        //   title: 'Job Classification',
-        //   icon: Icons.category_outlined,
-        //   children: [
-        //     FormFieldWrapper(
-        //       label: 'Job Category',
-        //       required: true,
-        //       child: CitySelectField<MasterDataItem>(
-        //         controller: controller.categoryNameCtrl,
-        //         fetchOptions: controller.fetchCategories,
-        //         labelOf: (item) => item.name,
-        //         hintText: "Select category",
-        //         prefixIcon: Icons.category_outlined,
-        //         sheetTitle: "Select Category",
-        //         searchHint: "Search category...",
-        //         onSelected: (item) => controller.categoryId.value = item.id,
-        //       ),
-        //     ),
-        //     const SizedBox(height: 14),
-        //     FormFieldWrapper(
-        //       label: 'Job Level',
-        //       required: true,
-        //       child: CitySelectField<MasterDataItem>(
-        //         controller: controller.jobLevelNameCtrl,
-        //         fetchOptions: controller.fetchJobLevels,
-        //         labelOf: (item) => item.name,
-        //         hintText: "Select level",
-        //         prefixIcon: Icons.layers_outlined,
-        //         sheetTitle: "Select Job Level",
-        //         searchHint: "Search level...",
-        //         onSelected: (item) => controller.jobLevelId.value = item.id,
-        //       ),
-        //     ),
-        //     const SizedBox(height: 14),
-        //     Row(
-        //       children: [
-        //         Expanded(
-        //           child: FormFieldWrapper(
-        //             label: 'Employment Type',
-        //             required: true,
-        //             child: CitySelectField<MasterDataItem>(
-        //               controller: controller.employmentTypeNameCtrl,
-        //               fetchOptions: controller.fetchEmploymentTypes,
-        //               labelOf: (item) => item.name,
-        //               hintText: "Type",
-        //               prefixIcon: Icons.work_history_outlined,
-        //               sheetTitle: "Select Employment Type",
-        //               searchHint: "Search...",
-        //               onSelected: (item) =>
-        //                   controller.employmentTypeId.value = item.id,
-        //             ),
-        //           ),
-        //         ),
-        //         const SizedBox(width: 12),
-        //         Expanded(
-        //           child: FormFieldWrapper(
-        //             label: 'Work Type',
-        //             required: true,
-        //             child: CitySelectField<MasterDataItem>(
-        //               controller: controller.workTypeNameCtrl,
-        //               fetchOptions: controller.fetchWorkTypes,
-        //               labelOf: (item) => item.name,
-        //               hintText: "Mode",
-        //               prefixIcon: Icons.home_work_outlined,
-        //               sheetTitle: "Select Work Type",
-        //               searchHint: "Search...",
-        //               onSelected: (item) =>
-        //                   controller.workTypeId.value = item.id,
-        //             ),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ],
-        // ),
       ],
     );
   }
 
-  // -----------------------------------------------------
-  // Smart Logo Section (Catches URL from Company Profile)
-  // -----------------------------------------------------
-  Widget _buildLogoSection() {
+  Widget _buildLogoSection(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return FormFieldWrapper(
-      label: 'Company Logo',
+      label: 'Company Logo'.tr,
       child: Obx(() {
         final hasLogo = controller.companyLogoUrl.value.isNotEmpty;
 
         return InkWell(
           onTap: () {
-            Get.snackbar("Upload", "Wire this to your image picker.");
+            Get.snackbar("Upload".tr, "Wire this to your image picker.".tr);
           },
           borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _surfaceVariantLight,
+              color: isDark
+                  ? AppColors.darkInputBackground
+                  : _surfaceVariantLight,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _outlineLight, width: 1.5),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : _outlineLight,
+                width: 1.5,
+              ),
             ),
             child: Row(
               children: [
-                // Display Fetched Logo OR Placeholder Icon
                 Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: hasLogo ? Colors.white : _primaryContainer,
+                    color: hasLogo
+                        ? (isDark ? AppColors.darkSurface : Colors.white)
+                        : (isDark
+                              ? AppColors.primary.withValues(
+                                  alpha: 0.15,
+                                ) // 🟢 Updated to withValues
+                              : _primaryContainer),
                     borderRadius: BorderRadius.circular(10),
-                    border: hasLogo ? Border.all(color: _outlineLight) : null,
+                    border: hasLogo
+                        ? Border.all(
+                            color: isDark
+                                ? AppColors.darkCardBorder
+                                : _outlineLight,
+                          )
+                        : null,
                     image: hasLogo
                         ? DecorationImage(
                             image: NetworkImage(
@@ -377,8 +322,6 @@ class Step1BasicInfoWidget extends StatelessWidget {
                       : null,
                 ),
                 const SizedBox(width: 16),
-
-                // Dynamic Text based on status
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,8 +329,8 @@ class Step1BasicInfoWidget extends StatelessWidget {
                     children: [
                       Text(
                         hasLogo
-                            ? 'Company Logo Applied'
-                            : 'Upload Company Logo',
+                            ? 'Company Logo Applied'.tr
+                            : 'Upload Company Logo'.tr,
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -397,22 +340,22 @@ class Step1BasicInfoWidget extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         hasLogo
-                            ? 'Fetched directly from your profile'
-                            : 'Tap to browse (PNG, JPG up to 5MB)',
-                        style: const TextStyle(
+                            ? 'Fetched directly from your profile'.tr
+                            : 'Tap to browse (PNG, JPG up to 5MB)'.tr,
+                        style: TextStyle(
                           fontSize: 11,
-                          color: _onSurfaceMuted,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : _onSurfaceMuted,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Status Icon or Button
                 if (hasLogo)
-                  const Icon(
+                  Icon(
                     Icons.check_circle_rounded,
-                    color: Colors.green,
+                    color: isDark ? Colors.greenAccent : Colors.green,
                     size: 22,
                   )
                 else
@@ -422,15 +365,22 @@ class Step1BasicInfoWidget extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark
+                          ? AppColors.darkSurfaceElevated
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: _outlineLight),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkCardBorder
+                            : _outlineLight,
+                      ),
                     ),
-                    child: const Text(
-                      'Browse',
+                    child: Text(
+                      'Browse'.tr,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                   ),
@@ -443,30 +393,29 @@ class Step1BasicInfoWidget extends StatelessWidget {
   }
 }
 
-// ==========================================
-// STEP 2: SALARY & REQUIREMENTS
-// ==========================================
 class Step2SalaryWidget extends StatelessWidget {
   final PostJobScreenViewController controller;
   const Step2SalaryWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildStepHeader(
           context,
-          'Salary & Requirements',
-          'Define compensation and candidate requirements',
+          'Salary & Requirements'.tr,
+          'Define compensation and candidate requirements'.tr,
         ),
         const SizedBox(height: 16),
         StepSectionCard(
-          title: 'Compensation',
+          title: 'Compensation'.tr,
           icon: Icons.attach_money_rounded,
           children: [
             FormFieldWrapper(
-              label: 'Salary Period',
+              label: 'Salary Period'.tr,
               child: Obx(
                 () => Row(
                   children: controller.salaryPeriodOptions.map((p) {
@@ -485,23 +434,29 @@ class Step2SalaryWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.primary
-                                : _surfaceVariantLight,
+                                : (isDark
+                                      ? AppColors.darkSurfaceElevated
+                                      : _surfaceVariantLight),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: isSelected
                                   ? AppColors.primary
-                                  : _outlineLight,
+                                  : (isDark
+                                        ? AppColors.darkCardBorder
+                                        : _outlineLight),
                             ),
                           ),
                           child: Text(
-                            p,
+                            p.tr,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: isSelected
                                   ? Colors.white
-                                  : _onSurfaceSecondary,
+                                  : (isDark
+                                        ? AppColors.darkTextSecondary
+                                        : _onSurfaceSecondary),
                             ),
                           ),
                         ),
@@ -516,28 +471,42 @@ class Step2SalaryWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: FormFieldWrapper(
-                    label: 'Minimum Salary',
+                    label: 'Minimum Salary'.tr,
                     required: true,
                     child: TextFormField(
                       controller: controller.minSalaryCtrl,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      style: const TextStyle(fontSize: 14),
-                      decoration: _inputDecoration(hint: '500', prefix: '\$ '),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
+                      ),
+                      decoration: _inputDecoration(
+                        context,
+                        hint: '500',
+                        prefix: '\$ ',
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FormFieldWrapper(
-                    label: 'Maximum Salary',
+                    label: 'Maximum Salary'.tr,
                     required: true,
                     child: TextFormField(
                       controller: controller.maxSalaryCtrl,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      style: const TextStyle(fontSize: 14),
-                      decoration: _inputDecoration(hint: '1000', prefix: '\$ '),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
+                      ),
+                      decoration: _inputDecoration(
+                        context,
+                        hint: '1000',
+                        prefix: '\$ ',
+                      ),
                     ),
                   ),
                 ),
@@ -552,13 +521,21 @@ class Step2SalaryWidget extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: controller.isNegotiable.value
-                      ? _primaryContainer
-                      : _surfaceVariantLight,
+                      ? (isDark
+                            ? AppColors.primary.withValues(
+                                alpha: 0.15,
+                              ) // 🟢 Updated to withValues
+                            : _primaryContainer)
+                      : (isDark
+                            ? AppColors.darkInputBackground
+                            : _surfaceVariantLight),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: controller.isNegotiable.value
-                        ? _primaryContainer
-                        : _outlineLight,
+                        ? AppColors.primary.withValues(
+                            alpha: 0.5,
+                          ) // 🟢 Updated to withValues
+                        : (isDark ? AppColors.darkCardBorder : _outlineLight),
                   ),
                 ),
                 child: Row(
@@ -568,7 +545,9 @@ class Step2SalaryWidget extends StatelessWidget {
                       size: 18,
                       color: controller.isNegotiable.value
                           ? AppColors.primary
-                          : _onSurfaceMuted,
+                          : (isDark
+                                ? AppColors.darkIconSecondary
+                                : _onSurfaceMuted),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -576,20 +555,24 @@ class Step2SalaryWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Negotiable Salary',
+                            'Negotiable Salary'.tr,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: controller.isNegotiable.value
                                   ? AppColors.primary
-                                  : const Color(0xFF374151),
+                                  : (isDark
+                                        ? AppColors.darkTextSecondary
+                                        : const Color(0xFF374151)),
                             ),
                           ),
-                          const Text(
-                            'Candidates can negotiate final offer',
+                          Text(
+                            'Candidates can negotiate final offer'.tr,
                             style: TextStyle(
                               fontSize: 11,
-                              color: _onSurfaceSecondary,
+                              color: isDark
+                                  ? AppColors.darkTextHint
+                                  : _onSurfaceSecondary,
                             ),
                           ),
                         ],
@@ -599,6 +582,11 @@ class Step2SalaryWidget extends StatelessWidget {
                       value: controller.isNegotiable.value,
                       onChanged: (v) => controller.isNegotiable.value = v,
                       activeThumbColor: AppColors.primary,
+                      activeTrackColor: isDark
+                          ? AppColors.primary.withValues(
+                              alpha: 0.5,
+                            ) // 🟢 Updated to withValues
+                          : null,
                     ),
                   ],
                 ),
@@ -607,53 +595,41 @@ class Step2SalaryWidget extends StatelessWidget {
           ],
         ),
         StepSectionCard(
-          title: 'Requirements',
+          title: 'Requirements'.tr,
           icon: Icons.school_outlined,
           children: [
             FormFieldWrapper(
-              label: 'Number of Vacancies',
+              label: 'Number of Vacancies'.tr,
               required: true,
               child: TextFormField(
                 controller: controller.headCountCtrl,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: const TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
-                  hint: 'e.g. 3',
+                  context,
+                  hint: 'e.g. 3'.tr,
                   icon: Icons.people_outline_rounded,
                 ),
               ),
             ),
             const SizedBox(height: 14),
             FormFieldWrapper(
-              label: 'Experience Required',
+              label: 'Experience Required'.tr,
               required: true,
               child: StyledDropdown(
                 value: controller.experienceCtrl.text.isEmpty
                     ? null
                     : controller.experienceCtrl.text,
                 items: controller.experienceOptions.map((e) => e.name).toList(),
-                hint: 'Select experience level',
+                hint: 'Select experience level'.tr,
                 prefixIcon: Icons.timeline_outlined,
                 onChanged: (v) => controller.experienceCtrl.text = v ?? '',
               ),
             ),
-            const SizedBox(height: 14),
-            // FormFieldWrapper(
-            //   label: 'Education Level',
-            //   required: true,
-            //   child: CitySelectField<MasterDataItem>(
-            //     controller: controller.educationLevelNameCtrl,
-            //     fetchOptions: controller.fetchEducationLevels,
-            //     labelOf: (item) => item.name,
-            //     hintText: "Select education",
-            //     prefixIcon: Icons.school_outlined,
-            //     sheetTitle: "Select Education Level",
-            //     searchHint: "Search education...",
-            //     onSelected: (item) =>
-            //         controller.educationLevelId.value = item.id,
-            //   ),
-            // ),
           ],
         ),
       ],
@@ -661,76 +637,85 @@ class Step2SalaryWidget extends StatelessWidget {
   }
 }
 
-// ==========================================
-// STEP 3: DETAILS
-// ==========================================
-// ==========================================
-// STEP 3: DETAILS
-// ==========================================
 class Step3DetailsWidget extends StatelessWidget {
   final PostJobScreenViewController controller;
   const Step3DetailsWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildStepHeader(
           context,
-          'Job Details',
-          'Describe the role, requirements, and what you offer',
+          'Job Details'.tr,
+          'Describe the role, requirements, and what you offer'.tr,
         ),
         const SizedBox(height: 16),
 
-        // 1. Job Description & About
         StepSectionCard(
-          title: 'Job Description',
+          title: 'Job Description'.tr,
           icon: Icons.description_outlined,
           children: [
             FormFieldWrapper(
-              label: 'Job Description',
+              label: 'Job Description'.tr,
               required: true,
               child: TextFormField(
                 controller: controller.descCtrl,
                 maxLines: 5,
-                style: const TextStyle(fontSize: 14, height: 1.5),
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
-                  hint: 'Describe the role, responsibilities, and tasks...',
+                  context,
+                  hint: 'Describe the role, responsibilities, and tasks...'.tr,
                 ).copyWith(alignLabelWithHint: true),
               ),
             ),
             const SizedBox(height: 14),
             FormFieldWrapper(
-              label: 'Minimum Qualifications',
+              label: 'Minimum Qualifications'.tr,
               required: true,
               child: TextFormField(
                 controller: controller.reqCtrl,
                 maxLines: 4,
-                style: const TextStyle(fontSize: 14, height: 1.5),
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
-                  hint: 'List required education, skills, and experience...',
+                  context,
+                  hint: 'List required education, skills, and experience...'.tr,
                 ).copyWith(alignLabelWithHint: true),
               ),
             ),
             const SizedBox(height: 14),
             FormFieldWrapper(
-              label: 'About the Company',
+              label: 'About the Company'.tr,
               child: TextFormField(
                 controller: controller.aboutCompanyCtrl,
                 maxLines: 3,
-                style: const TextStyle(fontSize: 14, height: 1.5),
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
-                  hint: 'Share your company culture, mission, and values...',
+                  context,
+                  hint: 'Share your company culture, mission, and values...'.tr,
                 ).copyWith(alignLabelWithHint: true),
               ),
             ),
           ],
         ),
 
-        // 2. Benefits & Perks
         StepSectionCard(
-          title: 'Benefits & Perks',
+          title: 'Benefits & Perks'.tr,
           icon: Icons.card_giftcard_outlined,
           children: [
             Row(
@@ -738,12 +723,16 @@ class Step3DetailsWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: FormFieldWrapper(
-                    label: 'Add Benefits',
+                    label: 'Add Benefits'.tr,
                     child: TextFormField(
                       controller: controller.benefitInputCtrl,
-                      style: const TextStyle(fontSize: 14),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
+                      ),
                       decoration: _inputDecoration(
-                        hint: 'e.g. Health Insurance',
+                        context,
+                        hint: 'e.g. Health Insurance'.tr,
                         icon: Icons.add_circle_outline_rounded,
                       ),
                       onFieldSubmitted: (_) => controller.addBenefit(),
@@ -752,9 +741,7 @@ class Step3DetailsWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Padding(
-                  padding: const EdgeInsets.only(
-                    top: 25.0,
-                  ), // Aligns button with the text field
+                  padding: const EdgeInsets.only(top: 25.0),
                   child: ElevatedButton(
                     onPressed: controller.addBenefit,
                     style: ElevatedButton.styleFrom(
@@ -766,9 +753,9 @@ class Step3DetailsWidget extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Add',
-                      style: TextStyle(
+                    child: Text(
+                      'Add'.tr,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -789,8 +776,8 @@ class Step3DetailsWidget extends StatelessWidget {
                     (index) => _buildRemovableChip(
                       controller.benefits[index],
                       () => controller.removeBenefit(index),
-                      isSuccessTheme:
-                          true, // Makes it green like the original UI
+                      isSuccessTheme: true,
+                      isDark: isDark,
                     ),
                   ),
                 ),
@@ -799,29 +786,10 @@ class Step3DetailsWidget extends StatelessWidget {
           ],
         ),
 
-        // 3. Required Skills
         StepSectionCard(
-          title: 'Required Skills',
+          title: 'Required Skills'.tr,
           icon: Icons.psychology_outlined,
           children: [
-            // FormFieldWrapper(
-            //   label: 'Select Skills',
-            //   required: true, // Marked as required since submitJob checks it
-            //   child: CitySelectField<MasterDataItem>(
-            //     controller: controller.skillNameCtrl,
-            //     fetchOptions: controller.fetchSkills,
-            //     labelOf: (item) => item.name,
-            //     hintText: "Search and add skills",
-            //     prefixIcon: Icons.search_rounded,
-            //     sheetTitle: "Select Skill",
-            //     searchHint: "Search for skills...",
-            //     onSelected: (item) {
-            //       controller.addSkill(item.id, item.name);
-            //       controller.skillNameCtrl
-            //           .clear(); // Clear input so they can add more
-            //     },
-            //   ),
-            // ),
             Obx(() {
               if (controller.selectedSkillNames.isEmpty)
                 return const SizedBox.shrink();
@@ -835,7 +803,8 @@ class Step3DetailsWidget extends StatelessWidget {
                     (index) => _buildRemovableChip(
                       controller.selectedSkillNames[index],
                       () => controller.removeSkill(index),
-                      isSuccessTheme: false, // Makes it blue for skills
+                      isSuccessTheme: false,
+                      isDark: isDark,
                     ),
                   ),
                 ),
@@ -847,21 +816,37 @@ class Step3DetailsWidget extends StatelessWidget {
     );
   }
 
-  // Helper widget to render those nice pill-shaped chips
   Widget _buildRemovableChip(
     String label,
     VoidCallback onRemove, {
     required bool isSuccessTheme,
+    required bool isDark,
   }) {
     final Color bgColor = isSuccessTheme
-        ? const Color(0xFFDCFCE7)
-        : AppColors.primaryLight;
+        ? (isDark
+              ? Colors.greenAccent.withValues(
+                  alpha: 0.15,
+                ) // 🟢 Updated to withValues
+              : const Color(0xFFDCFCE7))
+        : (isDark
+              ? AppColors.primary.withValues(
+                  alpha: 0.2,
+                ) // 🟢 Updated to withValues
+              : AppColors.primaryLight);
     final Color textColor = isSuccessTheme
-        ? const Color(0xFF166534)
-        : AppColors.primary;
+        ? (isDark ? Colors.greenAccent : const Color(0xFF166534))
+        : (isDark ? Colors.blueAccent : AppColors.primary);
     final Color borderColor = isSuccessTheme
-        ? const Color(0xFF86EFAC)
-        : AppColors.primary.withAlpha(77);
+        ? (isDark
+              ? Colors.greenAccent.withValues(
+                  alpha: 0.3,
+                ) // 🟢 Updated to withValues
+              : const Color(0xFF86EFAC))
+        : (isDark
+              ? Colors.blueAccent.withValues(
+                  alpha: 0.3,
+                ) // 🟢 Updated to withValues
+              : AppColors.primary.withAlpha(77));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -896,30 +881,29 @@ class Step3DetailsWidget extends StatelessWidget {
   }
 }
 
-// ==========================================
-// STEP 4: SCHEDULE & CONTACT
-// ==========================================
 class Step4ScheduleWidget extends StatelessWidget {
   final PostJobScreenViewController controller;
   const Step4ScheduleWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildStepHeader(
           context,
-          'Schedule & Contact',
-          'Set working schedule and how candidates can reach you',
+          'Schedule & Contact'.tr,
+          'Set working schedule and how candidates can reach you'.tr,
         ),
         const SizedBox(height: 16),
         StepSectionCard(
-          title: 'Working Schedule',
+          title: 'Working Schedule'.tr,
           icon: Icons.schedule_outlined,
           children: [
             FormFieldWrapper(
-              label: 'Working Days',
+              label: 'Working Days'.tr,
               required: true,
               child: StyledDropdown(
                 value: controller.workingDaysCtrl.text.isEmpty
@@ -928,14 +912,14 @@ class Step4ScheduleWidget extends StatelessWidget {
                 items: controller.workingDaysOptions
                     .map((e) => e.name)
                     .toList(),
-                hint: 'Select working days',
+                hint: 'Select working days'.tr,
                 prefixIcon: Icons.calendar_today_outlined,
                 onChanged: (v) => controller.workingDaysCtrl.text = v ?? '',
               ),
             ),
             const SizedBox(height: 14),
             FormFieldWrapper(
-              label: 'Working Hours',
+              label: 'Working Hours'.tr,
               required: true,
               child: StyledDropdown(
                 value: controller.workingHoursCtrl.text.isEmpty
@@ -944,14 +928,14 @@ class Step4ScheduleWidget extends StatelessWidget {
                 items: controller.workingHoursOptions
                     .map((e) => e.name)
                     .toList(),
-                hint: 'Select working hours',
+                hint: 'Select working hours'.tr,
                 prefixIcon: Icons.access_time_outlined,
                 onChanged: (v) => controller.workingHoursCtrl.text = v ?? '',
               ),
             ),
             const SizedBox(height: 14),
             FormFieldWrapper(
-              label: 'Application Closing Date',
+              label: 'Application Closing Date'.tr,
               required: true,
               child: InkWell(
                 onTap: () async {
@@ -979,16 +963,23 @@ class Step4ScheduleWidget extends StatelessWidget {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark
+                        ? AppColors.darkInputBackground
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _outlineLight, width: 1.5),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkCardBorder : _outlineLight,
+                      width: 1.5,
+                    ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.calendar_today_outlined,
                         size: 18,
-                        color: _onSurfaceMuted,
+                        color: isDark
+                            ? AppColors.darkIconSecondary
+                            : _onSurfaceMuted,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -1000,12 +991,16 @@ class Step4ScheduleWidget extends StatelessWidget {
                           return Text(
                             date != null
                                 ? '${date.day}/${date.month}/${date.year}'
-                                : 'Select closing date',
+                                : 'Select closing date'.tr,
                             style: TextStyle(
                               fontSize: 14,
                               color: date != null
-                                  ? const Color(0xFF0F172A)
-                                  : _onSurfaceMuted,
+                                  ? (isDark
+                                        ? Colors.white
+                                        : const Color(0xFF0F172A))
+                                  : (isDark
+                                        ? AppColors.darkTextHint
+                                        : _onSurfaceMuted),
                             ),
                           );
                         }),
@@ -1018,17 +1013,21 @@ class Step4ScheduleWidget extends StatelessWidget {
           ],
         ),
         StepSectionCard(
-          title: 'Contact Information',
+          title: 'Contact Information'.tr,
           icon: Icons.contact_mail_outlined,
           children: [
             FormFieldWrapper(
-              label: 'Contact Email',
+              label: 'Contact Email'.tr,
               required: true,
               child: TextFormField(
                 controller: controller.emailCtrl,
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
+                  context,
                   hint: 'hr@yourcompany.com',
                   icon: Icons.email_outlined,
                 ),
@@ -1036,11 +1035,15 @@ class Step4ScheduleWidget extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             FormFieldWrapper(
-              label: 'Telegram Username',
+              label: 'Telegram Username'.tr,
               child: TextFormField(
                 controller: controller.telegramCtrl,
-                style: const TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
                 decoration: _inputDecoration(
+                  context,
                   hint: '@hrteam',
                   icon: Icons.telegram,
                 ),
@@ -1049,20 +1052,29 @@ class Step4ScheduleWidget extends StatelessWidget {
           ],
         ),
 
-        // Final Ready to Post Review Box
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF7ED),
+            color: isDark
+                ? Colors.orangeAccent.withValues(
+                    alpha: 0.1,
+                  ) // 🟢 Updated to withValues
+                : const Color(0xFFFFF7ED),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.warning.withAlpha(77)),
+            border: Border.all(
+              color: isDark
+                  ? Colors.orangeAccent.withValues(
+                      alpha: 0.3,
+                    ) // 🟢 Updated to withValues
+                  : AppColors.warning.withAlpha(77),
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 Icons.info_outline_rounded,
-                color: AppColors.warning,
+                color: isDark ? Colors.orangeAccent : AppColors.warning,
                 size: 20,
               ),
               const SizedBox(width: 10),
@@ -1070,20 +1082,23 @@ class Step4ScheduleWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Ready to Post?',
+                    Text(
+                      'Ready to Post?'.tr,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.warning,
+                        color: isDark ? Colors.orangeAccent : AppColors.warning,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Review all information before posting your job. Once published, job seekers can immediately apply.',
+                      'Review all information before posting your job. Once published, job seekers can immediately apply.'
+                          .tr,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.warning.withBlue(50),
+                        color: isDark
+                            ? Colors.orangeAccent.shade100
+                            : AppColors.warning.withBlue(50),
                         height: 1.5,
                       ),
                     ),
@@ -1098,58 +1113,73 @@ class Step4ScheduleWidget extends StatelessWidget {
   }
 }
 
-// ==========================================
-// REUSABLE COMPONENTS
-// ==========================================
-
 Widget _buildStepHeader(BuildContext context, String title, String subtitle) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.bold,
-          color: Colors.black,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
         ),
       ),
       const SizedBox(height: 4),
       Text(
         subtitle,
-        style: const TextStyle(fontSize: 14, color: _onSurfaceSecondary),
+        style: TextStyle(
+          fontSize: 14,
+          color: isDark ? AppColors.darkTextSecondary : _onSurfaceSecondary,
+        ),
       ),
     ],
   );
 }
 
-InputDecoration _inputDecoration({
+InputDecoration _inputDecoration(
+  BuildContext context, {
   required String hint,
   IconData? icon,
   String? prefix,
 }) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   return InputDecoration(
     hintText: hint,
     prefixText: prefix,
-    prefixStyle: const TextStyle(
-      color: AppColors.primary,
+    prefixStyle: TextStyle(
+      color: isDark ? Colors.blueAccent : AppColors.primary,
       fontWeight: FontWeight.w600,
     ),
     prefixIcon: icon != null
-        ? Icon(icon, size: 18, color: _onSurfaceMuted)
+        ? Icon(
+            icon,
+            size: 18,
+            color: isDark ? AppColors.darkIconSecondary : _onSurfaceMuted,
+          )
         : null,
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    filled: true,
+    fillColor: isDark ? AppColors.darkInputBackground : Colors.white,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: _outlineLight),
+      borderSide: BorderSide(
+        color: isDark ? AppColors.darkCardBorder : _outlineLight,
+      ),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: _outlineLight),
+      borderSide: BorderSide(
+        color: isDark ? AppColors.darkCardBorder : _outlineLight,
+      ),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+    ),
+    hintStyle: TextStyle(
+      color: isDark ? AppColors.darkTextHint : _onSurfaceMuted,
     ),
   );
 }
@@ -1168,22 +1198,27 @@ class FormFieldWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
           text: TextSpan(
             text: label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF374151),
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : const Color(0xFF374151),
             ),
             children: required
                 ? [
-                    const TextSpan(
+                    TextSpan(
                       text: ' *',
-                      style: TextStyle(color: AppColors.error),
+                      style: TextStyle(
+                        color: isDark ? Colors.redAccent : AppColors.error,
+                      ),
                     ),
                   ]
                 : [],
@@ -1214,22 +1249,34 @@ class StyledDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.darkInputBackground : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _outlineLight, width: 1.5),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : _outlineLight,
+          width: 1.5,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
+          dropdownColor: Theme.of(context).cardColor,
           hint: Row(
             children: [
-              Icon(prefixIcon, size: 16, color: _onSurfaceMuted),
+              Icon(
+                prefixIcon,
+                size: 16,
+                color: isDark ? AppColors.darkIconSecondary : _onSurfaceMuted,
+              ),
               const SizedBox(width: 8),
               Text(
                 hint,
-                style: const TextStyle(fontSize: 14, color: _onSurfaceMuted),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? AppColors.darkTextHint : _onSurfaceMuted,
+                ),
               ),
             ],
           ),
@@ -1240,7 +1287,13 @@ class StyledDropdown extends StatelessWidget {
               .map(
                 (item) => DropdownMenuItem(
                   value: item,
-                  child: Text(item, style: const TextStyle(fontSize: 14)),
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    ),
+                  ),
                 ),
               )
               .toList(),
@@ -1265,14 +1318,20 @@ class StepSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.2 : 0.05,
+            ), // 🟢 Updated to withValues
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -1289,7 +1348,11 @@ class StepSectionCard extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: _primaryContainer,
+                    color: isDark
+                        ? AppColors.primary.withValues(
+                            alpha: 0.15,
+                          ) // 🟢 Updated to withValues
+                        : _primaryContainer,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, size: 16, color: AppColors.primary),
@@ -1297,9 +1360,10 @@ class StepSectionCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
               ],
@@ -1322,15 +1386,17 @@ class StepperWidget extends StatelessWidget {
   final int currentStep;
   const StepperWidget({super.key, required this.currentStep});
 
-  static const List<Map<String, dynamic>> _steps = [
-    {'label': 'Basic Info', 'icon': Icons.work_outline_rounded},
-    {'label': 'Salary', 'icon': Icons.attach_money_rounded},
-    {'label': 'Details', 'icon': Icons.description_outlined},
-    {'label': 'Schedule', 'icon': Icons.schedule_outlined},
+  static List<Map<String, dynamic>> get _steps => [
+    {'label': 'Basic Info'.tr, 'icon': Icons.work_outline_rounded},
+    {'label': 'Salary'.tr, 'icon': Icons.attach_money_rounded},
+    {'label': 'Details'.tr, 'icon': Icons.description_outlined},
+    {'label': 'Schedule'.tr, 'icon': Icons.schedule_outlined},
   ];
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: List.generate(_steps.length * 2 - 1, (index) {
         if (index.isOdd) {
@@ -1340,7 +1406,9 @@ class StepperWidget extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               height: 2,
               decoration: BoxDecoration(
-                color: isCompleted ? AppColors.primary : _outlineLight,
+                color: isCompleted
+                    ? AppColors.primary
+                    : (isDark ? AppColors.darkDivider : _outlineLight),
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
@@ -1353,13 +1421,17 @@ class StepperWidget extends StatelessWidget {
         Color bgColor = isCompleted
             ? AppColors.primary
             : isActive
-            ? _primaryContainer
-            : _surfaceVariantLight;
+            ? (isDark
+                  ? AppColors.primary.withValues(
+                      alpha: 0.2,
+                    ) // 🟢 Updated to withValues
+                  : _primaryContainer)
+            : (isDark ? AppColors.darkSurfaceElevated : _surfaceVariantLight);
         Color iconColor = isCompleted
             ? Colors.white
             : isActive
             ? AppColors.primary
-            : _onSurfaceMuted;
+            : (isDark ? AppColors.darkIconSecondary : _onSurfaceMuted);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -1373,11 +1445,15 @@ class StepperWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: isActive
                     ? Border.all(color: AppColors.primary, width: 2)
-                    : null,
+                    : (isDark && !isCompleted
+                          ? Border.all(color: AppColors.darkCardBorder)
+                          : null),
                 boxShadow: isActive
                     ? [
                         BoxShadow(
-                          color: AppColors.primary.withAlpha(64),
+                          color: AppColors.primary.withValues(
+                            alpha: 0.25,
+                          ), // 🟢 Updated to withValues
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -1406,7 +1482,7 @@ class StepperWidget extends StatelessWidget {
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                 color: isActive || isCompleted
                     ? AppColors.primary
-                    : _onSurfaceMuted,
+                    : (isDark ? AppColors.darkTextHint : _onSurfaceMuted),
               ),
             ),
           ],
@@ -1433,13 +1509,22 @@ class StickyNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLastStep = currentStep == 3;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.darkDivider : Colors.transparent,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(15),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ), // 🟢 Updated to withValues
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
@@ -1452,10 +1537,12 @@ class StickyNavBarWidget extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onPrevious,
                 icon: const Icon(Icons.arrow_back_ios_rounded, size: 14),
-                label: const Text('Previous'),
+                label: Text('Previous'.tr),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: _outlineLight),
+                  side: BorderSide(
+                    color: isDark ? AppColors.darkCardBorder : _outlineLight,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1475,9 +1562,11 @@ class StickyNavBarWidget extends StatelessWidget {
               onPressed: isPosting ? null : onNext,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isLastStep
-                    ? AppColors.success
+                    ? (isDark ? Colors.greenAccent : AppColors.success)
                     : AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: isLastStep && isDark
+                    ? Colors.black87
+                    : Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -1497,7 +1586,7 @@ class StickyNavBarWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          isLastStep ? 'Post Job' : 'Next Step',
+                          isLastStep ? 'Post Job'.tr : 'Next Step'.tr,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

@@ -42,23 +42,23 @@ class BiographyViewController extends GetxController {
         await _parentController.fetchCompleteProfile(); // Refresh
         Get.back();
         Get.snackbar(
-          'Success',
-          'Biography updated successfully.',
+          'Success'.tr, // 🟢 Added .tr
+          'Biography updated successfully.'.tr, // 🟢 Added .tr
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
       } else {
         Get.snackbar(
-          'Error',
-          'Failed to update biography.',
+          'Error'.tr, // 🟢 Added .tr
+          'Failed to update biography.'.tr, // 🟢 Added .tr
           backgroundColor: Colors.redAccent,
           colorText: Colors.white,
         );
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'An error occurred: $e',
+        'Error'.tr, // 🟢 Added .tr
+        'An error occurred: '.tr + '$e', // 🟢 Added .tr
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
       );

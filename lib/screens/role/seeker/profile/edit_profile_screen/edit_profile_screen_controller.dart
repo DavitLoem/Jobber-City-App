@@ -137,8 +137,8 @@ class EditProfileScreenViewController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        "Error",
-        "Cannot fetch Profile: $e",
+        "Error".tr, // 🟢 Added .tr
+        "Cannot fetch Profile: $e".tr, // 🟢 Added .tr
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -150,7 +150,10 @@ class EditProfileScreenViewController extends GetxController {
   // ── ៤. មុខងារបញ្ជូនទិន្នន័យទៅ Update ──
   Future<void> updateProfile() async {
     if (!isFormValid.value) {
-      Get.snackbar("Notice", "Please fill in all required fields!");
+      Get.snackbar(
+        "Notice".tr,
+        "Please fill in all required fields!".tr,
+      ); // 🟢 Added .tr
       return;
     }
 
@@ -190,16 +193,16 @@ class EditProfileScreenViewController extends GetxController {
       if (success) {
         Get.back(result: currentPositionCtrl.text.trim());
         Get.snackbar(
-          'Success',
-          'Profile updated successfully!',
+          'Success'.tr, // 🟢 Added .tr
+          'Profile updated successfully!'.tr, // 🟢 Added .tr
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
       }
     } catch (e) {
       Get.snackbar(
-        "Error",
-        "Update failed: $e",
+        "Error".tr, // 🟢 Added .tr
+        "Update failed: $e".tr, // 🟢 Added .tr
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -231,8 +234,9 @@ class EditProfileScreenViewController extends GetxController {
         isSaving.value = true;
 
         Get.snackbar(
-          'Uploading...',
-          'Please wait while your profile picture is being updated.',
+          'Uploading...'.tr, // 🟢 Added .tr
+          'Please wait while your profile picture is being updated.'
+              .tr, // 🟢 Added .tr
           showProgressIndicator: true,
           snackPosition: SnackPosition.TOP,
         );
@@ -251,8 +255,8 @@ class EditProfileScreenViewController extends GetxController {
 
         Get.closeAllSnackbars();
         Get.snackbar(
-          'Success',
-          'Profile picture updated successfully!',
+          'Success'.tr, // 🟢 Added .tr
+          'Profile picture updated successfully!'.tr, // 🟢 Added .tr
           backgroundColor: Colors.green,
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
@@ -260,7 +264,7 @@ class EditProfileScreenViewController extends GetxController {
       } catch (e) {
         Get.closeAllSnackbars();
         Get.snackbar(
-          'Upload Failed',
+          'Upload Failed'.tr, // 🟢 Added .tr
           e.toString(),
           backgroundColor: Colors.red,
           colorText: Colors.white,

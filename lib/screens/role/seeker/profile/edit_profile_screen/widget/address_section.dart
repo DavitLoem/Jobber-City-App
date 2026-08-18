@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// កុំភ្លេច Import Model និង Controller របស់អ្នក
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_controller.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/widget/city_select_field.dart';
@@ -11,7 +10,6 @@ import 'section_field_label.dart';
 class AddressSection extends StatelessWidget {
   const AddressSection({super.key, required this.controller});
 
-  // 🎯 តម្រូវឱ្យបញ្ជូន Controller មកពីឯកសារមេ
   final EditProfileScreenViewController controller;
 
   @override
@@ -19,16 +17,15 @@ class AddressSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionFieldLabel(title: 'Province'),
+        SectionFieldLabel(title: 'Province'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         CitySelectField<LocationModel>(
           controller: controller.provinceCtrl,
           fetchOptions: controller.fetchProvinceOptions,
           labelOf: (loc) => loc.nameEn,
-          hintText: 'Select Province',
-          sheetTitle: 'Select Province',
+          hintText: 'Select Province'.tr, // 🟢 Added .tr
+          sheetTitle: 'Select Province'.tr, // 🟢 Added .tr
           onSelected: (loc) {
-            // 🎯 កត់ត្រា ID ខេត្ត ហើយជម្រះស្រុកចោលពេលដូរខេត្ត
             controller.selectedProvinceId.value = loc.id.toString();
             controller.provinceCtrl.text = loc.nameEn;
 
@@ -38,7 +35,7 @@ class AddressSection extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'District / Khan'),
+        SectionFieldLabel(title: 'District / Khan'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         Obx(() {
           final isEnabled = controller.selectedProvinceId.value.isNotEmpty;
@@ -51,12 +48,11 @@ class AddressSection extends StatelessWidget {
                 controller: controller.districtCtrl,
                 fetchOptions: controller.fetchDistrictOptions,
                 labelOf: (d) => d.nameEn,
-                // 🎯 ឆែកមើលបើអត់ទាន់រើសខេត្តទេ ដាក់អក្សរព្រមាន
                 hintText: controller.selectedProvinceId.value.isEmpty
                     ? 'Select province first'
-                    : 'Select District',
-                sheetTitle: 'Select District',
-                // 🎯 បិទមិនឱ្យចុចរើសស្រុក បើមិនទាន់មានខេត្ត
+                          .tr // 🟢 Added .tr
+                    : 'Select District'.tr, // 🟢 Added .tr
+                sheetTitle: 'Select District'.tr, // 🟢 Added .tr
                 enabled: controller.selectedProvinceId.value.isNotEmpty,
                 onSelected: (d) {
                   controller.selectedDistrictId.value = d.id.toString();
@@ -68,21 +64,24 @@ class AddressSection extends StatelessWidget {
         }),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Commune / Sangkat'),
+        SectionFieldLabel(title: 'Commune / Sangkat'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.location_on_outlined,
-          hintText: 'Enter commune',
+          hintText: 'Enter commune'.tr, // 🟢 Added .tr
           controller: controller.communeCtrl,
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Village', isOptional: true),
+        SectionFieldLabel(
+          title: 'Village'.tr,
+          isOptional: true,
+        ), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.holiday_village_outlined,
-          hintText: 'Enter village',
-          controller: controller.villageCtrl, // 🎯 ភ្ជាប់ Controller
+          hintText: 'Enter village'.tr, // 🟢 Added .tr
+          controller: controller.villageCtrl,
         ),
         const SizedBox(height: 20),
 
@@ -92,12 +91,15 @@ class AddressSection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionFieldLabel(title: 'Street', isOptional: true),
+                  SectionFieldLabel(
+                    title: 'Street'.tr,
+                    isOptional: true,
+                  ), // 🟢 Added .tr
                   const SizedBox(height: 6),
                   ProfileTextField(
                     prefixIcon: Icons.signpost_outlined,
-                    hintText: 'Street name',
-                    controller: controller.streetCtrl, // 🎯 ភ្ជាប់ Controller
+                    hintText: 'Street name'.tr, // 🟢 Added .tr
+                    controller: controller.streetCtrl,
                   ),
                 ],
               ),
@@ -107,15 +109,15 @@ class AddressSection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionFieldLabel(
-                    title: 'House / No.',
+                  SectionFieldLabel(
+                    title: 'House / No.'.tr, // 🟢 Added .tr
                     isOptional: true,
                   ),
                   const SizedBox(height: 6),
                   ProfileTextField(
                     prefixIcon: Icons.home_outlined,
-                    hintText: 'e.g. 12A',
-                    controller: controller.houseNoCtrl, // 🎯 ភ្ជាប់ Controller
+                    hintText: 'e.g. 12A'.tr, // 🟢 Added .tr
+                    controller: controller.houseNoCtrl,
                   ),
                 ],
               ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/screens/role/seeker/job_list/widgets/job_card_vertical.dart'; // ត្រូវប្រាកដថា Path ត្រឹមត្រូវ[cite: 14]
+import 'package:jobber_city/screens/role/seeker/job_list/widgets/job_card_vertical.dart';
 
 import '../search_button_controller.dart';
 
@@ -11,6 +11,9 @@ class SearchResults extends GetView<SearchButtonViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Obx(() {
       if (controller.isSearching.value && controller.searchResults.isEmpty) {
         return const Center(
@@ -29,7 +32,11 @@ class SearchResults extends GetView<SearchButtonViewController> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
+                    color: isDark
+                        ? AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ) // 🟢 Updated opacity
+                        : AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(
@@ -39,20 +46,22 @@ class SearchResults extends GetView<SearchButtonViewController> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'No jobs found',
+                Text(
+                  'No jobs found'.tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Try searching for different keywords',
+                Text(
+                  'Try searching for different keywords'.tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),

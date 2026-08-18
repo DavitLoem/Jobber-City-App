@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 
 class CustomFormTextField extends StatelessWidget {
   final String label;
@@ -11,7 +12,7 @@ class CustomFormTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final VoidCallback? onTap;
   final List<TextInputFormatter>? inputFormatters;
-  final Widget? suffixIcon; // 👈 ១. បន្ថែមអថេរនេះ
+  final Widget? suffixIcon;
 
   const CustomFormTextField({
     super.key,
@@ -29,16 +30,19 @@ class CustomFormTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty) ...[
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Label
             ),
           ),
           const SizedBox(height: 8),
@@ -50,32 +54,47 @@ class CustomFormTextField extends StatelessWidget {
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           onTap: onTap,
+          style: TextStyle(
+            color: isDark
+                ? AppColors.darkInputText
+                : AppColors.inputText, // 🟢 Dynamic Text
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+            hintStyle: TextStyle(
+              color: isDark
+                  ? AppColors.darkTextHint
+                  : Colors.grey.shade400, // 🟢 Dynamic Hint
+              fontSize: 14,
+            ),
             suffixIcon:
                 suffixIcon ??
                 (isDropdown
-                    ? const Icon(
+                    ? Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: Colors.grey,
+                        color: isDark
+                            ? AppColors.darkIconSecondary
+                            : Colors.grey, // 🟢 Dynamic Icon
                       )
                     : null),
-
             filled: true,
-            fillColor: Colors.white,
+            fillColor: isDark
+                ? AppColors.darkInputBackground
+                : Colors.white, // 🟢 Dynamic Fill
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(
+                color: isDark ? AppColors.darkCardBorder : Colors.grey.shade300,
+              ), // 🟢 Dynamic Border
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.blueAccent,
+              borderSide: BorderSide(
+                color: isDark ? AppColors.primary : Colors.blueAccent,
                 width: 1.5,
               ),
             ),

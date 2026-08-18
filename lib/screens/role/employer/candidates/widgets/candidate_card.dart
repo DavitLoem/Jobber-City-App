@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/widgets/cv_viewer_view.dart';
@@ -11,30 +12,38 @@ class CandidateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor, // 🟢 Dynamic Card BG
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ), // 🟢 Dynamic Border
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.2 : 0.02, // 🟢 Updated opacity
+            ), // 🟢 Adjusted shadow
             blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header (រូបថត និង ឈ្មោះ) ──
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.grey.shade200,
+                radius: 26,
+                backgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade200,
                 backgroundImage:
                     applicant.profileImageUrl != null &&
                         applicant.profileImageUrl!.isNotEmpty
@@ -43,95 +52,69 @@ class CandidateCard extends StatelessWidget {
                 child:
                     applicant.profileImageUrl == null ||
                         applicant.profileImageUrl!.isEmpty
-                    ? const Icon(LucideIcons.user, color: Colors.grey)
+                    ? Icon(
+                        LucideIcons.user,
+                        color: isDark
+                            ? AppColors.darkIconSecondary
+                            : Colors.grey,
+                      )
                     : null,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       applicant.fullName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Applied for: ${applicant.jobTitle.isNotEmpty ? applicant.jobTitle : 'Unknown Job'}",
+                      "Applied: @date".trParams({
+                        'date': _formatDate(applicant.appliedAt),
+                      }), // 🟢 Added .trParams
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : Colors.grey.shade500,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.calendar,
-                          size: 14,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _formatDate(applicant.appliedAt),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
-          // ── 🎯 ផ្នែក Skills និង Experience ជាមួយការការពារ ──
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              // បង្ហាញជំនាញយ៉ាងច្រើន ៣ ប៉ុណ្ណោះ
-              ...applicant.skills.take(3).map((s) => _buildSkillChip(s)),
-
-              // បង្ហាញឆ្នាំបទពិសោធន៍ លុះត្រាតែធំជាង ០
               if (applicant.yearsOfExperience > 0)
                 _buildSkillChip(
-                  '${applicant.yearsOfExperience} Yrs Exp',
+                  "@years Yrs Exp".trParams({
+                    'years': applicant.yearsOfExperience.toString(),
+                  }),
+                  isDark,
                   isHighlight: true,
                 ),
-
-              // បង្ហាញអត្ថបទនេះបើអត់មានទាំង២ទាល់តែសោះ
-              if (applicant.skills.isEmpty && applicant.yearsOfExperience == 0)
-                Text(
-                  "No skills or experience provided",
-                  style: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 13,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+              ...applicant.skills
+                  .take(3)
+                  .map((s) => _buildSkillChip(s, isDark)),
+              if (applicant.skills.length > 3)
+                _buildSkillChip("+${applicant.skills.length - 3}", isDark),
             ],
           ),
-
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-          ),
-
-          // ── Actions (ប៊ូតុងខាងក្រោម) ──
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: OutlinedButton.icon(
+                child: OutlinedButton(
                   onPressed:
                       applicant.resumeUrl != null &&
                           applicant.resumeUrl!.isNotEmpty
@@ -144,45 +127,42 @@ class CandidateCard extends StatelessWidget {
                           );
                         }
                       : null,
-                  icon: const Icon(LucideIcons.fileText, size: 18),
-                  label: const Text("View CV"),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF4f7df7),
+                    foregroundColor: AppColors.primary,
                     side: BorderSide(
-                      color: applicant.resumeUrl != null
-                          ? const Color(0xFF4f7df7)
-                          : Colors.grey,
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade200,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // 🎯 ហៅទំព័រ Detail View ដោយប្រើ GetX
-                    debugPrint("👉 Button View Profile Tapped!");
-                    Get.to(
-                      () => const CandidateDetailView(),
-                      binding: BindingsBuilder(() {
-                        Get.put(CandidateDetailViewController());
-                      }),
-                      arguments: applicant,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4f7df7),
-                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
-                    "View Profile",
-                    style: TextStyle(
+                    "CV",
+                  ), // Usually no translation needed for CV
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.to(
+                      () => const CandidateDetailView(),
+                      arguments: applicant,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    "View Profile".tr, // 🟢 Added .tr
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -196,12 +176,23 @@ class CandidateCard extends StatelessWidget {
     );
   }
 
-  // ជំនួយគូរ Chip
-  Widget _buildSkillChip(String label, {bool isHighlight = false}) {
+  Widget _buildSkillChip(
+    String label,
+    bool isDark, {
+    bool isHighlight = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isHighlight ? const Color(0xFFE0E7FF) : const Color(0xFFF0F4FF),
+        color: isHighlight
+            ? (isDark
+                  ? const Color(0xFFE0E7FF).withValues(
+                      alpha: 0.1,
+                    ) // 🟢 Updated opacity
+                  : const Color(0xFFE0E7FF))
+            : (isDark
+                  ? AppColors.darkSurfaceElevated
+                  : const Color(0xFFF0F4FF)), // 🟢 Dynamic Chip BG
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -209,20 +200,16 @@ class CandidateCard extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           color: isHighlight
-              ? const Color(0xFF3730A3)
-              : const Color(0xFF4f7df7),
+              ? (isDark ? Colors.indigoAccent : const Color(0xFF3730A3))
+              : AppColors.primary, // 🟢 Dynamic Chip Text
           fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 
-  // ជំនួយថ្ងៃខែ
   String _formatDate(DateTime? date) {
-    if (date == null) return "Unknown date";
-    final diff = DateTime.now().difference(date).inDays;
-    if (diff == 0) return "Today";
-    if (diff == 1) return "Yesterday";
-    return "$diff days ago";
+    if (date == null) return "Unknown date".tr; // 🟢 Added .tr
+    return "${date.day}/${date.month}/${date.year}";
   }
 }

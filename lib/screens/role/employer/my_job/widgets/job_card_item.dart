@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added GetX import for translations
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobCardItem extends StatelessWidget {
@@ -7,11 +9,13 @@ class JobCardItem extends StatelessWidget {
   final String department;
   final String location;
   final String timeAgo;
-  final String status; // ឧ. 'active', 'draft', 'inactive'
+  final String status;
   final bool isUrgent;
   final int candidatesCount;
   final VoidCallback onTap;
   final VoidCallback onMoreTap;
+  final bool isDark;
+  final ThemeData theme;
 
   const JobCardItem({
     super.key,
@@ -25,34 +29,46 @@ class JobCardItem extends StatelessWidget {
     required this.onTap,
     required this.onMoreTap,
     this.logoUrl,
+    required this.isDark,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
     final statusLower = status.toLowerCase();
 
-    Color badgeColor = Colors.grey.shade100;
-    Color badgeTextColor = Colors.grey.shade700;
-    String displayStatus = status
-        .toUpperCase(); // 🟢 បន្ថែមអថេរនេះមួយទៀតសម្រាប់ប្តូរអក្សរ
+    Color badgeColor = isDark
+        ? AppColors.darkSurfaceElevated
+        : Colors.grey.shade100;
+    Color badgeTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : Colors.grey.shade700;
+    String displayStatus = status.toUpperCase();
 
     if (statusLower == 'active') {
-      badgeColor = Colors.green.shade50;
-      badgeTextColor = Colors.green.shade700;
-      displayStatus = 'ACTIVE';
+      badgeColor = isDark
+          ? Colors.greenAccent.withValues(alpha: 0.15) // 🟢 Updated opacity
+          : Colors.green.shade50;
+      badgeTextColor = isDark ? Colors.greenAccent : Colors.green.shade700;
+      displayStatus = 'ACTIVE'.tr; // 🟢 Added .tr
     } else if (statusLower == 'inactive' || statusLower == 'paused') {
-      badgeColor = Colors.orange.shade50; // 🟢 ពណ៌ទឹកក្រូច សម្រាប់ Paused
-      badgeTextColor = Colors.orange.shade700;
-      displayStatus =
-          'PAUSED'; // 🟢 បង្ខំឱ្យចេញពាក្យ PAUSED ទោះជា Backend បោះមក inactive ក៏ដោយ
+      badgeColor = isDark
+          ? Colors.orangeAccent.withValues(alpha: 0.15) // 🟢 Updated opacity
+          : Colors.orange.shade50;
+      badgeTextColor = isDark ? Colors.orangeAccent : Colors.orange.shade700;
+      displayStatus = 'PAUSED'.tr; // 🟢 Added .tr
     } else if (statusLower == 'closed') {
-      badgeColor = Colors.red.shade50; // 🟢 ពណ៌ក្រហម សម្រាប់ Closed
-      badgeTextColor = Colors.red.shade700;
-      displayStatus = 'CLOSED';
+      badgeColor = isDark
+          ? Colors.redAccent.withValues(alpha: 0.15) // 🟢 Updated opacity
+          : Colors.red.shade50;
+      badgeTextColor = isDark ? Colors.redAccent : Colors.red.shade700;
+      displayStatus = 'CLOSED'.tr; // 🟢 Added .tr
     } else if (statusLower == 'draft') {
-      badgeColor = Colors.grey.shade100; // 🟢 ពណ៌ប្រផេះ សម្រាប់ Draft
-      badgeTextColor = Colors.grey.shade700;
-      displayStatus = 'DRAFT';
+      badgeColor = isDark
+          ? AppColors.darkSurfaceElevated
+          : Colors.grey.shade100;
+      badgeTextColor = isDark ? AppColors.darkTextHint : Colors.grey.shade700;
+      displayStatus = 'DRAFT'.tr; // 🟢 Added .tr
     }
 
     return InkWell(
@@ -61,12 +77,17 @@ class JobCardItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade100, width: 1.5),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : Colors.grey.shade100,
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.2 : 0.02, // 🟢 Updated opacity
+              ),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -75,16 +96,18 @@ class JobCardItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── 1. ផ្នែកខាងលើ (Logo, Title, Status, More Icon) ──
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // រូប Logo ក្រុមហ៊ុន / Icon
                 Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEF2FF), // ពណ៌ខៀវស្រាល
+                    color: isDark
+                        ? AppColors.primary.withValues(
+                            alpha: 0.15,
+                          ) // 🟢 Updated opacity
+                        : const Color(0xFFEEF2FF),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ClipRRect(
@@ -99,33 +122,40 @@ class JobCardItem extends StatelessWidget {
                         : Icon(
                             LucideIcons.briefcase,
                             size: 28,
-                            color: Colors.grey.shade400,
+                            color: isDark
+                                ? AppColors.primary
+                                : Colors.grey.shade400,
                           ),
                   ),
                 ),
                 const SizedBox(width: 12),
 
-                // ផ្នែកអក្សរ
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Text(
-                            department,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey.shade500,
+                          Expanded(
+                            child: Text(
+                              department,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : Colors.grey.shade500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (isUrgent) ...[
@@ -136,15 +166,21 @@ class JobCardItem extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.red.shade50,
+                                color: isDark
+                                    ? Colors.redAccent.withValues(
+                                        alpha: 0.15,
+                                      ) // 🟢 Updated opacity
+                                    : Colors.red.shade50,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                "URGENT",
+                                "URGENT".tr, // 🟢 Added .tr
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.red.shade400,
+                                  color: isDark
+                                      ? Colors.redAccent
+                                      : Colors.red.shade400,
                                 ),
                               ),
                             ),
@@ -155,7 +191,6 @@ class JobCardItem extends StatelessWidget {
                   ),
                 ),
 
-                // បន្ទះ Status (ACTIVE / DRAFT)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -177,9 +212,9 @@ class JobCardItem extends StatelessWidget {
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: onMoreTap,
-                  child: const Icon(
+                  child: Icon(
                     Icons.more_vert,
-                    color: Colors.grey,
+                    color: isDark ? AppColors.darkTextHint : Colors.grey,
                     size: 20,
                   ),
                 ),
@@ -188,62 +223,89 @@ class JobCardItem extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // ── 2. ផ្នែកកណ្តាល (ទីតាំង និង ពេលវេលា) ──
             Row(
               children: [
-                Icon(LucideIcons.mapPin, size: 14, color: Colors.grey.shade400),
+                Icon(
+                  LucideIcons.mapPin,
+                  size: 14,
+                  color: isDark
+                      ? AppColors.darkTextTertiary
+                      : Colors.grey.shade400,
+                ),
                 const SizedBox(width: 4),
-                Text(
-                  location,
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                Expanded(
+                  child: Text(
+                    location,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark
+                          ? AppColors.darkTextTertiary
+                          : Colors.grey.shade500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 const SizedBox(width: 16),
-                Icon(LucideIcons.clock, size: 14, color: Colors.grey.shade400),
+                Icon(
+                  LucideIcons.clock,
+                  size: 14,
+                  color: isDark
+                      ? AppColors.darkTextTertiary
+                      : Colors.grey.shade400,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   timeAgo,
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : Colors.grey.shade500,
+                  ),
                 ),
               ],
             ),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Divider(height: 1, color: Color(0xFFF3F4F6)),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Divider(
+                height: 1,
+                color: isDark ? AppColors.darkDivider : const Color(0xFFF3F4F6),
+              ),
             ),
 
-            // ── 3. ផ្នែកខាងក្រោម (Candidates Avatars & Arrow) ──
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    // 🎯 លក្ខខណ្ឌទី១: បង្ហាញរូប Profile លុះត្រាតែមានបេក្ខជន (candidatesCount > 0)
                     if (candidatesCount > 0) ...[
                       _buildOverlappingAvatars(),
                       const SizedBox(width: 12),
                     ],
-
-                    // 🎯 លក្ខខណ្ឌទី២: ប្តូរពណ៌អក្សរតាមចំនួនបេក្ខជន
                     Text(
                       candidatesCount == 0
-                          ? "No candidates yet" // ឬអ្នកអាចដាក់ "0 candidates" ដូចដើមក៏បាន
-                          : "$candidatesCount candidates",
+                          ? "No candidates yet"
+                                .tr // 🟢 Added .tr
+                          : "@count candidates".trParams({
+                              'count': candidatesCount.toString(),
+                            }), // 🟢 Added .trParams
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: candidatesCount == 0
-                            ? Colors
-                                  .grey
-                                  .shade500 // ពណ៌ប្រផេះពេលគ្មានមនុស្ស
-                            : const Color(0xFF4f7df7), // ពណ៌ខៀវពេលមានមនុស្ស
+                            ? (isDark
+                                  ? AppColors.darkTextTertiary
+                                  : Colors.grey.shade500)
+                            : AppColors.primary,
                       ),
                     ),
                   ],
                 ),
-                const Icon(
+                Icon(
                   LucideIcons.chevronRight,
-                  color: Colors.grey,
+                  color: isDark ? AppColors.darkIconSecondary : Colors.grey,
                   size: 18,
                 ),
               ],
@@ -254,12 +316,9 @@ class JobCardItem extends StatelessWidget {
     );
   }
 
-  // មុខងារសម្រាប់គូររូប Avatar ត្រួតលើគ្នា (B, C, D)
   Widget _buildOverlappingAvatars() {
-    // ការពារ Error បើសិនជាចំនួន 0 មិនបាច់គូរអ្វីទាំងអស់
     if (candidatesCount == 0) return const SizedBox.shrink();
 
-    // 🎯 លក្ខខណ្ឌទី៣: កំណត់ចំនួនរូបដែលត្រូវបង្ហាញ (អតិបរមាគឺ ៣ រូប)
     final displayCount = candidatesCount > 3 ? 3 : candidatesCount;
 
     final colors = [
@@ -267,28 +326,25 @@ class JobCardItem extends StatelessWidget {
       const Color(0xFF8B5CF6),
       const Color(0xFF3B82F6),
     ];
-    final letters = [
-      'A',
-      'B',
-      'C',
-    ]; // អាចប្តូរជាអក្សរទី១នៃឈ្មោះបេក្ខជននៅថ្ងៃក្រោយ
+    final letters = ['A', 'B', 'C'];
 
     return SizedBox(
-      // គណនាប្រវែង Width សរុបដោយស្វ័យប្រវត្តិ អាស្រ័យលើចំនួនរូបភាព (រូបទី១ 26px, រូបបន្ទាប់ថែម 18px)
       width: 26.0 + ((displayCount - 1) * 18.0),
       height: 26,
       child: Stack(
         children: List.generate(displayCount, (index) {
           return Positioned(
-            left: index * 18.0, // រំកិលទៅស្តាំម្តងបន្តិចៗ (Overlap effect)
-
+            left: index * 18.0,
             child: Container(
               width: 26,
               height: 26,
               decoration: BoxDecoration(
                 color: colors[index],
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  width: 2,
+                ),
               ),
               child: Center(
                 child: Text(
