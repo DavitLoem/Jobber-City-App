@@ -7,6 +7,7 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
+import 'package:jobber_city/screens/notification/notification_view.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/employer_profile/company_detail/company_detail_view.dart';
@@ -81,6 +82,12 @@ class AppPages {
       name: AppRoutes.resetPassword,
       page: () => ResetPassScreenView(),
       binding: ResetPassScreenViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.notification,
+      page: () => NotificationView(),
+      binding: NotificationViewBinding(),
+      middlewares: [AuthMiddleware()],
     ),
 
     // ==========================================

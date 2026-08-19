@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../../../controllers/notification_controller.dart';
 import '../home_employer_view.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -10,6 +12,8 @@ class HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeEmployerViewController());
+    final NotificationController notifController =
+        Get.find<NotificationController>();
 
     return Container(
       color: Colors.white,
@@ -89,7 +93,7 @@ class HomeHeader extends StatelessWidget {
                 );
               }),
 
-              // Right: actions[cite: 11]
+              // Right: actions
               Row(
                 children: [
                   _RoundIconButton(
@@ -98,11 +102,17 @@ class HomeHeader extends StatelessWidget {
                     onTap: () {},
                   ),
                   const SizedBox(width: 10),
-                  _RoundIconButton(
-                    icon: LucideIcons.bell,
-                    iconColor: const Color(0xFF1A1F36),
-                    onTap: () {},
-                    showDot: true,
+                  Obx(
+                    () => _RoundIconButton(
+                      icon: LucideIcons.bell,
+                      iconColor: const Color(0xFF1A1F36),
+                      onTap: () {
+                        // លោតទៅកាន់ទំព័រ Notification
+                        Get.toNamed(AppRoutes.notification);
+                      },
+                      // 🎯 កំណត់លក្ខខណ្ឌទីនេះ៖ បើមានសារមិនទាន់អាន (hasUnread == true) វានឹងបង្ហាញ Dot
+                      showDot: notifController.hasUnread,
+                    ),
                   ),
                 ],
               ),

@@ -32,7 +32,8 @@ class CandidateActionBar extends StatelessWidget {
           );
         }
 
-        final status = controller.applicant.status.toLowerCase();
+        // 🟢 កន្លែងដែលបានកែប្រែ៖ បន្ថែម .value!
+        final status = controller.applicant.value!.status.toLowerCase();
 
         if (status == 'pending') {
           return Row(
@@ -163,8 +164,6 @@ class CandidateActionBar extends StatelessWidget {
       ),
     );
   }
-
-  // ── Modals & Dialogs (ចម្លងពីឯកសារចាស់មកដាក់ទីនេះ) ──
 
   void _showRejectBottomSheet(BuildContext context) {
     controller.feedbackController.clear();

@@ -48,6 +48,23 @@ class ApplicantEmployerService {
     }
   }
 
+  Future<ApplicantModel?> getApplicationDetail(String applicationId) async {
+    try {
+      // 🎯 សន្មតថា Backend របស់អ្នកមាន Endpoint នេះ (សូមកែប្រែ Path ទៅតាមជាក់ស្តែង បើខុសពីនេះ)
+      final response = await _apiClient.get(
+        '/employer/jobs/applications/$applicationId',
+      );
+
+      if (response['success'] == true && response['data'] != null) {
+        return ApplicantModel.fromJson(response['data']);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("❌ Error fetching application detail: $e");
+      rethrow;
+    }
+  }
+
   /// 🎯 ទាញយកបញ្ជីការងារសម្រាប់បង្ហាញក្នុង Bottom Sheet
   Future<List<JobDropdownItemModel>> getJobDropdownList() async {
     try {

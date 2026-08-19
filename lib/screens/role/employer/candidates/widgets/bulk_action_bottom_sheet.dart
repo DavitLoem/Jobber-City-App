@@ -45,12 +45,7 @@ class _BulkActionBottomSheetState extends State<BulkActionBottomSheet> {
     }
 
     return Container(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        24 + MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

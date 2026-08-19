@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
-import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/widgets/cv_viewer_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../../../routes/app_routes.dart';
 import 'edit_schedule_bottom_sheet.dart';
 
 class CandidateCard extends StatelessWidget {
@@ -274,12 +274,16 @@ class CandidateCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(
-                        () => const CandidateDetailView(),
-                        binding: BindingsBuilder(() {
-                          Get.put(CandidateDetailViewController());
-                        }),
-                        arguments: applicant,
+                      // Get.to(
+                      //   () => const CandidateDetailView(),
+                      //   binding: BindingsBuilder(() {
+                      //     Get.put(CandidateDetailViewController());
+                      //   }),
+                      //   arguments: applicant,
+                      // );
+                      Get.toNamed(
+                        AppRoutes.candidateDetail,
+                        arguments: applicant.applicationId,
                       );
                     },
                     style: ElevatedButton.styleFrom(

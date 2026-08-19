@@ -1,9 +1,11 @@
 part of 'candidate_detail_view.dart';
 
 class CandidateDetailViewController extends GetxController {
-  late ApplicantModel applicant;
-  late CandidatesViewController _listController;
+  // 🟢 ១. ប្តូរពី late ទៅជា Rxn (Nullable) និងបន្ថែម State សម្រាប់ Loading
+  final applicant = Rxn<ApplicantModel>();
+  var isLoadingData = false.obs;
 
+  late CandidatesViewController _listController;
   var isUpdating = false.obs;
 
   final feedbackController = TextEditingController();
@@ -12,17 +14,61 @@ class CandidateDetailViewController extends GetxController {
 
   var selectedInterviewDate = Rxn<DateTime>();
 
+  // 🟢 ២. ទាញយក Service មកប្រើប្រាស់
+  final ApplicantEmployerService _service = ApplicantEmployerService();
+
   @override
   void onInit() {
     super.onInit();
     try {
-      _listController = Get.find<CandidatesViewController>();
+      if (Get.isRegistered<CandidatesViewController>()) {
+        _listController = Get.find<CandidatesViewController>();
+      }
 
-      if (Get.arguments is ApplicantModel) {
-        applicant = Get.arguments as ApplicantModel;
+      final arg = Get.arguments;
+      // 🟢 ៣. ឆែកលក្ខខណ្ឌ៖ បើជា Object យកប្រើតែម្តង, បើជា String(ID) ហៅ API
+      if (arg is ApplicantModel) {
+        applicant.value = arg;
+      } else if (arg is String) {
+        fetchCandidateDetail(arg);
       }
     } catch (e) {
       debugPrint("❌ Error in CandidateDetailController onInit: $e");
+    }
+  }
+
+  Future<void> refreshDetail() async {
+    // ស្វែងរក ID បច្ចុប្បន្ន (អាចពី Object ដែលមានស្រាប់ ឬពី Arguments)
+    final currentId =
+        applicant.value?.applicationId ??
+        (Get.arguments is String ? Get.arguments as String : null);
+
+    if (currentId != null) {
+      // មិនបាច់កំណត់ isLoadingData = true ទេ ព្រោះ RefreshIndicator មានរង្វង់វិលរបស់វារួចហើយ
+      try {
+        final result = await _service.getApplicationDetail(currentId);
+        if (result != null) {
+          applicant.value = result;
+        }
+      } catch (e) {
+        debugPrint("❌ Error refreshing detail: $e");
+      }
+    }
+  }
+
+  // 🟢 ៤. មុខងារទាញយកទិន្នន័យពី API ពេលចុចពីកាត Recent Applicant
+  Future<void> fetchCandidateDetail(String applicationId) async {
+    try {
+      isLoadingData.value = true;
+      final result = await _service.getApplicationDetail(applicationId);
+      if (result != null) {
+        applicant.value = result;
+      }
+    } catch (e) {
+      debugPrint("❌ Error fetching detail: $e");
+      Get.snackbar("Error", "Could not load applicant details");
+    } finally {
+      isLoadingData.value = false;
     }
   }
 
@@ -32,11 +78,13 @@ class CandidateDetailViewController extends GetxController {
     Map<String, dynamic>? interviewSchedule,
     String? feedback,
   }) async {
+    if (applicant.value == null) return; // 🟢 ការពារ Error បើគ្មានទិន្នន័យ
+
     isUpdating.value = true;
 
-    // ១. រង់ចាំលទ្ធផលពី Controller មេ
+    // 🟢 ប្រើប្រាស់ applicant.value!
     final success = await _listController.updateApplicantStatus(
-      applicant.applicationId,
+      applicant.value!.applicationId,
       newStatus,
       interviewSchedule: interviewSchedule,
       feedback: feedback,
@@ -44,11 +92,9 @@ class CandidateDetailViewController extends GetxController {
 
     isUpdating.value = false;
 
-    // ២. ប្រសិនបើជោគជ័យ ទើបយើងបិទទំព័រ និងបង្ហាញ Snackbar
     if (success) {
-      Get.back(); // 🎯 បិទទំព័រ Detail (ត្រឡប់ទៅកាន់បញ្ជីវិញ)
+      Get.back();
 
-      // 🎯 ប្រើប្រាស់ Delay បន្តិច ដើម្បីឱ្យ Animation បិទទំព័រដើរចប់សិន ទើបបញ្ចេញ Snackbar
       Future.delayed(const Duration(milliseconds: 400), () {
         Get.snackbar(
           "Success",
@@ -66,18 +112,12 @@ class CandidateDetailViewController extends GetxController {
   // 🎯 អនុគមន៍សម្រាប់ទាញយកឈ្មោះ CV ចេញពី URL
   String getCvFileName(String? url) {
     if (url == null || url.isEmpty) return "No CV Attached";
-
     try {
-      // ១. កាត់ចោល Query Parameters (បើមាន ឧ. ?alt=media...)
       String cleanUrl = url.split('?').first;
-
-      // ២. ទាញយកឈ្មោះឯកសារក្រោយសញ្ញា / ចុងក្រោយគេ
       String fileName = cleanUrl.split('/').last;
-
-      // ៣. បំប្លែងកូដដូចជា %20 មកជាដកឃ្លា (Space)
       return Uri.decodeComponent(fileName);
     } catch (e) {
-      return "Applicant_Resume.pdf"; // Fallback បើមាន Error
+      return "Applicant_Resume.pdf";
     }
   }
 

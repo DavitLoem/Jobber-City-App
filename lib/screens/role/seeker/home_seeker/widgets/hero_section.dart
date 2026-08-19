@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/controllers/auth_controller.dart';
+import 'package:jobber_city/controllers/notification_controller.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_routes.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../home_seeker_view.dart'; // សម្រាប់ទាញយក Controller
 import 'avatar_tap_scale.dart';
@@ -49,6 +50,8 @@ class HeroSection extends GetView<HomeSeekerViewController> {
   }
 
   Widget _buildHeroTopRow() {
+    final NotificationController notifController =
+        Get.find<NotificationController>();
     return Row(
       children: [
         AvatarTapScale(
@@ -144,20 +147,16 @@ class HeroSection extends GetView<HomeSeekerViewController> {
             );
           }),
         ),
-        GestureDetector(
-          onTap: () => Get.find<AuthController>().logout(),
-          child: Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              color: Colors.white,
-              size: 22,
-            ),
+        Obx(
+          () => _RoundIconButton(
+            icon: LucideIcons.bell,
+            iconColor: Colors.white,
+            onTap: () {
+              // លោតទៅកាន់ទំព័រ Notification
+              Get.toNamed(AppRoutes.notification);
+            },
+            // 🎯 កំណត់លក្ខខណ្ឌទីនេះ៖ បើមានសារមិនទាន់អាន (hasUnread == true) វានឹងបង្ហាញ Dot
+            showDot: notifController.hasUnread,
           ),
         ),
       ],
@@ -186,7 +185,7 @@ class HeroSection extends GetView<HomeSeekerViewController> {
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.search),
       child: Hero(
-        tag: 'search_bar_hero', // 🎯 ដាក់ Hero Tag ទី១
+        tag: 'search_bar_hero',
         child: Material(
           color: Colors.transparent,
           child: Container(
@@ -213,22 +212,71 @@ class HeroSection extends GetView<HomeSeekerViewController> {
                     style: TextStyle(color: AppColors.textHint, fontSize: 14.5),
                   ),
                 ),
-
-                // Container(
-                //   margin: const EdgeInsets.all(6),
-                //   padding: const EdgeInsets.all(10),
-                //   decoration: BoxDecoration(
-                //     color: AppColors.primary,
-                //     borderRadius: BorderRadius.circular(10),
-                //   ),
-                //   child: const Icon(
-                //     Icons.tune_rounded,
-                //     color: Colors.white,
-                //     size: 18,
-                //   ),
-                // ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final VoidCallback onTap;
+  final bool showDot;
+
+  const _RoundIconButton({
+    required this.icon,
+    required this.iconColor,
+    required this.onTap,
+    this.showDot = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.18),
+      borderRadius: BorderRadius.circular(13),
+      elevation: 0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(13),
+        onTap: onTap,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(13),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Icon(icon, size: 20, color: iconColor),
+              if (showDot)
+                Positioned(
+                  top: 9,
+                  right: 10,
+                  child: Container(
+                    width: 9,
+                    height: 9,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFEF4444),
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),

@@ -7,12 +7,8 @@ class JobServices {
   final ApiClient _apiClient = ApiClient();
 
   /// POST /api/employer/jobs/
-  /// Creates a new job post for the authenticated employer.
   Future<Map<String, dynamic>> postJob(JobPostModel model) async {
     try {
-      debugPrint('📤 Posting job: ${model.title}');
-      debugPrint('📦 Payload: ${model.toJson()}');
-
       final response = await _apiClient.post(
         '/employer/jobs/',
         data: model.toJson(),
@@ -50,14 +46,7 @@ class JobServices {
     if (response is List) {
       return response;
     } else if (response is Map) {
-      final keys = [
-        'results',
-        'data',
-        'jobs',
-        'items',
-        'records',
-        'list',
-      ];
+      final keys = ['results', 'data', 'jobs', 'items', 'records', 'list'];
       for (final key in keys) {
         final value = response[key];
         if (value is List) {
