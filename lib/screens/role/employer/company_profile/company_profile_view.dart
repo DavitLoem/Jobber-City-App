@@ -316,61 +316,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
 
-              // 3. General Settings
-              ProfileSectionCard(
-                title: "General Settings".tr,
-                subtitle: "Customize your app experience".tr,
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.primary.withValues(alpha: 0.15)
-                            : AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.remove_red_eye_outlined,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    title: Text(
-                      'Appearance'.tr,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: theme.textTheme.bodyLarge?.color,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Light, Dark, or System mode'.tr,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textHint,
-                      ),
-                    ),
-                    trailing: Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: theme.hintColor,
-                    ),
-                    onTap: () => _showAppearanceBottomSheet(),
-                  ),
-                  Divider(
-                    height: 16,
-                    color: isDark
-                        ? AppColors.darkDivider
-                        : AppColors.cardBorder,
-                  ),
-                ],
-              ),
               const SizedBox(height: 100),
             ],
           ),
@@ -629,63 +575,63 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                 'Select your preferred color scheme'.tr,
                 style: TextStyle(fontSize: 14, color: subtitleColor),
               ),
-               const SizedBox(height: 32),
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                   _buildThemeOption(
-                     title: 'Light'.tr,
-                     mode: ThemeMode.light,
-                     mockup: const _PhoneMockup(style: _MockupStyle.light),
-                     isDark: isDark,
-                   ),
-                   _buildThemeOption(
-                     title: 'Dark'.tr,
-                     mode: ThemeMode.dark,
-                     mockup: const _PhoneMockup(style: _MockupStyle.dark),
-                     isDark: isDark,
-                   ),
-                   _buildThemeOption(
-                     title: 'System'.tr,
-                     mode: ThemeMode.system,
-                     mockup: const _PhoneMockup(style: _MockupStyle.system),
-                     isDark: isDark,
-                   ),
-                 ],
-               ),
-               const SizedBox(height: 32),
-               Text(
-                 'Language'.tr,
-                 style: TextStyle(
-                   fontSize: 20,
-                   fontWeight: FontWeight.bold,
-                   color: textColor,
-                 ),
-               ),
-               const SizedBox(height: 6),
-               Text(
-                 'Select your preferred language'.tr,
-                 style: TextStyle(fontSize: 14, color: subtitleColor),
-               ),
-               const SizedBox(height: 16),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildThemeOption(
+                    title: 'Light'.tr,
+                    mode: ThemeMode.light,
+                    mockup: const _PhoneMockup(style: _MockupStyle.light),
+                    isDark: isDark,
+                  ),
+                  _buildThemeOption(
+                    title: 'Dark'.tr,
+                    mode: ThemeMode.dark,
+                    mockup: const _PhoneMockup(style: _MockupStyle.dark),
+                    isDark: isDark,
+                  ),
+                  _buildThemeOption(
+                    title: 'System'.tr,
+                    mode: ThemeMode.system,
+                    mockup: const _PhoneMockup(style: _MockupStyle.system),
+                    isDark: isDark,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Language'.tr,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Select your preferred language'.tr,
+                style: TextStyle(fontSize: 14, color: subtitleColor),
+              ),
+              const SizedBox(height: 16),
 
-               _buildLanguageOption(
-                 title: 'English'.tr,
-                 langCode: 'en',
-                 countryCode: 'US',
-                 isDark: isDark,
-               ),
-               const SizedBox(height: 12),
-               _buildLanguageOption(
-                 title: 'Khmer'.tr,
-                 langCode: 'km',
-                 countryCode: 'KH',
-                 isDark: isDark,
-               ),
+              _buildLanguageOption(
+                title: 'English'.tr,
+                langCode: 'en',
+                countryCode: 'US',
+                isDark: isDark,
+              ),
+              const SizedBox(height: 12),
+              _buildLanguageOption(
+                title: 'Khmer'.tr,
+                langCode: 'km',
+                countryCode: 'KH',
+                isDark: isDark,
+              ),
 
-               const SizedBox(height: 16),
-             ],
+              const SizedBox(height: 16),
+            ],
           ),
         );
       }),

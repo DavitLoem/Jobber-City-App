@@ -17,6 +17,9 @@ class JobSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
@@ -83,75 +86,24 @@ class JobSearchBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200, width: 1),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : Colors.grey.shade200,
+                  width: 1,
+                ),
               ),
-              child: const Icon(
+              child: Icon(
                 LucideIcons.arrowUpDown,
-                color: theme.textTheme.bodyLarge?.color,
+                color: isDark
+                    ? AppColors.darkIconSecondary
+                    : Colors.grey.shade600,
                 size: 20,
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              color: Colors.white,
-              elevation: 4,
-              position: PopupMenuPosition.under,
-              onSelected: (String value) {
-                if (onSortChanged != null) {
-                  onSortChanged!(value);
-                }
-              },
-              itemBuilder: (BuildContext context) => [
-                _buildPopupItem(
-                  'newest',
-                  'Newest',
-                  LucideIcons.clock,
-                  currentSort,
-                ),
-                _buildPopupItem(
-                  'oldest',
-                  'Oldest',
-                  LucideIcons.history,
-                  currentSort,
-                ),
-                _buildPopupItem(
-                  'expiring_soon',
-                  'Expiring Soon',
-                  LucideIcons.calendarClock,
-                  currentSort,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopupItem(
-    String value,
-    String text,
-    IconData icon,
-    String currentVal,
-  ) {
-    final bool isSelected = value == currentVal;
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 18,
-            color: isSelected ? const Color(0xFF4f7df7) : Colors.grey.shade600,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF4f7df7) : Colors.black87,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ],

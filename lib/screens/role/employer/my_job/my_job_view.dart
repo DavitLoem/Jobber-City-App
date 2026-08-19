@@ -13,9 +13,7 @@ import 'package:jobber_city/widgets/confirm_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/utils/debouncer.dart';
-import '../candidates/candidates_view.dart';
 import '../employer_profile/employer_profile_view.dart';
-import '../main_screen_emloyer/main_screen_emloyer_controller.dart';
 import 'widgets/job_action_bottom_sheet.dart';
 import 'widgets/job_card_skeleton.dart';
 
@@ -92,7 +90,7 @@ class MyJobView extends GetView<MyJobViewController> {
           const SizedBox(height: 20),
 
           // ── ប្រើប្រាស់ Function ដើម្បីបង្ហាញបញ្ជីការងារ ──
-          Expanded(child: _buildJobList()),
+          Expanded(child: _buildJobList(context)),
         ],
       ),
     );
@@ -101,7 +99,7 @@ class MyJobView extends GetView<MyJobViewController> {
   // ==========================================
   // ── 1. Function សម្រាប់សាងសង់បញ្ជីការងារ (List View)
   // ==========================================
-  Widget _buildJobList() {
+  Widget _buildJobList(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -178,8 +176,11 @@ class MyJobView extends GetView<MyJobViewController> {
             onTap: () {
               Get.toNamed(AppRoutes.myJobDetail, arguments: job.id);
             },
+            onCandidatesTap: () {},
             onMoreTap: () =>
                 _showJobActionSheet(context, job.id, isDark, theme),
+            isDark: isDark,
+            theme: theme,
           );
         },
       );
@@ -327,18 +328,21 @@ class MyJobView extends GetView<MyJobViewController> {
       final createdDate = DateTime.parse(dateStr).toLocal();
       final difference = DateTime.now().difference(createdDate);
 
-      if (difference.inDays > 0)
+      if (difference.inDays > 0) {
         return "@daysd ago".trParams({
           'days': difference.inDays.toString(),
         }); // 🟢 Added .trParams
-      if (difference.inHours > 0)
+      }
+      if (difference.inHours > 0) {
         return "@hoursh ago".trParams({
           'hours': difference.inHours.toString(),
         }); // 🟢 Added .trParams
-      if (difference.inMinutes > 0)
+      }
+      if (difference.inMinutes > 0) {
         return "@minsm ago".trParams({
           'mins': difference.inMinutes.toString(),
         }); // 🟢 Added .trParams
+      }
     } catch (_) {}
     return "Just now".tr; // 🟢 Added .tr
   }

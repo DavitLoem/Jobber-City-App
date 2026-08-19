@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // 🟢 Added Storage Import
 import 'package:get/get.dart';
 import 'package:jobber_city/bindings/initial_binding.dart';
@@ -13,6 +14,7 @@ import 'package:jobber_city/widgets/translations/app_translations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   Get.put(ThemeController(), permanent: true);

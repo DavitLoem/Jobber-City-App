@@ -93,7 +93,7 @@ class HomeHeader extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           companyName, // 🎯 បង្ហាញឈ្មោះពិតប្រាកដ
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: theme.textTheme.bodyLarge?.color,

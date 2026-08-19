@@ -6,8 +6,6 @@ import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_det
 import 'package:jobber_city/screens/role/employer/candidate_detail/widgets/cv_viewer_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import 'edit_schedule_bottom_sheet.dart';
-
 class CandidateCard extends StatelessWidget {
   final ApplicantModel applicant;
   // 🟢 ១. បន្ថែម Parameters ថ្មីសម្រាប់ Selection Mode
@@ -114,11 +112,14 @@ class CandidateCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               // បង្ហាញជំនាញយ៉ាងច្រើន ៣ ប៉ុណ្ណោះ
-              ...applicant.skills.take(3).map((s) => _buildSkillChip(s)),
+              ...applicant.skills
+                  .take(3)
+                  .map((s) => _buildSkillChip(context, s)),
 
               // បង្ហាញឆ្នាំបទពិសោធន៍ លុះត្រាតែធំជាង ០
               if (applicant.yearsOfExperience > 0)
                 _buildSkillChip(
+                  context,
                   '${applicant.yearsOfExperience} Yrs Exp',
                   isHighlight: true,
                 ),
@@ -211,7 +212,14 @@ class CandidateCard extends StatelessWidget {
   }
 
   // ជំនួយគូរ Chip
-  Widget _buildSkillChip(String label, {bool isHighlight = false}) {
+  Widget _buildSkillChip(
+    BuildContext context,
+    String label, {
+    bool isHighlight = false,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -243,16 +251,5 @@ class CandidateCard extends StatelessWidget {
   String _formatDate(DateTime? date) {
     if (date == null) return "Unknown date".tr; // 🟢 Added .tr
     return "${date.day}/${date.month}/${date.year}";
-  }
-
-  String _formatInterviewDate(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return 'TBD';
-    try {
-      if (!dateStr.endsWith('Z')) dateStr += 'Z';
-      final date = DateTime.parse(dateStr).toLocal();
-      return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year} at ${date.hour}:${date.minute.toString().padLeft(2, '0')}";
-    } catch (_) {
-      return dateStr!.split('T').first;
-    }
   }
 }

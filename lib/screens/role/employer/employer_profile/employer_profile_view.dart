@@ -609,18 +609,27 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
               ),
               const SizedBox(height: 32),
 
-              _buildLanguageOption(
-                title: 'English'.tr,
-                langCode: 'en',
-                countryCode: 'US',
-                isDark: isDark,
-              ),
-              const SizedBox(height: 12),
-              _buildLanguageOption(
-                title: 'Khmer'.tr,
-                langCode: 'km',
-                countryCode: 'KH',
-                isDark: isDark,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLanguageOption(
+                    title: 'English',
+                    flagEmoji: '🇺🇸',
+                    accentColor: const Color(0xFF2F80ED),
+                    langCode: 'en',
+                    countryCode: 'US',
+                    isDark: isDark,
+                  ),
+                  _buildLanguageOption(
+                    title: 'ភាសាខ្មែរ',
+                    flagEmoji: '🇰🇭',
+                    accentColor: const Color(0xFFEB5757),
+                    langCode: 'km',
+                    countryCode: 'KH',
+                    isDark: isDark,
+                  ),
+                ],
               ),
 
               const SizedBox(height: 16),
@@ -712,6 +721,8 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
 
   Widget _buildLanguageOption({
     required String title,
+    required String flagEmoji,
+    required Color accentColor,
     required String langCode,
     required String countryCode,
     required bool isDark,
@@ -723,48 +734,76 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
         ? AppColors.darkTextHint
         : AppColors.textHint;
 
-    return InkWell(
-      onTap: () {
-        controller.changeLanguage(langCode, countryCode);
-        Get.back(); // Closes the bottom sheet
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.12)
-              : (isDark ? AppColors.darkSurface : Colors.white),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.5)
-                : (isDark ? AppColors.darkCardBorder : AppColors.cardBorder),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? textActiveColor : textInactiveColor,
-              ),
-            ),
-            if (isSelected)
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          controller.changeLanguage(langCode, countryCode);
+          Get.back(); // Closes the bottom sheet
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Column(
+            children: [
               Container(
-                width: 20,
-                height: 20,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                width: 64,
+                height: 64,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: isDark ? 0.2 : 0.12),
                   shape: BoxShape.circle,
+                  border: isSelected
+                      ? Border.all(color: AppColors.primary, width: 2)
+                      : null,
                 ),
-                child: const Icon(Icons.check, size: 14, color: Colors.white),
+                child: Text(flagEmoji, style: const TextStyle(fontSize: 28)),
               ),
-          ],
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primary.withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: isSelected ? textActiveColor : textInactiveColor,
+                      ),
+                    ),
+                    if (isSelected) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 16,
+                        height: 16,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          size: 11,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
