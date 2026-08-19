@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/core/theme/theme_controller.dart';
 import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
@@ -13,9 +14,16 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       height: 226,
       child: Obx(() {
+        // Observe themeMode to trigger rebuild on theme change
+        themeController.themeMode.value;
+
         if (controller.isRecommendedLoading.value &&
             controller.recommendedJobs.isEmpty) {
           return _buildRecommendedSkeleton();
@@ -23,6 +31,7 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
         if (controller.recommendedJobs.isEmpty) {
           return JobUiUtils.buildInlineEmptyState(
             'No recommended jobs found'.tr,
+            isDark: isDark,
           ); // 🟢 Added .tr
         }
 
@@ -121,11 +130,13 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
                     job.logoUrl,
                     job.companyName,
                     size: 44,
+                    isDark: isDark,
                   ),
                   const Spacer(),
                   JobUiUtils.buildBookmarkButton(
                     isSaved: job.isSaved,
                     onTap: () => controller.toggleSaveRecommendedJob(index),
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -143,10 +154,10 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
               const SizedBox(height: 3),
               Text(
                 job.companyName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: isDark ? AppColors.darkTextLink : AppColors.textLink,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -178,7 +189,7 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
                 ],
               ),
               const SizedBox(height: 10),
-              JobUiUtils.buildTag(job.employmentType),
+              JobUiUtils.buildTag(job.employmentType, isDark: isDark),
               const Spacer(),
               Text(
                 "\$${job.minSalary.toInt()} - \$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod)}",

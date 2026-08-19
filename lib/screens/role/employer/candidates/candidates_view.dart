@@ -27,13 +27,13 @@ class CandidatesView extends GetView<CandidatesViewController> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Candidates',
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -44,20 +44,24 @@ class CandidatesView extends GetView<CandidatesViewController> {
           const JobFilterDropdown(), // 🎯 ហៅ Widget ជ្រើសរើស Job
 
           Container(
-            color: Colors.white,
+            color: theme.cardColor,
             // 🎯 ប្រើប្រាស់ TabBar ដោយភ្ជាប់ជាមួយ tabController ពី GetX
             child: TabBar(
               controller: controller.tabController,
               isScrollable: true,
-              labelColor: const Color(0xFF4f7df7),
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: const Color(0xFF4f7df7),
+              labelColor: AppColors.primary,
+              unselectedLabelColor: isDark
+                  ? AppColors.darkTextHint
+                  : AppColors.textHint,
+              indicatorColor: AppColors.primary,
               indicatorWeight: 3,
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
-              dividerColor: Colors.grey.shade200,
+              dividerColor: isDark
+                  ? AppColors.darkCardBorder
+                  : AppColors.cardBorder,
               tabAlignment: TabAlignment.start,
               // 🎯 ប្រើ List ពី Controller ដើម្បីគូរ Tab បូកជាមួយចំនួន (Count)
               tabs: controller.tabs.map((tabStatus) {
@@ -80,7 +84,7 @@ class CandidatesView extends GetView<CandidatesViewController> {
   String _getTabDisplayName(String status) {
     switch (status) {
       case 'all':
-        return 'All';
+        return 'All'.tr; // 🟢 Added .tr
       case 'pending':
         return 'New'.tr; // 🟢 Added .tr
       case 'shortlisted':
@@ -90,7 +94,7 @@ class CandidatesView extends GetView<CandidatesViewController> {
       case 'rejected':
         return 'Rejected'.tr; // 🟢 Added .tr
       case 'hired':
-        return 'Hired'; // 🟢 បន្ថែម Hired
+        return 'Hired'.tr; // 🟢 Added .tr
       default:
         return status.capitalizeFirst?.tr ??
             status.tr; // 🟢 Added fallback translation

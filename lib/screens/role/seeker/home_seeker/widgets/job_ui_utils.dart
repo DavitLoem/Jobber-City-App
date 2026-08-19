@@ -11,8 +11,12 @@ class JobUiUtils {
     return p.isEmpty ? 'mo'.tr : p.tr;
   }
 
-  static Widget buildSectionHeader(String title, {VoidCallback? onSeeAll}) {
-    final isDark = Get.theme.brightness == Brightness.dark;
+  static Widget buildSectionHeader(
+    String title, {
+    VoidCallback? onSeeAll,
+    bool? isDark,
+  }) {
+    isDark ??= Get.theme.brightness == Brightness.dark;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,8 +57,9 @@ class JobUiUtils {
   static Widget buildBookmarkButton({
     required bool isSaved,
     required VoidCallback onTap,
+    bool? isDark,
   }) {
-    final isDark = Get.theme.brightness == Brightness.dark;
+    isDark ??= Get.theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
@@ -88,8 +93,9 @@ class JobUiUtils {
     String? logoUrl,
     String companyName, {
     double size = 46,
+    bool? isDark,
   }) {
-    final isDark = Get.theme.brightness == Brightness.dark;
+    isDark ??= Get.theme.brightness == Brightness.dark;
 
     return Container(
       width: size,
@@ -110,30 +116,31 @@ class JobUiUtils {
                 logoUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
-                    _buildLogoFallback(companyName),
+                    _buildLogoFallback(companyName, isDark: isDark),
               )
-            : _buildLogoFallback(companyName),
+            : _buildLogoFallback(companyName, isDark: isDark),
       ),
     );
   }
 
-  static Widget _buildLogoFallback(String companyName) {
+  static Widget _buildLogoFallback(String companyName, {bool? isDark}) {
+    isDark ??= Get.theme.brightness == Brightness.dark;
     return Center(
       child: Text(
         companyName.isNotEmpty ? companyName[0].toUpperCase() : 'C',
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 17,
-          color: AppColors.primary,
+          color: isDark ? AppColors.darkTextLink : AppColors.textLink,
         ),
       ),
     );
   }
 
-  static Widget buildTag(String text) {
+  static Widget buildTag(String text, {bool? isDark}) {
     if (text.isEmpty) return const SizedBox.shrink();
     final lower = text.toLowerCase();
-    final isDark = Get.theme.brightness == Brightness.dark;
+    isDark ??= Get.theme.brightness == Brightness.dark;
 
     Color bg;
     Color fg;
@@ -186,8 +193,12 @@ class JobUiUtils {
     );
   }
 
-  static Widget buildInlineEmptyState(String message, {double topPadding = 0}) {
-    final isDark = Get.theme.brightness == Brightness.dark;
+  static Widget buildInlineEmptyState(
+    String message, {
+    double topPadding = 0,
+    bool? isDark,
+  }) {
+    isDark ??= Get.theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(

@@ -31,12 +31,12 @@ class MyJobView extends GetView<MyJobViewController> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'My Jobs',
           style: TextStyle(
-            color: Colors.black,
+            color: theme.textTheme.bodyLarge?.color,
             fontSize: 24,
             fontWeight: FontWeight.w700,
           ),
@@ -132,11 +132,22 @@ class MyJobView extends GetView<MyJobViewController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(LucideIcons.inbox, size: 48, color: Colors.grey.shade300),
+              Icon(
+                LucideIcons.inbox,
+                size: 48,
+                color: isDark
+                    ? AppColors.darkTextDisabled
+                    : Colors.grey.shade300,
+              ),
               const SizedBox(height: 16),
               Text(
                 "No jobs found in this status",
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.darkTextTertiary
+                      : Colors.grey.shade500,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -156,7 +167,7 @@ class MyJobView extends GetView<MyJobViewController> {
               child: Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Color(0xFF4f7df7),
+                  color: AppColors.primary,
                 ),
               ),
             );

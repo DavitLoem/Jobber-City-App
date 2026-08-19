@@ -133,7 +133,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
         elevation: 0,
         centerTitle: true,
         title: Text(

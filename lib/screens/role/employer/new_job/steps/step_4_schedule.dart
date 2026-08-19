@@ -267,12 +267,12 @@ class Step4Schedule extends GetView<NewJobViewController> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Closing Date *",
+                Text(
+                  "Closing Date *".tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -296,30 +296,38 @@ class Step4Schedule extends GetView<NewJobViewController> {
                     }
                   },
                   decoration: InputDecoration(
-                    hintText: "Select application deadline",
+                    hintText: "Select application deadline".tr, // 🟢 Added .tr
                     hintStyle: TextStyle(
-                      color: Colors.grey.shade400,
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : Colors.grey.shade400,
                       fontSize: 14,
                     ),
-                    suffixIcon: const Icon(
+                    suffixIcon: Icon(
                       Icons.calendar_today_rounded,
-                      color: Colors.grey,
+                      color: isDark ? AppColors.darkIconSecondary : Colors.grey,
                       size: 20,
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: isDark
+                        ? AppColors.darkInputBackground
+                        : Colors.white,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.darkInputBorder
+                            : Colors.grey.shade300,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                        color: Colors.blueAccent,
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
                         width: 1.5,
                       ),
                     ),
@@ -327,8 +335,14 @@ class Step4Schedule extends GetView<NewJobViewController> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Post will automatically hide after this date.",
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  "Post will automatically hide after this date."
+                      .tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : Colors.grey.shade500,
+                  ),
                 ),
               ],
             ),

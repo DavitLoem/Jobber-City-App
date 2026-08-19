@@ -24,6 +24,7 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context); // 🟢 Get active theme
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
@@ -71,6 +72,7 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
                             },
                           );
                         },
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       const RecommendedJobsSection(),
@@ -88,6 +90,7 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
                             },
                           );
                         },
+                        isDark: isDark,
                       ),
                       const SizedBox(height: 16),
                       const RecentJobsSection(),
