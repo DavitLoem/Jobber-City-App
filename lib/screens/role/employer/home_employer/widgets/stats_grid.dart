@@ -240,16 +240,14 @@ class _StatCard extends StatelessWidget {
                             : Colors.white.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Flexible(
-                        child: Text(
-                          stat.delta,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                      child: Text(
+                        stat.delta,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
                         ),
                       ),
                     ),

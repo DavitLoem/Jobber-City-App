@@ -7,10 +7,10 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:jobber_city/bindings/initial_binding.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/firebase_options.dart';
-import 'package:jobber_city/routes/app_pages.dart';
-import 'package:jobber_city/routes/app_routes.dart';
 
 import 'core/api/services/firebase_messaging_service.dart';
+import 'routes/app_pages.dart';
+import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
-      // home: ProfileFilledMockupView(),
+      // home: NotificationTestView(),
     );
   }
 }
