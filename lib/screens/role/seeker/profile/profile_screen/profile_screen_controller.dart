@@ -79,7 +79,7 @@ class ProfileScreenViewController extends GetxController {
     fetchProfileRaw();
   }
 
-  void fetchProfileRaw() async {
+  Future<void> fetchProfileRaw() async {
     checkTokenExpiry();
 
     try {

@@ -105,7 +105,8 @@ class ApplicationView extends GetView<ApplicationViewController> {
   }) {
     if (apps.isEmpty) {
       return SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+        physics:
+            const AlwaysScrollableScrollPhysics(), // This allows pull-to-refresh on empty lists
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.6,
           child: Center(
@@ -134,6 +135,8 @@ class ApplicationView extends GetView<ApplicationViewController> {
     }
 
     return ListView.builder(
+      // 🟢 Add AlwaysScrollableScrollPhysics to support Pull to Refresh
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(20),
       itemCount: apps.length,
       itemBuilder: (context, index) {
@@ -167,7 +170,6 @@ class ApplicationView extends GetView<ApplicationViewController> {
       case 'hired':
         statusColor = Colors.green.shade700;
         statusBgColor = Colors.green.shade50;
-        break;
       default:
         statusColor = Colors.grey.shade700;
         statusBgColor = Colors.grey.shade100;
