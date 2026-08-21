@@ -1,239 +1,251 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/api/services/role/seeker/job_recent_services.dart';
-import 'package:jobber_city/core/api/services/role/seeker/job_recommended_services.dart';
+import 'package:jobber_city/controllers/category_controller.dart';
+import 'package:jobber_city/controllers/location_controller.dart';
+import 'package:jobber_city/controllers/master_data_controller.dart';
+import 'package:jobber_city/core/api/services/role/seeker/job_feed_service.dart';
+import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
+import 'package:jobber_city/screens/role/seeker/search_button/widgets/job_filter_bottom_sheet.dart';
+
+// អ្នកត្រូវ Import BottomSheet របស់អ្នកនៅទីនេះនៅពេលអ្នកបង្កើតវារួច
+// import 'package:jobber_city/views/widgets/job_filter_bottom_sheet.dart';
 
 class SearchButtonViewController extends GetxController {
-  final searchController = TextEditingController();
-  final recommendedServices = JobRecommendedServices();
-  final recentServices = JobRecentServices();
+  final JobFeedService _jobFeedService = JobFeedService();
+  final TextEditingController searchController = TextEditingController();
 
-  // 🟢 ប្រើ FlutterSecureStorage ដើម្បីរក្សាទុកទិន្នន័យ
-  static const FlutterSecureStorage _storage = FlutterSecureStorage();
-  static const String _storageKeyRecentSearches = 'recent_searches_list';
-  static const String _storageKeyAllJobs = 'all_jobs_cache';
-  static const String _storageKeySearchTimestamp = 'search_cache_timestamp';
-
+  // ── ផ្នែកគ្រប់គ្រង State របស់ Search UI ──
   var searchQuery = ''.obs;
-  var isLoading = false.obs;
   var isSearching = false.obs;
+  var isLoadingMore = false.obs;
+  var searchResults = <JobFeedModel>[].obs;
 
-  var allJobs = <dynamic>[].obs;
-  var searchResults = <dynamic>[].obs;
+  int _currentPage = 1;
+  var hasMoreData = true.obs;
 
-  var recentSearches = <String>[].obs;
-  var popularSearches = <String>[
-    'UI/UX Designer',
-    'Flutter Developer',
-    'Software Engineer',
-    'Data Analyst',
-    'Project Manager',
-    'Remote',
-  ].obs;
+  var recentSearches = <String>['UI/UX Designer', 'Flutter Developer'].obs;
+  var popularSearches = <String>['Remote', 'Part-time', 'Marketing'].obs;
 
-  // 🟢 Debounce timer for search
-  Timer? _searchDebounceTimer;
-  static const Duration _searchDebounceDuration = Duration(milliseconds: 300);
+  // ── 🟢 ផ្នែកគ្រប់គ្រង State របស់ Filter ទាំង ៦ ──
+  var selectedCategoryId = RxnString();
+  var selectedIndustryId = RxnString();
+  var minSalary = RxnDouble();
+  var maxSalary = RxnDouble();
+  var selectedJobLevelId = RxnString();
+  var selectedEmploymentTypeId = RxnString();
+  var selectedProvinceId = RxnString();
+
+  var activeFiltersCount = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _loadStoredSearches();
-    _loadCachedJobs(); // 🟢 Load cached jobs first
-    _fetchAllJobs(); // 🟢 Then fetch fresh data
 
-    // 🟢 Add listener with debounce
+    // 🎯 ១. ចុះឈ្មោះ Controllers ទាក់ទងនឹង Master Data ដើម្បីឱ្យវាចាប់ផ្តើមហៅ API ទាញទិន្នន័យទុក
+    Get.put(CategoryController());
+    Get.put(LocationController());
+    final mdCtrl = Get.put(MasterDataController());
+
+    // 🎯 ២. ទាញយកទិន្នន័យ Master Data ជាក់លាក់មកទុកក្នុង Cache មុននឹងគាត់ចុចបើក Filter
+    mdCtrl.getMasterData(endpoint: 'industries');
+    mdCtrl.getMasterData(endpoint: 'job-levels');
+    mdCtrl.getMasterData(endpoint: 'employment-types');
+
     searchController.addListener(() {
       searchQuery.value = searchController.text;
-      _debouncedSearch(searchController.text);
     });
+
+    debounce(searchQuery, (String query) {
+      if (query.trim().isNotEmpty || activeFiltersCount.value > 0) {
+        performSearch(isRefresh: true);
+      } else {
+        searchResults.clear();
+        isSearching.value = false;
+      }
+    }, time: const Duration(milliseconds: 800));
   }
 
-  // 🟢 Debounced search to avoid excessive filtering
-  void _debouncedSearch(String query) {
-    _searchDebounceTimer?.cancel();
-    _searchDebounceTimer = Timer(_searchDebounceDuration, () {
-      _filterJobsByTitle(query);
-    });
+  /// 🎯 មុខងារសម្រាប់រាប់ចំនួន Filter ដែលកំពុងប្រើ ដើម្បីបង្ហាញចំណុចក្រហម (Badge) លើ UI
+  void _calculateActiveFiltersCount() {
+    int count = 0;
+    if (selectedCategoryId.value != null) count++;
+    if (selectedIndustryId.value != null) count++;
+    if (minSalary.value != null || maxSalary.value != null) count++;
+    if (selectedJobLevelId.value != null) count++;
+    if (selectedEmploymentTypeId.value != null) count++;
+    if (selectedProvinceId.value != null) count++;
+    activeFiltersCount.value = count;
   }
 
-  // 🟢 ទាញយក និងរក្សាទុក Recent Searches ពី FlutterSecureStorage
-  Future<void> _loadStoredSearches() async {
-    try {
-      final String? jsonString = await _storage.read(
-        key: _storageKeyRecentSearches,
-      );
-      if (jsonString != null && jsonString.isNotEmpty) {
-        final List<dynamic> decodedList = jsonDecode(jsonString);
-        recentSearches.assignAll(
-          decodedList.map((e) => e.toString()).toList().cast<String>(),
-        );
-      }
-    } catch (e) {
-      debugPrint("Error loading recent searches: $e");
-    }
-  }
-
-  // 🟢 ទាញយក Cache Jobs ដែលរក្សាទុក
-  Future<void> _loadCachedJobs() async {
-    try {
-      final String? jsonString = await _storage.read(key: _storageKeyAllJobs);
-      if (jsonString != null && jsonString.isNotEmpty) {
-        // For now, we'll just use this as a fallback
-        debugPrint("Cached jobs found");
-      }
-    } catch (e) {
-      debugPrint("Error loading cached jobs: $e");
-    }
-  }
-
-  // 🟢 ទាញយក Jobs ពី API និងរក្សាទុក Cache
-  Future<void> _fetchAllJobs() async {
-    try {
-      isLoading.value = true;
-      final recommended = await recommendedServices.getJobRecommended();
-      final recent = await recentServices.getJobRecent();
-
-      final Map<String, dynamic> uniqueJobs = {};
-      for (var job in recommended) {
-        uniqueJobs[job.id.toString()] = job;
-      }
-      for (var job in recent) {
-        uniqueJobs[job.id.toString()] = job;
-      }
-
-      allJobs.assignAll(uniqueJobs.values.toList());
-
-      // 🟢 Save to secure storage for persistence
-      try {
-        final jobList = allJobs.map((job) {
-          return {
-            'id': job.id,
-            'title': job.title,
-            'companyName': job.companyName,
-            'logoUrl': job.logoUrl,
-            'location': job.location,
-            'minSalary': job.minSalary,
-            'maxSalary': job.maxSalary,
-          };
-        }).toList();
-
-        final String encodedJobs = jsonEncode(jobList);
-        await _storage.write(key: _storageKeyAllJobs, value: encodedJobs);
-
-        // Save timestamp
-        await _storage.write(
-          key: _storageKeySearchTimestamp,
-          value: DateTime.now().toIso8601String(),
-        );
-      } catch (e) {
-        debugPrint("Error caching jobs: $e");
-      }
-    } catch (e) {
-      debugPrint("Error fetching jobs for search: $e");
-      // 🟢 If API fails, try to load from cache
-      await _loadCachedJobs();
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  // 🟢 Filter jobs by title or company name
-  void _filterJobsByTitle(String query) {
-    if (query.isEmpty) {
-      searchResults.clear();
+  /// 🎯 មុខងារ Search ចម្បង (បាញ់ Parameters ទាំងអស់ទៅកាន់ API)
+  Future<void> performSearch({bool isRefresh = false}) async {
+    // មិនអាច Search បានទេ បើគ្មានទាំងអក្សរ និងគ្មានទាំង Filter
+    if (searchQuery.value.trim().isEmpty && activeFiltersCount.value == 0) {
       return;
     }
 
-    isSearching.value = true;
+    if (isRefresh) {
+      _currentPage = 1;
+      hasMoreData.value = true;
+      isSearching.value = true;
+      searchResults.clear();
+
+      // កត់ត្រាប្រវត្តិស្វែងរក តែនៅពេលមានវាយអក្សរប៉ុណ្ណោះ
+      if (searchQuery.value.trim().isNotEmpty) {
+        saveRecentSearch(searchQuery.value);
+      }
+    } else {
+      if (isLoadingMore.value || !hasMoreData.value) return;
+      isLoadingMore.value = true;
+    }
+
     try {
-      final lowerQuery = query.toLowerCase().trim();
+      var data = await _jobFeedService.searchJobs(
+        keyword: searchQuery.value.trim().isEmpty
+            ? null
+            : searchQuery.value.trim(),
+        page: _currentPage,
+        limit: 10,
+        categoryId: selectedCategoryId.value,
+        industryId: selectedIndustryId.value,
+        minSalary: minSalary.value,
+        maxSalary: maxSalary.value,
+        jobLevelId: selectedJobLevelId.value,
+        employmentTypeId: selectedEmploymentTypeId.value,
+        provinceId: selectedProvinceId.value,
+      );
 
-      // ✅ FIXED: Better filtering that shows full job title
-      final results = allJobs.where((job) {
-        final titleMatch = job.title.toLowerCase().contains(lowerQuery);
-        final companyMatch = job.companyName.toLowerCase().contains(lowerQuery);
-        final locationMatch = job.location.toLowerCase().contains(lowerQuery);
+      searchResults.addAll(data);
 
-        return titleMatch || companyMatch || locationMatch;
-      }).toList();
-
-      searchResults.assignAll(results);
+      if (data.length < 10) {
+        hasMoreData.value = false;
+      } else {
+        _currentPage++;
+      }
+    } catch (e) {
+      debugPrint('Error searching jobs: $e');
     } finally {
+      isSearching.value = false;
+      isLoadingMore.value = false;
+    }
+  }
+
+  /// 🎯 មុខងារសម្រាប់ BottomSheet ហៅនៅពេលចុច "Apply Filter"
+  void applyFilters({
+    String? categoryId,
+    String? industryId,
+    double? minSal,
+    double? maxSal,
+    String? jobLevelId,
+    String? empTypeId,
+    String? provId,
+  }) {
+    selectedCategoryId.value = categoryId;
+    selectedIndustryId.value = industryId;
+    minSalary.value = minSal;
+    maxSalary.value = maxSal;
+    selectedJobLevelId.value = jobLevelId;
+    selectedEmploymentTypeId.value = empTypeId;
+    selectedProvinceId.value = provId;
+
+    _calculateActiveFiltersCount();
+    performSearch(isRefresh: true); // ហៅ API ទាញយកទិន្នន័យថ្មីភ្លាមៗ
+  }
+
+  /// 🎯 មុខងារសម្រាប់ BottomSheet ហៅនៅពេលចុច "Reset"
+  void resetFilters() {
+    selectedCategoryId.value = null;
+    selectedIndustryId.value = null;
+    minSalary.value = null;
+    maxSalary.value = null;
+    selectedJobLevelId.value = null;
+    selectedEmploymentTypeId.value = null;
+    selectedProvinceId.value = null;
+
+    _calculateActiveFiltersCount();
+
+    // ប្រសិនបើពេល Clear Filter ទៅ អត់មាន Keyword ទៀត ត្រូវលុបបញ្ជីចោល
+    if (searchQuery.value.trim().isEmpty) {
+      searchResults.clear();
+      isSearching.value = false;
+    } else {
+      performSearch(isRefresh: true);
+    }
+  }
+
+  /// 🎯 មុខងារសម្រាប់លុប Filter ណាមួយចោល ពេលគាត់ចុចសញ្ញា (X) លើ Chip
+  void removeFilter(String filterType) {
+    switch (filterType) {
+      case 'category':
+        selectedCategoryId.value = null;
+        break;
+      case 'industry':
+        selectedIndustryId.value = null;
+        break;
+      case 'salary':
+        minSalary.value = null;
+        maxSalary.value = null;
+        break;
+      case 'jobLevel':
+        selectedJobLevelId.value = null;
+        break;
+      case 'employmentType':
+        selectedEmploymentTypeId.value = null;
+        break;
+      case 'province':
+        selectedProvinceId.value = null;
+        break;
+    }
+
+    _calculateActiveFiltersCount();
+
+    // បើលុប Filter អស់ ហើយអត់មាន Keyword ទៀត គឺត្រូវលុបបញ្ជីចោល
+    if (searchQuery.value.trim().isEmpty && activeFiltersCount.value == 0) {
+      searchResults.clear();
+      isSearching.value = false;
+    } else {
+      performSearch(isRefresh: true);
+    }
+  }
+
+  void saveRecentSearch(String keyword) {
+    if (keyword.trim().isEmpty) return;
+    if (!recentSearches.contains(keyword)) {
+      recentSearches.insert(0, keyword);
+      if (recentSearches.length > 5) recentSearches.removeLast();
+    }
+  }
+
+  void selectSearchQuery(String query) {
+    searchController.text = query;
+    performSearch(isRefresh: true);
+  }
+
+  void clearSearch() {
+    searchController.clear();
+    // បើមាន Filter ជាប់ មិនត្រូវលុបលទ្ធផលចោលទេ ត្រូវ Search ម្ដងទៀតដោយគ្មាន Keyword
+    if (activeFiltersCount.value > 0) {
+      performSearch(isRefresh: true);
+    } else {
+      searchResults.clear();
       isSearching.value = false;
     }
   }
 
-  // 🟢 Save recent search to FlutterSecureStorage
-  Future<void> saveRecentSearch(String query) async {
-    final text = query.trim();
-    if (text.isEmpty) return;
-
-    // Remove if already exists
-    recentSearches.remove(text);
-    // Add to the beginning
-    recentSearches.insert(0, text);
-
-    // Keep only last 10 searches
-    if (recentSearches.length > 10) {
-      recentSearches.removeRange(10, recentSearches.length);
-    }
-
-    try {
-      final String encodedList = jsonEncode(recentSearches.toList());
-      await _storage.write(key: _storageKeyRecentSearches, value: encodedList);
-      debugPrint("✅ Saved search: $text");
-    } catch (e) {
-      debugPrint("❌ Error saving recent search: $e");
-    }
+  void clearAllRecentSearches() {
+    recentSearches.clear();
   }
 
-  // 🟢 Fixed: When selecting a suggestion, perform actual search
-  void selectSearchQuery(String query) {
-    final trimmedQuery = query.trim();
-
-    // Set the search controller text
-    searchController.text = trimmedQuery;
-    searchController.selection = TextSelection.fromPosition(
-      TextPosition(offset: trimmedQuery.length),
+  void openFilterModal() {
+    Get.bottomSheet(
+      const JobFilterBottomSheet(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
-
-    // Perform the search immediately
-    _filterJobsByTitle(trimmedQuery);
-
-    // Save to recent searches
-    saveRecentSearch(trimmedQuery);
-  }
-
-  // 🟢 Clear search and results
-  void clearSearch() {
-    searchController.clear();
-    searchResults.clear();
-    searchQuery.value = '';
-  }
-
-  // 🟢 Clear all recent searches
-  Future<void> clearAllRecentSearches() async {
-    try {
-      recentSearches.clear();
-      await _storage.delete(key: _storageKeyRecentSearches);
-      debugPrint("✅ Cleared all recent searches");
-    } catch (e) {
-      debugPrint("❌ Error clearing recent searches: $e");
-    }
-  }
-
-  // 🟢 Refresh data from API
-  Future<void> refreshJobs() async {
-    await _fetchAllJobs();
   }
 
   @override
   void onClose() {
-    _searchDebounceTimer?.cancel();
     searchController.dispose();
     super.onClose();
   }

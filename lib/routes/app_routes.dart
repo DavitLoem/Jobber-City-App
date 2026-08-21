@@ -8,12 +8,14 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String verifyOtp = '/verify-otp';
   static const String resetPassword = '/reset-password';
+  static const String notification = '/notification';
 
   // ==========================================
   // 🔵 ២. SEEKER ROUTES (សម្រាប់អ្នកស្វែងរកការងារ)
   // ==========================================
   static const String mainScreenSeeker = '/main-screen';
   static const String homeSeeker = '/home-seeker';
+  static const String jobList = '/job-list';
   static const String search = '/search';
   static const String editprofile = '/edit-profile';
   static const String expertise = '/expertise';
@@ -21,6 +23,17 @@ class AppRoutes {
   static const String jobDetail = '/job-detail';
   static const String saveJob = '/save-job';
   static const String setting = '/setting';
+  static const String cvExtraction = '/cv-extraction';
+  static const String cvReview = '/cv-review';
+  static const String applied = '/applied';
+  static const String candidateDetail = '/candidate-detail';
+  static const String experience = '/experience';
+  static const String educations = '/educations';
+  static const String trainings = '/trainings';
+  static const String languages = '/languages';
+  static const String biography = '/biography';
+  static const String skill = '/skill';
+  static const String applicationDetail = '/application-detail';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES
@@ -39,9 +52,6 @@ class AppRoutes {
   static const String notificationEmployer = '/notification-employer';
 
   static const String employerEditprofile = '/edit-profile';
-  static const String experience = '/experience';
-  static const String educations = '/educations';
-  static const String trainings = '/trainings';
 
   static const String postJob = '/post-job';
   static const String recruit = '/recruit';

@@ -194,41 +194,45 @@ class _CustomTextfieldState extends State<CustomTextfield>
     final score = _passwordStrengthScore;
     final color = _passwordStrengthColor;
 
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 200),
-      opacity: score == 0 ? 0 : 1,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Password strength: $_passwordStrengthLabel',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: List.generate(4, (index) {
-                final filled = index < score;
-                return Expanded(
-                  child: Container(
-                    margin: EdgeInsets.only(right: index == 3 ? 0 : 6),
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: filled ? color : AppColors.line,
-                      borderRadius: BorderRadius.circular(2),
+    // 🎯 ប្រើ AnimatedSize ដើម្បីបិទបាំងចន្លោះ (Space) ទាំងស្រុងនៅពេលគ្មានអក្សរ
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      alignment: Alignment.topCenter,
+      child: score == 0
+          ? const SizedBox.shrink() // 🎯 ប្រសិនបើគ្មានអក្សរ គឺមិនទាមទារ Space ទេ
+          : Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Password strength: $_passwordStrengthLabel',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: color,
                     ),
                   ),
-                );
-              }),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: List.generate(4, (index) {
+                      final filled = index < score;
+                      return Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(right: index == 3 ? 0 : 6),
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: filled ? color : AppColors.line,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 

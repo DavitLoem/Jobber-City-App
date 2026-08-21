@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/location_services.dart';
 
@@ -21,6 +22,9 @@ class LocationController extends GetxController {
     try {
       final res = await _locationServices.getProvinces();
       provinces.assignAll(res);
+    } catch (e) {
+      // 🎯 បន្ថែម Catch block នេះ
+      debugPrint("Error fetching provinces: $e");
     } finally {
       isLoadingProvinces.value = false;
     }

@@ -112,8 +112,9 @@ class _CitySelectFieldState<T> extends State<CitySelectField<T>>
   Color get _accentColor {
     if (!widget.enabled) return AppColors.iconDisabled;
     if (_isFocused || _isOpen) return AppColors.inputFocusedBorder;
-    if (_hasText)
+    if (_hasText) {
       return AppColors.inputIconText; // ប្តូរទៅពណ៌ខ្មៅពេលមានទិន្នន័យជ្រើសរើសរួច
+    }
     return AppColors.inputIconText;
   }
 

@@ -24,9 +24,19 @@ class ApiClient {
   }
 
   // --- POST ---
-  Future<dynamic> post(String endpoint, {dynamic data}) async {
+  Future<dynamic> post(
+    String endpoint, {
+    dynamic data,
+    CancelToken? cancelToken,
+    Options? options,
+  }) async {
     try {
-      final response = await _dio.post(endpoint, data: data);
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        cancelToken: cancelToken,
+        options: options,
+      );
       return response.data;
     } catch (e) {
       throw _handleError(e);

@@ -177,8 +177,12 @@ class EditProfileEmployerView
                               .map(
                                 (prov) => DropdownMenuItem<String>(
                                   value: prov.id,
-                                  child: Text(prov.nameEn),
-                                ), // ដូរទៅតាមឈ្មោះ field របស់ Model អ្នក
+                                  child: Text(
+                                    prov.nameEn,
+                                    overflow: TextOverflow.ellipsis, // 👈 Added
+                                    maxLines: 1, // 👈 Added
+                                  ),
+                                ),
                               )
                               .toList(),
                         ),
@@ -193,8 +197,12 @@ class EditProfileEmployerView
                               .map(
                                 (dist) => DropdownMenuItem<String>(
                                   value: dist.id,
-                                  child: Text(dist.nameEn),
-                                ), // ដូរទៅតាមឈ្មោះ field របស់ Model អ្នក
+                                  child: Text(
+                                    dist.nameEn,
+                                    overflow: TextOverflow.ellipsis, // 👈 Added
+                                    maxLines: 1, // 👈 Added
+                                  ),
+                                ),
                               )
                               .toList(),
                         ),
@@ -419,9 +427,8 @@ class EditProfileEmployerView
     required String hint,
     IconData? icon,
     required RxString value,
-    required List<DropdownMenuItem<String>> Function()
-    itemsBuilder, // 👈 ប្រើជា Function វិញ
-    void Function(String?)? onChanged, // 👈 សម្រាប់ចាប់ពេលគេប្តូរខេត្ត
+    required List<DropdownMenuItem<String>> Function() itemsBuilder,
+    void Function(String?)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,7 +443,6 @@ class EditProfileEmployerView
         ),
         const SizedBox(height: 8),
         Obx(() {
-          // 🎯 ទាញយកបញ្ជី items ថ្មីៗរាល់ពេលទិន្នន័យដើមប្រែប្រួល
           final items = itemsBuilder();
 
           String? currentValue = value.value.isEmpty ? null : value.value;
@@ -444,6 +450,8 @@ class EditProfileEmployerView
           if (!valueExists) currentValue = null;
 
           return DropdownButtonFormField<String>(
+            isExpanded:
+                true, // 👈 បន្ថែមបន្ទាត់នេះជាដាច់ខាត ដើម្បីដោះស្រាយការ Overflow
             initialValue: currentValue,
             items: items,
             onChanged: (newValue) {

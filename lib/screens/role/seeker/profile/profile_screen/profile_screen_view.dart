@@ -3,10 +3,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/core/utils/app_logger.dart';
-import 'package:jobber_city/core/utils/token_storage.dart';
+import 'package:jobber_city/core/api/services/role/seeker/seeker_profile_services.dart';
+import 'package:jobber_city/models/role/seeker/seeker_profile_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
+
+import '../../../../../core/utils/app_logger.dart';
+import '../../../../../core/utils/token_storage.dart';
+import 'widgets/complete_profile_banner.dart';
+// Import ផ្នែកដែលបានបំបែក
+import 'widgets/profile_app_bar.dart';
+import 'widgets/profile_info_card.dart';
+import 'widgets/profile_section_item.dart';
 
 part 'profile_screen_binding.dart';
 part 'profile_screen_controller.dart';
@@ -17,403 +24,138 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Clean background color
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Obx(() {
-          // Show Loading while fetching data from API
           if (controller.isLoading.value) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildAppBar(),
+          return RefreshIndicator(
+            onRefresh: () async {
+              // រង់ចាំឱ្យអនុគមន៍ទាំង ២ ទាញទិន្នន័យចប់សិន ទើបបិទរង្វង់ Refresh
+              await Future.wait([
+                controller.fetchCompleteProfile(),
+                controller.fetchProfileRaw(),
+              ]);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ProfileAppBar(),
+                  const SizedBox(height: 15),
 
-                const SizedBox(height: 15),
-                _buildProfileCard(),
-                const SizedBox(height: 14),
-                _buildCompleteProfileBanner(),
-                const SizedBox(height: 24),
+                  ProfileInfoCard(controller: controller),
+                  const SizedBox(height: 14),
 
-                // Profile Section List
-                _buildSectionItem(
-                  icon: Icons.person_outline,
-                  title: "Contact Information",
-                  onTap: () => controller.goToEditProfile(),
-                ),
-                const SizedBox(height: 12),
-                _buildSectionItem(
-                  icon: Icons.article_outlined,
-                  title: "Summary",
-                  onTap: () {},
-                ),
-                const SizedBox(height: 12),
-                _buildSectionItem(
-                  icon: Icons.pie_chart_outline_rounded,
-                  title: "Expected Salary",
-                  onTap: () {},
-                ),
-                const SizedBox(height: 12),
-                _buildSectionItem(
-                  icon: Icons.work_outline,
-                  title: "Work Experience",
-                  onTap: () async {
-                    // ១. រង់ចាំរហូតដល់អ្នកប្រើប្រាស់ Back ត្រឡប់មកពីទំព័រ Experience វិញ
-                    await Get.toNamed(
-                      AppRoutes.experience,
-                    ); // សូមដូរឈ្មោះ Route ឲ្យត្រូវនឹងកូដពិតរបស់អ្នក
+                  CompleteProfileBanner(
+                    completionPercentage: 0.4,
+                    onFillInTap: () => controller.goToEditProfile(),
+                  ),
+                  const SizedBox(height: 24),
 
-                    // ២. ពេលត្រឡប់មកដល់ទីនេះវិញ ហៅមុខងារទាញទិន្នន័យម្ដងទៀត ដើម្បី Refresh UI!
-                    controller.fetchProfileRaw();
-                  },
-                ),
-                const SizedBox(height: 12),
-                _buildSectionItem(
-                  icon: Icons.school_outlined,
-                  title: "Education",
-                  onTap: () {
-                    Get.toNamed(AppRoutes.educations);
-                    controller.fetchProfileRaw();
-                  },
-                ),
-                const SizedBox(height: 12),
-                _buildSectionItem(
-                  icon: Icons.bar_chart_rounded,
-                  title: "Projects",
-                  onTap: () {},
-                ),
-                const SizedBox(height: 12),
-                _buildSectionItem(
-                  icon: Icons.workspace_premium_outlined,
-                  title: "Certifications & Licenses",
-                  onTap: () {
-                    Get.toNamed(AppRoutes.trainings);
-                    controller.fetchProfileRaw();
-                  },
-                ),
+                  // 🎯 1. Edit Resume (Upload CV)
+                  ProfileSectionItem(
+                    icon: Icons.upload_file_rounded,
+                    title: "Edit Resume",
+                    // សន្មតថាបើមាន URL ឬ Filename គឺបាន Completed ហើយ
+                    isCompleted:
+                        controller.profileData.value?.resumeUrl != null &&
+                        controller.profileData.value!.resumeUrl.isNotEmpty,
+                    isResume: true, // 🟢 កំណត់ថាជា Resume ទីនេះ
+                    onTap: () {
+                      Get.toNamed(AppRoutes.cvExtraction);
+                    },
+                  ),
+                  const SizedBox(height: 12),
 
-                const SizedBox(height: 30),
-              ],
+                  // 🎯 2. Work Experience
+                  ProfileSectionItem(
+                    icon: Icons.work_outline,
+                    title: "Work Experience",
+                    isCompleted:
+                        controller.profileData.value?.experiences != null &&
+                        controller.profileData.value!.experiences.isNotEmpty,
+                    onTap: () async {
+                      await Get.toNamed(AppRoutes.experience);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 🎯 3. Education Background
+                  ProfileSectionItem(
+                    icon: Icons.school_outlined,
+                    title: "Education Background",
+                    isCompleted:
+                        controller.profileData.value?.educations != null &&
+                        controller.profileData.value!.educations.isNotEmpty,
+                    onTap: () async {
+                      await Get.toNamed(AppRoutes.educations);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 🎯 4. Trainings
+                  ProfileSectionItem(
+                    icon: Icons.workspace_premium_outlined,
+                    title: "Trainings",
+                    isCompleted:
+                        controller.profileData.value?.trainings != null &&
+                        controller.profileData.value!.trainings.isNotEmpty,
+                    onTap: () async {
+                      await Get.toNamed(AppRoutes.trainings);
+                      controller.fetchProfileRaw();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 🎯 5. Skills
+                  ProfileSectionItem(
+                    icon: Icons.psychology_outlined, // ឬ Icons.star_border
+                    title: "Skills",
+                    isCompleted:
+                        controller.profileData.value?.skills != null &&
+                        controller.profileData.value!.skills.isNotEmpty,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.skill);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 🎯 6. Biography
+                  ProfileSectionItem(
+                    icon: Icons.article_outlined,
+                    title: "Biography",
+                    isCompleted:
+                        controller.profileData.value?.biography != null &&
+                        controller.profileData.value!.biography.isNotEmpty,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.biography);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 🎯 7. Language
+                  ProfileSectionItem(
+                    icon: Icons.language_outlined,
+                    title: "Language",
+                    isCompleted:
+                        controller.profileData.value?.languages != null &&
+                        controller.profileData.value!.languages.isNotEmpty,
+                    onTap: () {
+                      Get.toNamed(AppRoutes.languages);
+                    },
+                  ),
+
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           );
         }),
-      ),
-    );
-  }
-
-  // ── AppBar Section ──
-  Widget _buildAppBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Profile',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: Colors.black87,
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            Get.toNamed(AppRoutes.setting);
-          },
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
-            child: const Icon(
-              Icons.settings_outlined,
-              size: 22,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ── Profile Information Card (Avatar, Name, Position, Edit) ──
-  Widget _buildProfileCard() {
-    final bool hasPosition = controller.position.value.isNotEmpty;
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // 🟢 Avatar (Outlined Circle)
-          Obx(
-            () => Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryLight,
-                border: Border.all(color: AppColors.primary, width: 2),
-              ),
-              child: ClipOval(
-                child: controller.profileImageUrl.value.isNotEmpty
-                    ? Image.network(
-                        controller.profileImageUrl.value,
-                        width: 56,
-                        height: 56,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: Text(
-                              controller.firstName.value.isNotEmpty
-                                  ? controller.firstName.value[0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : Center(
-                        child: Text(
-                          controller.firstName.value.isNotEmpty
-                              ? controller.firstName.value[0].toUpperCase()
-                              : 'U',
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-
-          // Name and Position Status
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${controller.lastName.value} ${controller.firstName.value}"
-                      .trim(),
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: hasPosition
-                        ? AppColors.successBackground
-                        : AppColors.warningBackground,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        hasPosition
-                            ? Icons.check_circle_outline
-                            : Icons.info_outline,
-                        size: 13,
-                        color: hasPosition
-                            ? AppColors.success
-                            : AppColors.warning,
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          hasPosition
-                              ? controller.position.value
-                              : "No position added — tap to fill",
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: hasPosition
-                                ? AppColors.success
-                                : AppColors.warning,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Edit Button (pencil icon)
-          GestureDetector(
-            onTap: () => controller.goToEditProfile(),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F6FA),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.edit_outlined,
-                size: 19,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Complete Profile Banner ──
-  Widget _buildCompleteProfileBanner() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.location_on_outlined,
-              size: 16,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              "Complete your profile to stand out to employers.",
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primaryDark,
-                height: 1.3,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: () => controller.goToEditProfile(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                "Fill In",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Section Item (Icon + Title + Add Button) ──
-  Widget _buildSectionItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.cardBorder, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, size: 20, color: AppColors.primary),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.add,
-                  size: 18,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

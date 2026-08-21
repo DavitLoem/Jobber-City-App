@@ -1,5 +1,0 @@
-My Job Screen:
-- ចំពោះប៊ូតុង arrowUpDown នោះ ខ្ញុំសូមផ្តល់យោបល់ទុកជាគំនិតសម្រាប់ថ្ងៃក្រោយ គឺយើងអាចប្រើវាជាមុខងារ Sort (រៀបលំដាប់) ជំនួសឱ្យ Filter វិញ ដូចជា៖
-- រៀបតាមកាលបរិច្ឆេទ (Newest / Oldest)
-- រៀបតាមចំនួនបេក្ខជនដាក់ពាក្យ (Most Candidates / Least Candidates)
-- រៀបតាមប្រាក់ខែ (Highest Salary)

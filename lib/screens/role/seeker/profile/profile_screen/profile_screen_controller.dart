@@ -2,18 +2,38 @@ part of 'profile_screen_view.dart';
 
 class ProfileScreenViewController extends GetxController {
   final _seekerServices = AuthServices();
+  final _profileServices = SeekerProfileServices();
 
   var isLoading = true.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
   var email = ''.obs;
-  var position = ''.obs; // Job Title / Position
+  var position = ''.obs;
   var profileImageUrl = ''.obs;
+
+  final profileData = Rxn<SeekerProfileModel>();
+  final isProfileLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
+    fetchCompleteProfile();
     fetchProfileRaw();
+  }
+
+  Future<void> fetchCompleteProfile() async {
+    try {
+      isProfileLoading.value = true;
+      final response = await _profileServices.getSeekerProfile();
+
+      if (response.success && response.data != null) {
+        profileData.value = response.data; // Update UI ទាំងអស់ដែលស្តាប់អថេរនេះ
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch profile: $e');
+    } finally {
+      isProfileLoading.value = false;
+    }
   }
 
   Future<void> checkTokenExpiry() async {
@@ -59,7 +79,7 @@ class ProfileScreenViewController extends GetxController {
     fetchProfileRaw();
   }
 
-  void fetchProfileRaw() async {
+  Future<void> fetchProfileRaw() async {
     checkTokenExpiry();
 
     try {

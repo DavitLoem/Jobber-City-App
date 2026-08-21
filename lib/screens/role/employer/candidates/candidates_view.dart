@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/api/services/role/employer/applicant_employer_service.dart';
+import 'package:jobber_city/core/utils/debouncer.dart';
+import 'package:jobber_city/models/role/employer/applicant_model.dart';
+import 'package:jobber_city/models/role/employer/applicant_status_summary_model.dart';
+import 'package:jobber_city/models/role/employer/job_dropdown_item_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+import 'widgets/bulk_action_bottom_sheet.dart';
+import 'widgets/candidate_list.dart';
+import 'widgets/candidate_search_bar.dart';
+import 'widgets/job_filter_dropdown.dart';
 
 part 'candidates_binding.dart';
 part 'candidates_controller.dart';
@@ -10,100 +20,111 @@ class CandidatesView extends GetView<CandidatesViewController> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          title: const Text(
-            'Candidates',
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        centerTitle: false, // រុញទៅឆ្វេងបែប Modern Dashboard
+        title: const Text(
+          'Candidates',
+          style: TextStyle(
+            color: Color(0xFF1A1D1E), // ពណ៌ខ្មៅដិតបែប Premium
+            fontWeight: FontWeight.w900, // អក្សរក្រាស់
+            fontSize: 24, // ទំហំធំជាងមុន
+            letterSpacing: -0.5, // បង្រួមចន្លោះអក្សរបន្តិចឱ្យមើលទៅរលោង
           ),
-          leading: IconButton(
-            icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
-            onPressed: () => Get.back(),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(LucideIcons.search, color: Colors.black87),
-              onPressed: () {},
-            ),
-          ],
         ),
-        body: Column(
-          children: [
-            // ── 🎯 ផ្នែកថ្មី៖ Job Filter Dropdown ──
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
+        actions: [
+          Obx(() {
+            // ករណីកំពុង Select បង្ហាញប៊ូតុង Cancel
+            if (controller.isSelectionMode) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  icon: const Icon(LucideIcons.x, color: Colors.black87),
+                  tooltip: "Cancel Selection",
+                  onPressed: () {
+                    controller.clearSelection();
+                  },
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+              );
+            }
+            // 🟢 ករណីធម្មតា បង្ហាញ Icon ផ្សេងៗ (ឧទាហរណ៍: Notification) ដើម្បីឱ្យមានតុល្យភាព
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                icon: const Icon(LucideIcons.bell, color: Colors.black54),
+                tooltip: "Notifications",
+                onPressed: () {},
+              ),
+            );
+          }),
+        ],
+      ),
+
+      bottomNavigationBar: Obx(() {
+        if (!controller.isSelectionMode) return const SizedBox.shrink();
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                offset: const Offset(0, -4),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: ElevatedButton.icon(
+              onPressed: () => _showBulkActionBottomSheet(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4f7df7),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      LucideIcons.briefcase,
-                      size: 20,
-                      color: Colors.grey.shade500,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value:
-                              'all', // តម្លៃសាកល្បង (ក្រោយមកប្រើ controller.selectedJobId.value)
-                          isExpanded: true,
-                          icon: Icon(
-                            LucideIcons.chevronDown,
-                            size: 20,
-                            color: Colors.grey.shade400,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'all',
-                              child: Text("All Jobs"),
-                            ),
-                            DropdownMenuItem(
-                              value: 'job_1',
-                              child: Text("Senior Flutter Developer"),
-                            ),
-                            DropdownMenuItem(
-                              value: 'job_2',
-                              child: Text("UX/UI Designer"),
-                            ),
-                          ],
-                          onChanged: (value) {},
-                        ),
-                      ),
-                    ),
-                  ],
+              ),
+              icon: const Icon(LucideIcons.zap, color: Colors.white),
+              label: Text(
+                "Take Action (${controller.selectedApplicantIds.length})",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),
+          ),
+        );
+      }),
 
-            // ── ផ្នែក TabBar ──
-            Container(
-              color: Colors.white,
-              child: TabBar(
+      body: Column(
+        children: [
+          const JobFilterDropdown(),
+
+          CandidateSearchBar(
+            searchCtrl: controller.searchController,
+            onChanged: (value) {
+              controller.onSearchChanged(value);
+            },
+            onClear: () {
+              controller.searchController.clear();
+              controller.fetchApplicants();
+            },
+          ),
+
+          Container(
+            color: Colors.white,
+            child: Obx(() {
+              final summary = controller.statusSummary.value;
+
+              return TabBar(
+                controller: controller.tabController,
                 isScrollable: true,
                 labelColor: const Color(0xFF4f7df7),
                 unselectedLabelColor: Colors.grey,
@@ -115,217 +136,69 @@ class CandidatesView extends GetView<CandidatesViewController> {
                 ),
                 dividerColor: Colors.grey.shade200,
                 tabAlignment: TabAlignment.start,
-                tabs: const [
-                  Tab(text: "New (3)"),
-                  Tab(text: "Shortlisted (2)"),
-                  Tab(text: "Interviewed"),
-                  Tab(text: "Rejected"),
-                ],
-              ),
-            ),
+                tabs: controller.tabs.map((tabStatus) {
+                  final displayName = _getTabDisplayName(tabStatus);
 
-            // ── ផ្នែកបញ្ជីបេក្ខជន ──
-            const Expanded(
-              child: TabBarView(
-                children: [
-                  _CandidateList(), // New
-                  _CandidateList(), // Shortlisted
-                  Center(
-                    child: Text(
-                      "No candidates interviewed yet.",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      "No rejected candidates.",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-// ==========================================
-// ── មុខងារជំនួយសម្រាប់សង់ UI (Helper Widgets) ──
-// ==========================================
+                  int count = 0;
+                  switch (tabStatus) {
+                    case 'all':
+                      count = summary.all;
+                      break;
+                    case 'pending':
+                      count = summary.pending;
+                      break;
+                    case 'shortlisted':
+                      count = summary.shortlisted;
+                      break;
+                    case 'interview':
+                      count = summary.interview;
+                      break;
+                    case 'hired':
+                      count = summary.hired;
+                      break;
+                    case 'rejected':
+                      count = summary.rejected;
+                      break;
+                  }
 
-class _CandidateList extends StatelessWidget {
-  const _CandidateList();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.all(20),
-      itemCount: 3, // ចំនួនទិន្នន័យសាកល្បង
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        return _buildCandidateCard();
-      },
-    );
-  }
-
-  Widget _buildCandidateCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            offset: const Offset(0, 4),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ផ្នែកខាងលើ៖ រូបថត, ឈ្មោះ, និងតួនាទី
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.grey.shade200,
-                backgroundImage: const NetworkImage(
-                  "https://i.pravatar.cc/150?img=11", // រូបភាពសាកល្បង
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Sokmakara Chhean",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Applied for: Senior Flutter Developer",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.calendar,
-                          size: 14,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "Applied 2 days ago",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  return Tab(
+                    text: count > 0 ? '$displayName ($count)' : displayName,
+                  );
+                }).toList(),
+              );
+            }),
           ),
 
-          const SizedBox(height: 16),
-
-          // ផ្នែកកណ្តាល៖ ជំនាញ (Skills)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildSkillChip("Flutter"),
-              _buildSkillChip("Dart"),
-              _buildSkillChip("3 Yrs Exp"),
-            ],
-          ),
-
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-          ),
-
-          // ផ្នែកខាងក្រោម៖ ប៊ូតុងសកម្មភាព (Actions)
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    // មុខងារទាញយក ឬមើល CV
-                  },
-                  icon: const Icon(LucideIcons.fileText, size: 18),
-                  label: const Text("View CV"),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF4f7df7),
-                    side: const BorderSide(color: Color(0xFF4f7df7)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // ចូលទៅកាន់ Profile លម្អិតរបស់បេក្ខជន
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4f7df7),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    "View Profile",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          const Expanded(child: CandidateList()),
         ],
       ),
     );
   }
 
-  Widget _buildSkillChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0F4FF),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Color(0xFF4f7df7),
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+  String _getTabDisplayName(String status) {
+    switch (status) {
+      case 'all':
+        return 'All';
+      case 'pending':
+        return 'New';
+      case 'shortlisted':
+        return 'Shortlisted';
+      case 'interview':
+        return 'Interviewed';
+      case 'rejected':
+        return 'Rejected';
+      case 'hired':
+        return 'Hired';
+      default:
+        return status.capitalizeFirst ?? status;
+    }
+  }
+
+  void _showBulkActionBottomSheet(BuildContext context) {
+    Get.bottomSheet(
+      const BulkActionBottomSheet(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 }

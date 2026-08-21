@@ -21,27 +21,30 @@ class DioClient {
         baseUrl: ApiConfig.baseUrl,
         connectTimeout: const Duration(seconds: ApiConfig.connectionTimeout),
         receiveTimeout: const Duration(seconds: ApiConfig.receiveTimeout),
+        sendTimeout: const Duration(seconds: 30),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Connection': 'keep-alive',
         },
       ),
     );
 
+    dio.interceptors.add(AuthInterceptor(dio));
+
     if (kDebugMode) {
-      dio.interceptors.addAll([
-        AuthInterceptor(dio),
+      dio.interceptors.add(
         PrettyDioLogger(
           requestHeader: true,
           requestBody:
-              true, // បើចង់លាក់ Password សូម្បីតែពេល Dev អាចប្តូរទៅ false
-          responseBody: true,
+              false, // បើចង់លាក់ Password សូម្បីតែពេល Dev អាចប្តូរទៅ false
+          responseBody: false,
           responseHeader: false,
           error: true,
           compact: true,
           maxWidth: 90,
         ),
-      ]);
+      );
     }
   }
 }

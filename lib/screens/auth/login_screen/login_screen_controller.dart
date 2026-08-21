@@ -20,12 +20,8 @@ class LoginScreenViewController extends GetxController {
 
   @override
   void onClose() {
-    // Clear the fields but avoid disposing the controllers here because
-    // the framework or other async callbacks may still access them during
-    // navigation. Disposing here can lead to "used after being disposed"
-    // errors. Let the framework clean up the controllers when appropriate.
-    emailCtrl.clear();
-    passwordCtrl.clear();
+    emailCtrl.dispose();
+    passwordCtrl.dispose();
     super.onClose();
   }
 

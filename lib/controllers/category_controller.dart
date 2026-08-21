@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/category_services.dart';
 import 'package:jobber_city/models/category_model.dart';
@@ -20,6 +21,9 @@ class CategoryController extends GetxController {
     try {
       final res = await _categoryService.getCategories(search: search);
       categories.assignAll(res);
+    } catch (e) {
+      // 🎯 បន្ថែម Catch block នេះដើម្បីកុំឲ្យ App គាំង
+      debugPrint("Error fetching categories: $e");
     } finally {
       isLoading.value = false;
     }

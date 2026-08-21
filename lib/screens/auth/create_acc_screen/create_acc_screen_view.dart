@@ -29,43 +29,45 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
       resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.lightBackground,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 23),
-              child: _buildHeader(),
-            ),
+        // 🎯 ១. ប្រើ LayoutBuilder ដើម្បីចាប់យកទំហំកម្ពស់អេក្រង់
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                // 🎯 ២. បង្ខំឱ្យកម្ពស់អប្បបរមា ស្មើនឹងកម្ពស់អេក្រង់ទូរស័ព្ទ
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                // 🎯 ៣. ប្រើ IntrinsicHeight ដើម្បីឱ្យ Widget ខាងក្នុងអាចរុញគ្នាបានត្រឹមត្រូវ
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(23, 0, 23, 30),
+                    child: Column(
+                      children: [
+                        _buildHeader(),
+                        const SizedBox(height: 16),
+                        AnimatedTabBar(controller: controller),
+                        const SizedBox(height: 8),
 
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 23),
-              child: AnimatedTabBar(controller: controller),
-            ),
-
-            const SizedBox(height: 16),
-
-            Expanded(
-              child: SingleChildScrollView(
-                clipBehavior: Clip.none,
-                physics: const BouncingScrollPhysics(
-                  parent: NeverScrollableScrollPhysics(),
-                ),
-                padding: const EdgeInsets.fromLTRB(23, 0, 23, 30),
-                child: Form(
-                  key: controller.formKey,
-                  child: Obx(
-                    () => AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: controller.selectedIndex.value == 0
-                          ? _buildRegisterForm(isEmployer: false)
-                          : _buildRegisterForm(isEmployer: true),
+                        Expanded(
+                          child: Form(
+                            key: controller.formKey,
+                            child: Obx(
+                              () => AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                child: controller.selectedIndex.value == 0
+                                    ? _buildRegisterForm(isEmployer: false)
+                                    : _buildRegisterForm(isEmployer: true),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -76,7 +78,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
       children: [
         const SizedBox(height: 12),
 
-        const Logo(size: 120),
+        const Logo(size: 80),
 
         const SizedBox(height: 12),
 
@@ -153,7 +155,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           textInputAction: TextInputAction.done,
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
 
         Obx(
           () => CustomAnimatedCheckbox(
@@ -176,7 +178,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
 
         Obx(
           () => CustomButton(
@@ -191,7 +193,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
 
         Row(
           children: [
@@ -210,7 +212,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           ],
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
 
         Obx(() {
           // ១. កំណត់អក្សរទៅតាម Tab
@@ -238,7 +240,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           );
         }),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
 
         Center(
           child: Wrap(
@@ -251,7 +253,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
               ),
               GestureDetector(
                 onTap: () {
-                  Get.toNamed(AppRoutes.login);
+                  Get.offNamed(AppRoutes.login);
                 },
                 child: Text(
                   'Sign In',
@@ -268,7 +270,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
           ),
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 6),
       ],
     );
   }

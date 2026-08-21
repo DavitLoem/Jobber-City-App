@@ -4,13 +4,15 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class JobSearchBar extends StatelessWidget {
   final TextEditingController? searchController;
   final Function(String)? onChanged;
-  final VoidCallback? onSortTap;
+  final String currentSort;
+  final Function(String)? onSortChanged;
 
   const JobSearchBar({
     super.key,
     this.searchController,
     this.onChanged,
-    this.onSortTap,
+    required this.currentSort,
+    this.onSortChanged,
   });
 
   @override
@@ -56,21 +58,80 @@ class JobSearchBar extends StatelessWidget {
 
           const SizedBox(width: 12), // ចន្លោះកណ្តាល
           // ── 2. Sort/Filter Button ──
-          InkWell(
-            onTap: onSortTap,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200, width: 1),
-              ),
-              child: const Icon(
+          Container(
+            height: 48,
+            width: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200, width: 1),
+            ),
+            child: PopupMenuButton<String>(
+              icon: const Icon(
                 LucideIcons.arrowUpDown,
                 color: Colors.black87,
                 size: 20,
               ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.white,
+              elevation: 4,
+              position: PopupMenuPosition.under,
+              onSelected: (String value) {
+                if (onSortChanged != null) {
+                  onSortChanged!(value);
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                _buildPopupItem(
+                  'newest',
+                  'Newest',
+                  LucideIcons.clock,
+                  currentSort,
+                ),
+                _buildPopupItem(
+                  'oldest',
+                  'Oldest',
+                  LucideIcons.history,
+                  currentSort,
+                ),
+                _buildPopupItem(
+                  'expiring_soon',
+                  'Expiring Soon',
+                  LucideIcons.calendarClock,
+                  currentSort,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _buildPopupItem(
+    String value,
+    String text,
+    IconData icon,
+    String currentVal,
+  ) {
+    final bool isSelected = value == currentVal;
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 18,
+            color: isSelected ? const Color(0xFF4f7df7) : Colors.grey.shade600,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: TextStyle(
+              color: isSelected ? const Color(0xFF4f7df7) : Colors.black87,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ],

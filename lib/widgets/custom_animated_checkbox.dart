@@ -76,8 +76,8 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
-              width: 19,
-              height: 19,
+              width: 18,
+              height: 18,
               margin: const EdgeInsets.only(top: 2),
               decoration: BoxDecoration(
                 color: widget.value
@@ -102,6 +102,7 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
             // Flexibly generated Text Label
             Expanded(
               child: Text.rich(
+                // textAlign: TextAlign.justify,
                 TextSpan(
                   children: [
                     TextSpan(

@@ -7,10 +7,12 @@ class JobCardItem extends StatelessWidget {
   final String department;
   final String location;
   final String timeAgo;
-  final String status; // ឧ. 'active', 'draft', 'inactive'
+  final String status;
   final bool isUrgent;
   final int candidatesCount;
+  final List<String> avatars;
   final VoidCallback onTap;
+  final VoidCallback onCandidatesTap;
   final VoidCallback onMoreTap;
 
   const JobCardItem({
@@ -22,7 +24,9 @@ class JobCardItem extends StatelessWidget {
     required this.status,
     this.isUrgent = false,
     required this.candidatesCount,
+    this.avatars = const [],
     required this.onTap,
+    required this.onCandidatesTap,
     required this.onMoreTap,
     this.logoUrl,
   });
@@ -33,19 +37,26 @@ class JobCardItem extends StatelessWidget {
 
     Color badgeColor = Colors.grey.shade100;
     Color badgeTextColor = Colors.grey.shade700;
+    String displayStatus = status
+        .toUpperCase(); // 🟢 បន្ថែមអថេរនេះមួយទៀតសម្រាប់ប្តូរអក្សរ
 
     if (statusLower == 'active') {
-      badgeColor = Colors.green.shade100;
+      badgeColor = Colors.green.shade50;
       badgeTextColor = Colors.green.shade700;
-    } else if (statusLower == 'inactive') {
-      badgeColor = Colors.red.shade100; // ពណ៌ក្រហម/ផ្កាឈូកស្រាល
-      badgeTextColor = Colors.red.shade700;
-    } else if (statusLower == 'draft') {
-      badgeColor = Colors.orange.shade100;
-      badgeTextColor = Colors.orange.shade800;
+      displayStatus = 'ACTIVE';
+    } else if (statusLower == 'inactive' || statusLower == 'paused') {
+      badgeColor = Colors.orange.shade50; // 🟢 ពណ៌ទឹកក្រូច សម្រាប់ Paused
+      badgeTextColor = Colors.orange.shade700;
+      displayStatus =
+          'PAUSED'; // 🟢 បង្ខំឱ្យចេញពាក្យ PAUSED ទោះជា Backend បោះមក inactive ក៏ដោយ
     } else if (statusLower == 'closed') {
-      badgeColor = Colors.grey.shade200;
+      badgeColor = Colors.red.shade50; // 🟢 ពណ៌ក្រហម សម្រាប់ Closed
+      badgeTextColor = Colors.red.shade700;
+      displayStatus = 'CLOSED';
+    } else if (statusLower == 'draft') {
+      badgeColor = Colors.grey.shade100; // 🟢 ពណ៌ប្រផេះ សម្រាប់ Draft
       badgeTextColor = Colors.grey.shade700;
+      displayStatus = 'DRAFT';
     }
 
     return InkWell(
@@ -159,7 +170,7 @@ class JobCardItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    status.toUpperCase(),
+                    displayStatus,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -206,40 +217,48 @@ class JobCardItem extends StatelessWidget {
             ),
 
             // ── 3. ផ្នែកខាងក្រោម (Candidates Avatars & Arrow) ──
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+            // ── 3. ផ្នែកខាងក្រោម (Candidates Avatars & Arrow) ──
+            GestureDetector(
+              onTap: onCandidatesTap,
+              behavior: HitTestBehavior
+                  .opaque, // 🟢 សំខាន់បំផុត៖ បង្ខំឱ្យវាចាប់យកការចុចពេញផ្ទៃទាំងមូល មិនឱ្យធ្លាយទៅ InkWell
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 8,
+                  bottom: 4,
+                ), // 🟢 ជួយឱ្យផ្ទៃចុចធំជាងមុន ងាយស្រួលចុចលើទូរស័ព្ទ
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // 🎯 លក្ខខណ្ឌទី១: បង្ហាញរូប Profile លុះត្រាតែមានបេក្ខជន (candidatesCount > 0)
-                    if (candidatesCount > 0) ...[
-                      _buildOverlappingAvatars(),
-                      const SizedBox(width: 12),
-                    ],
+                    Row(
+                      children: [
+                        if (candidatesCount > 0) ...[
+                          _buildOverlappingAvatars(),
+                          const SizedBox(width: 12),
+                        ],
 
-                    // 🎯 លក្ខខណ្ឌទី២: ប្តូរពណ៌អក្សរតាមចំនួនបេក្ខជន
-                    Text(
-                      candidatesCount == 0
-                          ? "No candidates yet" // ឬអ្នកអាចដាក់ "0 candidates" ដូចដើមក៏បាន
-                          : "$candidatesCount candidates",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: candidatesCount == 0
-                            ? Colors
-                                  .grey
-                                  .shade500 // ពណ៌ប្រផេះពេលគ្មានមនុស្ស
-                            : const Color(0xFF4f7df7), // ពណ៌ខៀវពេលមានមនុស្ស
-                      ),
+                        Text(
+                          candidatesCount == 0
+                              ? "No candidates yet"
+                              : "$candidatesCount candidate${candidatesCount > 1 ? 's' : ''}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: candidatesCount == 0
+                                ? Colors.grey.shade500
+                                : const Color(0xFF4f7df7),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Icon(
+                      LucideIcons.chevronRight,
+                      color: Colors.grey,
+                      size: 18,
                     ),
                   ],
                 ),
-                const Icon(
-                  LucideIcons.chevronRight,
-                  color: Colors.grey,
-                  size: 18,
-                ),
-              ],
+              ),
             ),
           ],
         ),
@@ -248,51 +267,51 @@ class JobCardItem extends StatelessWidget {
   }
 
   // មុខងារសម្រាប់គូររូប Avatar ត្រួតលើគ្នា (B, C, D)
+  // 🟢 មុខងារសម្រាប់គូររូប Avatar ត្រួតលើគ្នា
   Widget _buildOverlappingAvatars() {
-    // ការពារ Error បើសិនជាចំនួន 0 មិនបាច់គូរអ្វីទាំងអស់
     if (candidatesCount == 0) return const SizedBox.shrink();
 
-    // 🎯 លក្ខខណ្ឌទី៣: កំណត់ចំនួនរូបដែលត្រូវបង្ហាញ (អតិបរមាគឺ ៣ រូប)
+    // បង្ហាញអតិបរមាត្រឹម ៣ រូប
     final displayCount = candidatesCount > 3 ? 3 : candidatesCount;
-
-    final colors = [
+    final fallbackColors = [
       const Color(0xFF6366F1),
       const Color(0xFF8B5CF6),
       const Color(0xFF3B82F6),
     ];
-    final letters = [
-      'A',
-      'B',
-      'C',
-    ]; // អាចប្តូរជាអក្សរទី១នៃឈ្មោះបេក្ខជននៅថ្ងៃក្រោយ
 
     return SizedBox(
-      // គណនាប្រវែង Width សរុបដោយស្វ័យប្រវត្តិ អាស្រ័យលើចំនួនរូបភាព (រូបទី១ 26px, រូបបន្ទាប់ថែម 18px)
       width: 26.0 + ((displayCount - 1) * 18.0),
       height: 26,
       child: Stack(
         children: List.generate(displayCount, (index) {
-          return Positioned(
-            left: index * 18.0, // រំកិលទៅស្តាំម្តងបន្តិចៗ (Overlap effect)
+          // ឆែកមើលថាតើមាន URL សម្រាប់ Index នេះឬអត់
+          final hasImage = index < avatars.length && avatars[index].isNotEmpty;
 
+          return Positioned(
+            left: index * 18.0,
             child: Container(
               width: 26,
               height: 26,
               decoration: BoxDecoration(
-                color: colors[index],
+                color: hasImage ? Colors.white : fallbackColors[index],
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
+                image: hasImage
+                    ? DecorationImage(
+                        image: NetworkImage(avatars[index]),
+                        fit: BoxFit.cover,
+                      )
+                    : null, // បើគ្មានរូប វានឹងប្រើពណ៌ខាងលើ
               ),
-              child: Center(
-                child: Text(
-                  letters[index],
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              child: !hasImage
+                  ? const Center(
+                      child: Icon(
+                        LucideIcons.user,
+                        size: 14,
+                        color: Colors.white,
+                      ), // បើគ្មានរូប ប្រើ Icon ជំនួសអក្សរ
+                    )
+                  : null,
             ),
           );
         }),

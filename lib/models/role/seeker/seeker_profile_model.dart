@@ -1,3 +1,5 @@
+import 'package:jobber_city/models/role/seeker/profile_model.dart';
+
 class SeekerProfileResponse {
   final bool success;
   final String message;
@@ -40,6 +42,9 @@ class SeekerProfileModel {
 
   final String provinceId;
   final String districtId;
+
+  final String addressProvinceId;
+  final String addressDistrictId;
   final String commune;
   final String village;
   final String street;
@@ -53,15 +58,17 @@ class SeekerProfileModel {
   final List<String> expertiseCategoryIds;
   final List<String> skills;
 
+  final String resumeFilename;
+  final String resumePublicId;
   final String resumeUrl;
   final String portfolioUrl;
   final String linkedinUrl;
 
   // Array បន្ថែមដែលទាន់មិនមានទិន្នន័យលម្អិត
-  final List<dynamic> experiences;
-  final List<dynamic> educations;
-  final List<dynamic> trainings;
-  final List<dynamic> languages;
+  final List<ExperienceModel> experiences;
+  final List<EducationModel> educations;
+  final List<TrainingModel> trainings;
+  final List<LanguageModel> languages;
 
   SeekerProfileModel({
     required this.id,
@@ -79,6 +86,8 @@ class SeekerProfileModel {
     required this.email,
     required this.phoneNumber,
     required this.provinceId,
+    required this.addressProvinceId,
+    required this.addressDistrictId,
     required this.districtId,
     required this.commune,
     required this.village,
@@ -90,6 +99,8 @@ class SeekerProfileModel {
     required this.jobTypePreferences,
     required this.expertiseCategoryIds,
     required this.skills,
+    required this.resumeFilename,
+    required this.resumePublicId,
     required this.resumeUrl,
     required this.portfolioUrl,
     required this.linkedinUrl,
@@ -117,6 +128,8 @@ class SeekerProfileModel {
       phoneNumber: json['phone_number'] ?? '',
       provinceId: json['province_id'] ?? '',
       districtId: json['district_id'] ?? '',
+      addressProvinceId: json['address_province_id'] ?? '',
+      addressDistrictId: json['address_district_id'] ?? '',
       commune: json['commune'] ?? '',
       village: json['village'] ?? '',
       street: json['street'] ?? '',
@@ -129,13 +142,66 @@ class SeekerProfileModel {
         json['expertise_category_ids'] ?? [],
       ),
       skills: List<String>.from(json['skills'] ?? []),
+      resumeFilename: json['resume_filename'] ?? '',
+      resumePublicId: json['resume_public_id'] ?? '',
       resumeUrl: json['resume_url'] ?? '',
       portfolioUrl: json['portfolio_url'] ?? '',
       linkedinUrl: json['linkedin_url'] ?? '',
-      experiences: json['experiences'] ?? [],
-      educations: json['educations'] ?? [],
-      trainings: json['trainings'] ?? [],
-      languages: json['languages'] ?? [],
+      experiences: json['experiences'] != null
+          ? (json['experiences'] as List)
+                .map((e) => ExperienceModel.fromJson(e))
+                .toList()
+          : [],
+      educations: json['educations'] != null
+          ? (json['educations'] as List)
+                .map((e) => EducationModel.fromJson(e))
+                .toList()
+          : [],
+      trainings: json['trainings'] != null
+          ? (json['trainings'] as List)
+                .map((e) => TrainingModel.fromJson(e))
+                .toList()
+          : [],
+      languages: json['languages'] != null
+          ? (json['languages'] as List)
+                .map((e) => LanguageModel.fromJson(e))
+                .toList()
+          : [],
+    );
+  }
+
+  // 🎯 មុខងារបំប្លែង Profile បច្ចុប្បន្ន ទៅជា UpdateRequest ដោយអាចកែតម្លៃណាមួយក៏បាន
+  SeekerCoreUpdateRequest toUpdateRequest({
+    String? biography,
+    List<String>? skills,
+  }) {
+    return SeekerCoreUpdateRequest(
+      firstName: firstName,
+      lastName: lastName,
+      dateOfBirth: dateOfBirth,
+      gender: gender,
+      maritalStatus: maritalStatus,
+      nationality: nationality,
+      currentPosition: currentPosition,
+      email: email,
+      phoneNumber: phoneNumber,
+      addressProvinceId: addressProvinceId,
+      addressDistrictId: addressDistrictId,
+      commune: commune,
+      village: village,
+      street: street,
+      houseNo: houseNo,
+      expectedSalaryMin: expectedSalaryMin,
+      expectedSalaryMax: expectedSalaryMax,
+      jobTypePreferences: jobTypePreferences,
+      expertiseCategoryIds: expertiseCategoryIds,
+      portfolioUrl: portfolioUrl,
+      linkedinUrl: linkedinUrl,
+      onboardingCompleted: onboardingCompleted,
+
+      // 🎯 ចំណុចសំខាន់៖ បើមានតម្លៃថ្មីបោះមក យកតម្លៃថ្មី បើគ្មានទេ យកតម្លៃដើម (this)
+      biography: biography ?? this.biography,
+      skills: skills ?? this.skills,
     );
   }
 }
@@ -152,8 +218,9 @@ class SeekerCoreUpdateRequest {
   final String email;
   final String phoneNumber;
 
-  final String provinceId;
-  final String districtId;
+  final String addressProvinceId;
+  final String addressDistrictId;
+
   final String commune;
   final String village;
   final String street;
@@ -181,8 +248,8 @@ class SeekerCoreUpdateRequest {
     required this.currentPosition,
     required this.email,
     required this.phoneNumber,
-    required this.provinceId,
-    required this.districtId,
+    required this.addressProvinceId,
+    required this.addressDistrictId,
     required this.commune,
     required this.village,
     required this.street,
@@ -209,8 +276,8 @@ class SeekerCoreUpdateRequest {
       "current_position": currentPosition,
       "email": email,
       "phone_number": phoneNumber,
-      "province_id": provinceId,
-      "district_id": districtId,
+      'address_province_id': addressProvinceId,
+      'address_district_id': addressDistrictId,
       "commune": commune,
       "village": village,
       "street": street,

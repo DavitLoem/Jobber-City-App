@@ -7,27 +7,35 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
+import 'package:jobber_city/screens/notification/notification_view.dart';
+import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/employer_profile/company_detail/company_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_binding.dart';
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_view.dart';
 import 'package:jobber_city/screens/role/employer/my_job_detail/my_job_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/new_job/new_job_view.dart';
-import 'package:jobber_city/screens/role/seeker/educations_screen/educations_screen_view.dart';
-import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_binding.dart';
-import 'package:jobber_city/screens/role/seeker/experience_screen/experience_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/application_detail/application_detail_view.dart';
 import 'package:jobber_city/screens/role/seeker/expertise_screen/category_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/job_detail/job_detail_view.dart';
+import 'package:jobber_city/screens/role/seeker/job_list/job_list_view.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/cv_extraction/cv_extraction_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/cv_review/cv_review_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/sub_profile/biography/biography_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/sub_profile/education/education_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/sub_profile/experience/experience_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/sub_profile/language/language_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/sub_profile/skills/skills_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/sub_profile/training/training_view.dart';
 import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/search_button/search_button_binding.dart';
 import 'package:jobber_city/screens/role/seeker/search_button/search_button_view.dart';
 import 'package:jobber_city/screens/role/seeker/setting_screen/setting_screen_view.dart';
-import 'package:jobber_city/screens/role/seeker/trainings_screen/trainings_screen_view.dart';
 // Import Views & Bindings
 import 'package:jobber_city/screens/splash/splash_view.dart';
 
@@ -75,6 +83,12 @@ class AppPages {
       page: () => ResetPassScreenView(),
       binding: ResetPassScreenViewBinding(),
     ),
+    GetPage(
+      name: AppRoutes.notification,
+      page: () => NotificationView(),
+      binding: NotificationViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
 
     // ==========================================
     // 🔵 ២. SEEKER ROUTES (ត្រូវការ Login ជា Seeker)
@@ -83,6 +97,15 @@ class AppPages {
       name: AppRoutes.mainScreenSeeker,
       page: () => MainScreenView(),
       binding: MainScreenBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.jobList,
+      page: () => JobListView(),
+      binding: JobListViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),
@@ -146,6 +169,87 @@ class AppPages {
       name: AppRoutes.setting,
       page: () => SettingScreenView(),
       binding: SettingScreenViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.cvExtraction,
+      page: () => CvExtractionView(),
+      binding: CvExtractionViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.cvReview,
+      page: () => CvReviewView(),
+      binding: CvReviewViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.experience,
+      page: () => ExperienceView(),
+      binding: ExperienceViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.educations,
+      page: () => EducationView(),
+      binding: EducationViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.trainings,
+      page: () => TrainingView(),
+      binding: TrainingViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.languages,
+      page: () => LanguageView(),
+      binding: LanguageViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.biography,
+      page: () => BiographyView(),
+      binding: BiographyViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.skill,
+      page: () => SkillsView(),
+      binding: SkillsViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.applicationDetail,
+      page: () => ApplicationDetailView(),
+      binding: ApplicationDetailViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),
@@ -237,21 +341,13 @@ class AppPages {
       ],
     ),
     GetPage(
-      name: AppRoutes.experience,
-      page: () => ExperienceScreenView(),
-      binding: ExperienceScreenViewBinding(),
+      name: AppRoutes.candidateDetail,
+      page: () => CandidateDetailView(),
+      binding: CandidateDetailViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
     ),
-    GetPage(
-      name: AppRoutes.educations,
-      page: () => EducationsScreenView(),
-      binding: EducationsScreenViewBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.trainings,
-      page: () => TrainingsScreenView(),
-      binding: TrainingsScreenViewBinding(),
-    ),
-
-    // Employer routes
   ];
 }

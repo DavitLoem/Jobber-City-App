@@ -3,6 +3,14 @@ part of 'my_job_view.dart';
 class MyJobViewController extends GetxController {
   final JobService _jobService = JobService();
 
+  final statusSummary = {
+    'all': 0,
+    'active': 0,
+    'paused': 0,
+    'closed': 0,
+    'draft': 0,
+  }.obs;
+
   // State UI
   final jobs = <JobDataModel>[].obs;
   final isLoading = false.obs;
@@ -20,12 +28,22 @@ class MyJobViewController extends GetxController {
 
   final _debouncer = Debouncer(milliseconds: 500);
 
+  final currentSort = 'newest'.obs;
+
   @override
   void onInit() {
     super.onInit();
+    fetchStatusSummary();
     fetchJobs(isRefresh: true);
 
     scrollController.addListener(_scrollListener);
+  }
+
+  Future<void> fetchStatusSummary() async {
+    final summary = await _jobService.getJobStatusSummary();
+    if (summary.isNotEmpty) {
+      statusSummary.assignAll(summary);
+    }
   }
 
   List<JobDataModel> get displayJobs {
@@ -41,8 +59,11 @@ class MyJobViewController extends GetxController {
           .toList();
     } else if (seletedTab.value == 'Draft') {
       return jobs.where((j) => j.status.toLowerCase() == 'draft').toList();
+    } else if (seletedTab.value == 'Closed') {
+      // 🟢 បន្ថែមលក្ខខណ្ឌ Closed
+      return jobs.where((j) => j.status.toLowerCase() == 'closed').toList();
     }
-    return jobs; // ប្រសិនបើជា All គឺបង្ហាញទាំងអស់
+    return jobs;
   }
 
   Future<void> fetchJobs({bool isRefresh = false}) async {
@@ -52,6 +73,8 @@ class MyJobViewController extends GetxController {
       _hasMoreData = true;
       isLoading.value = true;
       jobs.clear(); // clear old data
+
+      fetchStatusSummary();
     } else {
       if (isLoadingMore.value || !_hasMoreData) return;
       isLoadingMore.value = true;
@@ -61,8 +84,9 @@ class MyJobViewController extends GetxController {
       final response = await _jobService.getJobs(
         page: _currentPage,
         limit: _limit,
-        // status: seletedTab.value,
+        status: seletedTab.value,
         searchKeyword: searchController.text,
+        sortBy: currentSort.value,
       );
 
       if (response.success) {
@@ -197,7 +221,6 @@ class MyJobViewController extends GetxController {
   }
 
   void changeTab(String tabString) {
-    // 🎯 ១. កាត់យកតែពាក្យខាងមុខ (ឧ. ពី "Active (15)" មកត្រឹម "Active")
     String newFilter = 'All';
     if (tabString.startsWith('Active')) {
       newFilter = 'Active';
@@ -205,13 +228,18 @@ class MyJobViewController extends GetxController {
       newFilter = 'Paused';
     } else if (tabString.startsWith('Draft')) {
       newFilter = 'Draft';
+    } else if (tabString.startsWith('Closed')) {
+      newFilter = 'Closed';
     }
 
     // បើចុចចំ Tab ដដែល មិនបាច់ធ្វើអ្វីទេ
     if (seletedTab.value == newFilter) return;
 
-    // 🎯 ២. គ្រាន់តែប្តូរតម្លៃឱ្យ Obx ធ្វើការ Rebuild UI ជាការស្រេច
+    // ១. ប្តូរតម្លៃ Tab ឱ្យ UI ដឹង
     seletedTab.value = newFilter;
+
+    // 🎯 ២. [បន្ថែមថ្មី] ត្រូវហៅ API ទាញយកទិន្នន័យថ្មីរាល់ពេលដូរ Tab!
+    fetchJobs(isRefresh: true);
   }
 
   void onSearchChanged(String query) {
@@ -220,6 +248,12 @@ class MyJobViewController extends GetxController {
       // ពេលគាត់ឈប់វាយកន្លះវិនាទី ទើបវាហៅមុខងារនេះ
       fetchJobs(isRefresh: true);
     });
+  }
+
+  void changeSortOption(String newSort) {
+    if (currentSort.value == newSort) return;
+    currentSort.value = newSort;
+    fetchJobs(isRefresh: true); // ហៅទិន្នន័យសារថ្មី
   }
 
   @override
