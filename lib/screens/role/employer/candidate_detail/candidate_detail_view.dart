@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/models/chat/chat_models.dart';
+import 'package:jobber_city/models/interview/interview_models.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/widgets/cv_viewer_view.dart';
 import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -34,6 +37,19 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.videocam_outlined, color: AppColors.primary),
+            tooltip: 'Schedule video interview with ${applicant.fullName}',
+            onPressed: controller.scheduleVideoInterview,
+          ),
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline_rounded, color: AppColors.primary),
+            tooltip: 'Message ${applicant.fullName}',
+            onPressed: controller.openChat,
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

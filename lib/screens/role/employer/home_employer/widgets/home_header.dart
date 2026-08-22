@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:jobber_city/routes/app_routes.dart';
+
 import '../home_employer_view.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -104,6 +106,18 @@ class HomeHeader extends StatelessWidget {
                     icon: LucideIcons.search,
                     iconColor: const Color(0xFF697386),
                     onTap: () {},
+                  ),
+                  const SizedBox(width: 10),
+                  _RoundIconButton(
+                    icon: Icons.chat_bubble_outline_rounded,
+                    iconColor: const Color(0xFF1A1F36),
+                    onTap: () => Get.toNamed(AppRoutes.chatList),
+                  ),
+                  const SizedBox(width: 10),
+                  _RoundIconButton(
+                    icon: Icons.videocam_outlined,
+                    iconColor: const Color(0xFF1A1F36),
+                    onTap: () => Get.toNamed(AppRoutes.interviewList),
                   ),
                   const SizedBox(width: 10),
                   _RoundIconButton(

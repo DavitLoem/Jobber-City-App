@@ -22,6 +22,7 @@ import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/cv_extraction/cv_extraction_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/cv_generator/cv_generator_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/cv_review/cv_review_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
@@ -35,6 +36,17 @@ import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_
 import 'package:jobber_city/screens/role/seeker/search_button/search_button_binding.dart';
 import 'package:jobber_city/screens/role/seeker/search_button/search_button_view.dart';
 import 'package:jobber_city/screens/role/seeker/setting_screen/setting_screen_view.dart';
+import 'package:jobber_city/screens/shared/chat/chat_list/chat_list_binding.dart';
+import 'package:jobber_city/screens/shared/chat/chat_list/chat_list_view.dart';
+import 'package:jobber_city/screens/shared/chat/chat_thread/chat_thread_binding.dart';
+import 'package:jobber_city/screens/shared/chat/chat_thread/chat_thread_view.dart';
+import 'package:jobber_city/screens/shared/chat/seeker_directory/seeker_directory_binding.dart';
+import 'package:jobber_city/screens/shared/chat/seeker_directory/seeker_directory_view.dart';
+import 'package:jobber_city/screens/shared/interview/interview_detail/interview_detail_binding.dart';
+import 'package:jobber_city/screens/shared/interview/interview_detail/interview_detail_view.dart';
+import 'package:jobber_city/screens/shared/interview/interview_list/interview_list_binding.dart';
+import 'package:jobber_city/screens/shared/interview/interview_list/interview_list_view.dart';
+import 'package:jobber_city/screens/role/employer/schedule_interview/schedule_interview_view.dart';
 // Import Views & Bindings
 import 'package:jobber_city/screens/splash/splash_view.dart';
 
@@ -248,6 +260,15 @@ class AppPages {
         RoleMiddleware(requiredRole: AppRoles.seeker),
       ],
     ),
+    GetPage(
+      name: AppRoutes.cvGenerator,
+      page: () => const CvGeneratorView(),
+      binding: CvGeneratorViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
 
     // ==========================================
     // 🟠 ៣. EMPLOYER ROUTES
@@ -337,6 +358,59 @@ class AppPages {
       name: AppRoutes.candidateDetail,
       page: () => CandidateDetailView(),
       binding: CandidateDetailViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+
+    // ==========================================
+    // 💬 ៤. CHAT ROUTES (Shared — no RoleMiddleware, both seeker & employer use these)
+    // ==========================================
+    GetPage(
+      name: AppRoutes.chatList,
+      page: () => const ChatListView(),
+      binding: ChatListViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.chatThread,
+      page: () => const ChatThreadView(),
+      binding: ChatThreadViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.seekerDirectory,
+      page: () => const SeekerDirectoryView(),
+      binding: SeekerDirectoryBinding(),
+      // Employer-only: backed by GET /api/employer/jobs/seekers, which
+      // requires the employer role on the backend too.
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+
+    // ==========================================
+    // 🎥 ៥. ONLINE INTERVIEW ROUTES
+    // ==========================================
+    GetPage(
+      name: AppRoutes.interviewList,
+      page: () => const InterviewListView(),
+      binding: InterviewListViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.interviewDetail,
+      page: () => const InterviewDetailView(),
+      binding: InterviewDetailViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.scheduleInterview,
+      page: () => const ScheduleInterviewView(),
+      binding: ScheduleInterviewViewBinding(),
+      // Employer-only: backed by POST /api/interviews/, employer-gated on the backend too.
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.employer),

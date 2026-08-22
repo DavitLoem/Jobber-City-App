@@ -63,6 +63,20 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                 ),
                 const SizedBox(height: 12),
 
+                // 🎯 1b. Generate CV — builds a new PDF resume FROM the
+                // profile data below (experience, education, skills, etc.),
+                // the opposite direction of "Edit Resume" above (which reads
+                // an uploaded PDF INTO the profile).
+                ProfileSectionItem(
+                  icon: Icons.picture_as_pdf_outlined,
+                  title: "Generate CV",
+                  subtitle: "Create a polished PDF from your profile",
+                  onTap: () {
+                    Get.toNamed(AppRoutes.cvGenerator);
+                  },
+                ),
+                const SizedBox(height: 12),
+
                 // 🎯 2. Work Experience
                 ProfileSectionItem(
                   icon: Icons.work_outline,

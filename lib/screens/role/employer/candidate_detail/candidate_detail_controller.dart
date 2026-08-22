@@ -63,6 +63,38 @@ class CandidateDetailViewController extends GetxController {
     }
   }
 
+  // 🎯 បើកទំព័រជជែក (Chat) ជាមួយបេក្ខជននេះ — ប្រើ ChatThreadArgs.otherUserId ព្រោះ
+  // យើងមិនទាន់ដឹង conversation_id ទេ (ប្រហែលជាមិនទាន់មាន Conversation រវាងអ្នកទាំងពីរ
+  // ផងសោះ) — ChatThreadViewController នឹងហៅ startConversation() ដោយខ្លួនឯងម្តង
+  // ដំបូងបើកទំព័រ (get-or-create pattern, មិនបង្កើត Duplicate ទេ)។
+  void openChat() {
+    Get.toNamed(
+      AppRoutes.chatThread,
+      arguments: ChatThreadArgs(
+        otherUserId: applicant.seekerUserId,
+        otherPartyName: applicant.fullName,
+        otherPartyAvatarUrl: applicant.profileImageUrl,
+        otherPartyRole: 'seeker',
+      ),
+    );
+  }
+
+  // 🎯 បើកទំព័រណាត់សម្ភាសន៍តាម Video Call ជាមួយបេក្ខជននេះ — ខុសពី "Interview" Status
+  // ខាងលើ (ដែលគ្រាន់តែជា Label + កំណត់ត្រា Text) ត្រង់ថានេះបង្កើត Room Video Call
+  // ពិតប្រាកដតាម Backend (Jitsi Meet) ដែលភាគីទាំងពីរអាចចូលរួមបាន។
+  void scheduleVideoInterview() {
+    Get.toNamed(
+      AppRoutes.scheduleInterview,
+      arguments: ScheduleInterviewArgs(
+        seekerUserId: applicant.seekerUserId,
+        seekerName: applicant.fullName,
+        seekerAvatarUrl: applicant.profileImageUrl,
+        applicationId: applicant.applicationId,
+        jobTitle: applicant.jobTitle,
+      ),
+    );
+  }
+
   // 🎯 អនុគមន៍សម្រាប់ទាញយកឈ្មោះ CV ចេញពី URL
   String getCvFileName(String? url) {
     if (url == null || url.isEmpty) return "No CV Attached";

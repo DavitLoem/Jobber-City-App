@@ -20,6 +20,9 @@ class JobFeedModel {
   // ព័ត៌មានក្រុមហ៊ុន & Master Data
   final String companyName;
   final String? logoUrl; // អាច Null បាន
+  /// Employer's raw `users` collection `_id` (NOT company_id) — needed to
+  /// call `POST /api/chat/conversations` when the seeker taps "Message".
+  final String? employerUserId;
   final String location;
   final String employmentType;
   final String workType;
@@ -47,6 +50,7 @@ class JobFeedModel {
     this.closingDate,
     required this.companyName,
     this.logoUrl,
+    this.employerUserId,
     required this.location,
     required this.employmentType,
     required this.workType,
@@ -85,6 +89,7 @@ class JobFeedModel {
 
       companyName: json['company_name'] ?? 'Unknown Company',
       logoUrl: json['logo_url'],
+      employerUserId: json['employer_user_id'],
       location: json['location'] ?? '',
       employmentType: json['employment_type'] ?? '',
       workType: json['work_type'] ?? '',

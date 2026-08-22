@@ -5,7 +5,10 @@ class JobDetailController extends GetxController {
   final job = Rxn<JobFeedModel>();
   final ApplicationService _appService = ApplicationService();
   final ApiClient _apiClient = ApiClient();
+  final ChatService _chatService = ChatService();
   final BookmarkController bookmarkCtrl = Get.put(BookmarkController());
+
+  final isStartingChat = false.obs;
 
   // ស្ថានភាព UI
   var isDescriptionExpanded = false.obs;
@@ -46,6 +49,51 @@ class JobDetailController extends GetxController {
       debugPrint("Error fetching profile for CV check: $e");
     } finally {
       isLoadingProfile.value = false;
+    }
+  }
+
+  /// Lets the seeker message the employer directly from a job posting —
+  /// mirrors the "Message" flow employers already have on candidate detail,
+  /// so a seeker isn't stuck waiting for the employer to reach out first
+  /// (e.g. to ask a question or send their CV before formally applying).
+  Future<void> messageEmployer() async {
+    final currentJob = job.value;
+    if (currentJob == null || isStartingChat.value) return;
+
+    if (currentJob.employerUserId == null || currentJob.employerUserId!.isEmpty) {
+      Get.snackbar(
+        'Unavailable',
+        'This employer cannot be messaged right now.',
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    isStartingChat.value = true;
+    try {
+      final convo = await _chatService.startConversation(
+        otherUserId: currentJob.employerUserId!,
+        jobId: currentJob.id,
+      );
+      await Get.toNamed(
+        AppRoutes.chatThread,
+        arguments: ChatThreadArgs(
+          conversationId: convo.id,
+          otherPartyName: currentJob.companyName,
+          otherPartyAvatarUrl: currentJob.logoUrl,
+          otherPartyRole: 'employer',
+          jobId: currentJob.id,
+        ),
+      );
+    } catch (e) {
+      debugPrint('[JobDetail] messageEmployer error: $e');
+      Get.snackbar(
+        'Could not start chat',
+        'Please try again.',
+        snackPosition: SnackPosition.TOP,
+      );
+    } finally {
+      isStartingChat.value = false;
     }
   }
 

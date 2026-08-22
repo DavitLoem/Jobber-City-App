@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/controllers/bookmark_controller.dart';
 import 'package:jobber_city/core/api/network/api_client.dart';
+import 'package:jobber_city/core/api/services/chat/chat_service.dart';
 import 'package:jobber_city/core/api/services/role/seeker/application_service.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/models/chat/chat_models.dart';
 import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/seeker/application/application_view.dart';
 
 import 'widgets/bottom_apply_bar.dart';

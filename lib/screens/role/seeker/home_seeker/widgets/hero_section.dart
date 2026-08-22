@@ -4,6 +4,8 @@ import 'package:jobber_city/controllers/auth_controller.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
+import 'package:jobber_city/routes/app_routes.dart';
+
 import '../home_seeker_view.dart'; // សម្រាប់ទាញយក Controller
 import 'avatar_tap_scale.dart';
 import 'shimmer_box.dart';
@@ -143,6 +145,40 @@ class HeroSection extends GetView<HomeSeekerViewController> {
               ],
             );
           }),
+        ),
+        GestureDetector(
+          onTap: () => Get.toNamed(AppRoutes.chatList),
+          child: Container(
+            width: 42,
+            height: 42,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: const Icon(
+              Icons.chat_bubble_outline_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Get.toNamed(AppRoutes.interviewList),
+          child: Container(
+            width: 42,
+            height: 42,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: const Icon(
+              Icons.videocam_outlined,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
         ),
         GestureDetector(
           onTap: () => Get.find<AuthController>().logout(),

@@ -103,6 +103,35 @@ class CompanyInfoCard extends GetView<JobDetailController> {
               );
             }),
           ),
+          // Message employer
+          Obx(() {
+            final hasEmployer = (controller.job.value?.employerUserId ?? '').isNotEmpty;
+            if (!hasEmployer) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: controller.isStartingChat.value ? null : controller.messageEmployer,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.lightSurfaceVariant,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: controller.isStartingChat.value
+                      ? const Padding(
+                          padding: EdgeInsets.all(9),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                        )
+                      : const Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                ),
+              ),
+            );
+          }),
           // Bookmark
           Obx(
             () => GestureDetector(

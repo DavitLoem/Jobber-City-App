@@ -33,6 +33,21 @@ class AppRoutes {
   static const String biography = '/biography';
   static const String skill = '/skill';
   static const String applicationDetail = '/application-detail';
+  static const String cvGenerator = '/cv-generator';
+
+  // ==========================================
+  // 💬 ៤. CHAT ROUTES (Shared — Seeker & Employer both use these)
+  // ==========================================
+  static const String chatList = '/chat';
+  static const String chatThread = '/chat-thread';
+  static const String seekerDirectory = '/chat-new';
+
+  // ==========================================
+  // 🎥 ៥. ONLINE INTERVIEW ROUTES (Shared — Seeker & Employer both use these)
+  // ==========================================
+  static const String interviewList = '/interviews';
+  static const String interviewDetail = '/interview-detail';
+  static const String scheduleInterview = '/schedule-interview';
 
   // ==========================================
   // 🟠 ៣. EMPLOYER ROUTES
