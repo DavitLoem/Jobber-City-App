@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
-      // home: NotificationTestView(),
+      // home: ConversationListPreview(),
     );
   }
 }

@@ -39,6 +39,36 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          Obx(() {
+            // លាក់ប៊ូតុងបើមិនទាន់ទាញទិន្នន័យបាន
+            if (controller.isLoadingData.value ||
+                controller.applicant.value == null) {
+              return const SizedBox.shrink();
+            }
+            return IconButton(
+              icon: const Icon(
+                LucideIcons.messageSquare,
+                color: Color(0xFF4F7DF7),
+              ),
+              onPressed: () {
+                // ហៅអនុគមន៍ពី Controller ដើម្បីចាប់ផ្តើម Chat
+                // ឧទាហរណ៍: controller.startChatWithSeeker();
+
+                final applicantName =
+                    controller.applicant.value?.fullName ?? "Candidate";
+                Get.snackbar(
+                  "Start Chat",
+                  "ត្រៀមបើក Chat ជាមួយ $applicantName",
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.black87,
+                  colorText: Colors.white,
+                );
+              },
+            );
+          }),
+          const SizedBox(width: 8), // ទុកចន្លោះបន្តិចពីគែមអេក្រង់
+        ],
       ),
       // 🟢 រុំ Body ជាមួយ Obx ដើម្បីរង់ចាំការទាញយកទិន្នន័យ
       body: Obx(() {

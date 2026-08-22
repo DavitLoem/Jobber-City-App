@@ -1,4 +1,3 @@
-import 'package:cuberto_bottom_bar/cuberto_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/routes/app_routes.dart';
@@ -20,42 +19,47 @@ class MainScreenView extends GetView<MainScreenController> {
             _buildNavigator(1, AppRoutes.homeSeeker),
             _buildNavigator(2, AppRoutes.saveJob),
             _buildNavigator(3, '/applied'),
-            _buildNavigator(4, '/profile'),
+            _buildNavigator(4, AppRoutes.conversationList),
+            _buildNavigator(5, '/profile'),
           ],
         ),
       ),
 
       bottomNavigationBar: Obx(
-        () => CubertoBottomBar(
-          key: const Key("BottomBar"),
-          inactiveIconColor: Colors.grey.shade400,
-          tabStyle: CubertoTabStyle.styleFadedBackground,
-          selectedTab: controller.currentIndex.value,
-          tabs: [
-            TabData(
-              iconData: Icons.home_rounded,
-              title: "Home",
-              tabColor: Colors.blue,
+        () => NavigationBar(
+          selectedIndex: controller.currentIndex.value,
+          onDestinationSelected: controller.changeTab,
+          backgroundColor: Colors.white,
+          indicatorColor: Colors.blue.withValues(
+            alpha: 0.2,
+          ), // ពណ៌ Background ពេលចុច
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home_rounded, color: Colors.blue),
+              label: "Home",
             ),
-            TabData(
-              iconData: Icons.bookmark_rounded,
-              title: "Saved",
-              tabColor: Colors.blue,
+            NavigationDestination(
+              icon: Icon(Icons.bookmark_outline),
+              selectedIcon: Icon(Icons.bookmark_rounded, color: Colors.blue),
+              label: "Saved",
             ),
-            TabData(
-              iconData: Icons.description_rounded,
-              title: "Applications",
-              tabColor: Colors.blue,
+            NavigationDestination(
+              icon: Icon(Icons.description_outlined),
+              selectedIcon: Icon(Icons.description_rounded, color: Colors.blue),
+              label: "Applications",
             ),
-            TabData(
-              iconData: Icons.person_rounded,
-              title: "Profile",
-              tabColor: Colors.blue,
+            NavigationDestination(
+              icon: Icon(Icons.chat_bubble_outline),
+              selectedIcon: Icon(Icons.chat_bubble_rounded, color: Colors.blue),
+              label: "Chats",
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person_rounded, color: Colors.blue),
+              label: "Profile",
             ),
           ],
-          onTabChangedListener: (position, title, color) {
-            controller.changeTab(position);
-          },
         ),
       ),
     );

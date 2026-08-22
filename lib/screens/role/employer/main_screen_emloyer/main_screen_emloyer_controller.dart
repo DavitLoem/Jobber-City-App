@@ -6,8 +6,10 @@ import 'package:jobber_city/screens/role/employer/employer_profile/employer_prof
 import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
 import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 
+import '../../../shared/chat/conversation_list/conversation_list_view.dart';
+
 class MainScreenEmloyerController extends GetxController {
-var currentIndex = 0.obs;
+  var currentIndex = 0.obs;
 
   void changeTab(int index) {
     currentIndex.value = index;
@@ -21,14 +23,17 @@ var currentIndex = 0.obs;
           page: () => const HomeEmployerView(),
         );
       case AppRoutes.myJob:
-        return GetPageRoute(
-          settings: settings,
-          page: () => const MyJobView(),
-        );
+        return GetPageRoute(settings: settings, page: () => const MyJobView());
       case AppRoutes.candidates:
         return GetPageRoute(
           settings: settings,
           page: () => const CandidatesView(),
+        );
+
+      case AppRoutes.conversationList:
+        return GetPageRoute(
+          settings: settings,
+          page: () => const ConversationListView(),
         );
       case AppRoutes.employerProfile:
         return GetPageRoute(

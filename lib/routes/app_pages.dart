@@ -7,7 +7,8 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
-import 'package:jobber_city/screens/notification/notification_view.dart';
+import 'package:jobber_city/screens/shared/chat/conversation_list/conversation_list_view.dart';
+import 'package:jobber_city/screens/shared/notification/notification_view.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/employer_profile/company_detail/company_detail_view.dart';
@@ -42,6 +43,7 @@ import 'package:jobber_city/screens/splash/splash_view.dart';
 import '../screens/role/employer/employer_profile/change_password/change_password_view.dart';
 import '../screens/role/employer/employer_profile/edit_profile_employer/edit_profile_employer_view.dart';
 import '../screens/role/employer/employer_profile/notification_employer/notification_employer_view.dart';
+import '../screens/shared/chat/chat_room/chat_room_view.dart';
 
 class AppRoles {
   static const String seeker = 'seeker';
@@ -87,6 +89,18 @@ class AppPages {
       name: AppRoutes.notification,
       page: () => NotificationView(),
       binding: NotificationViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+        GetPage(
+      name: AppRoutes.conversationList,
+      page: () => ConversationListView(),
+      binding: ConversationListViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+            GetPage(
+      name: AppRoutes.chatRoom,
+      page: () => ChatRoomView(),
+      binding: ChatRoomViewBinding(),
       middlewares: [AuthMiddleware()],
     ),
 

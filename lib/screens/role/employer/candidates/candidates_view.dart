@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/api/services/chat/chat_rest_service.dart';
 import 'package:jobber_city/core/api/services/role/employer/applicant_employer_service.dart';
 import 'package:jobber_city/core/utils/debouncer.dart';
+import 'package:jobber_city/models/chat_model.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/models/role/employer/applicant_status_summary_model.dart';
 import 'package:jobber_city/models/role/employer/job_dropdown_item_model.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'widgets/bulk_action_bottom_sheet.dart';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/widgets/cv_viewer_view.dart';
+import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../routes/app_routes.dart';
@@ -255,9 +256,16 @@ class CandidateCard extends StatelessWidget {
                             );
                           }
                         : null,
-                    icon: const Icon(LucideIcons.fileText, size: 18),
-                    label: const Text("View CV"),
+                    icon: const Icon(
+                      LucideIcons.fileText,
+                      size: 16,
+                    ), // បង្រួម Icon បន្តិច
+                    label: const Text(
+                      "View CV",
+                      style: TextStyle(fontSize: 13),
+                    ), // បង្រួមអក្សរបន្តិច
                     style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       foregroundColor: const Color(0xFF4f7df7),
                       side: BorderSide(
                         color: applicant.resumeUrl != null
@@ -270,23 +278,17 @@ class CandidateCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8), // បង្រួញចន្លោះពី 12 មក 8
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Get.to(
-                      //   () => const CandidateDetailView(),
-                      //   binding: BindingsBuilder(() {
-                      //     Get.put(CandidateDetailViewController());
-                      //   }),
-                      //   arguments: applicant,
-                      // );
                       Get.toNamed(
                         AppRoutes.candidateDetail,
                         arguments: applicant.applicationId,
                       );
                     },
                     style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       backgroundColor: const Color(0xFF4f7df7),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -298,7 +300,35 @@ class CandidateCard extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 13, // បង្រួមអក្សរបន្តិច
                       ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8), // បន្ថែមចន្លោះ
+                // 🎯 ទីតាំងប៊ូតុង Chat ថ្មី
+                InkWell(
+                  onTap: () {
+                    // ទាញយក Controller មកប្រើ
+                    final controller = Get.find<CandidatesViewController>();
+                    // ហៅអនុគមន៍ដោយបោះ Object applicant ទាំងមូលទៅឱ្យ
+                    controller.startChatWithSeeker(applicant);
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    width: 44, // ទទឹងរាងការ៉េ
+                    height: 44, // កម្ពស់ស្មើនឹងប៊ូតុងខាងលើ
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4f7df7).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xFF4f7df7).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: const Icon(
+                      LucideIcons.messageSquare, // រូបភាពសារ
+                      color: Color(0xFF4f7df7),
+                      size: 20,
                     ),
                   ),
                 ),

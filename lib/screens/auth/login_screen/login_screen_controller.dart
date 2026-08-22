@@ -54,6 +54,8 @@ class LoginScreenViewController extends GetxController {
         isProfileCompleted: response.user.isProfileCompleted,
       );
 
+      await TokenStorage.saveUserId(response.user.id);
+
       await Get.find<AuthController>().checkLoginStatus();
 
       Get.snackbar("Success", "Login Successfully");

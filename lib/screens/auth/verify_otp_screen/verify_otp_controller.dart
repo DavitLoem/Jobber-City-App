@@ -102,6 +102,8 @@ class VerifyOtpController extends GetxController {
           isProfileCompleted: response.user.isProfileCompleted,
         );
 
+        await TokenStorage.saveUserId(response.user.id);
+
         await Get.find<AuthController>().checkLoginStatus();
 
         Get.snackbar('Success', 'Your account has been verified successfully!');

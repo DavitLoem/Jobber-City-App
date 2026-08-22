@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../models/notification_model.dart';
+import '../../../../models/notification_model.dart';
 
 class NotificationCard extends StatefulWidget {
   final NotificationItemModel notification;

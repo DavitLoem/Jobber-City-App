@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/routes/app_routes.dart';
-import 'package:jobber_city/screens/notification/widgets/notification_card.dart';
+import 'package:jobber_city/screens/shared/notification/widgets/notification_card.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../controllers/notification_controller.dart';
-import '../../core/api/services/notification_api_service.dart';
-import '../../models/notification_model.dart';
+import '../../../controllers/notification_controller.dart';
+import '../../../core/api/services/notification_api_service.dart';
+import '../../../models/notification_model.dart';
 
 part 'notification_binding.dart';
 part 'notification_controller.dart';

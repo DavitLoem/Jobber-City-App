@@ -3,6 +3,7 @@ part of 'candidates_view.dart';
 class CandidatesViewController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final ApplicantEmployerService applicantService = ApplicantEmployerService();
+  final ChatRestService _chatRestService = Get.find<ChatRestService>();
 
   var isLoading = false.obs;
   var isJobsLoading = false.obs;
@@ -65,6 +66,58 @@ class CandidatesViewController extends GetxController
     fetchPostedJobs();
     fetchApplicants(isRefresh: true); // 🟢 ចាប់ផ្តើមដោយ Refresh
     fetchStatusSummary();
+  }
+
+  Future<void> startChatWithSeeker(ApplicantModel applicant) async {
+    // ត្រួតពិនិត្យថាមាន User ID ឬអត់
+    if (applicant.seekerUserId.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Cannot start chat. User ID is missing.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // បង្ហាញសញ្ញា Loading
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+
+    try {
+      // 🎯 ១. កែតម្រូវការហៅ API ឱ្យត្រូវនឹង ChatRestService ថ្មី
+      // ប្រើ Parameter: otherUserId និងចាប់យក selectedJobId ពិតប្រាកដ
+      final conversation = await _chatRestService.startConversation(
+        otherUserId: applicant.seekerUserId,
+        jobId: (selectedJobId.value.isNotEmpty && selectedJobId.value != 'all')
+            ? selectedJobId.value
+            : null,
+      );
+
+      // បិទ Loading វិញ
+      Get.back();
+
+      // 🎯 ២. ប្រើប្រាស់ ChatThreadArgs ដែលមានសុវត្ថិភាពខ្ពស់ ជំនួសការប្រើ Map
+      Get.toNamed(
+        AppRoutes
+            .chatRoom, // (ចំណាំ: សូមប្រាកដថា Route នេះត្រូវគ្នានឹង AppRoutes របស់អ្នក)
+        arguments: ChatThreadArgs(
+          conversationId: conversation.id,
+          otherPartyName: applicant.fullName,
+          otherPartyAvatarUrl: applicant.profileImageUrl,
+          otherPartyRole: 'seeker', // Employer កំពុងឆាតទៅ Seeker
+          jobId:
+              (selectedJobId.value.isNotEmpty && selectedJobId.value != 'all')
+              ? selectedJobId.value
+              : null,
+        ),
+      );
+    } catch (e) {
+      Get.back();
+      Get.snackbar("Error", "Something went wrong.");
+      debugPrint("Error starting chat: $e");
+    }
   }
 
   Future<void> fetchPostedJobs() async {

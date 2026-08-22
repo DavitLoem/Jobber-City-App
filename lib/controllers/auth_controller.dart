@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/api/services/chat/chat_ws_service.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
 
 import '../routes/app_routes.dart';
@@ -32,6 +33,7 @@ class AuthController extends GetxController {
       userRole.value = role ?? 'seeker';
       isOnboardingCompleted.value = onboarding;
       isProfileCompleted.value = profileCompleted;
+      Get.find<ChatWsService>().connect(token);
       debugPrint("✅ Status: Login as ${userRole.value}");
     } else {
       isLoggedIn.value = false;
@@ -46,6 +48,7 @@ class AuthController extends GetxController {
     try {
       isGoogleLoading.value = true;
       var response = await _authService.loginWithGoogle(role);
+      var token = response.accessToken;
 
       await TokenStorage.saveTokens(
         accessToken: response.accessToken,
@@ -54,6 +57,10 @@ class AuthController extends GetxController {
         isProfileCompleted: response.user.isProfileCompleted,
         onboardingCompleted: response.user.onboardingCompleted,
       );
+
+      await TokenStorage.saveUserId(response.user.id);
+
+      Get.find<ChatWsService>().connect(token);
 
       isLoggedIn.value = true;
       userRole.value = response.user.role;
@@ -246,6 +253,13 @@ class AuthController extends GetxController {
 
   void _clearStateAndLogout(String message, String title) async {
     await TokenStorage.clearTokens();
+
+    // 🎯 បន្ថែមបន្ទាត់នេះ៖ បិទ WebSocket ចាស់ចោលរាល់ពេល Logout
+    try {
+      Get.find<ChatWsService>().disconnect();
+    } catch (e) {
+      debugPrint("WebSocket disconnect error: $e");
+    }
 
     isLoggedIn.value = false;
     userRole.value = '';

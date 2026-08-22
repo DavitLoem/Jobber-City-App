@@ -9,6 +9,7 @@ class TokenStorage {
   static const String _keyUserRole = 'user_role';
   static const String _profileCompletedKey = 'profile_completed_status';
   static const String _onboardingKey = 'onboarding_status';
+  static const _keyUserId = 'user_id';
 
   static Future<void> saveTokens({
     required String accessToken,
@@ -62,5 +63,19 @@ class TokenStorage {
     await _storage.delete(key: _keyUserRole);
     await _storage.delete(key: _profileCompletedKey);
     await _storage.delete(key: _onboardingKey);
+  }
+
+  static Future<void> saveUserId(String id) async {
+    await _storage.write(key: _keyUserId, value: id);
+  }
+
+  // 🎯 មុខងារទាញយក User ID មកប្រើ
+  static Future<String?> getUserId() async {
+    return await _storage.read(key: _keyUserId);
+  }
+
+  // 🎯 គួរលុបចោលវិញពេល Logout
+  static Future<void> deleteUserId() async {
+    await _storage.delete(key: _keyUserId);
   }
 }

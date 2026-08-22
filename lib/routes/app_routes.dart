@@ -9,6 +9,8 @@ class AppRoutes {
   static const String verifyOtp = '/verify-otp';
   static const String resetPassword = '/reset-password';
   static const String notification = '/notification';
+  static const String conversationList = '/conversation-list';
+  static const String chatRoom = '/chat-room';
 
   // ==========================================
   // 🔵 ២. SEEKER ROUTES (សម្រាប់អ្នកស្វែងរកការងារ)

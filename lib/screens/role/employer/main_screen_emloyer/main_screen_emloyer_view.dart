@@ -25,6 +25,11 @@ class MainScreenEmloyerView extends GetView<MainScreenEmloyerController> {
       label: 'Candidates',
     ),
     _NavItem(
+      icon: LucideIcons.messageSquare,
+      activeIcon: LucideIcons.messageSquare,
+      label: 'Chats',
+    ),
+    _NavItem(
       icon: LucideIcons.user,
       activeIcon: LucideIcons.user,
       label: 'Profile',
@@ -43,7 +48,8 @@ class MainScreenEmloyerView extends GetView<MainScreenEmloyerController> {
             _buildNavigator(1, AppRoutes.homeEmployer),
             _buildNavigator(2, AppRoutes.myJob),
             _buildNavigator(3, AppRoutes.candidates),
-            _buildNavigator(4, AppRoutes.employerProfile),
+            _buildNavigator(4, AppRoutes.conversationList),
+            _buildNavigator(5, AppRoutes.employerProfile),
           ],
         ),
       ),
