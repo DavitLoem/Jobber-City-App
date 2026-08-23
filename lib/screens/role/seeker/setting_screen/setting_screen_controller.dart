@@ -2,6 +2,7 @@ part of 'setting_screen_view.dart';
 
 class SettingScreenViewController extends GetxController {
   final _seekerServices = AuthServices();
+  final themeController = Get.find<ThemeController>();
 
   var isLoading = true.obs;
   var completionPercentage = 0.obs;
@@ -64,5 +65,16 @@ class SettingScreenViewController extends GetxController {
     } else {
       Get.snackbar("Error", "Cannot perform logout at this moment.");
     }
+  }
+
+  void changeTheme(ThemeMode mode) {
+    themeController.changeTheme(mode);
+  }
+
+  Future<void> changeLanguage(String languageCode, String countryCode) async {
+    Get.updateLocale(Locale(languageCode, countryCode));
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'app_lang', value: languageCode);
+    await storage.write(key: 'app_country', value: countryCode);
   }
 }

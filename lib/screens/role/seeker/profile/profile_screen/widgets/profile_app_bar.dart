@@ -8,15 +8,18 @@ class ProfileAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'Profile',
+        Text(
+          'Profile'.tr,
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color,
           ),
         ),
         GestureDetector(
@@ -26,14 +29,16 @@ class ProfileAppBar extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.cardBorder),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+              ),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.settings_outlined,
               size: 22,
-              color: Colors.black87,
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
         ),

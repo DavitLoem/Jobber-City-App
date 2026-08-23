@@ -53,6 +53,11 @@ android {
         release {
             // ៣. ប្តូរមកប្រើ "release" ដែលយើងទើបបង្កើតខាងលើវិញ
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
             isMinifyEnabled = false
             isShrinkResources = false
         }

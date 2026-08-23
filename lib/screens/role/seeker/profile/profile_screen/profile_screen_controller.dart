@@ -4,6 +4,8 @@ class ProfileScreenViewController extends GetxController {
   final _seekerServices = AuthServices();
   final _profileServices = SeekerProfileServices();
 
+  ThemeController get themeController => Get.find<ThemeController>();
+
   var isLoading = true.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
@@ -111,5 +113,16 @@ class ProfileScreenViewController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void changeTheme(ThemeMode mode) {
+    themeController.changeTheme(mode);
+  }
+
+  Future<void> changeLanguage(String languageCode, String countryCode) async {
+    Get.updateLocale(Locale(languageCode, countryCode));
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'app_lang', value: languageCode);
+    await storage.write(key: 'app_country', value: countryCode);
   }
 }

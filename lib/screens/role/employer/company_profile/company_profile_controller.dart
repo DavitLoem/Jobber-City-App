@@ -5,6 +5,8 @@ class CompanyProfileViewController extends GetxController {
   final LocationController locationCtrl = Get.find<LocationController>();
   final MasterDataController masterDataCtrl = Get.find<MasterDataController>();
 
+  ThemeController get themeController => Get.find<ThemeController>();
+
   final isLoading = false.obs;
   final isFetching = true.obs;
 
@@ -194,5 +196,16 @@ class CompanyProfileViewController extends GetxController {
     districtCtrl.dispose();
     companySizeCtrl.dispose();
     super.onClose();
+  }
+
+  void changeTheme(ThemeMode mode) {
+    themeController.changeTheme(mode);
+  }
+
+  Future<void> changeLanguage(String languageCode, String countryCode) async {
+    Get.updateLocale(Locale(languageCode, countryCode));
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'app_lang', value: languageCode);
+    await storage.write(key: 'app_country', value: countryCode);
   }
 }

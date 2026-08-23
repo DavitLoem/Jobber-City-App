@@ -7,6 +7,8 @@ class EmployerProfileViewController extends GetxController {
   final masterDataCtrl = Get.find<MasterDataController>();
   final locationCtrl = Get.find<LocationController>();
 
+  ThemeController get themeController => Get.find<ThemeController>();
+
   final isLoading = true.obs;
   final isFetching = false.obs; // សម្រាប់ Initial Data
   final companyProfile = Rxn<CompanyProfileModel>();
@@ -55,7 +57,8 @@ class EmployerProfileViewController extends GetxController {
         errorMessage.value = response.message;
       }
     } catch (e) {
-      errorMessage.value = 'Failed to load profile. Please try again.';
+      errorMessage.value =
+          'Failed to load profile. Please try again.'.tr; // 🟢 Added .tr
       debugPrint('Error fetching profile: $e');
     }
   }
@@ -64,21 +67,31 @@ class EmployerProfileViewController extends GetxController {
   // ── មុខងារទាញយកឈ្មោះពី ID (ដាក់ក្នុង Controller) ──
   // ==========================================
   String getIndustryName(String? id) {
-    if (id == null || id.isEmpty) return 'Unknown Industry';
+    if (id == null || id.isEmpty) return 'Unknown Industry'.tr; // 🟢 Added .tr
     try {
-      // ស្វែងរកក្នុងបញ្ជីដែលយើងទើបទាញបាន
       return industriesList.firstWhere((i) => i.id == id).name;
     } catch (_) {
-      return 'Unknown Industry';
+      return 'Unknown Industry'.tr; // 🟢 Added .tr
     }
   }
 
   String getProvinceName(String? id) {
-    if (id == null || id.isEmpty) return 'Unknown Location';
+    if (id == null || id.isEmpty) return 'Unknown Location'.tr; // 🟢 Added .tr
     try {
       return locationCtrl.provinces.firstWhere((p) => p.id == id).nameEn;
     } catch (_) {
-      return 'Unknown Location';
+      return 'Unknown Location'.tr; // 🟢 Added .tr
     }
+  }
+
+  void changeTheme(ThemeMode mode) {
+    themeController.changeTheme(mode);
+  }
+
+  Future<void> changeLanguage(String languageCode, String countryCode) async {
+    Get.updateLocale(Locale(languageCode, countryCode));
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'app_lang', value: languageCode);
+    await storage.write(key: 'app_country', value: countryCode);
   }
 }
