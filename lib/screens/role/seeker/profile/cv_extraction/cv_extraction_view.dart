@@ -39,11 +39,11 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
     });
 
     // ស្តាប់រាល់ពេលការទាញយកទិន្នន័យជោគជ័យ
-    ever(controller.extractionResult, (result) {
-      if (result != null && result.parsedData != null) {
-        _showSuccessBottomSheet(result.parsedData!);
-      }
-    });
+    // ever(controller.extractionResult, (result) {
+    //   if (result != null && result.parsedData != null) {
+    //     _showSuccessBottomSheet(result.parsedData!);
+    //   }
+    // });
 
     return Scaffold(
       backgroundColor: Colors.white,

@@ -69,7 +69,6 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                   ProfileSectionItem(
                     icon: Icons.upload_file_rounded,
                     title: "Edit Resume",
-                    // សន្មតថាបើមាន URL ឬ Filename គឺបាន Completed ហើយ
                     isCompleted:
                         controller.profileData.value?.resumeUrl != null &&
                         controller.profileData.value!.resumeUrl.isNotEmpty,

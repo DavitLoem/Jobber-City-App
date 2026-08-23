@@ -6,7 +6,6 @@ import 'package:jobber_city/models/interview_models.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../routes/app_routes.dart';
 import 'widgets/candidate_action_bar.dart';
@@ -15,6 +14,7 @@ import 'widgets/candidate_header.dart';
 import 'widgets/candidate_interview.dart';
 import 'widgets/candidate_resume.dart';
 import 'widgets/candidate_skills.dart';
+import 'widgets/document_viewer_screen.dart';
 
 part 'candidate_detail_binding.dart';
 part 'candidate_detail_controller.dart';
