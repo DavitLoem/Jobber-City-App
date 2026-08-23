@@ -186,13 +186,21 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
             children: [
               // Cover Photo Placeholder
               Container(
-                height: 120,
+                height: 160,
                 width: double.infinity,
-                decoration: const BoxDecoration(
+
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Color(0xFF4f7df7), Color(0xFF8faaf9)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
+                  ),
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+
+                    image: NetworkImage(
+                      'https://askonlinesolutions.com/wp-content/uploads/2016/06/Company.jpg',
+                    ),
                   ),
                 ),
               ),

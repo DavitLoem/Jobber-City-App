@@ -77,7 +77,8 @@ class ChatRoomViewController extends GetxController {
     isLoadingHistory.value = true;
     try {
       final result = await _restService.getMessages(conversationId.value!);
-      messages.assignAll(result.messages);
+      messages.assignAll(result.messages.reversed.toList());
+      _sortMessages();
       hasMoreHistory.value = result.hasMore;
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => _scrollToBottom(animated: false),
@@ -93,8 +94,9 @@ class ChatRoomViewController extends GetxController {
     if (!hasMoreHistory.value ||
         isLoadingMore.value ||
         conversationId.value == null ||
-        messages.isEmpty)
+        messages.isEmpty) {
       return;
+    }
     isLoadingMore.value = true;
     try {
       final oldestId = messages.last.id;
@@ -102,7 +104,8 @@ class ChatRoomViewController extends GetxController {
         conversationId.value!,
         before: oldestId,
       );
-      messages.addAll(result.messages);
+      messages.addAll(result.messages.reversed.toList());
+      _sortMessages();
       hasMoreHistory.value = result.hasMore;
     } catch (e) {
       debugPrint('[ChatRoom] load more error: $e');
@@ -145,6 +148,7 @@ class ChatRoomViewController extends GetxController {
       }
 
       messages.refresh();
+      _sortMessages();
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
       if (incoming.senderId != currentUserId) {
@@ -217,6 +221,7 @@ class ChatRoomViewController extends GetxController {
     textController.clear();
     _stopTyping();
 
+    // ១. បង្កើតសាររង់ចាំ (Optimistic UI)
     final optimistic = ChatMessage(
       id: 'pending-$clientTempId',
       conversationId: id,
@@ -229,37 +234,34 @@ class ChatRoomViewController extends GetxController {
       createdAt: DateTime.now(),
       isPending: true,
     );
+
     messages.insert(0, optimistic);
+    _sortMessages();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
+    // ២. ប្រើ REST API តែម្តង (លុបកូដ try-catch WebSocket ជំនាន់ចាស់ចោល)
     try {
-      _wsService.sendEvent('send_message', {
-        "conversation_id": id,
-        "content": text,
-        "message_type": "text",
-        "client_temp_id": clientTempId,
-      });
+      final sent = await _restService.sendMessageRest(
+        conversationId: id,
+        content: text,
+        clientTempId: clientTempId,
+      );
+
+      // បើជោគជ័យ ទាញយកសារពិតពី Database មកជំនួសសារដែលកំពុងវិល
+      final idx = messages.indexWhere((m) => m.clientTempId == clientTempId);
+      if (idx != -1) {
+        messages[idx] = sent;
+        _sortMessages();
+      }
     } catch (e) {
-      try {
-        final sent = await _restService.sendMessageRest(
-          conversationId: id,
-          content: text,
-          clientTempId: clientTempId,
+      // បើ Error ឬដាច់អ៊ីនធឺណិត ប្តូរទៅជាសញ្ញាពណ៌ក្រហម (Failed) ភ្លាមៗ
+      final idx = messages.indexWhere((m) => m.clientTempId == clientTempId);
+      if (idx != -1) {
+        messages[idx] = messages[idx].copyWith(
+          status: 'failed',
+          isPending: false,
         );
-        final idx = messages.indexWhere((m) => m.clientTempId == clientTempId);
-        if (idx != -1) {
-          messages[idx] = sent;
-          messages.refresh();
-        }
-      } catch (eREST) {
-        final idx = messages.indexWhere((m) => m.clientTempId == clientTempId);
-        if (idx != -1) {
-          messages[idx] = messages[idx].copyWith(
-            status: 'failed',
-            isPending: false,
-          );
-          messages.refresh();
-        }
+        messages.refresh();
       }
     }
   }
@@ -419,5 +421,10 @@ class ChatRoomViewController extends GetxController {
     textController.dispose();
     scrollController.dispose();
     super.onClose();
+  }
+
+  void _sortMessages() {
+    messages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    messages.refresh();
   }
 }

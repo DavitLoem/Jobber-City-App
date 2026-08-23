@@ -16,6 +16,9 @@ class JobDetailController extends GetxController {
   var resumeFilename = ''.obs;
   var isLoadingProfile = true.obs;
 
+  var coverLetterDocPath = ''.obs;
+  var coverLetterDocName = ''.obs;
+
   final TextEditingController coverLetterController = TextEditingController();
 
   @override
@@ -29,6 +32,39 @@ class JobDetailController extends GetxController {
       hasApplied.value = job.value!.hasApplied;
     }
     fetchUserProfile();
+  }
+
+  Future<void> pickCoverLetterDocument() async {
+    try {
+      FilePickerResult? result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        // ត្រួតពិនិត្យទំហំកុំឱ្យលើស 5MB (ស្រេចចិត្ត)
+        final file = File(result.files.single.path!);
+        final sizeInBytes = await file.length();
+        if (sizeInBytes > 5 * 1024 * 1024) {
+          Get.snackbar(
+            "File too large",
+            "Please select a file smaller than 5MB.",
+            backgroundColor: Colors.red.shade50,
+          );
+          return;
+        }
+
+        coverLetterDocPath.value = result.files.single.path!;
+        coverLetterDocName.value = result.files.single.name;
+      }
+    } catch (e) {
+      debugPrint("Error picking file: $e");
+    }
+  }
+
+  void removeCoverLetterDocument() {
+    coverLetterDocPath.value = '';
+    coverLetterDocName.value = '';
   }
 
   // 🎯 មុខងារទាញយក Profile ដើម្បីឆែកមើល CV
@@ -68,12 +104,23 @@ class JobDetailController extends GetxController {
     }
 
     isApplying.value = true;
+    String? finalCoverLetterUrl;
+    String? finalCoverLetterFilename;
 
     try {
+      if (coverLetterDocPath.value.isNotEmpty) {
+        final uploadResult = await _appService.uploadCoverLetter(
+          File(coverLetterDocPath.value),
+        );
+        finalCoverLetterUrl = uploadResult['cover_letter_url'];
+        finalCoverLetterFilename = uploadResult['cover_letter_filename'];
+      }
+
       final isSuccess = await _appService.applyForJob(
         jobId: job.value!.id,
         coverLetter: coverLetterController.text.trim(),
-        // មិនបាច់ដាក់ resumeUrl ទេ ព្រោះ Backend នឹងទាញពី Profile ស្វ័យប្រវត្តិ
+        coverLetterUrl: finalCoverLetterUrl,
+        coverLetterFilename: finalCoverLetterFilename,
       );
 
       if (isSuccess) {

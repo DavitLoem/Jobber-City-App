@@ -7,8 +7,6 @@ import 'package:jobber_city/screens/auth/login_screen/login_screen_binding.dart'
 import 'package:jobber_city/screens/auth/login_screen/login_screen_view.dart';
 import 'package:jobber_city/screens/auth/reset_pass_screen/reset_pass_screen_view.dart';
 import 'package:jobber_city/screens/auth/verify_otp_screen/verify_otp_view.dart';
-import 'package:jobber_city/screens/shared/chat/conversation_list/conversation_list_view.dart';
-import 'package:jobber_city/screens/shared/notification/notification_view.dart';
 import 'package:jobber_city/screens/role/employer/candidate_detail/candidate_detail_view.dart';
 import 'package:jobber_city/screens/role/employer/company_profile/company_profile_view.dart';
 import 'package:jobber_city/screens/role/employer/employer_profile/company_detail/company_detail_view.dart';
@@ -24,6 +22,7 @@ import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/main_screen/main_screen_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/cv_extraction/cv_extraction_view.dart';
+import 'package:jobber_city/screens/role/seeker/profile/cv_generator/cv_generator_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/cv_review/cv_review_view.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_binding.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_view.dart';
@@ -37,6 +36,11 @@ import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_
 import 'package:jobber_city/screens/role/seeker/search_button/search_button_binding.dart';
 import 'package:jobber_city/screens/role/seeker/search_button/search_button_view.dart';
 import 'package:jobber_city/screens/role/seeker/setting_screen/setting_screen_view.dart';
+import 'package:jobber_city/screens/shared/chat/conversation_list/conversation_list_view.dart';
+import 'package:jobber_city/screens/shared/interview/interview_list/interview_list_binding.dart';
+import 'package:jobber_city/screens/shared/interview/interview_list/interview_list_view.dart';
+import 'package:jobber_city/screens/shared/interview/schedule_interview/schedule_interview_view.dart';
+import 'package:jobber_city/screens/shared/notification/notification_view.dart';
 // Import Views & Bindings
 import 'package:jobber_city/screens/splash/splash_view.dart';
 
@@ -44,6 +48,8 @@ import '../screens/role/employer/employer_profile/change_password/change_passwor
 import '../screens/role/employer/employer_profile/edit_profile_employer/edit_profile_employer_view.dart';
 import '../screens/role/employer/employer_profile/notification_employer/notification_employer_view.dart';
 import '../screens/shared/chat/chat_room/chat_room_view.dart';
+import '../screens/shared/interview/interview_detail/interview_detail_binding.dart';
+import '../screens/shared/interview/interview_detail/interview_detail_view.dart';
 
 class AppRoles {
   static const String seeker = 'seeker';
@@ -91,13 +97,13 @@ class AppPages {
       binding: NotificationViewBinding(),
       middlewares: [AuthMiddleware()],
     ),
-        GetPage(
+    GetPage(
       name: AppRoutes.conversationList,
       page: () => ConversationListView(),
       binding: ConversationListViewBinding(),
       middlewares: [AuthMiddleware()],
     ),
-            GetPage(
+    GetPage(
       name: AppRoutes.chatRoom,
       page: () => ChatRoomView(),
       binding: ChatRoomViewBinding(),
@@ -201,6 +207,15 @@ class AppPages {
       name: AppRoutes.cvReview,
       page: () => CvReviewView(),
       binding: CvReviewViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.seeker),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.cvGenerate,
+      page: () => CvGeneratorView(),
+      binding: CvGeneratorViewBinding(),
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.seeker),
@@ -358,6 +373,32 @@ class AppPages {
       name: AppRoutes.candidateDetail,
       page: () => CandidateDetailView(),
       binding: CandidateDetailViewBinding(),
+      middlewares: [
+        AuthMiddleware(),
+        RoleMiddleware(requiredRole: AppRoles.employer),
+      ],
+    ),
+
+    // ==========================================
+    // 🎥 ៥. ONLINE INTERVIEW ROUTES
+    // ==========================================
+    GetPage(
+      name: AppRoutes.interviewList,
+      page: () => const InterviewListView(),
+      binding: InterviewListViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.interviewDetail,
+      page: () => const InterviewDetailView(),
+      binding: InterviewDetailViewBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.scheduleInterview,
+      page: () => const ScheduleInterviewView(),
+      binding: ScheduleInterviewViewBinding(),
+      // Employer-only: backed by POST /api/interviews/, employer-gated on the backend too.
       middlewares: [
         AuthMiddleware(),
         RoleMiddleware(requiredRole: AppRoles.employer),

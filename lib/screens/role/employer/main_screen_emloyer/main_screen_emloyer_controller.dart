@@ -6,7 +6,7 @@ import 'package:jobber_city/screens/role/employer/employer_profile/employer_prof
 import 'package:jobber_city/screens/role/employer/home_employer/home_employer_view.dart';
 import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 
-import '../../../shared/chat/conversation_list/conversation_list_view.dart';
+import '../../../shared/interview/chats_main_view.dart';
 
 class MainScreenEmloyerController extends GetxController {
   var currentIndex = 0.obs;
@@ -33,7 +33,7 @@ class MainScreenEmloyerController extends GetxController {
       case AppRoutes.conversationList:
         return GetPageRoute(
           settings: settings,
-          page: () => const ConversationListView(),
+          page: () => const ChatsMainView(),
         );
       case AppRoutes.employerProfile:
         return GetPageRoute(

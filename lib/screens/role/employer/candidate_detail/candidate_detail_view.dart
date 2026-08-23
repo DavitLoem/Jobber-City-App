@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // 🟢 Import Service មកទីនេះ ដើម្បីឱ្យ Controller ស្គាល់វា
 import 'package:jobber_city/core/api/services/role/employer/applicant_employer_service.dart';
+import 'package:jobber_city/models/interview_models.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../routes/app_routes.dart';
 import 'widgets/candidate_action_bar.dart';
 import 'widgets/candidate_cover_letter.dart';
 import 'widgets/candidate_header.dart';
@@ -41,33 +44,60 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
         ),
         actions: [
           Obx(() {
-            // លាក់ប៊ូតុងបើមិនទាន់ទាញទិន្នន័យបាន
-            if (controller.isLoadingData.value ||
-                controller.applicant.value == null) {
+            final applicant = controller.applicant.value;
+
+            // លាក់ប៊ូតុងបើមិនទាន់ទាញទិន្នន័យបាន ឬអត់មានទិន្នន័យ
+            if (controller.isLoadingData.value || applicant == null) {
               return const SizedBox.shrink();
             }
-            return IconButton(
-              icon: const Icon(
-                LucideIcons.messageSquare,
-                color: Color(0xFF4F7DF7),
-              ),
-              onPressed: () {
-                // ហៅអនុគមន៍ពី Controller ដើម្បីចាប់ផ្តើម Chat
-                // ឧទាហរណ៍: controller.startChatWithSeeker();
 
-                final applicantName =
-                    controller.applicant.value?.fullName ?? "Candidate";
-                Get.snackbar(
-                  "Start Chat",
-                  "ត្រៀមបើក Chat ជាមួយ $applicantName",
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.black87,
-                  colorText: Colors.white,
-                );
-              },
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 🎯 ១. ប៊ូតុង Chat (ជួសជុល Error រួចរាល់)
+                IconButton(
+                  icon: const Icon(
+                    LucideIcons.messageSquare,
+                    color: Color(0xFF4F7DF7),
+                  ),
+                  onPressed: () {
+                    // ដោយសារ applicant យើងឆែក null រួចហើយ យើងអាចបោះវាបានដោយសុវត្ថិភាព
+                    final candidatesController =
+                        Get.find<CandidatesViewController>();
+                    candidatesController.startChatWithSeeker(applicant);
+                  },
+                ),
+
+                // 🎯 ២. ប៊ូតុង Interview ថ្មី
+                IconButton(
+                  icon: const Icon(LucideIcons.video, color: Color(0xFF10B981)),
+                  onPressed: () {
+                    // 🎯 ឆែកមើលថាតើគាត់មានម៉ោងសម្ភាសន៍ចាស់ឬអត់ (ឧទាហរណ៍ពី applicant.interviewSchedule)
+                    DateTime? oldDate;
+                    if (applicant.interviewSchedule != null &&
+                        applicant.interviewSchedule!['date'] != null) {
+                      oldDate = DateTime.tryParse(
+                        applicant.interviewSchedule!['date'].toString(),
+                      )?.toLocal();
+                    }
+
+                    Get.toNamed(
+                      AppRoutes.scheduleInterview,
+                      arguments: ScheduleInterviewArgs(
+                        seekerUserId: applicant.seekerUserId,
+                        seekerName: applicant.fullName,
+                        seekerAvatarUrl: applicant.profileImageUrl,
+                        applicationId: applicant.applicationId,
+                        jobTitle: applicant.jobTitle,
+                        existingDate: oldDate, // 🎯 បោះម៉ោងចាស់ទៅឱ្យ
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+              ],
             );
           }),
-          const SizedBox(width: 8), // ទុកចន្លោះបន្តិចពីគែមអេក្រង់
         ],
       ),
       // 🟢 រុំ Body ជាមួយ Obx ដើម្បីរង់ចាំការទាញយកទិន្នន័យ
@@ -106,7 +136,18 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                   ),
                 ),
                 CandidateInterview(applicant: applicant),
-                CandidateCoverLetter(coverLetter: applicant.coverLetter),
+                CandidateCoverLetter(
+                  coverLetterText: controller.applicant.value?.coverLetter,
+                  coverLetterUrl: controller
+                      .applicant
+                      .value
+                      ?.coverLetterUrl, // ត្រូវប្រាកដថា ApplicantModel មាន Field នេះ
+                  coverLetterFilename:
+                      controller.applicant.value?.coverLetterFilename,
+                  onTapFile: () => controller.openDocument(
+                    controller.applicant.value?.coverLetterUrl,
+                  ),
+                ),
                 const SizedBox(height: 24),
                 CandidateResume(applicant: applicant),
               ],

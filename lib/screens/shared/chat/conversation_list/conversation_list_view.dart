@@ -20,19 +20,6 @@ class ConversationListView extends GetView<ConversationListViewController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        title: const Text(
-          'Messages',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.black87,
-          ),
-        ),
-      ),
       body: Column(
         children: [
           // 🎯 បន្ថែម Search Bar

@@ -4,6 +4,7 @@ import 'package:jobber_city/screens/role/employer/employer_profile/employer_prof
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_controller.dart';
 import 'package:jobber_city/screens/role/employer/my_job/my_job_view.dart';
 import 'package:jobber_city/screens/role/seeker/home_seeker/home_seeker_view.dart';
+import 'package:jobber_city/screens/shared/interview/interview_list/interview_list_view.dart';
 
 import '../../../shared/chat/conversation_list/conversation_list_view.dart';
 
@@ -17,6 +18,7 @@ class MainScreenEmloyerBinding extends Bindings {
     Get.lazyPut(() => MyJobViewController(), fenix: true);
     Get.lazyPut(() => CandidatesViewController(), fenix: true);
     Get.lazyPut(() => ConversationListViewController(), fenix: true);
+    Get.lazyPut(() => InterviewListViewController(), fenix: true);
     Get.lazyPut(() => EmployerProfileViewController(), fenix: true);
   }
 }

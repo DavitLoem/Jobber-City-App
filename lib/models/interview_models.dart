@@ -123,6 +123,7 @@ class ScheduleInterviewArgs {
   final String? seekerAvatarUrl;
   final String? applicationId;
   final String? jobTitle;
+  final DateTime? existingDate;
 
   ScheduleInterviewArgs({
     required this.seekerUserId,
@@ -130,5 +131,6 @@ class ScheduleInterviewArgs {
     this.seekerAvatarUrl,
     this.applicationId,
     this.jobTitle,
+    this.existingDate,
   });
 }

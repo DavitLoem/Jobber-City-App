@@ -7,6 +7,8 @@ import 'package:jobber_city/core/api/services/chat/chat_ws_service.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/chat_model.dart';
+import 'package:jobber_city/models/interview_models.dart';
+import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/shared/chat/chat_room/widgets/chat_input_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:uuid/uuid.dart';
@@ -251,6 +253,31 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
           ),
         ],
       ),
+      actions: [
+        // ឆែកមើលបើ otherPartyRole គឺ seeker មានន័យថាយើងកំពុងប្រើ App ក្នុងនាម Employer
+        if (controller.args.otherPartyRole == 'seeker')
+          IconButton(
+            icon: const Icon(
+              Icons.videocam_rounded,
+              color: AppColors.primary,
+              size: 28,
+            ),
+            onPressed: () {
+              // ហៅទៅអេក្រង់ Schedule Interview ជាមួយទិន្នន័យស្រាប់ៗ[cite: 15]
+              Get.toNamed(
+                AppRoutes.scheduleInterview,
+                arguments: ScheduleInterviewArgs(
+                  seekerUserId:
+                      controller.currentUserId ??
+                      '', // ជំនួសដោយ Seeker ID ពិតប្រាកដពី Chat args
+                  seekerName: controller.args.otherPartyName,
+                  seekerAvatarUrl: controller.args.otherPartyAvatarUrl,
+                ),
+              );
+            },
+          ),
+        const SizedBox(width: 8),
+      ],
     );
   }
 

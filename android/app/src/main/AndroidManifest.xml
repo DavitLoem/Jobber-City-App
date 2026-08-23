@@ -1,16 +1,26 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <!-- កំណត់ឲ្យប្រើ READ_EXTERNAL_STORAGE ត្រឹម Android 12 ចុះក្រោម -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <!-- ប្រើសម្រាប់ Android 13 ឡើងទៅ ដើម្បីទាញយករូបភាព -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
     
     <application
         android:label="jobber_city"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        tools:replace="android:label"
         android:usesCleartextTraffic="false"> <!-- បិទ Cleartext និងកែតម្រូវ Syntax ឲ្យត្រូវ -->
+        
         
         <!-- 🟢 ១. ប្រាប់ Firebase ឱ្យប្រើ Channel នេះពេល App ស្ថិតក្នុង Background -->
         <meta-data

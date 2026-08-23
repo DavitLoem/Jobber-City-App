@@ -11,6 +11,8 @@ class ApplicantModel {
   final String? resumeUrl;
   final String? resumeFilename;
   final String? coverLetter;
+  final String? coverLetterUrl;
+  final String? coverLetterFilename;
   final String status;
   final DateTime? appliedAt;
   final Map<String, dynamic>? interviewSchedule;
@@ -29,6 +31,8 @@ class ApplicantModel {
     this.resumeUrl,
     this.resumeFilename,
     this.coverLetter,
+    this.coverLetterUrl,
+    this.coverLetterFilename,
     required this.status,
     this.appliedAt,
     this.interviewSchedule,
@@ -50,6 +54,8 @@ class ApplicantModel {
       resumeUrl: json['resume_url'],
       resumeFilename: json['resume_filename'],
       coverLetter: json['cover_letter'],
+      coverLetterUrl: json['cover_letter_url'],
+      coverLetterFilename: json['cover_letter_filename'],
       status: json['status'] ?? 'pending',
       // បំប្លែងកាលបរិច្ឆេទ
       appliedAt: json['applied_at'] != null

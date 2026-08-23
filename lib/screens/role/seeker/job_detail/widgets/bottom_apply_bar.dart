@@ -168,6 +168,78 @@ class BottomApplyBar extends GetView<JobDetailController> {
                 ),
               ),
 
+              const SizedBox(height: 12),
+
+              // 🎯 កូដថ្មី៖ ផ្នែកបង្ហាញប៊ូតុង Upload ឬ បង្ហាញឈ្មោះឯកសារដែលបានរើសរួច
+              Obx(() {
+                if (controller.coverLetterDocName.value.isNotEmpty) {
+                  // បង្ហាញឈ្មោះឯកសារ និងប៊ូតុងលុបចោល
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.description_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            controller.coverLetterDocName.value,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: controller.removeCoverLetterDocument,
+                          child: const Icon(
+                            Icons.close_rounded,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  // បង្ហាញប៊ូតុងសម្រាប់ចុច Upload
+                  return SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: controller.pickCoverLetterDocument,
+                      icon: const Icon(Icons.upload_file_rounded, size: 18),
+                      label: const Text("Upload Cover Letter (PDF, Word)"),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(
+                          color: AppColors.primary.withValues(alpha: 0.5),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  );
+                }
+              }),
+
               const SizedBox(height: 24),
 
               // 🎯 ប៊ូតុង Submit

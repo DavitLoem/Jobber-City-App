@@ -5,8 +5,10 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App needs access to photo gallery to let you upload a company logo.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>App needs access to camera to let you take a company logo.</string>
+	<string>App needs access to camera to let you take a company logo and access to the camera for video interviews.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>This app requires access to the microphone for video interviews.</string>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
@@ -70,5 +72,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>https</string>
+    </array>
 </dict>
 </plist>

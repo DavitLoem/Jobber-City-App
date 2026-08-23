@@ -135,6 +135,21 @@ class ChatMessage {
     isDeletedForEveryone: isDeletedForEveryone ?? this.isDeletedForEveryone,
   );
 
+  static DateTime _parseServerTime(String? timeStr) {
+    if (timeStr == null || timeStr.isEmpty) return DateTime.now();
+    try {
+      // បើ Server បោះមកអត់មាន Z ឬ + (តំណាងឱ្យ Timezone) ទេ, យើងថែម Z ឱ្យវាដោយស្វ័យប្រវត្តិ
+      if (!timeStr.endsWith('Z') &&
+          !timeStr.contains('+') &&
+          !timeStr.contains('-')) {
+        timeStr += 'Z'; // Force ឱ្យវាស្គាល់ថាជាម៉ោង UTC
+      }
+      return DateTime.parse(timeStr).toLocal();
+    } catch (e) {
+      return DateTime.now();
+    }
+  }
+
   factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
     id: json['id']?.toString() ?? '',
     conversationId: json['conversation_id']?.toString() ?? '',
@@ -145,10 +160,7 @@ class ChatMessage {
     attachmentUrl: json['attachment_url'],
     status: json['status']?.toString() ?? 'sent',
     clientTempId: json['client_temp_id']?.toString(),
-    createdAt: json['created_at'] != null
-        ? DateTime.tryParse(json['created_at'].toString())?.toLocal() ??
-              DateTime.now()
-        : DateTime.now(),
+    createdAt: _parseServerTime(json['created_at']?.toString()),
     isDeletedForEveryone: json['is_deleted_for_everyone'] == true,
   );
 }

@@ -122,9 +122,15 @@ class CandidateInterview extends StatelessWidget {
     try {
       if (!dateStr.endsWith('Z')) dateStr += 'Z';
       final date = DateTime.parse(dateStr).toLocal();
-      return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
+
+      // បំប្លែងម៉ោងទៅជាទម្រង់ 12 ម៉ោង និងរក AM/PM
+      int hour12 = date.hour % 12;
+      if (hour12 == 0) hour12 = 12;
+      final String amPm = date.hour >= 12 ? 'PM' : 'AM';
+      final String minute = date.minute.toString().padLeft(2, '0');
+
+      return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year} at $hour12:$minute $amPm";
     } catch (_) {
-      // 🟢 ដកសញ្ញា ? ចេញពី dateStr
       return dateStr?.split('T').first ?? 'TBD';
     }
   }

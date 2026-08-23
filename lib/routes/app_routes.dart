@@ -11,6 +11,9 @@ class AppRoutes {
   static const String notification = '/notification';
   static const String conversationList = '/conversation-list';
   static const String chatRoom = '/chat-room';
+  static const String interviewList = '/interviews';
+  static const String interviewDetail = '/interview-detail';
+  static const String scheduleInterview = '/schedule-interview';
 
   // ==========================================
   // 🔵 ២. SEEKER ROUTES (សម្រាប់អ្នកស្វែងរកការងារ)
@@ -27,6 +30,7 @@ class AppRoutes {
   static const String setting = '/setting';
   static const String cvExtraction = '/cv-extraction';
   static const String cvReview = '/cv-review';
+  static const String cvGenerate = '/cv-generate';
   static const String applied = '/applied';
   static const String candidateDetail = '/candidate-detail';
   static const String experience = '/experience';

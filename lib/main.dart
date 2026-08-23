@@ -41,7 +41,16 @@ class MyApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
-      // home: ConversationListPreview(),
+      // home: ChatsMainView(),
+      // builder: (context, child) {
+      //   return SafeArea(
+      //     // ការពារកុំឱ្យចូលកាមេរ៉ាខាងលើ គ្រប់ Screen
+      //     top: true,
+      //     // អាចកំណត់ bottom: false បើចង់ឱ្យ Bottom Navigation ជាប់បាតស្អាត
+      //     bottom: false,
+      //     child: child!,
+      //   );
+      // },
     );
   }
 }

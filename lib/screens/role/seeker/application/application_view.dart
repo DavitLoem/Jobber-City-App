@@ -66,31 +66,24 @@ class ApplicationView extends GetView<ApplicationViewController> {
           }
 
           // 🎯 បន្ថែម RefreshIndicator នៅទីនេះ
-          return RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: () async {
-              await controller
-                  .fetchApplications(); // ហៅមុខងារទាញយកទិន្នន័យឡើងវិញ
-            },
-            child: TabBarView(
-              children: [
-                _buildApplicationList(
-                  apps: controller.pendingApps,
-                  emptyMessage: "No pending applications",
-                  context: context,
-                ),
-                _buildApplicationList(
-                  apps: controller.interviewApps,
-                  emptyMessage: "No interviews scheduled yet",
-                  context: context,
-                ),
-                _buildApplicationList(
-                  apps: controller.closedApps,
-                  emptyMessage: "No closed applications",
-                  context: context,
-                ),
-              ],
-            ),
+          return TabBarView(
+            children: [
+              _buildApplicationList(
+                apps: controller.pendingApps,
+                emptyMessage: "No pending applications",
+                context: context,
+              ),
+              _buildApplicationList(
+                apps: controller.interviewApps,
+                emptyMessage: "No interviews scheduled yet",
+                context: context,
+              ),
+              _buildApplicationList(
+                apps: controller.closedApps,
+                emptyMessage: "No closed applications",
+                context: context,
+              ),
+            ],
           );
         }),
       ),
@@ -103,46 +96,51 @@ class ApplicationView extends GetView<ApplicationViewController> {
     required String emptyMessage,
     required BuildContext context,
   }) {
-    if (apps.isEmpty) {
-      return SingleChildScrollView(
-        physics:
-            const AlwaysScrollableScrollPhysics(), // This allows pull-to-refresh on empty lists
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  LucideIcons.folderOpen,
-                  size: 60,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  emptyMessage,
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+    // 🎯 ដាក់ RefreshIndicator នៅទីនេះវិញ ដើម្បីកុំឱ្យជាន់ Gesture ជាមួយ TabBarView
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () async {
+        await controller.fetchApplications();
+      },
+      child: apps.isEmpty
+          // ករណីគ្មានទិន្នន័យ
+          ? SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.folderOpen,
+                        size: 60,
+                        color: Colors.grey.shade300,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        emptyMessage,
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
+            )
+          // ករណីមានទិន្នន័យ
+          : ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(20),
+              itemCount: apps.length,
+              itemBuilder: (context, index) {
+                final app = apps[index];
+                return _buildApplicationCard(app);
+              },
             ),
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      // 🟢 Add AlwaysScrollableScrollPhysics to support Pull to Refresh
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(20),
-      itemCount: apps.length,
-      itemBuilder: (context, index) {
-        final app = apps[index];
-        return _buildApplicationCard(app);
-      },
     );
   }
 

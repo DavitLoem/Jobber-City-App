@@ -11,11 +11,13 @@ class ApiClient {
   Future<dynamic> get(
     String endpoint, {
     Map<String, dynamic>? queryParameters,
+    Options? options,
   }) async {
     try {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParameters,
+        options: options,
       );
       return response.data;
     } catch (e) {

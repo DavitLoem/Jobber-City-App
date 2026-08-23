@@ -57,6 +57,14 @@ class ProfileScreenView extends GetView<ProfileScreenViewController> {
                   ),
                   const SizedBox(height: 24),
 
+                  ProfileSectionItem(
+                    icon: Icons.picture_as_pdf_outlined,
+                    title: "Generate CV",
+                    onTap: () {
+                      Get.toNamed(AppRoutes.cvGenerate);
+                    },
+                  ),
+
                   // 🎯 1. Edit Resume (Upload CV)
                   ProfileSectionItem(
                     icon: Icons.upload_file_rounded,

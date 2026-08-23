@@ -7,6 +7,7 @@ import 'package:jobber_city/screens/role/seeker/profile/profile_screen/profile_s
 import 'package:jobber_city/screens/role/seeker/save_job_screen/save_job_screen_view.dart';
 
 import '../../../shared/chat/conversation_list/conversation_list_view.dart';
+import '../../../shared/interview/interview_list/interview_list_view.dart';
 
 class MainScreenBinding extends Bindings {
   @override
@@ -25,6 +26,7 @@ class MainScreenBinding extends Bindings {
 
     // 🟢 ៤. សម្រាប់ Tab ទី៤ ()
     Get.lazyPut(() => ConversationListViewController(), fenix: true);
+    Get.lazyPut(() => InterviewListViewController(), fenix: true);
 
     // 🟢 ៥. សម្រាប់ Tab ទី៥ (Profile)
     Get.lazyPut(() => ProfileScreenViewController());
