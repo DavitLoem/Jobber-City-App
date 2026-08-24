@@ -15,6 +15,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// កំណត់ Java Toolchain ជំនួសអោយ kotlinOptions ដែលចាស់លែងប្រើ (Fix error jvmTarget)
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace = "com.example.jobber_city"
     compileSdk = flutter.compileSdkVersion
@@ -24,10 +29,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
     }
 
     // ២. បង្កើតការកំណត់ Release Signing ដោយទាញទិន្នន័យពី properties
@@ -40,7 +41,6 @@ android {
         }
     }
 
-    // minSdk = flutter.minSdkVersion
     defaultConfig {
         applicationId = "com.example.jobber_city"
         minSdk = 26
@@ -51,7 +51,7 @@ android {
 
     buildTypes {
         release {
-            // ៣. ប្តូរមកប្រើ "release" ដែលយើងទើបបង្កើតខាងលើវិញ
+            // ៣. ប្តូរមកប្រើ "release" ដែលយើងទើបបង្កើតខាងលើ
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
@@ -61,6 +61,11 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
         }
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 }
 

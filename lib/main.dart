@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
           appBarTheme: const AppBarTheme(
             backgroundColor: AppColors.darkBackground,
           ),
-          cardColor: AppColors.darkSurfaceElevated ?? const Color(0xFF1E1E1E),
+          cardColor: AppColors.darkSurfaceElevated,
           textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.white)),
         ),
         themeMode: themeController.themeMode.value,

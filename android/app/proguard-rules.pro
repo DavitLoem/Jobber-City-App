@@ -37,6 +37,8 @@
 # Google Sign In
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
+-dontwarn com.google.android.play.core.**
+-keep class com.google.android.play.core.** { *; }
 
 # Image Picker
 -keep class com.fluttercamerapicker.** { *; }
