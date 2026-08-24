@@ -40,6 +40,13 @@ class ApplicationService {
         data: {
           if (coverLetter != null && coverLetter.isNotEmpty)
             'cover_letter': coverLetter,
+
+          // 🎯 បន្ថែម ២ បន្ទាត់នេះ ដើម្បីបញ្ជូន URL និង ឈ្មោះឯកសារ ទៅកាន់ Backend
+          if (coverLetterUrl != null && coverLetterUrl.isNotEmpty)
+            'cover_letter_url': coverLetterUrl,
+          if (coverLetterFilename != null && coverLetterFilename.isNotEmpty)
+            'cover_letter_filename': coverLetterFilename,
+
           if (resumeUrl != null && resumeUrl.isNotEmpty)
             'resume_url': resumeUrl,
         },
