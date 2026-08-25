@@ -126,14 +126,9 @@ class CandidateDetailViewController extends GetxController {
       Get.snackbar("Notice", "No document attached.");
       return;
     }
-    // បើលោកអ្នកមានអេក្រង់ CvPdfView អាចហៅប្រើវាបាន ឧទាហរណ៍៖
-    // Get.to(() => CvPdfView(pdfUrl: url));
 
-    // ឬបើចង់ឱ្យវាហោះទៅបើកក្នុង Browser/Phone viewer ផ្ទាល់ អាចប្រើ url_launcher៖
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+    // 🎯 ប្រើប្រាស់ Screen ថ្មីដើម្បីបង្ហាញ Cover Letter ដោយផ្ទាល់
+    Get.to(() => DocumentViewerScreen(documentUrl: url, title: "Cover Letter"));
   }
 
   @override

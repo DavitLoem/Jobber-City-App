@@ -26,27 +26,54 @@ class _NotificationCardState extends State<NotificationCard> {
     Color iconColor = const Color(0xFF4F7DF7);
     IconData iconData = LucideIcons.bell;
 
-    switch (widget.notification.type.toLowerCase()) {
-      case 'new_application':
-        iconBgColor = const Color(0xFFEEF2FF);
-        iconColor = const Color(0xFF4F7DF7);
-        iconData = LucideIcons.shieldCheck;
-        break;
-      case 'status_update':
-        iconBgColor = const Color(0xFFFFFBEB);
-        iconColor = const Color(0xFFD97706);
-        iconData = LucideIcons.arrowDownToLine;
-        break;
-      case 'system_alert':
-        iconBgColor = const Color(0xFFF0FDF4);
+    // 🎯 ១. ទាញយក Type និង Message មកធ្វើជាអក្សរតូចទាំងអស់ ដើម្បីងាយស្រួលផ្ទៀងផ្ទាត់
+    final String type = widget.notification.type.toLowerCase();
+    final String message = widget.notification.message.toLowerCase();
+
+    // 🎯 ២. កំណត់លក្ខខណ្ឌដ៏ឆ្លាតវៃតាមប្រភេទ និងអត្ថន័យនៃសារ
+    if (type == 'new_application') {
+      // មានអ្នកដាក់ពាក្យថ្មី (Employer)
+      iconBgColor = const Color(0xFFEEF2FF); // លឿង/ខៀវខ្ចី
+      iconColor = const Color(0xFF4F7DF7);
+      iconData = LucideIcons.fileText;
+    } else if (type == 'interview_update') {
+      // ផ្លាស់ប្តូរថ្ងៃសម្ភាសន៍
+      iconBgColor = const Color(0xFFF3E8FF); // ស្វាយស្រាល
+      iconColor = const Color(0xFFA855F7);
+      iconData = LucideIcons.calendarClock;
+    } else if (type == 'status_update') {
+      // 🎯 ឆែកមើលពាក្យគន្លឹះក្នុង Message សម្រាប់ Status នីមួយៗ
+      if (message.contains('interview')) {
+        iconBgColor = const Color(0xFFF3E8FF); // ស្វាយស្រាល
+        iconColor = const Color(0xFFA855F7);
+        iconData = LucideIcons.users;
+      } else if (message.contains('hired') || message.contains('accepted')) {
+        iconBgColor = const Color(0xFFF0FDF4); // បៃតងស្រាល
         iconColor = const Color(0xFF16A34A);
-        iconData = LucideIcons.user;
-        break;
-      default:
-        iconBgColor = const Color(0xFFEEF2FF);
-        iconColor = const Color(0xFF4F7DF7);
-        iconData = LucideIcons.lock;
-        break;
+        iconData = LucideIcons.award;
+      } else if (message.contains('rejected') ||
+          message.contains('unsuccessful')) {
+        iconBgColor = const Color(0xFFFEF2F2); // ក្រហមស្រាល
+        iconColor = const Color(0xFFDC2626);
+        iconData = LucideIcons.xCircle;
+      } else if (message.contains('shortlisted')) {
+        iconBgColor = const Color(0xFFFFF7ED); // ទឹកក្រូចស្រាល
+        iconColor = const Color(0xFFEA580C);
+        iconData = LucideIcons.bookmark;
+      } else if (message.contains('reviewed')) {
+        iconBgColor = const Color(0xFFF0F9FF); // ខៀវស្រាល
+        iconColor = const Color(0xFF0284C7);
+        iconData = LucideIcons.eye;
+      } else {
+        // Default Pending ឬ Status ផ្សេងៗ
+        iconBgColor = const Color(0xFFF8FAFC); // ប្រផេះស្រាល
+        iconColor = const Color(0xFF64748B);
+        iconData = LucideIcons.refreshCcw;
+      }
+    } else if (type == 'system_alert') {
+      iconBgColor = const Color(0xFFFEF2F2);
+      iconColor = const Color(0xFFDC2626);
+      iconData = LucideIcons.alertTriangle;
     }
 
     return Container(
