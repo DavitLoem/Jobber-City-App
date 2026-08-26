@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class CurrentResumeCard extends StatelessWidget {
@@ -15,10 +16,15 @@ class CurrentResumeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F0),
+        color: isDark
+            ? Colors.redAccent.withValues(alpha: 0.15)
+            : const Color(0xFFFFF0F0), // 🟢 Dynamic BG
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
       ),
@@ -27,7 +33,9 @@ class CurrentResumeCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark
+                  ? AppColors.darkSurfaceElevated
+                  : Colors.white, // 🟢 Dynamic Icon BG
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -42,19 +50,26 @@ class CurrentResumeCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  filename,
-                  style: const TextStyle(
+                  filename, // Filename usually doesn't need translation
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.black87,
+                    color: isDark
+                        ? Colors.white
+                        : Colors.black87, // 🟢 Dynamic Text
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Uploaded Document",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  "Uploaded Document".tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade600, // 🟢 Dynamic Subtext
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),

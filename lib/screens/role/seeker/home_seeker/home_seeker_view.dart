@@ -6,7 +6,7 @@ import 'package:jobber_city/core/api/network/api_client.dart';
 import 'package:jobber_city/core/api/services/role/seeker/job_feed_service.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/core/utils/app_logger.dart';
-import 'package:jobber_city/models/role/seeker/job_feed_model.dart'; // 🎯 ប្តូរមកប្រើ Model ថ្មី
+import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 import 'widgets/hero_section.dart';
@@ -23,8 +23,10 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Fetch active Theme
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () async {
@@ -60,13 +62,13 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
                       const SizedBox(height: 28),
 
                       JobUiUtils.buildSectionHeader(
-                        "Recommended For You",
+                        "Recommended For You".tr, // 🟢 Added .tr
                         onSeeAll: () {
                           Get.toNamed(
                             AppRoutes.jobList,
                             arguments: {
                               'type': 'recommended',
-                              'title': 'Recommended Jobs',
+                              'title': 'Recommended Jobs'.tr, // 🟢 Added .tr
                             },
                           );
                         },
@@ -77,13 +79,13 @@ class HomeSeekerView extends GetView<HomeSeekerViewController> {
                       const SizedBox(height: 32),
 
                       JobUiUtils.buildSectionHeader(
-                        "Recent Jobs",
+                        "Recent Jobs".tr, // 🟢 Added .tr
                         onSeeAll: () {
                           Get.toNamed(
                             AppRoutes.jobList,
                             arguments: {
                               'type': 'recent',
-                              'title': 'Recent Jobs',
+                              'title': 'Recent Jobs'.tr, // 🟢 Added .tr
                             },
                           );
                         },

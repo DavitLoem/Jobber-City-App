@@ -10,6 +10,9 @@ class EditProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 26),
@@ -17,10 +20,15 @@ class EditProfileHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primaryLight.withValues(alpha: 0.55),
-            Colors.white,
-          ],
+          colors: isDark
+              ? [
+                  AppColors.primary.withValues(alpha: 0.15),
+                  theme.scaffoldBackgroundColor,
+                ]
+              : [
+                  AppColors.primaryLight.withValues(alpha: 0.55),
+                  Colors.white,
+                ], // 🟢 Dynamic BG Gradient
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
@@ -34,36 +42,42 @@ class EditProfileHeader extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.white, // 🟢 Dynamic Btn BG
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cardBorder),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : AppColors.cardBorder,
+                    ), // 🟢 Dynamic Border
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 18,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
                   ),
                 ),
               ),
-              const Text(
-                'Edit Profile',
+              Text(
+                'Edit Profile'.tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: Colors.black87,
+                  color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                 ),
               ),
               const SizedBox(width: 40),
             ],
           ),
           const SizedBox(height: 18),
-          _buildAvatarHeader(),
+          _buildAvatarHeader(theme, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildAvatarHeader() {
+  Widget _buildAvatarHeader(ThemeData theme, bool isDark) {
     return Center(
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.0, end: 1.0),
@@ -106,9 +120,11 @@ class EditProfileHeader extends StatelessWidget {
                         ],
                       ),
                       child: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          color: isDark
+                              ? AppColors.darkSurfaceElevated
+                              : Colors.white, // 🟢 Dynamic Ring
                         ),
                         padding: const EdgeInsets.all(3),
                         child: ClipOval(
@@ -118,7 +134,6 @@ class EditProfileHeader extends StatelessWidget {
                               opacity: anim,
                               child: ScaleTransition(scale: anim, child: child),
                             ),
-                            // 🎯 ឆែកមើលបើមាន Link រូប ទើបបង្ហាញ Image.network
                             child: imageUrl.isNotEmpty
                                 ? Image.network(
                                     imageUrl,
@@ -127,10 +142,10 @@ class EditProfileHeader extends StatelessWidget {
                                     height: 82,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return _buildPlaceholderAvatar();
+                                      return _buildPlaceholderAvatar(isDark);
                                     },
                                   )
-                                : _buildPlaceholderAvatar(),
+                                : _buildPlaceholderAvatar(isDark),
                           ),
                         ),
                       ),
@@ -144,7 +159,12 @@ class EditProfileHeader extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.primary,
-                          border: Border.all(color: Colors.white, width: 2.5),
+                          border: Border.all(
+                            color: isDark
+                                ? AppColors.darkSurfaceElevated
+                                : Colors.white,
+                            width: 2.5,
+                          ), // 🟢 Dynamic Ring
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.15),
@@ -177,11 +197,11 @@ class EditProfileHeader extends StatelessWidget {
                         .trim();
 
                 return Text(
-                  fullName.isEmpty ? "Loading..." : fullName,
-                  style: const TextStyle(
+                  fullName.isEmpty ? "Loading...".tr : fullName, // 🟢 Added .tr
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                    color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                   ),
                 );
               },
@@ -192,13 +212,14 @@ class EditProfileHeader extends StatelessWidget {
     );
   }
 
-  // 🎯 បំបែកមុខងារគូរ Placeholder (រូបមនុស្ស) ឱ្យងាយស្រួលហៅប្រើ
-  Widget _buildPlaceholderAvatar() {
+  Widget _buildPlaceholderAvatar(bool isDark) {
     return Container(
       key: const ValueKey('avatar_placeholder'),
       width: 82,
       height: 82,
-      color: AppColors.primaryLight,
+      color: isDark
+          ? AppColors.primary.withValues(alpha: 0.15)
+          : AppColors.primaryLight, // 🟢 Dynamic BG
       child: const Icon(
         Icons.person_rounded,
         size: 42,

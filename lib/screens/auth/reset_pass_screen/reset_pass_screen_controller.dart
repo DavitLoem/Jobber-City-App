@@ -16,7 +16,6 @@ class ResetPassScreenViewController extends GetxController {
   String otp = '';
 
   @override
-  @override
   void onInit() {
     super.onInit();
     newPasswordCtrl = TextEditingController();
@@ -29,6 +28,8 @@ class ResetPassScreenViewController extends GetxController {
   }
 
   void resetPassword() async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check for Snackbars
+
     // 🎯 ២. បញ្ជាឱ្យ Form ឆែកមើលប្រអប់ Password តាមរយៈ Validator
     if (!formKey.currentState!.validate()) {
       return;
@@ -40,9 +41,12 @@ class ResetPassScreenViewController extends GetxController {
     // 🎯 ៣. ការឆែក Confirm Password អាចដាក់នៅទីនេះ ឬក្នុង AuthValidator ខាង UI ក៏បាន
     if (newPassword != confirmPassword) {
       Get.snackbar(
-        "Notice",
-        "Passwords do not match.",
-        backgroundColor: Colors.orangeAccent,
+        "Notice".tr, // 🟢 Added .tr
+        "Passwords do not match.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
       );
       return;
     }
@@ -50,11 +54,11 @@ class ResetPassScreenViewController extends GetxController {
     try {
       isLoading.value = true;
 
-      // ៤. បាញ់ API ដោយប្រើប្រាស់ Model ត្រឹមត្រូវ (ត្រូវប្រាកដថា Model របស់អ្នកមាន Parameter ត្រូវគ្នា)
+      // ៤. បាញ់ API ដោយប្រើប្រាស់ Model ត្រឹមត្រូវ
       var response = await _authServices.resetPassword(
         ResetPasswordRequestModel(
           email: email,
-          otpCode: otp, // ⚠️ បើ Backend ទាមទារឈ្មោះ key ខុសពីនេះ សូមកែនៅ Model
+          otpCode: otp,
           newPassword: newPassword,
           confirmPassword: confirmPassword,
         ),
@@ -62,8 +66,13 @@ class ResetPassScreenViewController extends GetxController {
 
       // ៥. បើឆ្លងកាត់ការបាញ់ API ខាងលើបានដោយមិនធ្លាក់ចូល catch គឺជោគជ័យ
       Get.snackbar(
-        "Success",
-        response["message"] ?? "Password reset successfully.",
+        "Success".tr, // 🟢 Added .tr
+        response["message"]?.toString().tr ??
+            "Password reset successfully.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.greenAccent.withValues(alpha: 0.15)
+            : Colors.green.shade50,
+        colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
       );
 
       // ៦. សម្អាត Email និង Password ចាស់ចោលពី LoginScreen មុននឹងថយក្រោយ
@@ -75,11 +84,25 @@ class ResetPassScreenViewController extends GetxController {
       Get.until((route) => route.settings.name == AppRoutes.login);
     } on ApiException catch (e) {
       // 🎯 ៨. ចាប់យក Error ពិតប្រាកដពី Server មកបង្ហាញយ៉ាងស្អាត
-      Get.snackbar("Error", e.message);
+      Get.snackbar(
+        "Error".tr, // 🟢 Added .tr
+        e.message.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.redAccent.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
     } catch (e) {
       // ករណីគាំងទូទៅ (ឧ. ដាច់អ៊ីនធឺណិត)
-      print("Reset Password Crash Log: $e");
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      debugPrint("Reset Password Crash Log: $e");
+      Get.snackbar(
+        "Error".tr, // 🟢 Added .tr
+        "Something went wrong. Please try again.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.redAccent.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
     } finally {
       isLoading.value = false;
     }

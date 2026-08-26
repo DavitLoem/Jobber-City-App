@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 
 class SplashTagline extends StatelessWidget {
   final Animation<double> taglineFade;
@@ -14,18 +15,23 @@ class SplashTagline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Column(
       children: [
         FadeTransition(
           opacity: taglineFade,
           child: SlideTransition(
             position: taglineSlide,
-            child: const Text(
-              'Jobber City',
+            child: Text(
+              'Jobber City', // 🟢 Usually Brand Names remain untranslated, but styles updated
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
-                color: Colors.black87, // ដាក់ពណ៌ផ្ទាល់សិន
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Title
                 letterSpacing: -1.0,
                 height: 1.0,
               ),
@@ -35,11 +41,13 @@ class SplashTagline extends StatelessWidget {
         const SizedBox(height: 8),
         FadeTransition(
           opacity: subtitleFade,
-          child: const Text(
-            'Your Career Starts Here',
+          child: Text(
+            'Your Career Starts Here'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 15,
-              color: Colors.black54, // ដាក់ពណ៌ផ្ទាល់សិន
+              color: isDark
+                  ? Colors.white70
+                  : Colors.black54, // 🟢 Dynamic Subtitle
               fontWeight: FontWeight.w400,
               letterSpacing: 0.2,
             ),

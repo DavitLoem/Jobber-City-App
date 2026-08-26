@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/chat/chat_rest_service.dart';
 import 'package:jobber_city/core/api/services/chat/chat_ws_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/core/utils/token_storage.dart';
 import 'package:jobber_city/models/chat_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
@@ -18,8 +19,13 @@ class ConversationListView extends GetView<ConversationListViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : const Color(0xFFF8F9FA), // 🟢 Dynamic BG
       body: Column(
         children: [
           // 🎯 បន្ថែម Search Bar
@@ -30,7 +36,9 @@ class ConversationListView extends GetView<ConversationListViewController> {
               if (controller.isLoading.value &&
                   controller.conversations.isEmpty) {
                 return const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF4F7DF7)),
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ), // 🟢 Replaced Hex with AppColors
                 );
               }
 
@@ -54,15 +62,17 @@ class ConversationListView extends GetView<ConversationListViewController> {
               }
 
               return RefreshIndicator(
-                color: const Color(0xFF4F7DF7),
+                color: AppColors.primary,
                 onRefresh: () => controller.fetchConversations(),
                 child: ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: displayList.length,
-                  separatorBuilder: (_, _) => const Divider(
+                  separatorBuilder: (_, _) => Divider(
                     height: 1,
                     indent: 82,
-                    color: Color(0xFFEEEEEE),
+                    color: isDark
+                        ? AppColors.darkDivider
+                        : const Color(0xFFEEEEEE), // 🟢 Dynamic Divider
                   ),
                   itemBuilder: (context, index) {
                     final convo = displayList[index];
@@ -83,7 +93,7 @@ class ConversationListView extends GetView<ConversationListViewController> {
         if (!controller.isEmployer.value) return const SizedBox.shrink();
 
         return FloatingActionButton.extended(
-          backgroundColor: const Color(0xFF4F7DF7),
+          backgroundColor: AppColors.primary, // 🟢 Replaced Hex
           onPressed: () async {
             // លោតទៅកាន់អេក្រង់ Seeker Directory
             // await Get.toNamed(AppRoutes.seekerDirectory);
@@ -91,9 +101,12 @@ class ConversationListView extends GetView<ConversationListViewController> {
             controller.fetchConversations(silent: true);
           },
           icon: const Icon(Icons.add_comment_rounded, color: Colors.white),
-          label: const Text(
-            'New Chat',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          label: Text(
+            'New Chat'.tr, // 🟢 Added .tr
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         );
       }),

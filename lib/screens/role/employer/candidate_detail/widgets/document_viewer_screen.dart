@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/core/constants/app_colors.dart'; // តម្រូវតាមទីតាំងជាក់ស្តែងរបស់អ្នក
+import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DocumentViewerScreen extends StatefulWidget {
   final String documentUrl;
-  final String title;
+  final String? title;
 
   const DocumentViewerScreen({
     super.key,
     required this.documentUrl,
-    this.title = "Document Viewer",
+    this.title,
   });
 
   @override
@@ -24,14 +25,15 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   void initState() {
     super.initState();
 
-    // 🎯 ប្រើប្រាស់ Google Docs Viewer ដើម្បីបំប្លែង PDF/DOCX ឱ្យអាចមើលបានក្នុង WebView
     final formattedUrl = Uri.encodeComponent(widget.documentUrl);
     final googleDocsUrl =
         'https://docs.google.com/gview?embedded=true&url=$formattedUrl';
 
+    final isDark = Get.isDarkMode;
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
+      ..setBackgroundColor(isDark ? Colors.black : Colors.white)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
@@ -49,20 +51,23 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.black87,
+          widget.title?.tr ?? "Document Viewer".tr,
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: theme.textTheme.bodyLarge?.color),
       ),
       body: Stack(
         children: [

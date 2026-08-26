@@ -207,6 +207,9 @@ class AppColors {
   /// Disabled icon
   static const Color iconDisabled = Color(0xFFCDCDCD);
 
+  /// Disabled icon (dark mode)
+  static const Color darkIconDisabled = Color(0xFF2D3451);
+
   /// Icon on coloured surface (e.g. white on blue card)
   static const Color iconOnColor = Color(0xFFFFFFFF);
 

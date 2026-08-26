@@ -34,7 +34,7 @@ class ChatRoomViewController extends GetxController {
     if (Get.arguments is ChatThreadArgs) {
       args = Get.arguments as ChatThreadArgs;
     } else {
-      setupError.value = "Invalid Arguments";
+      setupError.value = "Invalid Arguments".tr; // 🟢 Added .tr
       return;
     }
 
@@ -65,7 +65,7 @@ class ChatRoomViewController extends GetxController {
       await _loadInitialMessages();
       _markRead();
     } catch (e) {
-      setupError.value = 'Could not open conversation.';
+      setupError.value = 'Could not open conversation.'.tr; // 🟢 Added .tr
       debugPrint('[ChatRoom] setup error: $e');
     } finally {
       isSettingUp.value = false;
@@ -195,7 +195,6 @@ class ChatRoomViewController extends GetxController {
         if (deleteType == 'everyone') {
           final index = messages.indexWhere((m) => m.id == msgId);
           if (index != -1) {
-            // Update ទៅជាទម្រង់ Tombstone ភ្លាមៗ
             messages[index] = messages[index].copyWith(
               isDeletedForEveryone: true,
               content: "",
@@ -203,7 +202,6 @@ class ChatRoomViewController extends GetxController {
             messages.refresh();
           }
         } else if (deleteType == 'me') {
-          // លុបចេញពី UI យើងបាត់ឈឹងតែម្តង
           messages.removeWhere((m) => m.id == msgId);
           messages.refresh();
         }
@@ -221,7 +219,6 @@ class ChatRoomViewController extends GetxController {
     textController.clear();
     _stopTyping();
 
-    // ១. បង្កើតសាររង់ចាំ (Optimistic UI)
     final optimistic = ChatMessage(
       id: 'pending-$clientTempId',
       conversationId: id,
@@ -239,7 +236,6 @@ class ChatRoomViewController extends GetxController {
     _sortMessages();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
-    // ២. ប្រើ REST API តែម្តង (លុបកូដ try-catch WebSocket ជំនាន់ចាស់ចោល)
     try {
       final sent = await _restService.sendMessageRest(
         conversationId: id,
@@ -247,14 +243,12 @@ class ChatRoomViewController extends GetxController {
         clientTempId: clientTempId,
       );
 
-      // បើជោគជ័យ ទាញយកសារពិតពី Database មកជំនួសសារដែលកំពុងវិល
       final idx = messages.indexWhere((m) => m.clientTempId == clientTempId);
       if (idx != -1) {
         messages[idx] = sent;
         _sortMessages();
       }
     } catch (e) {
-      // បើ Error ឬដាច់អ៊ីនធឺណិត ប្តូរទៅជាសញ្ញាពណ៌ក្រហម (Failed) ភ្លាមៗ
       final idx = messages.indexWhere((m) => m.clientTempId == clientTempId);
       if (idx != -1) {
         messages[idx] = messages[idx].copyWith(
@@ -268,17 +262,20 @@ class ChatRoomViewController extends GetxController {
 
   void showDeleteOptions(ChatMessage message) {
     if (message.isDeletedForEveryone || message.isPending) {
-      return; // មិនអាចលុបសារដែលលុបរួច ឫកំពុងផ្ញើ
+      return;
     }
 
     final isMine = message.senderId == currentUserId;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : Colors.white, // 🟢 Dynamic BG
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -286,32 +283,48 @@ class ChatRoomViewController extends GetxController {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "Message Options",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              "Message Options".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Title
+              ),
             ),
             const SizedBox(height: 10),
 
-            // ជម្រើសទី ១: Delete for Me (មានសម្រាប់ទាំងសារយើង និងសារគេ)
             ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.black87),
-              title: const Text("Delete for me"),
+              leading: Icon(
+                Icons.delete_outline,
+                color: isDark
+                    ? Colors.white70
+                    : Colors.black87, // 🟢 Dynamic Icon
+              ),
+              title: Text(
+                "Delete for me".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  color: isDark
+                      ? Colors.white70
+                      : Colors.black87, // 🟢 Dynamic Text
+                ),
+              ),
               onTap: () {
                 Get.back();
                 _confirmAndDelete(message, 'me');
               },
             ),
 
-            // ជម្រើសទី ២: Delete for Everyone (មានតែសម្រាប់សារដែលយើងផ្ញើប៉ុណ្ណោះ)
             if (isMine)
               ListTile(
                 leading: const Icon(
                   Icons.delete_forever,
                   color: Colors.redAccent,
                 ),
-                title: const Text(
-                  "Delete for everyone",
-                  style: TextStyle(color: Colors.redAccent),
+                title: Text(
+                  "Delete for everyone".tr, // 🟢 Added .tr
+                  style: const TextStyle(color: Colors.redAccent),
                 ),
                 onTap: () {
                   Get.back();
@@ -327,21 +340,37 @@ class ChatRoomViewController extends GetxController {
   void _confirmAndDelete(ChatMessage message, String type) async {
     final title = type == 'everyone'
         ? 'Delete for Everyone?'
-        : 'Delete for Me?';
+              .tr // 🟢 Added .tr
+        : 'Delete for Me?'.tr; // 🟢 Added .tr
     final content = type == 'everyone'
         ? 'This message will be deleted for all participants in this chat.'
-        : 'This message will be deleted for you only. Other participants will still see it.';
+              .tr // 🟢 Added .tr
+        : 'This message will be deleted for you only. Other participants will still see it.'
+              .tr; // 🟢 Added .tr
+
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
     Get.defaultDialog(
       title: title,
+      titleStyle: TextStyle(
+        color: isDark ? Colors.white : Colors.black87,
+      ), // 🟢 Dynamic Title Color
       middleText: content,
-      textCancel: 'Cancel',
-      textConfirm: 'Delete',
+      middleTextStyle: TextStyle(
+        color: isDark ? Colors.white70 : Colors.black87,
+      ), // 🟢 Dynamic Middle Text
+      backgroundColor: isDark
+          ? AppColors.darkSurfaceElevated
+          : Colors.white, // 🟢 Dynamic Background
+      textCancel: 'Cancel'.tr, // 🟢 Added .tr
+      textConfirm: 'Delete'.tr, // 🟢 Added .tr
       confirmTextColor: Colors.white,
       buttonColor: Colors.redAccent,
-      cancelTextColor: Colors.black87,
+      cancelTextColor: isDark
+          ? Colors.white
+          : Colors.black87, // 🟢 Dynamic Cancel Color
       onConfirm: () async {
-        Get.back(); // បិទ Dialog
+        Get.back();
 
         final success = await _restService.deleteMessage(
           conversationId.value!,
@@ -350,7 +379,6 @@ class ChatRoomViewController extends GetxController {
         );
 
         if (success) {
-          // 🎯 Optimistic UI Update (ដូរ UI មុនពេល WebSocket លោតមកដល់ក៏បាន)
           if (type == 'everyone') {
             final index = messages.indexWhere((m) => m.id == message.id);
             if (index != -1) {
@@ -365,7 +393,14 @@ class ChatRoomViewController extends GetxController {
             messages.refresh();
           }
         } else {
-          Get.snackbar("Error", "Could not delete message. Please try again.");
+          Get.snackbar(
+            "Error".tr, // 🟢 Added .tr
+            "Could not delete message. Please try again.".tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? AppColors.error.withValues(alpha: 0.15)
+                : Colors.red.shade50,
+            colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+          );
         }
       },
     );

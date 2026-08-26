@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 
@@ -9,12 +10,19 @@ class CandidateSkills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Skills & Experience",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Text(
+          "Skills & Experience".tr,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -23,15 +31,20 @@ class CandidateSkills extends StatelessWidget {
           children: [
             if (applicant.yearsOfExperience > 0)
               _buildChip(
-                "${applicant.yearsOfExperience} Yrs Exp",
+                "@exp Yrs Exp".trParams({
+                  'exp': applicant.yearsOfExperience.toString(),
+                }),
+                isDark,
                 isHighlight: true,
               ),
-            ...applicant.skills.map((s) => _buildChip(s)),
+            ...applicant.skills.map((s) => _buildChip(s, isDark)),
             if (applicant.skills.isEmpty && applicant.yearsOfExperience == 0)
               Text(
-                "No specific skills provided.",
+                "No specific skills provided.".tr,
                 style: TextStyle(
-                  color: Colors.grey.shade500,
+                  color: isDark
+                      ? AppColors.darkTextTertiary
+                      : Colors.grey.shade500,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -41,18 +54,26 @@ class CandidateSkills extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(String label, {bool isHighlight = false}) {
+  Widget _buildChip(String label, bool isDark, {bool isHighlight = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isHighlight ? const Color(0xFFE0E7FF) : const Color(0xFFF0F4FF),
+        color: isHighlight
+            ? (isDark
+                  ? const Color(0xFF3730A3).withValues(alpha: 0.3)
+                  : const Color(0xFFE0E7FF))
+            : (isDark
+                  ? AppColors.darkInputBackground
+                  : const Color(0xFFF0F4FF)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 13,
-          color: isHighlight ? const Color(0xFF3730A3) : AppColors.primary,
+          color: isHighlight
+              ? (isDark ? const Color(0xFF818CF8) : const Color(0xFF3730A3))
+              : (isDark ? Colors.blueAccent : AppColors.primary),
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -15,14 +15,17 @@ class InterviewListView extends GetView<InterviewListViewController> {
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 លុប Scaffold និង AppBar ចេញ ព្រោះយើងប្រើ AppBar របស់ ChatsMainView ជំនួស
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      color: AppColors.lightSurfaceVariant,
+      color: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       child: Column(
         children: [
           Obx(
             () => _FilterTabs(
               selected: controller.filter.value,
+              isDark: isDark, // 🟢 Pass Theme
               onChanged: controller.setFilter,
             ),
           ),
@@ -37,7 +40,8 @@ class InterviewListView extends GetView<InterviewListViewController> {
               if (controller.errorMessage.value.isNotEmpty &&
                   controller.interviews.isEmpty) {
                 return _ErrorState(
-                  message: controller.errorMessage.value,
+                  message: controller.errorMessage.value, // Already Translated
+                  isDark: isDark, // 🟢 Pass Theme
                   onRetry: controller.fetchInterviews,
                 );
               }
@@ -47,14 +51,12 @@ class InterviewListView extends GetView<InterviewListViewController> {
                 return _EmptyState(
                   isUpcomingTab:
                       controller.filter.value == _InterviewFilter.upcoming,
+                  isDark: isDark, // 🟢 Pass Theme
                 );
               }
 
               return AnimatedSwitcher(
-                duration: const Duration(
-                  milliseconds: 300,
-                ), // រយៈពេលនៃការដូរ List
-                // 🎯 ប្រើ Key ដើម្បីឱ្យ Flutter ដឹងថាវាជា List ២ ផ្សេងគ្នាទើបវាធ្វើ Animation ឱ្យ
+                duration: const Duration(milliseconds: 300),
                 key: ValueKey(controller.filter.value),
                 child: RefreshIndicator(
                   color: AppColors.primary,
@@ -62,15 +64,18 @@ class InterviewListView extends GetView<InterviewListViewController> {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: visible.length,
-                    separatorBuilder: (_, _) => const Divider(
+                    separatorBuilder: (_, _) => Divider(
                       height: 1,
                       indent: 82,
-                      color: AppColors.divider,
+                      color: isDark
+                          ? AppColors.darkDivider
+                          : AppColors.divider, // 🟢 Dynamic Divider
                     ),
                     itemBuilder: (context, index) {
                       final interview = visible[index];
                       return _InterviewTile(
                         interview: interview,
+                        isDark: isDark, // 🟢 Pass Theme
                         onTap: () => controller.openInterview(interview),
                       );
                     },
@@ -89,26 +94,35 @@ enum _InterviewFilter { upcoming, past }
 
 class _FilterTabs extends StatelessWidget {
   final _InterviewFilter selected;
+  final bool isDark; // 🟢 Added
   final ValueChanged<_InterviewFilter> onChanged;
-  const _FilterTabs({required this.selected, required this.onChanged});
+
+  const _FilterTabs({
+    required this.selected,
+    required this.isDark,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isUpcoming = selected == _InterviewFilter.upcoming;
 
     return Container(
-      color: Colors.white,
+      color: isDark
+          ? AppColors.darkBackground
+          : Colors.white, // 🟢 Dynamic Outer Wrapper
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Container(
-        height: 42, // កំណត់កម្ពស់ថេរ ដើម្បីងាយស្រួលធ្វើ Animation
+        height: 42,
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: AppColors.lightSurfaceVariant,
+          color: isDark
+              ? AppColors.darkInputBackground
+              : AppColors.lightSurfaceVariant, // 🟢 Dynamic Tab Container
           borderRadius: BorderRadius.circular(12),
         ),
         child: Stack(
           children: [
-            // 🎯 ១. ផ្ទៃពណ៌សរអិលចុះឡើង (Sliding Background)
             AnimatedAlign(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,
@@ -116,15 +130,19 @@ class _FilterTabs extends StatelessWidget {
                   ? Alignment.centerLeft
                   : Alignment.centerRight,
               child: FractionallySizedBox(
-                widthFactor: 0.5, // យកទំហំ ៥០% នៃប្រអប់
+                widthFactor: 0.5,
                 heightFactor: 1.0,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.white, // 🟢 Dynamic Highlighted Pill
                     borderRadius: BorderRadius.circular(9),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.3 : 0.05,
+                        ), // 🟢 Dynamic Shadow
                         blurRadius: 6,
                       ),
                     ],
@@ -132,7 +150,6 @@ class _FilterTabs extends StatelessWidget {
                 ),
               ),
             ),
-            // 🎯 ២. អក្សរនៅពីលើផ្ទៃរអិល (Text Buttons)
             Row(
               children: [
                 Expanded(
@@ -145,12 +162,17 @@ class _FilterTabs extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
-                          // បញ្ជាក់៖ បើលោកអ្នកមានប្រើ font ផ្ទាល់ខ្លួន អាចថែម fontFamily ទីនេះ
                           color: isUpcoming
-                              ? AppColors.primary
-                              : AppColors.textTertiary,
+                              ? (isDark
+                                    ? Colors.blueAccent
+                                    : AppColors
+                                          .primary) // 🟢 Dynamic Selected Text
+                              : (isDark
+                                    ? AppColors.darkTextTertiary
+                                    : AppColors
+                                          .textTertiary), // 🟢 Dynamic Unselected Text
                         ),
-                        child: const Text('Upcoming'),
+                        child: Text('Upcoming'.tr), // 🟢 Added .tr
                       ),
                     ),
                   ),
@@ -166,10 +188,16 @@ class _FilterTabs extends StatelessWidget {
                           fontSize: 13.5,
                           fontWeight: FontWeight.w700,
                           color: !isUpcoming
-                              ? AppColors.primary
-                              : AppColors.textTertiary,
+                              ? (isDark
+                                    ? Colors.blueAccent
+                                    : AppColors
+                                          .primary) // 🟢 Dynamic Selected Text
+                              : (isDark
+                                    ? AppColors.darkTextTertiary
+                                    : AppColors
+                                          .textTertiary), // 🟢 Dynamic Unselected Text
                         ),
-                        child: const Text('Past'),
+                        child: Text('Past'.tr), // 🟢 Added .tr
                       ),
                     ),
                   ),
@@ -185,8 +213,14 @@ class _FilterTabs extends StatelessWidget {
 
 class _InterviewTile extends StatelessWidget {
   final InterviewModel interview;
+  final bool isDark; // 🟢 Added
   final VoidCallback onTap;
-  const _InterviewTile({required this.interview, required this.onTap});
+
+  const _InterviewTile({
+    required this.interview,
+    required this.isDark,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -195,12 +229,18 @@ class _InterviewTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkBackground
+            : Colors.white, // 🟢 Dynamic Tile BG
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Avatar(name: other.name, avatarUrl: other.avatarUrl),
+            _Avatar(
+              name: other.name,
+              avatarUrl: other.avatarUrl,
+              isDark: isDark,
+            ), // 🟢 Passed Theme State
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -213,15 +253,20 @@ class _InterviewTile extends StatelessWidget {
                           other.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary, // 🟢 Dynamic Title
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _StatusBadge(status: interview.status),
+                      _StatusBadge(
+                        status: interview.status,
+                        isDark: isDark,
+                      ), // 🟢 Passed Theme State
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -231,9 +276,11 @@ class _InterviewTile extends StatelessWidget {
                       interview.jobTitle!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: AppColors.primary,
+                        color: isDark
+                            ? Colors.blueAccent
+                            : AppColors.primary, // 🟢 Dynamic Subtitle
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -241,31 +288,41 @@ class _InterviewTile extends StatelessWidget {
                   ],
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.event_rounded,
                         size: 13,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextTertiary
+                            : AppColors.textTertiary, // 🟢 Dynamic Sub-icon
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDateTime(interview.scheduledAt),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
-                          color: AppColors.textTertiary,
+                          color: isDark
+                              ? AppColors.darkTextTertiary
+                              : AppColors.textTertiary, // 🟢 Dynamic Text
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Icon(
+                      Icon(
                         Icons.timer_outlined,
                         size: 13,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextTertiary
+                            : AppColors.textTertiary, // 🟢 Dynamic Sub-icon
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${interview.durationMinutes} min',
-                        style: const TextStyle(
+                        '@dur min'.trParams({
+                          'dur': interview.durationMinutes.toString(),
+                        }), // 🟢 Added .trParams
+                        style: TextStyle(
                           fontSize: 12.5,
-                          color: AppColors.textTertiary,
+                          color: isDark
+                              ? AppColors.darkTextTertiary
+                              : AppColors.textTertiary, // 🟢 Dynamic Text
                         ),
                       ),
                     ],
@@ -282,22 +339,31 @@ class _InterviewTile extends StatelessWidget {
 
 class _StatusBadge extends StatelessWidget {
   final String status;
-  const _StatusBadge({required this.status});
+  final bool isDark; // 🟢 Added
+  const _StatusBadge({required this.status, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final (label, color) = switch (status) {
-      'scheduled' => ('Scheduled', AppColors.primary),
-      'ongoing' => ('Live', AppColors.success),
-      'completed' => ('Completed', AppColors.textTertiary),
-      'cancelled' => ('Cancelled', AppColors.error),
-      'no_show' => ('No-show', AppColors.error),
-      _ => (status, AppColors.textTertiary),
+      'scheduled' => ('Scheduled'.tr, AppColors.primary), // 🟢 Added .tr
+      'ongoing' => ('Live'.tr, AppColors.success), // 🟢 Added .tr
+      'completed' => (
+        'Completed'.tr,
+        isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+      ), // 🟢 Added .tr & Dynamic
+      'cancelled' => ('Cancelled'.tr, AppColors.error), // 🟢 Added .tr
+      'no_show' => ('No-show'.tr, AppColors.error), // 🟢 Added .tr
+      _ => (
+        status,
+        isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+      ), // 🟢 Fallback Dynamic
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withValues(
+          alpha: isDark ? 0.15 : 0.12,
+        ), // 🟢 Elevated opacity on Dark
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -315,16 +381,19 @@ class _StatusBadge extends StatelessWidget {
 class _Avatar extends StatelessWidget {
   final String name;
   final String? avatarUrl;
-  const _Avatar({required this.name, this.avatarUrl});
+  final bool isDark; // 🟢 Added
+  const _Avatar({required this.name, this.avatarUrl, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 52,
       height: 52,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.primaryLight,
+        color: isDark
+            ? AppColors.primary.withValues(alpha: 0.15)
+            : AppColors.primaryLight, // 🟢 Dynamic Avatar BG
       ),
       clipBehavior: Clip.hardEdge,
       child: avatarUrl != null && avatarUrl!.trim().isNotEmpty
@@ -353,7 +422,8 @@ class _Avatar extends StatelessWidget {
 
 class _EmptyState extends StatelessWidget {
   final bool isUpcomingTab;
-  const _EmptyState({required this.isUpcomingTab});
+  final bool isDark; // 🟢 Added
+  const _EmptyState({required this.isUpcomingTab, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -366,8 +436,10 @@ class _EmptyState extends StatelessWidget {
             Container(
               width: 84,
               height: 84,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryLight,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : AppColors.primaryLight, // 🟢 Dynamic BG
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -378,22 +450,30 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              isUpcomingTab ? 'No upcoming interviews' : 'No past interviews',
-              style: const TextStyle(
+              isUpcomingTab
+                  ? 'No upcoming interviews'.tr
+                  : 'No past interviews'.tr, // 🟢 Added .tr
+              style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? Colors.white
+                    : AppColors.textPrimary, // 🟢 Dynamic Text
               ),
             ),
             const SizedBox(height: 8),
             Text(
               isUpcomingTab
                   ? 'Scheduled video interviews will show up here.'
-                  : 'Completed and cancelled interviews will show up here.',
+                        .tr // 🟢 Added .tr
+                  : 'Completed and cancelled interviews will show up here.'
+                        .tr, // 🟢 Added .tr
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13.5,
-                color: AppColors.textTertiary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textTertiary, // 🟢 Dynamic Subtext
                 height: 1.5,
               ),
             ),
@@ -406,8 +486,13 @@ class _EmptyState extends StatelessWidget {
 
 class _ErrorState extends StatelessWidget {
   final String message;
+  final bool isDark; // 🟢 Added
   final VoidCallback onRetry;
-  const _ErrorState({required this.message, required this.onRetry});
+  const _ErrorState({
+    required this.message,
+    required this.isDark,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -417,16 +502,22 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.wifi_off_rounded,
-              color: AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.darkIconSecondary
+                  : AppColors.textTertiary, // 🟢 Dynamic Icon
               size: 40,
             ),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textTertiary),
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textTertiary,
+              ), // 🟢 Dynamic Text
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -437,9 +528,9 @@ class _ErrorState extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Try Again',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                'Try Again'.tr, // 🟢 Added .tr
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
@@ -466,6 +557,6 @@ String _formatDateTime(DateTime dt) {
   ];
   final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
   final minute = dt.minute.toString().padLeft(2, '0');
-  final period = dt.hour >= 12 ? 'PM' : 'AM';
-  return '${months[dt.month - 1]} ${dt.day}, $hour:$minute $period';
+  final period = dt.hour >= 12 ? 'PM'.tr : 'AM'.tr; // 🟢 Added .tr
+  return '${months[dt.month - 1].tr} ${dt.day}, $hour:$minute $period'; // 🟢 Added .tr for month text
 }

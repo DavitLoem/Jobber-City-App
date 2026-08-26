@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class ScanningOverlay extends StatelessWidget {
@@ -10,16 +11,23 @@ class ScanningOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Positioned.fill(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
         child: Container(
-          color: Colors.black.withValues(alpha: 0.3),
+          color: Colors.black.withValues(
+            alpha: 0.3,
+          ), // 🟢 Uses modern withValues
           child: Center(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.white, // 🟢 Dynamic Modal BG
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -34,18 +42,24 @@ class ScanningOverlay extends StatelessWidget {
                 children: [
                   const CircularProgressIndicator(color: AppColors.primary),
                   const SizedBox(height: 24),
-                  const Text(
-                    'AI is analyzing your CV...',
+                  Text(
+                    'AI is analyzing your CV...'.tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color:
+                          theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'This might take a few seconds.',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                    'This might take a few seconds.'.tr, // 🟢 Added .tr
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : Colors.grey.shade600, // 🟢 Dynamic Subtext
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -61,9 +75,9 @@ class ScanningOverlay extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
+                    child: Text(
+                      'Cancel'.tr, // 🟢 Added .tr
+                      style: const TextStyle(
                         color: Colors.redAccent,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

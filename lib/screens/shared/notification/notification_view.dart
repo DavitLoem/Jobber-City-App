@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/shared/notification/widgets/notification_card.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -16,23 +17,29 @@ class NotificationView extends GetView<NotificationViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          "Notifications",
+        title: Text(
+          "Notifications".tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Color(0xFF1E293B),
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
             fontWeight: FontWeight.w800,
             fontSize: 18,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF1E293B)),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: theme.textTheme.bodyLarge?.color,
+          ), // 🟢 Dynamic Icon
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -42,10 +49,12 @@ class NotificationView extends GetView<NotificationViewController> {
               return const SizedBox.shrink();
             }
             return IconButton(
-              tooltip: "Mark all as read",
-              icon: const Icon(
+              tooltip: "Mark all as read".tr, // 🟢 Added .tr
+              icon: Icon(
                 LucideIcons.checkCheck,
-                color: Color(0xFF4F7DF7),
+                color: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Icon
               ),
               onPressed: () {
                 controller.markAllAsRead();
@@ -57,16 +66,16 @@ class NotificationView extends GetView<NotificationViewController> {
       body: Obx(() {
         if (controller.isLoading.value && controller.notifications.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF4F7DF7)),
+            child: CircularProgressIndicator(color: AppColors.primary),
           );
         }
 
         if (controller.notifications.isEmpty) {
-          return _buildEmptyState();
+          return _buildEmptyState(isDark); // 🟢 Passed Theme State
         }
 
         return RefreshIndicator(
-          color: const Color(0xFF4F7DF7),
+          color: AppColors.primary,
           onRefresh: () => controller.fetchNotifications(isRefresh: true),
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
@@ -88,7 +97,7 @@ class NotificationView extends GetView<NotificationViewController> {
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF4F7DF7),
+                        color: AppColors.primary,
                       ),
                     ),
                   );
@@ -106,14 +115,12 @@ class NotificationView extends GetView<NotificationViewController> {
                     if (notif.relatedId != null) {
                       switch (notif.type.toLowerCase()) {
                         case 'new_application':
-                          // សម្រាប់ Employer
                           Get.toNamed(
                             AppRoutes.candidateDetail,
                             arguments: notif.relatedId,
                           );
                           break;
                         case 'status_update':
-                          // សម្រាប់ Seeker
                           Get.toNamed(
                             AppRoutes.applicationDetail,
                             arguments: notif.relatedId,
@@ -131,25 +138,34 @@ class NotificationView extends GetView<NotificationViewController> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.bellOff, size: 60, color: Colors.grey.shade300),
+          Icon(
+            LucideIcons.bellOff,
+            size: 60,
+            color: isDark ? AppColors.darkIconSecondary : Colors.grey.shade300,
+          ),
           const SizedBox(height: 16),
           Text(
-            "No notifications yet",
+            "No notifications yet".tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : Colors.grey.shade600, // 🟢 Dynamic Text
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            "We'll let you know when something happens.",
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+            "We'll let you know when something happens.".tr, // 🟢 Added .tr
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? AppColors.darkTextTertiary : Colors.grey.shade500,
+            ), // 🟢 Dynamic Text
           ),
         ],
       ),

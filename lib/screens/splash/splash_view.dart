@@ -17,12 +17,12 @@ class SplashView extends GetView<SplashViewController> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context); // 🟢 Theme Check
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: Stack(
         children: [
-          // ប្រើប្រាស់ 'controller' ដើម្បីបោះតម្លៃ Animation ទៅឱ្យ Widgets
           SplashBackground(
             size: size,
             bgCtrl: controller.bgCtrl,

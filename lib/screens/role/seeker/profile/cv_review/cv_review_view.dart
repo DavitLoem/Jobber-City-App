@@ -13,21 +13,27 @@ class CvReviewView extends GetView<CvReviewViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
           ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Review Extracted Data',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'Review Extracted Data'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ), // 🟢 Dynamic Text
         ),
         centerTitle: true,
       ),
@@ -48,7 +54,8 @@ class CvReviewView extends GetView<CvReviewViewController> {
                       children: [
                         // ១. ផ្នែក Personal Information
                         _buildSectionHeader(
-                          'Personal Information',
+                          'Personal Information'.tr, // 🟢 Added .tr
+                          theme,
                           icon: Icons.person_outline,
                         ),
                         const SizedBox(height: 16),
@@ -57,50 +64,55 @@ class CvReviewView extends GetView<CvReviewViewController> {
 
                         // ២. ផ្នែក Skills
                         _buildSectionHeader(
-                          'Skills',
+                          'Skills'.tr, // 🟢 Added .tr
+                          theme,
                           icon: Icons.bolt_outlined,
                         ),
                         const SizedBox(height: 16),
-                        _buildSkillsSection(),
+                        _buildSkillsSection(isDark), // 🟢 Pass Theme State
                         const SizedBox(height: 32),
 
                         // ៣. ផ្នែក Experiences
                         _buildSectionHeaderWithAdd(
-                          title: 'Work Experiences',
+                          title: 'Work Experiences'.tr, // 🟢 Added .tr
                           icon: Icons.work_outline,
+                          theme: theme,
                           onAdd: () {
                             // TODO: បើក BottomSheet ឬ Page ថ្មីដើម្បីថែមបទពិសោធន៍
                           },
                         ),
                         const SizedBox(height: 16),
-                        _buildExperiencesList(),
+                        _buildExperiencesList(theme, isDark),
                         const SizedBox(height: 32),
 
                         // ៤. ផ្នែក Educations
                         _buildSectionHeaderWithAdd(
-                          title: 'Educations',
+                          title: 'Educations'.tr, // 🟢 Added .tr
                           icon: Icons.school_outlined,
+                          theme: theme,
                           onAdd: () {
                             // TODO: បើក BottomSheet ឬ Page ថ្មីដើម្បីថែមការសិក្សា
                           },
                         ),
                         const SizedBox(height: 16),
-                        _buildEducationsList(),
-                        const SizedBox(height: 40), // ទុកចន្លោះខាងក្រោមបន្តិច
+                        _buildEducationsList(theme, isDark),
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
                 ),
 
                 // ── ប៊ូតុង Save នៅខាងក្រោមជាប់ជានិច្ច ──
-                _buildBottomSaveButton(),
+                _buildBottomSaveButton(theme, isDark),
               ],
             ),
 
             // ── Loading Overlay ពេលកំពុង Save ──
             if (controller.isLoading.value)
               Container(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(
+                  alpha: 0.3,
+                ), // 🟢 Updated to withValues
                 child: const Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
@@ -115,17 +127,21 @@ class CvReviewView extends GetView<CvReviewViewController> {
   // 📍 អនុគមន៍ជំនួយសម្រាប់រៀបចំ UI
   // ==========================================
 
-  Widget _buildSectionHeader(String title, {required IconData icon}) {
+  Widget _buildSectionHeader(
+    String title,
+    ThemeData theme, {
+    required IconData icon,
+  }) {
     return Row(
       children: [
         Icon(icon, color: AppColors.primary, size: 24),
         const SizedBox(width: 8),
         Text(
-          title,
-          style: const TextStyle(
+          title, // 🟢 Already translated in parent
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text Color
           ),
         ),
       ],
@@ -135,12 +151,13 @@ class CvReviewView extends GetView<CvReviewViewController> {
   Widget _buildSectionHeaderWithAdd({
     required String title,
     required IconData icon,
+    required ThemeData theme,
     required VoidCallback onAdd,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSectionHeader(title, icon: icon),
+        _buildSectionHeader(title, theme, icon: icon),
         TextButton.icon(
           onPressed: onAdd,
           icon: const Icon(
@@ -148,9 +165,9 @@ class CvReviewView extends GetView<CvReviewViewController> {
             size: 20,
             color: AppColors.primary,
           ),
-          label: const Text(
-            'Add',
-            style: TextStyle(
+          label: Text(
+            'Add'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
             ),
@@ -171,14 +188,14 @@ class CvReviewView extends GetView<CvReviewViewController> {
           children: [
             Expanded(
               child: CustomTextfield(
-                hintText: 'First Name',
+                hintText: 'First Name'.tr, // 🟢 Added .tr
                 controller: controller.firstNameCtrl,
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: CustomTextfield(
-                hintText: 'Last Name',
+                hintText: 'Last Name'.tr, // 🟢 Added .tr
                 controller: controller.lastNameCtrl,
               ),
             ),
@@ -186,19 +203,19 @@ class CvReviewView extends GetView<CvReviewViewController> {
         ),
         const SizedBox(height: 16),
         CustomTextfield(
-          hintText: 'Email',
+          hintText: 'Email'.tr, // 🟢 Added .tr
           controller: controller.emailCtrl,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 16),
         CustomTextfield(
-          hintText: 'Phone Number',
+          hintText: 'Phone Number'.tr, // 🟢 Added .tr
           controller: controller.phoneCtrl,
           keyboardType: TextInputType.phone,
         ),
         const SizedBox(height: 16),
         CustomTextfield(
-          hintText: 'Biography',
+          hintText: 'Biography'.tr, // 🟢 Added .tr
           controller: controller.bioCtrl,
           maxLines: 4,
         ),
@@ -206,16 +223,15 @@ class CvReviewView extends GetView<CvReviewViewController> {
     );
   }
 
-  Widget _buildSkillsSection() {
+  Widget _buildSkillsSection(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ប្រអប់វាយបញ្ចូល Skill ថ្មី
         Row(
           children: [
             Expanded(
               child: CustomTextfield(
-                hintText: 'e.g. Flutter, Python...',
+                hintText: 'e.g. Flutter, Python...'.tr, // 🟢 Added .tr
                 controller: controller.skillInputCtrl,
               ),
             ),
@@ -233,12 +249,15 @@ class CvReviewView extends GetView<CvReviewViewController> {
           ],
         ),
         const SizedBox(height: 16),
-        // បង្ហាញជំនាញដែលមានស្រាប់ជា Chips
         Obx(() {
           if (controller.skills.isEmpty) {
             return Text(
-              'No skills extracted.',
-              style: TextStyle(color: Colors.grey.shade500),
+              'No skills extracted.'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade500,
+              ), // 🟢 Dynamic Text
             );
           }
           return Wrap(
@@ -248,10 +267,18 @@ class CvReviewView extends GetView<CvReviewViewController> {
               return Chip(
                 label: Text(
                   skill,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? Colors.blueAccent
+                        : AppColors.textPrimary, // 🟢 Dynamic Chip Text
+                  ),
                 ),
-                backgroundColor: AppColors.primaryLight.withValues(alpha: 0.3),
-
+                backgroundColor: isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : AppColors.primaryLight.withValues(
+                        alpha: 0.3,
+                      ), // 🟢 Dynamic BG
                 deleteIcon: const Icon(
                   Icons.close,
                   size: 18,
@@ -270,10 +297,13 @@ class CvReviewView extends GetView<CvReviewViewController> {
     );
   }
 
-  Widget _buildExperiencesList() {
+  Widget _buildExperiencesList(ThemeData theme, bool isDark) {
     return Obx(() {
       if (controller.experiences.isEmpty) {
-        return _buildEmptyState('No work experience found.');
+        return _buildEmptyState(
+          'No work experience found.'.tr,
+          isDark,
+        ); // 🟢 Added .tr
       }
       return ListView.separated(
         shrinkWrap: true,
@@ -283,12 +313,13 @@ class CvReviewView extends GetView<CvReviewViewController> {
         itemBuilder: (context, index) {
           final exp = controller.experiences[index];
           return _buildInfoCard(
-            title: exp.jobTitle ?? 'Unknown Title',
-            subtitle: exp.companyName ?? 'Unknown Company',
-            dateText: '${exp.startDate ?? 'N/A'} - ${exp.endDate ?? 'Present'}',
-            onEdit: () {
-              // បើក BottomSheet ឱ្យកែប្រែ
-            },
+            title: exp.jobTitle ?? 'Unknown Title'.tr, // 🟢 Added .tr
+            subtitle: exp.companyName ?? 'Unknown Company'.tr, // 🟢 Added .tr
+            dateText:
+                '${exp.startDate ?? 'N/A'} - ${exp.endDate ?? 'Present'.tr}', // 🟢 Added .tr
+            theme: theme, // 🟢 Pass Theme
+            isDark: isDark,
+            onEdit: () {},
             onDelete: () => controller.removeExperience(index),
           );
         },
@@ -296,10 +327,13 @@ class CvReviewView extends GetView<CvReviewViewController> {
     });
   }
 
-  Widget _buildEducationsList() {
+  Widget _buildEducationsList(ThemeData theme, bool isDark) {
     return Obx(() {
       if (controller.educations.isEmpty) {
-        return _buildEmptyState('No education history found.');
+        return _buildEmptyState(
+          'No education history found.'.tr,
+          isDark,
+        ); // 🟢 Added .tr
       }
       return ListView.separated(
         shrinkWrap: true,
@@ -309,12 +343,13 @@ class CvReviewView extends GetView<CvReviewViewController> {
         itemBuilder: (context, index) {
           final edu = controller.educations[index];
           return _buildInfoCard(
-            title: edu.schoolName ?? 'Unknown School',
-            subtitle: edu.degree ?? 'Unknown Degree',
-            dateText: '${edu.startDate ?? 'N/A'} - ${edu.endDate ?? 'Present'}',
-            onEdit: () {
-              // TODO: បើក BottomSheet ឱ្យកែប្រែ
-            },
+            title: edu.schoolName ?? 'Unknown School'.tr, // 🟢 Added .tr
+            subtitle: edu.degree ?? 'Unknown Degree'.tr, // 🟢 Added .tr
+            dateText:
+                '${edu.startDate ?? 'N/A'} - ${edu.endDate ?? 'Present'.tr}', // 🟢 Added .tr
+            theme: theme, // 🟢 Pass Theme
+            isDark: isDark,
+            onEdit: () {},
             onDelete: () => controller.removeEducation(index),
           );
         },
@@ -322,20 +357,25 @@ class CvReviewView extends GetView<CvReviewViewController> {
     });
   }
 
-  // Card សម្រាប់បង្ហាញទាំង Experience និង Education
   Widget _buildInfoCard({
     required String title,
     required String subtitle,
     required String dateText,
+    required ThemeData theme,
+    required bool isDark,
     required VoidCallback onEdit,
     required VoidCallback onDelete,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.grey.shade50, // 🟢 Dynamic BG
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ), // 🟢 Dynamic Border
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,15 +386,21 @@ class CvReviewView extends GetView<CvReviewViewController> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade700, // 🟢 Dynamic Subtext
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -397,23 +443,29 @@ class CvReviewView extends GetView<CvReviewViewController> {
     );
   }
 
-  Widget _buildEmptyState(String message) {
+  Widget _buildEmptyState(String message, bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.grey.shade50, // 🟢 Dynamic BG
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: isDark
+              ? AppColors.darkCardBorder
+              : Colors.grey.shade200, // 🟢 Dynamic Border
           style: BorderStyle.solid,
         ),
       ),
       child: Center(
         child: Text(
-          message,
+          message, // 🟢 Already translated
           style: TextStyle(
-            color: Colors.grey.shade500,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : Colors.grey.shade500, // 🟢 Dynamic Text
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -421,14 +473,16 @@ class CvReviewView extends GetView<CvReviewViewController> {
     );
   }
 
-  Widget _buildBottomSaveButton() {
+  Widget _buildBottomSaveButton(ThemeData theme, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor, // 🟢 Dynamic Bottom Container BG
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ), // 🟢 Dynamic Shadow
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -443,14 +497,17 @@ class CvReviewView extends GetView<CvReviewViewController> {
               : () => controller.saveReviewedData(),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
+            disabledBackgroundColor: isDark
+                ? AppColors.darkSurfaceElevated
+                : Colors.grey.shade300, // 🟢 Dynamic Disabled BG
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
             elevation: 0,
           ),
-          child: const Text(
-            'Save & Update Profile',
-            style: TextStyle(
+          child: Text(
+            'Save & Update Profile'.tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,

@@ -9,9 +9,7 @@ class MyJobDetailViewController extends GetxController {
   final locationCtrl = Get.find<LocationController>();
   final categoryCtrl = Get.find<CategoryController>();
 
-  // State Variables
   final isLoading = false.obs;
-  // សូមដូរ `JobDataModel` ទៅតាមឈ្មោះ Model ពិតប្រាកដរបស់អ្នក
   final jobData = Rxn<JobDataModel>();
   late String jobId;
 
@@ -27,13 +25,15 @@ class MyJobDetailViewController extends GetxController {
   void onReady() {
     super.onReady();
 
-    // ឆែកមើលបើអត់មាន ID ឱ្យវាលោតសារ និងថយក្រោយ
     if (Get.arguments == null || Get.arguments is! String) {
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        "Error",
-        "Job ID is missing",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Error".tr, // 🟢 Added .tr
+        "Job ID is missing".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
       Get.back();
     } else {
@@ -41,9 +41,10 @@ class MyJobDetailViewController extends GetxController {
     }
   }
 
-  // 🎯 ១. មុខងារទាញយកទិន្នន័យការងារ
   Future<void> _fetchJobDetail() async {
     isLoading.value = true;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     try {
       if (masterCtrl.masterDataCache['employment-types'] == null) {
         await masterCtrl.getMasterData(endpoint: 'employment-types');
@@ -58,26 +59,29 @@ class MyJobDetailViewController extends GetxController {
       if (response.success && response.data != null) {
         jobData.value = response.data;
 
-        // ទាញយក District ទុកមុន ដើម្បីឱ្យវាបង្ហាញឈ្មោះស្រុកបាន
         if (jobData.value?.provinceId != null) {
           await locationCtrl.getDistricts(jobData.value!.provinceId);
         }
       } else {
         Get.snackbar(
-          "Error",
-          response.message,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          "Error".tr, // 🟢 Added .tr
+          response.message.tr, // 🟢 Tr for server string if configured
+          backgroundColor: isDark
+              ? AppColors.error.withValues(alpha: 0.15)
+              : Colors.red,
+          colorText: isDark ? Colors.redAccent : Colors.white,
         );
       }
     } catch (e, stackTrace) {
       debugPrint("🔥 Error fetching job detail: $e");
       debugPrint("🔥 StackTrace: $stackTrace");
       Get.snackbar(
-        "Error",
-        "Could not load job details.",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Error".tr, // 🟢 Added .tr
+        "Could not load job details.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     } finally {
       isLoading.value = false;
@@ -88,21 +92,17 @@ class MyJobDetailViewController extends GetxController {
     final catId = jobData.value?.categoryId;
     if (catId == null || catId.isEmpty) return '';
 
-    // រកមើលឈ្មោះ Category ក្នុង List របស់ CategoryController
     final category = categoryCtrl.categories.firstWhereOrNull(
       (c) => c.id == catId,
     );
     return category?.name ?? '';
   }
 
-  // 🎯 ២. មុខងារបំប្លែង ID ទៅជាឈ្មោះ (Helper Functions)
-
   String getLocationName() {
     if (jobData.value == null) return '';
     final provId = jobData.value!.provinceId;
     final distId = jobData.value!.districtId;
 
-    // ដូរ nameEn ទៅតាម Field ពិតក្នុង LocationModel របស់អ្នក
     final provName =
         locationCtrl.provinces
             .firstWhereOrNull((p) => p.id == provId)
@@ -118,13 +118,12 @@ class MyJobDetailViewController extends GetxController {
       return "$distName, $provName";
     }
     if (provName.isNotEmpty) return provName;
-    return "Unknown Location";
+    return "Unknown Location".tr; // 🟢 Added .tr
   }
 
   String getEmploymentTypeName() {
     final typeId = jobData.value?.employmentTypeId;
-    if (typeId == null || typeId.isEmpty) return 'N/A';
-    // 🎯 ហៅប្រើ Generic Method ពី MasterDataController
+    if (typeId == null || typeId.isEmpty) return 'N/A'.tr; // 🟢 Added .tr
     return masterCtrl.getMasterDataName('employment-types', typeId);
   }
 
@@ -132,9 +131,9 @@ class MyJobDetailViewController extends GetxController {
     return masterCtrl.getMasterDataName('skills', skillId);
   }
 
-  // 🎯 ៣. មុខងារគ្រប់គ្រងការងារ (Actions)
-
   Future<void> updateJobStatus(String newStatus) async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     try {
       Get.dialog(
         const Center(
@@ -151,41 +150,42 @@ class MyJobDetailViewController extends GetxController {
       Get.back();
 
       if (success) {
-        // ១. Update UI ក្នុង Detail Screen
         jobData.value = jobData.value?.copyWith(status: newStatus);
 
-        // 🎯 ២. Update UI ក្នុង List Screen ខាងក្រៅ (MyJobViewController)
         if (Get.isRegistered<MyJobViewController>()) {
           final listCtrl = Get.find<MyJobViewController>();
-          // ស្វែងរកទីតាំង (Index) នៃការងារនេះក្នុងបញ្ជី
           final index = listCtrl.jobs.indexWhere((j) => j.id == jobId);
           if (index != -1) {
-            // Update តែ Item នេះប៉ុណ្ណោះ រួចប្រាប់ Obx ឱ្យគូរឡើងវិញ
             listCtrl.jobs[index] = listCtrl.jobs[index].copyWith(
               status: newStatus,
             );
             listCtrl.jobs.refresh();
 
-            // 🟢 [បន្ថែមថ្មី]: ធ្វើបច្ចុប្បន្នភាពតួលេខនៅលើ Tab (All, Active, Paused...)
             listCtrl.fetchStatusSummary();
           }
         }
 
         Get.snackbar(
-          'Status Updated',
-          'The job status has been changed to $newStatus.',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          'Status Updated'.tr, // 🟢 Added .tr
+          'The job status has been changed to @status.'.trParams({
+            'status': newStatus.tr,
+          }), // 🟢 Added .trParams
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green,
+          colorText: isDark ? Colors.greenAccent : Colors.white,
           snackPosition: SnackPosition.TOP,
         );
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
       Get.snackbar(
-        "Update Failed",
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Update Failed".tr, // 🟢 Added .tr
+        e.toString().tr,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     }
   }

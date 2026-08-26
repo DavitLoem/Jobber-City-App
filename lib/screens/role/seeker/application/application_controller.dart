@@ -23,11 +23,19 @@ class ApplicationViewController extends GetxController {
       applications.assignAll(result);
     } catch (e) {
       debugPrint("❌ Error fetching my applications: $e");
+
+      final isDark =
+          Get.isDarkMode; // 🟢 Extract active theme context for Get.snackbar
+
       Get.snackbar(
-        "Error",
-        "Cannot load your applications. Please try again.",
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        "Error".tr, // 🟢 Added .tr
+        "Cannot load your applications. Please try again.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.redAccent.withValues(alpha: 0.15)
+            : Colors.red.shade50, // 🟢 Dynamic Color
+        colorText: isDark
+            ? Colors.redAccent
+            : Colors.red.shade700, // 🟢 Dynamic Color
       );
     } finally {
       isLoading.value = false;

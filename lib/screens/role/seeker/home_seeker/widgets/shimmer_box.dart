@@ -45,6 +45,14 @@ class _ShimmerBoxState extends State<ShimmerBox>
 
   @override
   Widget build(BuildContext context) {
+    // 🟢 Update background color dynamically depending on the current theme mode
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final defaultBaseColor = isDark
+        ? AppColors.darkSurfaceElevated
+        : AppColors.shimmerBase;
+
     return AnimatedBuilder(
       animation: _opacity,
       builder: (context, child) {
@@ -54,7 +62,7 @@ class _ShimmerBoxState extends State<ShimmerBox>
             width: widget.width,
             height: widget.height,
             decoration: BoxDecoration(
-              color: widget.baseColor ?? AppColors.shimmerBase,
+              color: widget.baseColor ?? defaultBaseColor,
               borderRadius: BorderRadius.circular(widget.borderRadius),
             ),
           ),

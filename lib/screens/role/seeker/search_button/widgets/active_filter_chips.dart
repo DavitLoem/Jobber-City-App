@@ -17,20 +17,23 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
     final locationCtrl = Get.find<LocationController>();
     final masterDataCtrl = Get.find<MasterDataController>();
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Obx(() {
-      // បើអត់មាន Filter ទេ មិនបាច់បង្ហាញរបារនេះឡើយ
       if (controller.activeFiltersCount.value == 0) {
         return const SizedBox.shrink();
       }
 
       List<Widget> chips = [];
 
-      // អនុគមន៍ជំនួយសម្រាប់គូរ Chip នីមួយៗ
       Widget buildChip(String label, String filterType) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.primaryLight,
+            color: isDark
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : AppColors.primaryLight, // 🟢 Dynamic BG
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: AppColors.primary.withValues(alpha: 0.15),
@@ -40,21 +43,24 @@ class ActiveFilterChips extends GetView<SearchButtonViewController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                label,
-                style: const TextStyle(
+                label.tr, // 🟢 Translate if applicable
+                style: TextStyle(
                   fontSize: 12.5,
-                  color: AppColors.primary,
+                  color: isDark
+                      ? Colors.blueAccent
+                      : AppColors.primary, // 🟢 Dynamic Text
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(width: 6),
               GestureDetector(
-                onTap: () =>
-                    controller.removeFilter(filterType), // 🎯 ហៅមុខងារលុប
-                child: const Icon(
+                onTap: () => controller.removeFilter(filterType),
+                child: Icon(
                   Icons.close_rounded,
                   size: 16,
-                  color: AppColors.primary,
+                  color: isDark
+                      ? Colors.blueAccent
+                      : AppColors.primary, // 🟢 Dynamic Icon
                 ),
               ),
             ],

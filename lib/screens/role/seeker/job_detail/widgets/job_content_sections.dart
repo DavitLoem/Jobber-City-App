@@ -9,6 +9,9 @@ class JobContentSections extends GetView<JobDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Obx(() {
       final job = controller.job.value;
       if (job == null) return const Center(child: CircularProgressIndicator());
@@ -16,68 +19,79 @@ class JobContentSections extends GetView<JobDetailController> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🎯 ១. កែសម្រួល Grid មកនៅត្រឹម ៤ ប្រអប់ (ទាញឱ្យវារាងវែងដូចប៊ូតុង)
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
-            childAspectRatio: 2.5, // ធ្វើឱ្យប្រអប់មានរាងផ្តេក (Horizontal)
+            childAspectRatio: 2.5,
             children: [
               _statChip(
                 icon: Icons.payments_rounded,
                 label: "\$${job.minSalary} - \$${job.maxSalary}",
                 highlight: true,
+                isDark: isDark,
               ),
               _statChip(
                 icon: Icons.work_outline_rounded,
-                label: job.employmentType,
+                label: job.employmentType.tr, // 🟢 Added .tr
+                isDark: isDark,
               ),
-              _statChip(icon: Icons.apartment_rounded, label: job.workType),
+              _statChip(
+                icon: Icons.apartment_rounded,
+                label: job.workType.tr, // 🟢 Added .tr
+                isDark: isDark,
+              ),
               _statChip(
                 icon: Icons.badge_rounded,
-                label: job.experience.isNotEmpty ? job.experience : "Any Exp",
+                label: job.experience.isNotEmpty
+                    ? job.experience
+                    : "Any Exp".tr, // 🟢 Added .tr
+                isDark: isDark,
               ),
             ],
           ),
 
           const SizedBox(height: 16),
 
-          // 🎯 ២. បន្ថែមកាតថ្មីដែលរៀបចំបញ្ជីដូចទៅនឹង Employer View
-          _buildJobInfoCard(job),
+          _buildJobInfoCard(job, theme, isDark),
 
           const SizedBox(height: 18),
-          _buildSectionTitle("Job Description"),
+          _buildSectionTitle("Job Description".tr, theme), // 🟢 Added .tr
           const SizedBox(height: 8),
-          _buildTextList(job.description),
+          _buildTextList(job.description, isDark),
 
           const SizedBox(height: 24),
-          _buildSectionTitle("Requirements"),
+          _buildSectionTitle("Requirements".tr, theme), // 🟢 Added .tr
           const SizedBox(height: 10),
-          _buildTextList(job.requirements),
+          _buildTextList(job.requirements, isDark),
 
           const SizedBox(height: 24),
-          _buildSectionTitle("Benefits"),
+          _buildSectionTitle("Benefits".tr, theme), // 🟢 Added .tr
           const SizedBox(height: 12),
-          _buildBenefits(job.benefits),
+          _buildBenefits(job.benefits, isDark),
         ],
       );
     });
   }
 
-  // 🎯 កែសម្រួល Chip ឱ្យបង្ហាញ Icon និង Text ទន្ទឹមគ្នា (Row)
   Widget _statChip({
     required IconData icon,
     required String label,
     bool highlight = false,
+    required bool isDark,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: highlight
-            ? AppColors.primaryLight
-            : AppColors.lightSurfaceVariant,
+            ? (isDark
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : AppColors.primaryLight) // 🟢 Dynamic Highlight BG
+            : (isDark
+                  ? AppColors.darkSurfaceElevated
+                  : AppColors.lightSurfaceVariant), // 🟢 Dynamic Normal BG
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -86,7 +100,11 @@ class JobContentSections extends GetView<JobDetailController> {
           Icon(
             icon,
             size: 18,
-            color: highlight ? AppColors.primary : AppColors.textTertiary,
+            color: highlight
+                ? AppColors.primary
+                : (isDark
+                      ? AppColors.darkIconSecondary
+                      : AppColors.textTertiary), // 🟢 Dynamic Icon
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -97,7 +115,11 @@ class JobContentSections extends GetView<JobDetailController> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: highlight ? AppColors.primary : AppColors.textPrimary,
+                color: highlight
+                    ? AppColors.primary
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textPrimary), // 🟢 Dynamic Text
               ),
             ),
           ),
@@ -106,45 +128,60 @@ class JobContentSections extends GetView<JobDetailController> {
     );
   }
 
-  // 🎯 ៣. កាតបង្ហាញព័ត៌មានលម្អិត
-  Widget _buildJobInfoCard(dynamic job) {
+  Widget _buildJobInfoCard(dynamic job, ThemeData theme, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB), // ពណ៌ប្រផេះស្រាល
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : const Color(0xFFF9FAFB), // 🟢 Dynamic List Box BG
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ), // 🟢 Dynamic Border
       ),
       child: Column(
         children: [
           _infoRow(
             Icons.calendar_month_rounded,
-            "Working Days",
+            "Working Days".tr, // 🟢 Added .tr
             job.workingDays,
+            theme,
+            isDark,
           ),
           const SizedBox(height: 14),
           _infoRow(
             Icons.access_time_rounded,
-            "Working Hours",
-            job.workingHours ?? "N/A",
+            "Working Hours".tr, // 🟢 Added .tr
+            job.workingHours ?? "N/A".tr, // 🟢 Added .tr
+            theme,
+            isDark,
           ),
           const SizedBox(height: 14),
           _infoRow(
             Icons.people_alt_rounded,
-            "Headcount",
-            "${job.headcount} Position(s)",
+            "Headcount".tr, // 🟢 Added .tr
+            "@count Position(s)".trParams({
+              'count': job.headcount.toString(),
+            }), // 🟢 Added .trParams
+            theme,
+            isDark,
           ),
           const SizedBox(height: 14),
           _infoRow(
             Icons.history_rounded,
-            "Posted Date",
+            "Posted Date".tr, // 🟢 Added .tr
             _formatDate(job.createdAt),
+            theme,
+            isDark,
           ),
           const SizedBox(height: 14),
           _infoRow(
             Icons.event_busy_rounded,
-            "Closing Date",
+            "Closing Date".tr, // 🟢 Added .tr
             _formatDate(job.closingDate),
+            theme,
+            isDark,
             isAlert: true,
           ),
         ],
@@ -152,58 +189,73 @@ class JobContentSections extends GetView<JobDetailController> {
     );
   }
 
-  // 🎯 Widget ជំនួយសម្រាប់គូរជួរនីមួយៗនៅក្នុងកាត
   Widget _infoRow(
     IconData icon,
     String label,
-    String value, {
+    String value,
+    ThemeData theme,
+    bool isDark, {
     bool isAlert = false,
   }) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textTertiary),
+        Icon(
+          icon,
+          size: 18,
+          color: isDark
+              ? AppColors.darkIconSecondary
+              : AppColors.textTertiary, // 🟢 Dynamic Icon
+        ),
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(fontSize: 13.5, color: AppColors.textTertiary),
+          style: TextStyle(
+            fontSize: 13.5,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textTertiary, // 🟢 Dynamic Label
+          ),
         ),
         const Spacer(),
         Text(
-          value.isNotEmpty ? value : "N/A",
+          value.isNotEmpty ? value : "N/A".tr, // 🟢 Added .tr
           style: TextStyle(
             fontSize: 13.5,
             fontWeight: FontWeight.bold,
-            color: isAlert ? Colors.redAccent : AppColors.textPrimary,
+            color: isAlert
+                ? (isDark ? Colors.redAccent : Colors.redAccent)
+                : theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
           ),
         ),
       ],
     );
   }
 
-  // 🎯 អនុគមន៍កាត់យកតែថ្ងៃខែឆ្នាំ (YYYY-MM-DD)
   String _formatDate(DateTime? date) {
-    if (date == null) return "N/A";
-
-    // បំប្លែង DateTime ទៅជាទម្រង់ YYYY-MM-DD
+    if (date == null) return "N/A".tr; // 🟢 Added .tr
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
-  Widget _buildSectionTitle(String text) {
+  Widget _buildSectionTitle(String text, ThemeData theme) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16.5,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
+        color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
       ),
     );
   }
 
-  Widget _buildTextList(List<String> items) {
+  Widget _buildTextList(List<String> items, bool isDark) {
     if (items.isEmpty) {
-      return const Text(
-        "No details provided.",
-        style: TextStyle(color: AppColors.textTertiary),
+      return Text(
+        "No details provided.".tr, // 🟢 Added .tr
+        style: TextStyle(
+          color: isDark
+              ? AppColors.darkTextTertiary
+              : AppColors.textTertiary, // 🟢 Dynamic Default
+        ),
       );
     }
 
@@ -229,10 +281,13 @@ class JobContentSections extends GetView<JobDetailController> {
                   Expanded(
                     child: Text(
                       item,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         height: 1.45,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors
+                                  .textTertiary, // 🟢 Dynamic Paragraph Text
                       ),
                     ),
                   ),
@@ -244,11 +299,15 @@ class JobContentSections extends GetView<JobDetailController> {
     );
   }
 
-  Widget _buildBenefits(List<String> benefits) {
+  Widget _buildBenefits(List<String> benefits, bool isDark) {
     if (benefits.isEmpty) {
-      return const Text(
-        "No specific benefits.",
-        style: TextStyle(color: AppColors.textTertiary),
+      return Text(
+        "No specific benefits.".tr, // 🟢 Added .tr
+        style: TextStyle(
+          color: isDark
+              ? AppColors.darkTextTertiary
+              : AppColors.textTertiary, // 🟢 Dynamic Default
+        ),
       );
     }
 
@@ -260,25 +319,31 @@ class JobContentSections extends GetView<JobDetailController> {
           constraints: BoxConstraints(maxWidth: Get.width - 40),
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
           decoration: BoxDecoration(
-            color: AppColors.successBackground,
+            color: isDark
+                ? AppColors.success.withValues(alpha: 0.15)
+                : AppColors.successBackground, // 🟢 Dynamic Tag BG
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle_rounded,
                 size: 14,
-                color: AppColors.success,
+                color: isDark
+                    ? Colors.greenAccent
+                    : AppColors.success, // 🟢 Dynamic Tag Icon
               ),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
                   benefit,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.success,
+                    color: isDark
+                        ? Colors.greenAccent
+                        : AppColors.success, // 🟢 Dynamic Tag Text
                   ),
                 ),
               ),

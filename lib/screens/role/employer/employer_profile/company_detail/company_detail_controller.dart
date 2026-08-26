@@ -1,13 +1,11 @@
 part of 'company_detail_view.dart';
 
 class CompanyDetailViewController extends GetxController {
-  // ── Controllers ផ្សេងៗដែលត្រូវប្រើ ──
   final masterCtrl = Get.find<MasterDataController>();
   final locationCtrl = Get.find<LocationController>();
 
   final JobService _jobService = JobService();
 
-  // យើងអាចយក Profile ពី EmployerProfileViewController មកប្រើតែម្តង
   CompanyProfileModel? get companyProfile {
     if (Get.isRegistered<EmployerProfileViewController>()) {
       return Get.find<EmployerProfileViewController>().companyProfile.value;
@@ -29,7 +27,6 @@ class CompanyDetailViewController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
     scrollController.addListener(_scrollListener);
   }
 
@@ -39,7 +36,6 @@ class CompanyDetailViewController extends GetxController {
     _fetchActiveJobs(isRefresh: true);
   }
 
-  // មុខងារទាញយកការងារសកម្ម
   Future<void> _fetchActiveJobs({bool isRefresh = false}) async {
     if (companyProfile == null) return;
 
@@ -54,12 +50,10 @@ class CompanyDetailViewController extends GetxController {
     }
 
     try {
-      // ធានាថា Master Data មានក្នុង Cache សិន
       if (masterCtrl.masterDataCache['employment-types'] == null) {
         await masterCtrl.getMasterData(endpoint: 'employment-types');
       }
 
-      // ហៅ API ទាញយកការងារ
       final response = await _jobService.getJobs(
         page: _currentPage,
         limit: _limit,
@@ -67,7 +61,6 @@ class CompanyDetailViewController extends GetxController {
       );
 
       if (response.success) {
-        // លុបការ Filter (.where) ចោល ព្រោះ API គួរតែទាញមកតែ Active ស្រាប់
         final fetchedActiveJobs = response.data;
 
         if (isRefresh) {
@@ -92,15 +85,11 @@ class CompanyDetailViewController extends GetxController {
   }
 
   void _scrollListener() {
-    // 🎯 ១. ការពារកុំឱ្យវាដើរ បើមិនទាន់ភ្ជាប់ជាមួយ UI ពេញលេញ
     if (!scrollController.hasClients) return;
-
-    // 🎯 ២. ការពារកុំឱ្យវាហៅ API ផ្ទួនៗគ្នាពេលកំពុង Load ស្រាប់
     if (isLoadingJobs.value || isLoadingMoreJobs.value) return;
 
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent - 200) {
-      // ប្រសិនបើអូសជិតដល់បាត (សល់ 200 pixels) ទើបហៅទិន្នន័យបន្ថែម
       _fetchActiveJobs(isRefresh: false);
     }
   }
@@ -122,27 +111,27 @@ class CompanyDetailViewController extends GetxController {
   }
 
   String getIndustryName(String? industryId) {
-    if (industryId == null || industryId.isEmpty) return 'Unknown Industry';
+    if (industryId == null || industryId.isEmpty)
+      return 'Unknown Industry'.tr; // 🟢 Added .tr
     try {
       final industries = masterCtrl.masterDataCache['industries'];
       if (industries != null) {
         final industry = industries.firstWhere((i) => i.id == industryId);
-        return industry.name; // ឈ្មោះ Field តាម Model របស់អ្នក
+        return industry.name;
       }
     } catch (_) {}
-    return 'Unknown Industry';
+    return 'Unknown Industry'.tr; // 🟢 Added .tr
   }
 
   String getLocationName(String? provId, String? distId) {
-    if (provId == null || provId.isEmpty) return 'Unknown Location';
+    if (provId == null || provId.isEmpty)
+      return 'Unknown Location'.tr; // 🟢 Added .tr
     String location = '';
 
     try {
-      // យកឈ្មោះខេត្ត
       final province = locationCtrl.provinces.firstWhere((p) => p.id == provId);
-      location = province.nameEn; // ឈ្មោះ Field តាម Model របស់អ្នក
+      location = province.nameEn;
 
-      // បើមាន Cache ស្រុក អាចយកមកបង្ហាញបន្ថែមបាន
       if (distId != null && locationCtrl.districtsCache.containsKey(provId)) {
         final district = locationCtrl.districtsCache[provId]!.firstWhere(
           (d) => d.id == distId,
@@ -151,10 +140,9 @@ class CompanyDetailViewController extends GetxController {
       }
     } catch (_) {}
 
-    return location.isEmpty ? 'Unknown Location' : location;
+    return location.isEmpty ? 'Unknown Location'.tr : location; // 🟢 Added .tr
   }
 
-  // 🎯 មុខងារថ្មីសម្រាប់ទាញយក District មកញាត់ចូលក្នុង Cache
   Future<void> _fetchDistrictsForLoadedData() async {
     final Set<String> provinceIdsToFetch = {};
 
@@ -173,7 +161,6 @@ class CompanyDetailViewController extends GetxController {
       await locationCtrl.getDistricts(provId);
     }
 
-    // 🎯 ២. ពេលទាញចប់ បើកកុងតាក់នេះ ដើម្បីប្រាប់ UI ឱ្យគូរឡើងវិញ
     isLocationLoaded.value = true;
     activeJobs.refresh();
   }

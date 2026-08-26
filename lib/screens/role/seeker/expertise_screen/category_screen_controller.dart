@@ -58,14 +58,33 @@ class CategoryScreenViewController extends GetxController {
       if (selectedCategoryIds.length < 5) {
         selectedCategoryIds.add(id);
       } else {
-        Get.snackbar('Notice', 'You can only select up to 5 categories.');
+        final isDark = Get.isDarkMode; // 🟢 Get the current theme mode
+        Get.snackbar(
+          'Notice'.tr, // 🟢 Added .tr
+          'You can only select up to 5 categories.'.tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? Colors.orangeAccent.withValues(alpha: 0.15)
+              : AppColors.warningBackground, // 🟢 Dynamic BG
+          colorText: isDark
+              ? Colors.orangeAccent
+              : AppColors.warning, // 🟢 Dynamic Text
+        );
       }
     }
   }
 
   Future<void> continueToNextScreen() async {
+    final isDark = Get.isDarkMode;
+
     if (selectedCategoryIds.isEmpty) {
-      Get.snackbar('Action Required', 'Please select at least one expertise.');
+      Get.snackbar(
+        'Action Required'.tr, // 🟢 Added .tr
+        'Please select at least one expertise.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : AppColors.warningBackground,
+        colorText: isDark ? Colors.orangeAccent : AppColors.warning,
+      );
       return;
     }
 
@@ -91,7 +110,14 @@ class CategoryScreenViewController extends GetxController {
 
       Get.offAllNamed(AppRoutes.mainScreenSeeker);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to complete setup. Please try again.');
+      Get.snackbar(
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to complete setup. Please try again.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
       debugPrint("Onboarding Submit Error: $e");
     } finally {
       isSubmitting.value = false;

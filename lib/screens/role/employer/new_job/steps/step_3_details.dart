@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/models/master_data_model.dart';
 import 'package:jobber_city/screens/role/employer/new_job/new_job_view.dart';
 import 'package:jobber_city/widgets/bullet_list_formatter.dart';
@@ -13,37 +13,50 @@ class Step3Details extends GetView<NewJobViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : Colors.white, // 🟢 Dynamic Section BG
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+          ), // 🟢 Dynamic Section Border
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Job Details",
+            Text(
+              "Job Details".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Section Header Text
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              "Provide specific requirements and benefits",
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+              "Provide specific requirements and benefits".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade500,
+              ), // 🟢 Dynamic Instruction Text
             ),
             const SizedBox(height: 24),
 
-            // ── 1. Education Level (ប្រើ Single Select ដូច Step 1) ──
             CustomFormTextField(
-              label: "Education Level *",
-              hint: "e.g. Bachelor's Degree",
+              label: "Education Level *".tr, // 🟢 Added .tr
+              hint: "e.g. Bachelor's Degree".tr, // 🟢 Added .tr
               isDropdown: true,
               controller: controller.educationLevelCtrl,
               onTap: () async {
@@ -51,7 +64,7 @@ class Step3Details extends GetView<NewJobViewController> {
                     .getMasterData(endpoint: 'education-levels');
 
                 CustomBottomSheetPicker.show<MasterDataModel>(
-                  title: "Select Education Level",
+                  title: "Select Education Level".tr, // 🟢 Added .tr
                   items: educations,
                   getName: (item) => item.name,
                   onSelected: (item) {
@@ -64,26 +77,24 @@ class Step3Details extends GetView<NewJobViewController> {
             const SizedBox(height: 16),
 
             CustomFormTextField(
-              label: "Experience *",
-              hint: "e.g. 1 Year, 2-3 Years, No experience",
+              label: "Experience *".tr, // 🟢 Added .tr
+              hint: "e.g. 1 Year, 2-3 Years, No experience".tr, // 🟢 Added .tr
               controller: controller.experienceCtrl,
             ),
             const SizedBox(height: 16),
 
-            // ── 2. Required Skills (Multi-Select ពី Master Data) ──
             CustomFormTextField(
-              label: "Required Skills *",
-              hint: "Tap to select skills",
+              label: "Required Skills *".tr, // 🟢 Added .tr
+              hint: "Tap to select skills".tr, // 🟢 Added .tr
               isDropdown: true,
               controller: controller.requiredSkillsTextCtrl,
               onTap: () async {
-                // ទាញយក Skills ពី Master Data
                 final skills = await controller.masterDataCtrl.getMasterData(
                   endpoint: 'skills',
                 );
 
                 CustomMultiSelectBottomSheet.show<MasterDataModel>(
-                  title: "Select Required Skills",
+                  title: "Select Required Skills".tr, // 🟢 Added .tr
                   items: skills,
                   initialSelectedIds: controller.selectedSkillIds.toList(),
                   getName: (item) => item.name,
@@ -103,7 +114,6 @@ class Step3Details extends GetView<NewJobViewController> {
               },
             ),
 
-            // បង្ហាញ Chips ពណ៌ខៀវខាងក្រោមប្រអប់ ពេលគាត់រើសរួចរាល់
             Obx(
               () => controller.selectedSkillNames.isNotEmpty
                   ? Padding(
@@ -127,13 +137,11 @@ class Step3Details extends GetView<NewJobViewController> {
                               color: Colors.white,
                             ),
                             onDeleted: () {
-                              // មុខងារចុចខ្វែងលុប
                               final index = controller.selectedSkillNames
                                   .indexOf(skill);
                               controller.selectedSkillNames.removeAt(index);
                               controller.selectedSkillIds.removeAt(index);
 
-                              // 🎯 ត្រូវថែមបន្ទាត់នេះ! ដើម្បី Update អក្សរក្នុងប្រអប់វិញ
                               controller.requiredSkillsTextCtrl.text =
                                   controller.selectedSkillNames.join(", ");
                             },
@@ -146,24 +154,24 @@ class Step3Details extends GetView<NewJobViewController> {
 
             const SizedBox(height: 16),
 
-            // ── 3. Custom Skills (បញ្ចូលដោយសេរី) ──
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: CustomFormTextField(
-                    label: "Other Custom Skills (Optional)",
-                    hint: "e.g. Figma",
+                    label: "Other Custom Skills (Optional)".tr, // 🟢 Added .tr
+                    hint: "e.g. Figma".tr, // 🟢 Added .tr
                     controller: controller.customSkillsCtrl,
                   ),
                 ),
                 const SizedBox(width: 8),
 
-                // ប៊ូតុងសម្រាប់ចុច Add បញ្ចូល Skill
                 ElevatedButton(
                   onPressed: controller.addCustomSkill,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.white, // 🟢 Dynamic Add Skill Button Base
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 14,
@@ -171,13 +179,18 @@ class Step3Details extends GetView<NewJobViewController> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    side: BorderSide(color: AppColors.primary, width: 1.5),
+                    side: BorderSide(
+                      color: isDark ? Colors.blueAccent : AppColors.primary,
+                      width: 1.5,
+                    ), // 🟢 Dynamic Outline Color
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Add",
+                  child: Text(
+                    "Add".tr, // 🟢 Added .tr
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: isDark
+                          ? Colors.blueAccent
+                          : AppColors.primary, // 🟢 Dynamic Action Text
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -185,7 +198,6 @@ class Step3Details extends GetView<NewJobViewController> {
               ],
             ),
 
-            // បង្ហាញ Chips សម្រាប់ Custom Skills ខាងក្រោមប្រអប់
             Obx(
               () => controller.customSkillsList.isNotEmpty
                   ? Padding(
@@ -197,24 +209,34 @@ class Step3Details extends GetView<NewJobViewController> {
                           return Chip(
                             label: Text(
                               skill,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.black87,
+                                color: isDark
+                                    ? Colors.white
+                                    : Colors.black87, // 🟢 Dynamic Text
                               ),
                             ),
-                            // ប្រើពណ៌ប្រផេះស្រាល ដើម្បីងាយស្រួលចំណាំខុសពី Required Skills ពណ៌ខៀវ
-                            backgroundColor: Colors.grey.shade100,
+                            backgroundColor: isDark
+                                ? AppColors.darkInputBackground
+                                : Colors
+                                      .grey
+                                      .shade100, // 🟢 Dynamic Free-Form Tag Pill BG
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
-                              side: BorderSide(color: Colors.grey.shade300),
+                              side: BorderSide(
+                                color: isDark
+                                    ? AppColors.darkCardBorder
+                                    : Colors.grey.shade300,
+                              ), // 🟢 Dynamic Edge Line
                             ),
-                            deleteIcon: const Icon(
+                            deleteIcon: Icon(
                               Icons.close,
                               size: 16,
-                              color: Colors.black54,
+                              color: isDark
+                                  ? AppColors.darkIconSecondary
+                                  : Colors.black54, // 🟢 Dynamic Dismiss Icon
                             ),
                             onDeleted: () {
-                              // មុខងារចុចខ្វែងលុប
                               controller.customSkillsList.remove(skill);
                             },
                           );
@@ -226,30 +248,30 @@ class Step3Details extends GetView<NewJobViewController> {
 
             const SizedBox(height: 16),
 
-            // ── 4. Job Description ──
             CustomFormTextField(
-              label: "Job Description *",
-              hint: "Describe the day-to-day responsibilities...",
+              label: "Job Description *".tr, // 🟢 Added .tr
+              hint: "Describe the day-to-day responsibilities..."
+                  .tr, // 🟢 Added .tr
               maxLines: 4,
               controller: controller.descriptionCtrl,
               inputFormatters: [BulletListFormatter()],
             ),
             const SizedBox(height: 16),
 
-            // ── 5. Requirements ──
             CustomFormTextField(
-              label: "Requirements *",
-              hint: "List the required qualifications, experience...",
+              label: "Requirements *".tr, // 🟢 Added .tr
+              hint: "List the required qualifications, experience..."
+                  .tr, // 🟢 Added .tr
               maxLines: 4,
               controller: controller.requirementsCtrl,
               inputFormatters: [BulletListFormatter()],
             ),
             const SizedBox(height: 16),
 
-            // ── 6. Benefits ──
             CustomFormTextField(
-              label: "Benefits",
-              hint: "List what you offer (e.g. Insurance, Annual Leave...)",
+              label: "Benefits".tr, // 🟢 Added .tr
+              hint: "List what you offer (e.g. Insurance, Annual Leave...)"
+                  .tr, // 🟢 Added .tr
               maxLines: 4,
               controller: controller.benefitsCtrl,
               inputFormatters: [BulletListFormatter()],

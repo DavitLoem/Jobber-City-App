@@ -10,7 +10,7 @@ class NewJobViewController extends GetxController {
   final masterDataCtrl = Get.find<MasterDataController>();
 
   // ==========================================
-  // ── 2. General State (ការគ្រប់គ្រងទូទៅ) ──
+  // ── 2. General State ──
   // ==========================================
   final currentStep = 0.obs;
   final isLoading = false.obs;
@@ -116,7 +116,6 @@ class NewJobViewController extends GetxController {
 
     isPrefilling.value = true;
 
-    // ================= 1. Basic Info =================
     titleCtrl.text = job.title;
     headcountCtrl.text = job.headcount.toString();
 
@@ -127,14 +126,12 @@ class NewJobViewController extends GetxController {
     selectedWorkTypeId.value = job.workTypeId;
     selectedEmploymentTypeId.value = job.employmentTypeId;
 
-    // ក. ទាញយកឈ្មោះ Province និង District
     if (job.provinceId.isNotEmpty) {
       try {
         provinceCtrl.text = locationDataCtrl.provinces
             .firstWhere((p) => p.id == job.provinceId)
             .nameEn;
 
-        // 🎯 ដំណោះស្រាយ District: ត្រូវរង់ចាំទាញយក District តាម Province ID សិន
         if (job.districtId.isNotEmpty) {
           final districts = await locationDataCtrl.getDistricts(job.provinceId);
           districtCtrl.text = districts
@@ -144,7 +141,6 @@ class NewJobViewController extends GetxController {
       } catch (_) {}
     }
 
-    // ខ. ទាញយកឈ្មោះ Category
     if (job.categoryId.isNotEmpty) {
       try {
         categoryTextCtrl.text = categoryDataCtrl.categories
@@ -156,8 +152,6 @@ class NewJobViewController extends GetxController {
       }
     }
 
-    // គ. 🎯 ដំណោះស្រាយ Master Data (Job Level, Work Type, Employment Type, Education Level)
-    // បង្កើតមុខងារតូចមួយដើម្បីរង់ចាំទាញយក និងរកឈ្មោះចេញពី MasterDataController
     Future<String> getMasterName(String endpoint, String id) async {
       if (id.isEmpty) return "";
       try {
@@ -168,20 +162,18 @@ class NewJobViewController extends GetxController {
       }
     }
 
-    // រង់ចាំយកឈ្មោះមកញាត់ចូល Controller នីមួយៗ
     jobLevelCtrl.text = await getMasterName('job-levels', job.jobLevelId);
     workTypeCtrl.text = await getMasterName('work-types', job.workTypeId);
     employmentTypeCtrl.text = await getMasterName(
       'employment-types',
       job.employmentTypeId,
     );
-    selectedEducationLevelId.value = job.educationLevelId; // កុំភ្លេច Assign ID
+    selectedEducationLevelId.value = job.educationLevelId;
     educationLevelCtrl.text = await getMasterName(
       'education-levels',
       job.educationLevelId,
     );
 
-    // ================= 2. Salary =================
     minSalaryCtrl.text = job.minSalary > 0 ? job.minSalary.toString() : "";
     maxSalaryCtrl.text = job.maxSalary > 0 ? job.maxSalary.toString() : "";
     salaryPeriodCtrl.text = job.salaryPeriod.isNotEmpty
@@ -189,7 +181,6 @@ class NewJobViewController extends GetxController {
         : "Monthly";
     isNegotiable.value = job.isNegotiable;
 
-    // ================= 3. Details =================
     experienceCtrl.text = job.experience;
 
     selectedSkillIds.assignAll(job.requiredSkills);
@@ -210,12 +201,10 @@ class NewJobViewController extends GetxController {
         }
 
         selectedSkillNames.assignAll(skillNames);
-        // បង្ហាញឈ្មោះនៅលើ TextField ដោយប្រើសញ្ញាក្បៀស
         requiredSkillsTextCtrl.text = skillNames.join(', ');
       } catch (_) {}
     }
 
-    // ប្រើ map ដើម្បីបន្ថែម '• '
     descriptionCtrl.text = job.description.isNotEmpty
         ? job.description.map((e) => '• $e').join('\n')
         : '';
@@ -228,7 +217,6 @@ class NewJobViewController extends GetxController {
         ? job.benefits.map((e) => '• $e').join('\n')
         : '';
 
-    // ================= 4. Schedule =================
     if (job.workingDays.contains('-')) {
       final days = job.workingDays.split('-');
       startDayCtrl.text = days.first.trim();
@@ -245,12 +233,10 @@ class NewJobViewController extends GetxController {
       startTimeCtrl.text = job.workingHours;
     }
 
-    // 🎯 ដំណោះស្រាយ Closing Date: បន្ថែមការញាត់អត្ថបទចូល closingDateCtrl
     if (job.closingDate.isNotEmpty) {
       try {
         final parsedDate = DateTime.parse(job.closingDate).toLocal();
         selectedClosingDate.value = parsedDate;
-        // បំប្លែងថ្ងៃខែឆ្នាំទៅជាទម្រង់ YYYY-MM-DD សម្រាប់បង្ហាញលើ TextField (អ្នកអាចប្តូរទម្រង់តាមចិត្ត)
         closingDateCtrl.text =
             "${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}";
       } catch (_) {}
@@ -292,7 +278,9 @@ class NewJobViewController extends GetxController {
   }
 
   Future<void> submitJob() async {
-    if (!_validateInput()) return;
+    final isDark = Get.isDarkMode; // 🟢 Check Theme
+
+    if (!_validateInput(isDark)) return;
 
     isLoading.value = true;
     try {
@@ -331,15 +319,10 @@ class NewJobViewController extends GetxController {
                 .toIso8601String(),
       );
 
-      // ── 🎯 ដំណោះស្រាយ Update ចេញកាតថ្មី និងទប់ស្កាត់ Bug "Job not found" ──
       if (isEditing) {
-        // ១. ប្រើ updateJob ប្រសិនបើជាការ Edit
         await _jobService.updateJob(editJobData!.id, requestData);
-
-        // ២. បិទទំព័រ Edit Job
         Get.back();
 
-        // ៣. 🟢 [Optimistic Update] Update សម្រាប់បញ្ជីខាងក្រៅ (My Jobs List)
         if (Get.isRegistered<MyJobViewController>()) {
           final listCtrl = Get.find<MyJobViewController>();
           final index = listCtrl.jobs.indexWhere(
@@ -370,7 +353,6 @@ class NewJobViewController extends GetxController {
           }
         }
 
-        // ៤. 🟢 [បន្ថែមថ្មី] Optimistic Update សម្រាប់ទំព័រ Detail ខាងក្នុង!
         if (Get.isRegistered<MyJobDetailViewController>()) {
           final detailCtrl = Get.find<MyJobDetailViewController>();
           if (detailCtrl.jobData.value != null &&
@@ -403,42 +385,44 @@ class NewJobViewController extends GetxController {
           }
         }
       } else {
-        // ១. ប្រើ createJob ប្រសិនបើជាការបង្កើតថ្មី
         await _jobService.createJob(requestData);
-
-        // ២. បិទទំព័រ Create Job
         Get.back();
 
-        // ៣. 🟢 បើបង្កើតថ្មី ហៅ fetchJobs(isRefresh: true) ដើម្បីឱ្យវាលោតមកលើគេ
         if (Get.isRegistered<MyJobViewController>()) {
           final listCtrl = Get.find<MyJobViewController>();
           listCtrl.fetchJobs(isRefresh: true);
-          listCtrl
-              .fetchStatusSummary(); // ធ្វើបច្ចុប្បន្នភាពតួលេខនៅលើ Tab ផងដែរ
+          listCtrl.fetchStatusSummary();
         }
       }
 
-      // ប្តូរពាក្យ Success ទៅតាមសកម្មភាពជាក់ស្តែង
       Get.snackbar(
-        'Success',
-        isEditing ? 'Job updated successfully!' : 'Job posted successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        'Success'.tr, // 🟢 Added .tr
+        isEditing
+            ? 'Job updated successfully!'.tr
+            : 'Job posted successfully!'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green,
+        colorText: isDark ? Colors.greenAccent : Colors.white,
       );
     } on ApiException catch (e) {
       Get.snackbar(
-        "Failed",
-        e.message,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Failed".tr, // 🟢 Added .tr
+        e.message.tr, // 🟢 Optional Backend Msg mapping
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     } catch (e) {
       debugPrint("System Error: $e");
       Get.snackbar(
-        "Error",
-        "An unexpected error occurred. Please try again.",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Error".tr, // 🟢 Added .tr
+        "An unexpected error occurred. Please try again.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     } finally {
       isLoading.value = false;
@@ -464,31 +448,38 @@ class NewJobViewController extends GetxController {
         .toList();
   }
 
-  bool _validateInput() {
+  bool _validateInput(bool isDark) {
+    // 🟢 Pass Theme
     if (titleCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        "Missing Field",
-        "Job Title is required.",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        "Missing Field".tr, // 🟢 Added .tr
+        "Job Title is required.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange,
+        colorText: isDark ? Colors.orangeAccent : Colors.white,
       );
       return false;
     }
     if (selectedProvinceId.value.isEmpty || selectedCategoryId.value.isEmpty) {
       Get.snackbar(
-        "Missing Field",
-        "Please complete all basic information.",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        "Missing Field".tr, // 🟢 Added .tr
+        "Please complete all basic information.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange,
+        colorText: isDark ? Colors.orangeAccent : Colors.white,
       );
       return false;
     }
     if (descriptionCtrl.text.trim().length < 10) {
       Get.snackbar(
-        "Missing Field",
-        "Description must be at least 10 characters.",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        "Missing Field".tr, // 🟢 Added .tr
+        "Description must be at least 10 characters.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange,
+        colorText: isDark ? Colors.orangeAccent : Colors.white,
       );
       return false;
     }
@@ -497,10 +488,8 @@ class NewJobViewController extends GetxController {
 
   @override
   void onClose() {
-    // ── Dispose តាមលំដាប់ ──
     pageController.dispose();
 
-    // Step 1
     titleCtrl.dispose();
     headcountCtrl.dispose();
     provinceCtrl.dispose();
@@ -510,12 +499,10 @@ class NewJobViewController extends GetxController {
     workTypeCtrl.dispose();
     employmentTypeCtrl.dispose();
 
-    // Step 2
     minSalaryCtrl.dispose();
     maxSalaryCtrl.dispose();
     salaryPeriodCtrl.dispose();
 
-    // Step 3
     educationLevelCtrl.dispose();
     experienceCtrl.dispose();
     requiredSkillsTextCtrl.dispose();
@@ -524,7 +511,6 @@ class NewJobViewController extends GetxController {
     requirementsCtrl.dispose();
     benefitsCtrl.dispose();
 
-    // Step 4
     startDayCtrl.dispose();
     endDayCtrl.dispose();
     startTimeCtrl.dispose();

@@ -10,10 +10,15 @@ class AnimatedTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 54,
       decoration: BoxDecoration(
-        color: AppColors.inputBackground, // Soft gray background for the track
+        color: isDark
+            ? AppColors.darkInputBackground
+            : AppColors.inputBackground, // 🟢 Dynamic Track BG
         borderRadius: BorderRadius.circular(16),
       ),
       child: Stack(
@@ -31,11 +36,15 @@ class AnimatedTabBar extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.white, // High contrast white active state
+                    color: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.white, // 🟢 Dynamic Active Indicator BG
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.3 : 0.05,
+                        ), // 🟢 Dynamic Shadow
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -63,10 +72,16 @@ class AnimatedTabBar extends StatelessWidget {
                               ? FontWeight.w700
                               : FontWeight.w500,
                           color: controller.selectedIndex.value == 0
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
+                              ? (isDark
+                                    ? Colors.white
+                                    : AppColors
+                                          .textPrimary) // 🟢 Dynamic Selected Text
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors
+                                          .textSecondary), // 🟢 Dynamic Unselected Text
                         ),
-                        child: const Text('Seeker'),
+                        child: Text('Seeker'.tr), // 🟢 Added .tr
                       ),
                     ),
                   ),
@@ -86,10 +101,16 @@ class AnimatedTabBar extends StatelessWidget {
                               ? FontWeight.w700
                               : FontWeight.w500,
                           color: controller.selectedIndex.value == 1
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
+                              ? (isDark
+                                    ? Colors.white
+                                    : AppColors
+                                          .textPrimary) // 🟢 Dynamic Selected Text
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors
+                                          .textSecondary), // 🟢 Dynamic Unselected Text
                         ),
-                        child: const Text('Employer'),
+                        child: Text('Employer'.tr), // 🟢 Added .tr
                       ),
                     ),
                   ),

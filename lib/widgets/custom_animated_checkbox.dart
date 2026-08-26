@@ -7,7 +7,6 @@ class CustomAnimatedCheckbox extends StatefulWidget {
   final VoidCallback onTap;
   final String label;
 
-  // Made optional with "?" so it works seamlessly for simple text rows too
   final String? linkText;
   final String? labelText;
   final String? linkText2;
@@ -53,6 +52,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -72,7 +74,6 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Custom Animated Checkbox box
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
@@ -87,7 +88,9 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
                 border: Border.all(
                   color: widget.value
                       ? AppColors.buttonPrimary
-                      : Colors.grey.shade400,
+                      : (isDark
+                            ? AppColors.darkCardBorder
+                            : Colors.grey.shade400), // 🟢 Dynamic Outline
                   width: 2,
                 ),
               ),
@@ -99,27 +102,30 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
               ),
             ),
             const SizedBox(width: 12),
-            // Flexibly generated Text Label
             Expanded(
               child: Text.rich(
-                // textAlign: TextAlign.justify,
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: widget.label,
+                      text: widget.label, // Passed Translation Value Expected
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary, // 🟢 Dynamic Text
                       ),
                     ),
                     if (widget.linkText != null)
                       TextSpan(
-                        text: widget.linkText,
+                        text: widget
+                            .linkText, // Passed Translation Value Expected
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textLink,
+                          color: isDark
+                              ? Colors.blueAccent
+                              : AppColors.textLink, // 🟢 Dynamic Link
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
@@ -128,20 +134,26 @@ class _CustomAnimatedCheckboxState extends State<CustomAnimatedCheckbox>
                       ),
                     if (widget.labelText != null)
                       TextSpan(
-                        text: widget.labelText,
+                        text: widget
+                            .labelText, // Passed Translation Value Expected
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary, // 🟢 Dynamic Text
                         ),
                       ),
                     if (widget.linkText2 != null)
                       TextSpan(
-                        text: widget.linkText2,
+                        text: widget
+                            .linkText2, // Passed Translation Value Expected
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textLink,
+                          color: isDark
+                              ? Colors.blueAccent
+                              : AppColors.textLink, // 🟢 Dynamic Link
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {

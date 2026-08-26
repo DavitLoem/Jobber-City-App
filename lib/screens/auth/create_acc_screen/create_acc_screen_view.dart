@@ -25,25 +25,25 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
-        // 🎯 ១. ប្រើ LayoutBuilder ដើម្បីចាប់យកទំហំកម្ពស់អេក្រង់
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: ConstrainedBox(
-                // 🎯 ២. បង្ខំឱ្យកម្ពស់អប្បបរមា ស្មើនឹងកម្ពស់អេក្រង់ទូរស័ព្ទ
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                // 🎯 ៣. ប្រើ IntrinsicHeight ដើម្បីឱ្យ Widget ខាងក្នុងអាចរុញគ្នាបានត្រឹមត្រូវ
                 child: IntrinsicHeight(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(23, 0, 23, 30),
                     child: Column(
                       children: [
-                        _buildHeader(),
+                        _buildHeader(theme, isDark),
                         const SizedBox(height: 16),
                         AnimatedTabBar(controller: controller),
                         const SizedBox(height: 8),
@@ -55,8 +55,14 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
                               () => AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: controller.selectedIndex.value == 0
-                                    ? _buildRegisterForm(isEmployer: false)
-                                    : _buildRegisterForm(isEmployer: true),
+                                    ? _buildRegisterForm(
+                                        isEmployer: false,
+                                        isDark: isDark,
+                                      )
+                                    : _buildRegisterForm(
+                                        isEmployer: true,
+                                        isDark: isDark,
+                                      ),
                               ),
                             ),
                           ),
@@ -73,36 +79,39 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme, bool isDark) {
     return Column(
       children: [
         const SizedBox(height: 12),
-
         const Logo(size: 80),
-
         const SizedBox(height: 12),
 
         Text(
-          'Create Account',
+          'Create Account'.tr, // 🟢 Added .tr
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
           ),
         ),
 
         const SizedBox(height: 4),
 
         Text(
-          'Fill in your details to get started',
+          'Fill in your details to get started'.tr, // 🟢 Added .tr
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+          style: TextStyle(
+            fontSize: 15,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary, // 🟢 Dynamic Subtitle
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildRegisterForm({required bool isEmployer}) {
+  Widget _buildRegisterForm({required bool isEmployer, required bool isDark}) {
     return Column(
       key: ValueKey(isEmployer),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +124,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
             Expanded(
               child: CustomTextfield(
                 controller: controller.firstNameCtrl,
-                hintText: 'First Name',
+                hintText: 'First Name'.tr, // 🟢 Added .tr
                 prefixIcon: Icons.person,
                 validator: AuthValidator.validateName,
                 textInputAction: TextInputAction.next,
@@ -124,7 +133,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
             Expanded(
               child: CustomTextfield(
                 controller: controller.lastNameCtrl,
-                hintText: 'Last Name',
+                hintText: 'Last Name'.tr, // 🟢 Added .tr
                 prefixIcon: Icons.person,
                 validator: AuthValidator.validateName,
               ),
@@ -136,7 +145,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
         CustomTextfield(
           controller: controller.emailCtrl,
-          hintText: 'Email',
+          hintText: 'Email'.tr, // 🟢 Added .tr
           prefixIcon: Icons.email,
           validator: AuthValidator.validateEmail,
           textInputAction: TextInputAction.next,
@@ -146,7 +155,7 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
         CustomTextfield(
           controller: controller.passwordCtrl,
-          hintText: 'Password',
+          hintText: 'Password'.tr, // 🟢 Added .tr
           prefixIcon: Icons.lock,
           suffixIcon: Icons.visibility,
           isPasswordField: true,
@@ -169,10 +178,10 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
                 controller.toggleTermsSeeker();
               }
             },
-            label: 'I agree to the ',
-            linkText: 'Terms of Service',
-            labelText: ' and ',
-            linkText2: 'Privacy Policy',
+            label: 'I agree to the '.tr, // 🟢 Added .tr
+            linkText: 'Terms of Service'.tr, // 🟢 Added .tr
+            labelText: ' and '.tr, // 🟢 Added .tr
+            linkText2: 'Privacy Policy'.tr, // 🟢 Added .tr
             onLinkTap: () {},
             onLinkTap2: () {},
           ),
@@ -187,9 +196,9 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
             },
             text: isEmployer
                 ? 'Register as Employer'
-                : 'Register as Job Seeker',
-            isLoading:
-                controller.isLoading.value, // បោះតម្លៃនេះទៅដើម្បីប្តូររាង
+                      .tr // 🟢 Added .tr
+                : 'Register as Job Seeker'.tr, // 🟢 Added .tr
+            isLoading: controller.isLoading.value,
           ),
         ),
 
@@ -197,37 +206,47 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
 
         Row(
           children: [
-            Expanded(child: Divider(thickness: 1, color: AppColors.line)),
+            Expanded(
+              child: Divider(
+                thickness: 1,
+                color: isDark ? AppColors.darkDivider : AppColors.line,
+              ),
+            ), // 🟢 Dynamic Divider
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                'OR',
+                'OR'.tr, // 🟢 Added .tr
                 style: TextStyle(
-                  color: AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary, // 🟢 Dynamic Text
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            Expanded(child: Divider(thickness: 1, color: AppColors.line)),
+            Expanded(
+              child: Divider(
+                thickness: 1,
+                color: isDark ? AppColors.darkDivider : AppColors.line,
+              ),
+            ), // 🟢 Dynamic Divider
           ],
         ),
 
         const SizedBox(height: 16),
 
         Obx(() {
-          // ១. កំណត់អក្សរទៅតាម Tab
           String btnText = isEmployer
               ? 'Continue as Employer with Google'
-              : 'Continue as Seeker with Google';
+                    .tr // 🟢 Added .tr
+              : 'Continue as Seeker with Google'.tr; // 🟢 Added .tr
 
-          // ២. ទាញយក Loading State ពី AuthController
           bool isGoogleLoading =
               Get.find<AuthController>().isGoogleLoading.value;
 
           return SizedBox(
             width: double.infinity,
             child: SocialLogin(
-              // បិទប៊ូតុងមិនឱ្យចុច ពេលកំពុង Loading
               onPressed: isGoogleLoading
                   ? null
                   : () {
@@ -248,21 +267,30 @@ class CreateAccScreenView extends GetView<CreateAccScreenViewController> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                'Already have an account? ',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                'Already have an account? '.tr, // 🟢 Added .tr
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary, // 🟢 Dynamic Text
+                  fontSize: 14,
+                ),
               ),
               GestureDetector(
                 onTap: () {
                   Get.offNamed(AppRoutes.login);
                 },
                 child: Text(
-                  'Sign In',
+                  'Sign In'.tr, // 🟢 Added .tr
                   style: TextStyle(
-                    color: AppColors.primary,
+                    color: isDark
+                        ? Colors.blueAccent
+                        : AppColors.primary, // 🟢 Dynamic Action Link
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     decoration: TextDecoration.underline,
-                    decorationColor: AppColors.primary,
+                    decorationColor: isDark
+                        ? Colors.blueAccent
+                        : AppColors.primary, // 🟢 Dynamic Underline
                   ),
                 ),
               ),

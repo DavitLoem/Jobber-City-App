@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 
 class SplashLoader extends StatelessWidget {
   final Animation<double> loaderFade;
@@ -12,6 +13,9 @@ class SplashLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return FadeTransition(
       opacity: loaderFade,
       child: Padding(
@@ -22,7 +26,9 @@ class SplashLoader extends StatelessWidget {
               height: 4,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFEEEEEE), // ប្រើតម្លៃ Light Mode
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : const Color(0xFFEEEEEE), // 🟢 Dynamic Loader Track
                 borderRadius: BorderRadius.circular(2),
               ),
               child: AnimatedBuilder(
@@ -59,17 +65,21 @@ class SplashLoader extends StatelessWidget {
                 final progress = loaderProgress.value;
                 final status = progress < 0.4
                     ? 'Loading…'
+                          .tr // 🟢 Added .tr
                     : progress < 0.75
                     ? 'Getting things ready…'
-                    : 'Almost there…';
+                          .tr // 🟢 Added .tr
+                    : 'Almost there…'.tr; // 🟢 Added .tr
                 return AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: Text(
                     status,
                     key: ValueKey(status),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Colors.black54, // ដាក់ពណ៌ផ្ទាល់សិន
+                      color: isDark
+                          ? Colors.white70
+                          : Colors.black54, // 🟢 Dynamic Text
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.2,
                     ),

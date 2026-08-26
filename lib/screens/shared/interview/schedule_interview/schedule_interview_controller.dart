@@ -10,7 +10,7 @@ class ScheduleInterviewViewController extends GetxController {
   final notesController = TextEditingController();
   final isSubmitting = false.obs;
 
-@override
+  @override
   void onInit() {
     super.onInit();
     if (Get.arguments is ScheduleInterviewArgs) {
@@ -22,17 +22,38 @@ class ScheduleInterviewViewController extends GetxController {
         selectedTime.value = TimeOfDay.fromDateTime(args.existingDate!);
       }
     } else {
-      args = ScheduleInterviewArgs(seekerUserId: '', seekerName: 'Candidate');
+      args = ScheduleInterviewArgs(
+        seekerUserId: '',
+        seekerName: 'Candidate'.tr,
+      ); // 🟢 Added .tr
     }
   }
 
   Future<void> submit() async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     if (args.seekerUserId.isEmpty) {
-      Get.snackbar('Error', 'Missing candidate information.', snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        'Error'.tr, // 🟢 Added .tr
+        'Missing candidate information.'.tr, // 🟢 Added .tr
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
       return;
     }
     if (selectedDate.value == null || selectedTime.value == null) {
-      Get.snackbar('Required', 'Please select both a date and a time.', snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        'Required'.tr, // 🟢 Added .tr
+        'Please select both a date and a time.'.tr, // 🟢 Added .tr
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+      );
       return;
     }
 
@@ -45,7 +66,15 @@ class ScheduleInterviewViewController extends GetxController {
     );
 
     if (!scheduledAt.isAfter(DateTime.now())) {
-      Get.snackbar('Invalid time', 'Please choose a date and time in the future.', snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        'Invalid time'.tr, // 🟢 Added .tr
+        'Please choose a date and time in the future.'.tr, // 🟢 Added .tr
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+      );
       return;
     }
 
@@ -61,17 +90,29 @@ class ScheduleInterviewViewController extends GetxController {
 
       Get.back();
       Get.snackbar(
-        'Interview Scheduled 🎉',
-        '${args.seekerName} has been notified.',
+        'Interview Scheduled 🎉'.tr, // 🟢 Added .tr
+        '@name has been notified.'.trParams({
+          'name': args.seekerName,
+        }), // 🟢 Added .trParams
         snackPosition: SnackPosition.TOP,
-        backgroundColor: AppColors.successBackground,
-        colorText: AppColors.success,
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : AppColors.successBackground,
+        colorText: isDark ? Colors.greenAccent : AppColors.success,
         duration: const Duration(seconds: 3),
       );
       Get.toNamed(AppRoutes.interviewDetail, arguments: interview);
     } catch (e) {
       final message = e.toString().replaceAll('Exception: ', '');
-      Get.snackbar('Could not schedule interview', message, snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        'Could not schedule interview'.tr, // 🟢 Added .tr
+        message.tr, // 🟢 Added .tr
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
       debugPrint('[ScheduleInterview] submit error: $e');
     } finally {
       isSubmitting.value = false;

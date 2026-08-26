@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 
 class JobStatusTabs extends StatelessWidget {
-  // បញ្ជីឈ្មោះ Tab (ឧ. ['All (35)', 'Active (15)', 'Paused (5)', 'Draft (2)'])
   final List<String> tabs;
-  // Tab ដែលកំពុងត្រូវបានជ្រើសរើសបច្ចុប្បន្ន
   final String selectedTab;
-  // មុខងារពេលចុចលើ Tab ណាមួយ
   final ValueChanged<String> onTabChanged;
 
   const JobStatusTabs({
@@ -17,41 +15,52 @@ class JobStatusTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal, // 👈 អនុញ្ញាតឱ្យអូសទៅឆ្វេងស្តាំបាន
+      scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      // លាក់របារ Scroll ខាងក្រោម
       physics: const BouncingScrollPhysics(),
       child: Row(
         children: tabs.map((tab) {
           final isSelected = tab == selectedTab;
 
           return Padding(
-            padding: const EdgeInsets.only(right: 10), // ចន្លោះរវាងប៊ូតុងនីមួយៗ
+            padding: const EdgeInsets.only(right: 10),
             child: InkWell(
               onTap: () => onTabChanged(tab),
-              borderRadius: BorderRadius.circular(20), // ឱ្យរាងមូលស្អាតពេលចុច
+              borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  // ពណ៌ផ្ទៃ: បើចុចយកពណ៌ខៀវ បើមិនចុចយកពណ៌ស
-                  color: isSelected ? const Color(0xFF4f7df7) : Colors.white,
+                  color: isSelected
+                      ? (isDark ? Colors.blueAccent : const Color(0xFF4f7df7))
+                      : (isDark
+                            ? AppColors.darkSurfaceElevated
+                            : Colors.white), // 🟢 Dynamic Pill Action BG
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    // ពណ៌បន្ទាត់ជុំវិញ
                     color: isSelected
-                        ? const Color(0xFF4f7df7)
-                        : Colors.grey.shade300,
+                        ? (isDark ? Colors.blueAccent : const Color(0xFF4f7df7))
+                        : (isDark
+                              ? AppColors.darkCardBorder
+                              : Colors.grey.shade300), // 🟢 Dynamic Tab Line
                   ),
                 ),
                 child: Text(
-                  tab,
+                  tab, // Tab is already pre-configured to be translated via MyJobView
                   style: TextStyle(
-                    // ពណ៌អក្សរ: បើចុចយកពណ៌ស បើមិនចុចយកពណ៌ប្រផេះ
-                    color: isSelected ? Colors.white : Colors.grey.shade600,
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors
+                                    .grey
+                                    .shade600), // 🟢 Dynamic Tab Label Text
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     fontSize: 14,
                   ),

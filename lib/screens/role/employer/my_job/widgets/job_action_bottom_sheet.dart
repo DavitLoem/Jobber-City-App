@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobActionBottomSheet extends StatelessWidget {
@@ -26,93 +28,119 @@ class JobActionBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.only(top: 12, bottom: 30),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkBackground
+            : Colors.white, // 🟢 Dynamic Sheet BG
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Drag Handle (បន្ទាត់ខ្លីកណ្តាលខាងលើ) ──
           Center(
             child: Container(
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: isDark
+                    ? AppColors.darkDivider
+                    : Colors.grey.shade300, // 🟢 Dynamic Handle
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
           const SizedBox(height: 20),
 
-          // ── ចំណងជើង ──
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              "Job Actions",
+              "Job Actions".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Title
               ),
             ),
           ),
           const SizedBox(height: 10),
 
-          // ── បញ្ជី Actions ──
           _buildActionItem(
             icon: LucideIcons.pencil,
-            label: "Edit Job",
+            label: "Edit Job".tr, // 🟢 Added .tr
             onTap: onEdit,
+            isDark: isDark,
           ),
           _buildActionItem(
-            icon: LucideIcons.upload, // ឬប្រើ share ក៏បាន
-            label: "Share",
+            icon: LucideIcons.upload,
+            label: "Share".tr, // 🟢 Added .tr
             onTap: onShare,
+            isDark: isDark,
           ),
-          _buildActionItem(icon: pauseIcon, label: pauseLabel, onTap: onPause),
+          _buildActionItem(
+            icon: pauseIcon,
+            label: pauseLabel.tr, // 🟢 Passed translated label
+            onTap: onPause,
+            isDark: isDark,
+          ),
           _buildActionItem(
             icon: LucideIcons.copy,
-            label: "Duplicate Job",
+            label: "Duplicate Job".tr, // 🟢 Added .tr
             onTap: onDuplicate,
+            isDark: isDark,
           ),
           _buildActionItem(
-            icon: LucideIcons.archive, // ប្រើ Icon ប្រអប់សម្រាប់ Close
-            label: "Close Job",
+            icon: LucideIcons.archive,
+            label: "Close Job".tr, // 🟢 Added .tr
             onTap: onCloseJob,
+            isDark: isDark,
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: Divider(color: Color(0xFFF3F4F6), height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Divider(
+              color: isDark ? AppColors.darkDivider : const Color(0xFFF3F4F6),
+              height: 1,
+            ), // 🟢 Dynamic Divider
           ),
 
-          // ── ប៊ូតុង Delete (ពណ៌ក្រហម) ──
           _buildActionItem(
             icon: LucideIcons.trash2,
-            label: "Delete Job",
+            label: "Delete Job".tr, // 🟢 Added .tr
             isDestructive: true,
             onTap: onDelete,
+            isDark: isDark,
           ),
         ],
       ),
     );
   }
 
-  // មុខងារជំនួយសម្រាប់គូរប៊ូតុងនីមួយៗ
   Widget _buildActionItem({
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-    bool isDestructive = false, // កំណត់ថាជាប៊ូតុងលុបឬអត់
+    bool isDestructive = false,
+    required bool isDark,
   }) {
-    final color = isDestructive ? Colors.red : Colors.black87;
-    final bgColor = isDestructive ? Colors.red.shade50 : Colors.grey.shade50;
-    final iconColor = isDestructive ? Colors.red : Colors.grey.shade700;
+    final color = isDestructive
+        ? (isDark ? Colors.redAccent : Colors.red)
+        : (isDark ? Colors.white : Colors.black87);
+    final bgColor = isDestructive
+        ? (isDark
+              ? AppColors.error.withValues(alpha: 0.15)
+              : Colors.red.shade50)
+        : (isDark ? AppColors.darkSurfaceElevated : Colors.grey.shade50);
+    final iconColor = isDestructive
+        ? (isDark ? Colors.redAccent : Colors.red)
+        : (isDark ? AppColors.darkIconSecondary : Colors.grey.shade700);
 
     return InkWell(
       onTap: onTap,
@@ -120,14 +148,12 @@ class JobActionBottomSheet extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Row(
           children: [
-            // រូប Icon ដែលមានផ្ទៃខាងក្រោយរាងមូល
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
               child: Icon(icon, size: 20, color: iconColor),
             ),
             const SizedBox(width: 16),
-            // អក្សរ Label
             Text(
               label,
               style: TextStyle(

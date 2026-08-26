@@ -20,6 +20,9 @@ class SplashBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Stack(
       children: [
         AnimatedBuilder(
@@ -36,9 +39,9 @@ class SplashBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(
-                        0xFF2E5BFF,
-                      ).withValues(alpha: 0.12), // ប្រើតម្លៃ Light Mode
+                      const Color(0xFF2E5BFF).withValues(
+                        alpha: isDark ? 0.25 : 0.12,
+                      ), // 🟢 Dynamic Blob Intensity
                       const Color(0xFF2E5BFF).withValues(alpha: 0.0),
                     ],
                   ),
@@ -61,9 +64,9 @@ class SplashBackground extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      const Color(
-                        0xFF5B7FFF,
-                      ).withValues(alpha: 0.10), // ប្រើតម្លៃ Light Mode
+                      const Color(0xFF5B7FFF).withValues(
+                        alpha: isDark ? 0.20 : 0.10,
+                      ), // 🟢 Dynamic Blob Intensity
                       const Color(0xFF5B7FFF).withValues(alpha: 0.0),
                     ],
                   ),
@@ -74,8 +77,10 @@ class SplashBackground extends StatelessWidget {
         ),
         Positioned.fill(
           child: Opacity(
-            opacity: 0.025, // ប្រើតម្លៃ Light Mode
-            child: CustomPaint(painter: DotGridPainter()),
+            opacity: isDark
+                ? 0.05
+                : 0.025, // 🟢 Enhance dot visibility slightly on dark backgrounds
+            child: CustomPaint(painter: DotGridPainter(isDark: isDark)),
           ),
         ),
       ],
@@ -84,11 +89,17 @@ class SplashBackground extends StatelessWidget {
 }
 
 class DotGridPainter extends CustomPainter {
+  final bool isDark; // 🟢 Injected Theme Status
+  DotGridPainter({required this.isDark});
+
   @override
   void paint(Canvas canvas, Size size) {
     const spacing = 28.0;
     const radius = 1.5;
-    final paint = Paint()..color = const Color(0xFF2E5BFF);
+    final paint = Paint()
+      ..color = isDark
+          ? Colors.white
+          : const Color(0xFF2E5BFF); // 🟢 Dynamic Dot Color
 
     for (double x = 0; x < size.width; x += spacing) {
       for (double y = 0; y < size.height; y += spacing) {

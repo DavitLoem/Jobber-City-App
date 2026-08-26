@@ -22,20 +22,24 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
+        foregroundColor:
+            theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Appbar Text
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: theme.textTheme.bodyLarge?.color),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'OTP Code Verification',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        title: Text(
+          'OTP Code Verification'.tr, // 🟢 Added .tr
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
       ),
       body: SafeArea(
@@ -52,33 +56,37 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                   height: 180,
                 ),
                 const SizedBox(height: 30),
-                const Text(
-                  "Check Your Email",
+                Text(
+                  "Check Your Email".tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                   ),
                 ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "We have sent an OTP code to ",
+                    Text(
+                      "We have sent an OTP code to ".tr, // 🟢 Added .tr
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary, // 🟢 Dynamic Text
                       ),
                     ),
                     Text(
                       controller.maskedEmail.isNotEmpty
                           ? controller.maskedEmail
-                          : "your email",
-                      style: const TextStyle(
+                          : "your email".tr, // 🟢 Added .tr
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: isDark
+                            ? Colors.white
+                            : AppColors.textPrimary, // 🟢 Dynamic Text
                       ),
                     ),
                   ],
@@ -90,7 +98,10 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(
                     4,
-                    (index) => _buildOtpTextField(index),
+                    (index) => _buildOtpTextField(
+                      index,
+                      isDark,
+                    ), // 🟢 Passed Theme State
                   ),
                 ),
 
@@ -101,9 +112,13 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Didn't receive code? ",
-                        style: TextStyle(color: AppColors.textSecondary),
+                      Text(
+                        "Didn't receive code? ".tr, // 🟢 Added .tr
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ), // 🟢 Dynamic Text
                       ),
                       GestureDetector(
                         onTap: controller.remainingSeconds.value == 0
@@ -112,11 +127,21 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                         child: Text(
                           controller.remainingSeconds.value == 0
                               ? "Resend OTP"
-                              : "Resend in ${controller.remainingSeconds.value}s",
+                                    .tr // 🟢 Added .tr
+                              : "Resend in @secs".trParams({
+                                  'sec': controller.remainingSeconds.value
+                                      .toString(),
+                                }), // 🟢 Added .trParams
                           style: TextStyle(
                             color: controller.remainingSeconds.value == 0
-                                ? AppColors.primary
-                                : Colors.grey,
+                                ? (isDark
+                                      ? Colors.blueAccent
+                                      : AppColors
+                                            .primary) // 🟢 Dynamic Resend Action Text
+                                : (isDark
+                                      ? AppColors.darkTextTertiary
+                                      : Colors
+                                            .grey), // 🟢 Dynamic Countdown Timer
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -137,7 +162,8 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                     },
                     text: controller.isLoading.value
                         ? "Verifying..."
-                        : "Verify & Proceed",
+                              .tr // 🟢 Added .tr
+                        : "Verify & Proceed".tr, // 🟢 Added .tr
                   );
                 }),
                 const SizedBox(height: 20),
@@ -150,18 +176,29 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
   }
 
   // Widget សម្រាប់ប្រឡោះ OTP នីមួយៗ
-  Widget _buildOtpTextField(int index) {
+  Widget _buildOtpTextField(int index, bool isDark) {
     return SizedBox(
       width: 60,
       height: 60,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.inputBackground,
-          border: Border.all(color: AppColors.buttonOutlineBorder, width: 2),
+          color: isDark
+              ? AppColors.darkInputBackground
+              : AppColors.inputBackground, // 🟢 Dynamic Input BG
+          border: Border.all(
+            color: isDark
+                ? AppColors.darkCardBorder
+                : AppColors.buttonOutlineBorder, // 🟢 Dynamic Input Border
+            width: 2,
+          ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textTertiary.withValues(alpha: 0.2),
+              color: isDark
+                  ? Colors.transparent
+                  : AppColors.textTertiary.withValues(
+                      alpha: 0.2,
+                    ), // 🟢 Dynamic Shadow
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -179,10 +216,12 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                 controller.focusNodes[index - 1].requestFocus();
               }
             },
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: isDark
+                  ? Colors.white
+                  : AppColors.textPrimary, // 🟢 Dynamic Input Text
             ),
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,

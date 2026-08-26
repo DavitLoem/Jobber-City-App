@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class BannerData {
@@ -17,24 +18,28 @@ class BannerData {
   final List<Color> colors;
 }
 
-const promoBannersList = [
+// Ensure the properties translate properly inside a Getter
+List<BannerData> get promoBannersList => [
   BannerData(
-    title: "Find Your Dream\nCareer",
-    subtitle: "Explore thousands of verified companies hiring today.",
-    buttonText: "Explore Jobs",
-    colors: [AppColors.primary, AppColors.secondary],
+    title: "Find Your Dream\nCareer".tr, // 🟢 Added .tr
+    subtitle: "Explore thousands of verified companies hiring today."
+        .tr, // 🟢 Added .tr
+    buttonText: "Explore Jobs".tr, // 🟢 Added .tr
+    colors: const [AppColors.primary, AppColors.secondary],
   ),
   BannerData(
-    title: "Build A Standout\nResume",
-    subtitle: "Get noticed by recruiters with a polished, ATS-ready CV.",
-    buttonText: "Build Resume",
-    colors: [AppColors.primaryDark, AppColors.primary],
+    title: "Build A Standout\nResume".tr, // 🟢 Added .tr
+    subtitle: "Get noticed by recruiters with a polished, ATS-ready CV."
+        .tr, // 🟢 Added .tr
+    buttonText: "Build Resume".tr, // 🟢 Added .tr
+    colors: const [AppColors.primaryDark, AppColors.primary],
   ),
   BannerData(
-    title: "Track Every\nApplication",
-    subtitle: "Stay on top of interviews and offers, all in one place.",
-    buttonText: "View Progress",
-    colors: [AppColors.secondary, AppColors.accent],
+    title: "Track Every\nApplication".tr, // 🟢 Added .tr
+    subtitle: "Stay on top of interviews and offers, all in one place."
+        .tr, // 🟢 Added .tr
+    buttonText: "View Progress".tr, // 🟢 Added .tr
+    colors: const [AppColors.secondary, AppColors.accent],
   ),
 ];
 
@@ -169,26 +174,26 @@ class _PromoBannerSliderState extends State<PromoBannerSlider> {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  height: 1.25,
+                  height: 1.15,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               SizedBox(
                 width: 190,
                 child: Text(
                   banner.subtitle,
                   style: TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.9),
-                    height: 1.35,
+                    height: 1.25,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 10,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,

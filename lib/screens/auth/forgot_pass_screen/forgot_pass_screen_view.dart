@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/network/api_exception.dart';
 import 'package:jobber_city/core/api/services/auth_services.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/core/theme/app_assets.dart';
 import 'package:jobber_city/core/utils/auth_validator.dart';
 import 'package:jobber_city/routes/app_routes.dart';
@@ -16,19 +17,30 @@ class ForgotPassScreenView extends GetView<ForgotPassScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        title: const Text(
-          "Forgot Password",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+        title: Text(
+          "Forgot Password".tr, // 🟢 Added .tr
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
+          ),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: theme.textTheme.bodyLarge?.color,
+          ), // 🟢 Dynamic Icon
         ),
       ),
 
@@ -47,19 +59,22 @@ class ForgotPassScreenView extends GetView<ForgotPassScreenViewController> {
                 const SizedBox(height: 15),
 
                 CustomTextfield(
-                  hintText: "Enter Email Address",
+                  hintText: "Enter Email Address".tr, // 🟢 Added .tr
                   prefixIcon: Icons.email_outlined,
                   controller: controller.emailCtrl,
                   validator: AuthValidator.validateEmail,
                 ),
                 const SizedBox(height: 30),
 
-                const Text(
-                  "Enter the email address associated with your account and we'll send you a verification code to reset your password.",
+                Text(
+                  "Enter the email address associated with your account and we'll send you a verification code to reset your password."
+                      .tr, // 🟢 Added .tr
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey, // 🟢 Dynamic Subtext
                     height: 1.5,
                   ),
                 ),
@@ -71,7 +86,7 @@ class ForgotPassScreenView extends GetView<ForgotPassScreenViewController> {
                     onPressed: () {
                       controller.forgotPassword();
                     },
-                    text: "Send Verification Code",
+                    text: "Send Verification Code".tr, // 🟢 Added .tr
                     isLoading: controller.isLoading.value,
                   ),
                 ),

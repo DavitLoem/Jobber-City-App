@@ -1052,4 +1052,539 @@ const Map<String, String> kmKH = {
   'Try searching with different keywords or filters.':
       'ព្យាយាមស្វែងរកដោយប្រើពាក្យគន្លឹះ ឬតម្រងផ្សេង។',
   'Failed to load jobs': 'បរាជ័យក្នុងការទាញយកការងារ',
+
+  // ==========================
+  // Job Detail Sub-Components
+  // ==========================
+  'Cover Letter (Optional)': 'លិខិតអម (អាចរំលងបាន)',
+  'Upload Cover Letter (PDF, Word)': 'បញ្ចូលលិខិតអម (PDF, Word)',
+
+  // ==========================
+  // Saved Jobs Screen
+  // ==========================
+  '@count job saved': 'បានរក្សាទុក @count ការងារ',
+  '@count jobs saved': 'បានរក្សាទុក @count ការងារ',
+
+  // ==========================
+  // Search Controller Default Values
+  // ==========================
+  'Remote': 'ធ្វើការពីចម្ងាយ',
+  'Part-time': 'ក្រៅម៉ោង',
+  'Marketing': 'ទីផ្សារ',
+
+  // ==========================
+  // CV Extraction Widgets
+  // ==========================
+  'We found @exp experiences, @edu educations, and @skill skills in your CV.':
+      'យើងបានរកឃើញបទពិសោធន៍ @exp ការអប់រំ @edu និងជំនាញ @skill នៅក្នុង CV របស់អ្នក។',
+
+  // ==========================
+  // CV Generator Screen
+  // ==========================
+  'Could not load CV templates': 'មិនអាចទាញយកគំរូប្រវត្តិរូបបានទេ',
+  'Please check your connection and try again.':
+      'សូមពិនិត្យការតភ្ជាប់របស់អ្នក រួចព្យាយាមម្តងទៀត។',
+  'CV Generated 🎉': 'ប្រវត្តិរូបត្រូវបានបង្កើត 🎉',
+  'Your CV is ready to view and share.':
+      'ប្រវត្តិរូបរបស់អ្នករួចរាល់សម្រាប់ការមើល និងចែករំលែក។',
+  'Could not generate CV': 'មិនអាចបង្កើតប្រវត្តិរូបបានទេ',
+  'Choose a template': 'ជ្រើសរើសគំរូ',
+  'We\'ll fill it in automatically using your profile — experience, education, skills, and more.':
+      'យើងនឹងបំពេញវាដោយស្វ័យប្រវត្តិដោយប្រើប្រាស់ប្រវត្តិរូបរបស់អ្នក — បទពិសោធន៍ ការអប់រំ ជំនាញ និងច្រើនទៀត។',
+  'No templates available right now.': 'មិនមានគំរូទេនៅពេលនេះ។',
+  'Regenerate CV': 'បង្កើតប្រវត្តិរូបម្តងទៀត',
+  'My CV': 'ប្រវត្តិរូបរបស់ខ្ញុំ',
+  'Open in browser / download': 'បើកក្នុងកម្មវិធីរុករក / ទាញយក',
+  // ==========================
+  // CV Generator Widgets
+  // ==========================
+  'You already have a CV': 'អ្នកមានប្រវត្តិរូបរួចហើយ',
+  '@template template': 'គំរូ @template',
+  '@template template · Generated @date': 'គំរូ @template · បានបង្កើតនៅ @date',
+  // ==========================
+  // CV Review Screen
+  // ==========================
+  'Success': 'ជោគជ័យ',
+
+  // ==========================
+  // Edit Profile Core
+  // ==========================
+  'Cannot fetch Profile: @error': 'មិនអាចទាញយកប្រវត្តិរូបបានទេ៖ @error',
+
+  'Profile updated successfully!': 'ប្រវត្តិរូបត្រូវបានកែប្រែដោយជោគជ័យ!',
+  'Update failed: @error': 'ការកែប្រែបរាជ័យ៖ @error',
+
+  // ==========================
+  // Splash Screen Messages
+  // ==========================
+  'Loading…': 'កំពុងដំណើរការ…',
+  'Getting things ready…': 'កំពុងរៀបចំ…',
+  'Almost there…': 'ជិតរួចរាល់ហើយ…',
+  'Your Career Starts Here': 'អាជីពរបស់អ្នកចាប់ផ្តើមនៅទីនេះ',
+
+  // ==========================
+  // Chat Room View
+  // ==========================
+  'Invalid Arguments': 'ទិន្នន័យមិនត្រឹមត្រូវ',
+  'Could not open conversation.': 'មិនអាចបើកការសន្ទនាបានទេ។',
+  'Message Options': 'ជម្រើសសារ',
+  'Delete for me': 'លុបសម្រាប់ខ្ញុំ',
+  'Delete for everyone': 'លុបសម្រាប់អ្នកទាំងអស់គ្នា',
+  'Delete for Everyone?': 'លុបសម្រាប់អ្នកទាំងអស់គ្នាឬ?',
+  'Delete for Me?': 'លុបសម្រាប់ខ្ញុំឬ?',
+  'This message will be deleted for all participants in this chat.':
+      'សារនេះនឹងត្រូវបានលុបសម្រាប់អ្នកចូលរួមទាំងអស់នៅក្នុងការជជែកនេះ។',
+  'This message will be deleted for you only. Other participants will still see it.':
+      'សារនេះនឹងត្រូវបានលុបសម្រាប់តែអ្នកប៉ុណ្ណោះ។ អ្នកចូលរួមផ្សេងទៀតនៅតែអាចមើលឃើញវា។',
+
+  'Could not delete message. Please try again.':
+      'មិនអាចលុបសារបានទេ។ សូមព្យាយាមម្តងទៀត។',
+  'Say hello to @name 👋': 'និយាយសួស្តីទៅកាន់ @name 👋',
+  'User': 'អ្នកប្រើប្រាស់',
+
+  'Jan': 'មករា',
+  'Feb': 'កុម្ភៈ',
+  'Mar': 'មីនា',
+  'Apr': 'មេសា',
+  'May': 'ឧសភា',
+  'Jun': 'មិថុនា',
+  'Jul': 'កក្កដា',
+  'Aug': 'សីហា',
+  'Sep': 'កញ្ញា',
+  'Oct': 'តុលា',
+  'Nov': 'វិច្ឆិកា',
+  'Dec': 'ធ្នូ',
+
+  // ==========================
+  // Chat Input & Bubbles
+  // ==========================
+  'Type a message…': 'វាយសារ...',
+  'This message was deleted': 'សារនេះត្រូវបានលុប',
+
+  // ==========================
+  // Conversation List Screen
+  // ==========================
+  'Could not load your conversations. Pull down to try again.':
+      'មិនអាចទាញយកការសន្ទនារបស់អ្នកបានទេ។ អូសចុះក្រោមដើម្បីសាកល្បងម្ដងទៀត។',
+  'New Chat': 'ការសន្ទនាថ្មី',
+  'Search messages...': 'ស្វែងរកសារ...',
+  'Say hello 👋': 'និយាយសួស្តី 👋',
+  'No messages found': 'រកមិនឃើញសារទេ',
+  'No conversations yet': 'មិនទាន់មានការសន្ទនាទេ',
+  'Try searching with a different name.': 'សាកល្បងស្វែងរកជាមួយឈ្មោះផ្សេង។',
+  'When you message someone, it will show up here.':
+      'នៅពេលអ្នកផ្ញើសារទៅនរណាម្នាក់ វានឹងបង្ហាញនៅទីនេះ។',
+  'Try Again': 'សាកល្បងម្តងទៀត',
+  'AM': 'ព្រឹក',
+  'PM': 'ល្ងាច',
+  'Mon': 'ច័ន្ទ',
+  'Tue': 'អង្គារ',
+  'Wed': 'ពុធ',
+  'Thu': 'ព្រហស្បតិ៍',
+  'Fri': 'សុក្រ',
+  'Sat': 'សៅរ៍',
+  'Sun': 'អាទិត្យ',
+  // ==========================
+  // Chats Main View
+  // ==========================
+  'Communications': 'ទំនាក់ទំនង',
+  'Messages': 'សារ',
+
+  // ==========================
+  // Interview Detail Screen
+  // ==========================
+  'Interview not found.': 'រកមិនឃើញកិច្ចសម្ភាសន៍ទេ។',
+  'Could not load this interview.': 'មិនអាចទាញយកកិច្ចសម្ភាសន៍នេះបានទេ។',
+  'Could not join interview': 'មិនអាចចូលរួមកិច្ចសម្ភាសន៍បានទេ',
+  'Interview completed': 'កិច្ចសម្ភាសន៍ត្រូវបានបញ្ចប់',
+  'Marked as completed.': 'បានសម្គាល់ថាបានបញ្ចប់។',
+  'Could not update': 'មិនអាចធ្វើបច្ចុប្បន្នភាពបានទេ',
+  'Reschedule Interview': 'កំណត់ពេលសម្ភាសន៍ឡើងវិញ',
+  'Select time': 'ជ្រើសរើសម៉ោង',
+  'Confirm New Time': 'បញ្ជាក់ពេលវេលាថ្មី',
+  'Please pick both a date and a time.': 'សូមជ្រើសរើសទាំងថ្ងៃខែ និងម៉ោង។',
+  'Invalid time': 'ពេលវេលាមិនត្រឹមត្រូវ',
+  'Please choose a time in the future.': 'សូមជ្រើសរើសពេលវេលានៅថ្ងៃអនាគត។',
+  'Interview rescheduled': 'កិច្ចសម្ភាសន៍ត្រូវបានកំណត់ពេលឡើងវិញ',
+  'The candidate has been notified.': 'បេក្ខជនត្រូវបានជូនដំណឹងរួចរាល់។',
+  'Could not reschedule': 'មិនអាចកំណត់ពេលឡើងវិញបានទេ',
+  'Cancel Interview': 'បោះបង់កិច្ចសម្ភាសន៍',
+  'Are you sure? This cannot be undone.':
+      'តើអ្នកប្រាកដទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។',
+  'Reason (optional)': 'មូលហេតុ (មិនចាំបាច់ក៏បាន)',
+  'Keep Interview': 'រក្សាកិច្ចសម្ភាសន៍',
+  'Yes, Cancel': 'យល់ព្រម, បោះបង់',
+  'Interview cancelled': 'កិច្ចសម្ភាសន៍ត្រូវបានបោះបង់',
+  'Could not cancel': 'មិនអាចបោះបង់បានទេ',
+  'Interview Details': 'ព័ត៌មានលម្អិតនៃកិច្ចសម្ភាសន៍',
+  'Employer': 'និយោជក',
+  'Candidate': 'បេក្ខជន',
+  'Scheduled': 'បានកំណត់ពេល',
+  'Live Now': 'កំពុងដំណើរការ',
+  'Completed': 'បានបញ្ចប់',
+  'Cancelled': 'បានបោះបង់',
+  'No-show': 'អវត្តមាន',
+  'Date': 'កាលបរិច្ឆេទ',
+  'Time': 'ម៉ោង',
+  'Duration': 'រយៈពេល',
+  '@dur minutes': '@dur នាទី',
+  'Platform': 'ប្រព័ន្ធ',
+  'Video call (Jitsi Meet)': 'ការហៅជាវីដេអូ (Jitsi Meet)',
+  'Notes': 'កំណត់ចំណាំ',
+  'Cancellation reason: @reason': 'មូលហេតុនៃការបោះបង់៖ @reason',
+  'Rejoin Interview': 'ចូលរួមកិច្ចសម្ភាសន៍ម្ដងទៀត',
+  'Join Interview': 'ចូលរួមកិច្ចសម្ភាសន៍',
+  'Mark as Completed': 'សម្គាល់ថាបានបញ្ចប់',
+  'Reschedule': 'កំណត់ពេលឡើងវិញ',
+  'January': 'មករា',
+  'February': 'កុម្ភៈ',
+  'March': 'មីនា',
+  'April': 'មេសា',
+  'June': 'មិថុនា',
+  'July': 'កក្កដា',
+  'August': 'សីហា',
+  'September': 'កញ្ញា',
+  'October': 'តុលា',
+  'November': 'វិច្ឆិកា',
+  'December': 'ធ្នូ',
+
+  // ==========================
+  // Interview List Screen
+  // ==========================
+  'Could not load your interviews. Pull down to try again.':
+      'មិនអាចទាញយកការសម្ភាសន៍របស់អ្នកបានទេ។ អូសចុះក្រោមដើម្បីព្យាយាមម្តងទៀត។',
+  'Upcoming': 'ខាងមុខ',
+  'Past': 'កន្លងទៅ',
+  '@dur min': '@dur នាទី',
+  'Live': 'កំពុងផ្ទាល់',
+
+  'No upcoming interviews': 'គ្មានការសម្ភាសន៍ខាងមុខទេ',
+  'No past interviews': 'គ្មានការសម្ភាសន៍កន្លងទៅទេ',
+  'Scheduled video interviews will show up here.':
+      'ការសម្ភាសន៍វីដេអូដែលបានកំណត់ពេលនឹងបង្ហាញនៅទីនេះ។',
+  'Completed and cancelled interviews will show up here.':
+      'ការសម្ភាសន៍ដែលបានបញ្ចប់និងលុបចោលនឹងបង្ហាញនៅទីនេះ។',
+
+  // ==========================
+  // Schedule Interview Module
+  // ==========================
+  'Missing candidate information.': 'បាត់ព័ត៌មានបេក្ខជន។',
+  'Please select both a date and a time.': 'សូមជ្រើសរើសទាំងថ្ងៃខែ និងម៉ោង។',
+  'Please choose a date and time in the future.':
+      'សូមជ្រើសរើសពេលវេលានៅថ្ងៃអនាគត។',
+  'Interview Scheduled 🎉': 'កិច្ចសម្ភាសន៍ត្រូវបានកំណត់ 🎉',
+  '@name has been notified.': '@name ត្រូវបានជូនដំណឹងរួចរាល់។',
+  'Could not schedule interview': 'មិនអាចកំណត់ពេលសម្ភាសន៍បានទេ',
+  'Interview Date': 'កាលបរិច្ឆេទសម្ភាសន៍',
+  'Select a date': 'ជ្រើសរើសថ្ងៃខែ',
+  'Interview Time': 'ម៉ោងសម្ភាសន៍',
+  'Select a time': 'ជ្រើសរើសម៉ោង',
+  '@mins min': '@mins នាទី',
+  'Notes (Optional)': 'កំណត់ចំណាំ (មិនចាំបាច់ក៏បាន)',
+  'E.g., Please prepare a short portfolio walkthrough.':
+      'ឧ. សូមរៀបចំការបង្ហាញស្នាដៃខ្លីៗ។',
+  'A private video call link will be generated automatically — no extra app needed on either side.':
+      'តំណហៅជាវីដេអូឯកជននឹងត្រូវបានបង្កើតដោយស្វ័យប្រវត្តិ — មិនត្រូវការកម្មវិធីបន្ថែមទេ។',
+  'For: @job': 'សម្រាប់៖ @job',
+
+  // ==========================
+  // Notifications View
+  // ==========================
+  'No notifications yet': 'មិនទាន់មានការជូនដំណឹងនៅឡើយទេ',
+  'We\'ll let you know when something happens.':
+      'យើងនឹងជូនដំណឹងអ្នកនៅពេលមានអ្វីមួយកើតឡើង។',
+
+  // ==========================
+  // Login Screen
+  // ==========================
+  'Logging in...': 'កំពុងចូល...',
+  'Login': 'ចូលប្រើប្រាស់',
+  'Continue with Google': 'បន្តជាមួយ Google',
+  'Don\'t have an account?': 'មិនទាន់មានគណនីមែនទេ?',
+  'Sign up': 'ចុះឈ្មោះ',
+  'Or': 'ឬ',
+  'Remember me': 'ចងចាំខ្ញុំ',
+  'Forgot Password?': 'ភ្លេចពាក្យសម្ងាត់?',
+  'Password': 'ពាក្យសម្ងាត់',
+  'Welcome Back': 'សូមស្វាគមន៍មកកាន់ការចូលប្រើប្រាស់',
+  'Sign in to continue to your account':
+      'ចូលប្រើប្រាស់ដើម្បីបន្តទៅកាន់គណនីរបស់អ្នក',
+
+  // ==========================
+  // Create Account Screen
+  // ==========================
+  'Please agree to the Terms and Conditions':
+      'សូមយល់ព្រមតាមលក្ខន្តិកៈ និងគោលការណ៍',
+  'Create Account': 'បង្កើតគណនី',
+  'Fill in your details to get started': 'បំពេញព័ត៌មានរបស់អ្នកដើម្បីចាប់ផ្តើម',
+
+  'I agree to the ': 'ខ្ញុំយល់ព្រមតាម ',
+  ' and ': ' និង ',
+  'Register as Employer': 'ចុះឈ្មោះជានិយោជក',
+  'Register as Job Seeker': 'ចុះឈ្មោះជាអ្នកស្វែងរកការងារ',
+  'Continue as Employer with Google': 'បន្តជានិយោជកជាមួយ Google',
+  'Continue as Seeker with Google': 'បន្តជាអ្នកស្វែងរកការងារជាមួយ Google',
+  'Already have an account? ': 'មានគណនីរួចហើយមែនទេ? ',
+  'Sign In': 'ចូលគណនី',
+
+  // ==========================
+  // Forgot Password Screen
+  // ==========================
+  'Forgot Password': 'ភ្លេចពាក្យសម្ងាត់',
+  'Enter Email Address': 'បញ្ចូលអាសយដ្ឋានអ៊ីមែល',
+  'Enter the email address associated with your account and we\'ll send you a verification code to reset your password.':
+      'បញ្ចូលអាសយដ្ឋានអ៊ីមែលដែលភ្ជាប់ជាមួយគណនីរបស់អ្នក ហើយយើងនឹងផ្ញើលេខកូដផ្ទៀងផ្ទាត់ដើម្បីកំណត់ពាក្យសម្ងាត់របស់អ្នកឡើងវិញ។',
+  'Send Verification Code': 'ផ្ញើលេខកូដផ្ទៀងផ្ទាត់',
+  'Verification code has been sent to your email.':
+      'លេខកូដផ្ទៀងផ្ទាត់ត្រូវបានផ្ញើទៅកាន់អ៊ីមែលរបស់អ្នក។',
+  'Something wrong. Please check your connection':
+      'មានបញ្ហាខុសប្រក្រតី។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក។',
+
+  // ==========================
+  // Reset Password Screen
+  // ==========================
+  'Passwords do not match.': 'ពាក្យសម្ងាត់មិនត្រូវគ្នាទេ។',
+
+  'Password reset successfully.': 'ពាក្យសម្ងាត់ត្រូវបានកំណត់ឡើងវិញដោយជោគជ័យ។',
+
+  'Something went wrong. Please try again.':
+      'មានបញ្ហាមិនប្រក្រតី។ សូមព្យាយាមម្ដងទៀត។',
+  'Reset Password': 'កំណត់ពាក្យសម្ងាត់ឡើងវិញ',
+  'Create New Password': 'បង្កើតពាក្យសម្ងាត់ថ្មី',
+  'Your new password must be different from previous used passwords.':
+      'ពាក្យសម្ងាត់ថ្មីរបស់អ្នកត្រូវតែខុសពីពាក្យសម្ងាត់ដែលធ្លាប់ប្រើពីមុន។',
+
+  'Resetting...': 'កំពុងកំណត់ឡើងវិញ...',
+
+  // ==========================
+  // OTP Verification Screen
+  // ==========================
+  'Your account has been verified successfully!':
+      'គណនីរបស់អ្នកត្រូវបានផ្ទៀងផ្ទាត់ដោយជោគជ័យ!',
+  'There is a system error. Please check your internet connection.':
+      'មានបញ្ហាប្រព័ន្ធ។ សូមពិនិត្យមើលការភ្ជាប់អ៊ីនធឺណិតរបស់អ្នក។',
+  'OTP has been resent to your email.':
+      'លេខកូដ OTP ត្រូវបានផ្ញើទៅកាន់អ៊ីមែលរបស់អ្នកម្តងទៀត។',
+  'OTP Code Verification': 'ការផ្ទៀងផ្ទាត់លេខកូដ OTP',
+  'Check Your Email': 'ពិនិត្យអ៊ីមែលរបស់អ្នក',
+  'We have sent an OTP code to ': 'យើងបានផ្ញើលេខកូដ OTP ទៅកាន់ ',
+  'your email': 'អ៊ីមែលរបស់អ្នក',
+  'Didn\'t receive code? ': 'មិនទទួលបានលេខកូដមែនទេ? ',
+  'Resend OTP': 'ផ្ញើលេខកូដឡើងវិញ',
+  'Resend in @secs': 'ផ្ញើឡើងវិញក្នុង @sec វិនាទី',
+  'Verifying...': 'កំពុងផ្ទៀងផ្ទាត់...',
+  'Verify & Proceed': 'ផ្ទៀងផ្ទាត់ & បន្ត',
+
+  // ==========================
+  // Auth Widgets
+  // ==========================
+  'Seeker': 'អ្នកស្វែងរកការងារ',
+
+  // ==========================
+  // Generic Widgets
+  // ==========================
+  'Confirm': 'បញ្ជាក់',
+  'Search...': 'ស្វែងរក...',
+  'Processing...': 'កំពុងដំណើរការ...',
+
+  // ==========================
+  // Custom Widgets & Utilities
+  // ==========================
+  'Apply (@count selected)': 'យល់ព្រម (ជ្រើសរើស @count)',
+  'Password strength: @status': 'កម្រិតសុវត្ថិភាព: @status',
+  'Weak': 'ខ្សោយ',
+  'Fair': 'មធ្យម',
+  'Strong': 'ខ្លាំង',
+  'Very Strong': 'ខ្លាំងបំផុត',
+
+  // ==========================
+  // Candidate Detail Module
+  // ==========================
+  'Candidate details not found.': 'រកមិនឃើញព័ត៌មានលម្អិតរបស់បេក្ខជនទេ។',
+  'Could not load applicant details':
+      'មិនអាចទាញយកព័ត៌មានលម្អិតរបស់អ្នកដាក់ពាក្យបានទេ។',
+
+  'No document attached.': 'គ្មានឯកសារភ្ជាប់មកជាមួយទេ។',
+
+  // ==========================
+  // Candidate Sub-Widgets
+  // ==========================
+  'No cover letter provided.': 'មិនមានផ្តល់ជូនលិខិតអមសំបុត្រទេ។',
+  'Attached Cover Letter': 'លិខិតអមសំបុត្រដែលបានភ្ជាប់',
+  'Tap to view document': 'ចុចដើម្បីមើលឯកសារ',
+  'Applied for: @jobTitle': 'បានដាក់ពាក្យសម្រាប់៖ @jobTitle',
+  'Date & Time': 'កាលបរិច្ឆេទ និងម៉ោង',
+  'TBD': 'មិនទាន់កំណត់',
+
+  '@exp Yrs Exp': 'បទពិសោធន៍ @exp ឆ្នាំ',
+
+  'Document Viewer': 'កម្មវិធីមើលឯកសារ',
+
+  // ==========================
+  // Candidates View
+  // ==========================
+  'Cannot start chat. User ID is missing.':
+      'មិនអាចចាប់ផ្តើមការសន្ទនាបានទេ។ បាត់លេខសម្គាល់អ្នកប្រើប្រាស់។',
+  'Something went wrong.': 'មានបញ្ហាមិនប្រក្រតី។',
+
+  'Selection Error': 'កំហុសក្នុងការជ្រើសរើស',
+  'You can only select candidates with the same status at a time.':
+      'អ្នកអាចជ្រើសរើសបានតែបេក្ខជនដែលមានស្ថានភាពដូចគ្នាក្នុងពេលតែមួយប៉ុណ្ណោះ។',
+
+  'Candidates have been updated successfully.':
+      'បេក្ខជនត្រូវបានធ្វើបច្ចុប្បន្នភាពដោយជោគជ័យ។',
+  'Could not process bulk action.': 'មិនអាចដំណើរការសកម្មភាពព្រមគ្នាបានទេ។',
+  'Interview schedule has been updated.':
+      'កាលវិភាគសម្ភាសន៍ត្រូវបានធ្វើបច្ចុប្បន្នភាព។',
+  'Could not update data. Please try again.':
+      'មិនអាចធ្វើបច្ចុប្បន្នភាពទិន្នន័យបានទេ។ សូមព្យាយាមម្តងទៀត។',
+
+  'Cancel Selection': 'បោះបង់ការជ្រើសរើស',
+
+  'Take Action (@count)': 'ចាត់វិធានការ (@count)',
+
+  // ==========================
+  // Candidate Sub-Components
+  // ==========================
+  'Take Action (@count selected)': 'ចាត់វិធានការ (@count បានជ្រើសរើស)',
+  'Move to Shortlisted': 'ប្ដូរទៅបេក្ខជនត្រូវបានជ្រើសរើស',
+  'Hire Candidates': 'ជួលបេក្ខជន',
+  'Reject Candidates': 'បដិសេធបេក្ខជន',
+  'Are you sure you want to @action @count candidate(s)? This action cannot be undone.':
+      'តើអ្នកប្រាកដជាចង់ @action បេក្ខជនចំនួន @count នាក់មែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។',
+
+  'Search candidates, skills...': 'ស្វែងរកបេក្ខជន, ជំនាញ...',
+  'Newest Applied': 'ដាក់ពាក្យថ្មីបំផុត',
+  'Name (A-Z)': 'ឈ្មោះ (A-Z)',
+  'Nearest Interview': 'ការសម្ភាសន៍កៀកបំផុត',
+  'Empty': 'ទទេ',
+  'No candidates to export.': 'គ្មានបេក្ខជនដើម្បីទាញយកចេញទេ។',
+  'Export Candidates': 'ទាញយកបេក្ខជនចេញ',
+  'Export as PDF': 'ទាញយកជា PDF',
+  'Best for printing interview scorecards':
+      'ល្អបំផុតសម្រាប់ការបោះពុម្ពតារាងពិន្ទុសម្ភាសន៍',
+  'Export as Excel': 'ទាញយកជា Excel',
+  'Best for filtering and data analysis':
+      'ល្អបំផុតសម្រាប់ការត្រង និងវិភាគទិន្នន័យ',
+  'No candidates found.': 'រកមិនឃើញបេក្ខជន។',
+  'Failed to generate report.': 'បរាជ័យក្នុងការបង្កើតរបាយការណ៍។',
+  'Edit Interview Schedule': 'កែប្រែកាលវិភាគសម្ភាសន៍',
+  'Updating schedule for @name': 'កំពុងធ្វើបច្ចុប្បន្នភាពកាលវិភាគសម្រាប់ @name',
+  'Update Message (Optional)': 'ធ្វើបច្ចុប្បន្នភាពសារ (មិនចាំបាច់ក៏បាន)',
+  'E.g., We have changed the location to...':
+      'ឧទាហរណ៍៖ យើងបានប្តូរទីតាំងទៅកាន់...',
+  'Please provide a location': 'សូមផ្តល់ទីតាំង',
+  'Select Job Post': 'ជ្រើសរើសការងារដែលបានប្រកាស',
+
+  // ==========================
+  // Company Profile Setup
+  // ==========================
+  'Company Name is required': 'តម្រូវឱ្យមានឈ្មោះក្រុមហ៊ុន',
+  'Please select an Industry!': 'សូមជ្រើសរើសវិស័យការងារ!',
+  'Company Description must have at least 10 characters!':
+      'ការពិពណ៌នាក្រុមហ៊ុនត្រូវមានយ៉ាងហោចណាស់ 10 តួអក្សរ!',
+
+  'Company Identity': 'អត្តសញ្ញាណក្រុមហ៊ុន',
+  'Tell us about your business': 'ប្រាប់យើងអំពីអាជីវកម្មរបស់អ្នក',
+  'e.g. Jobber City Co., Ltd.': 'ឧ. ក្រុមហ៊ុន Jobber City ចំកាត់.',
+  'Industry *': 'វិស័យការងារ *',
+  'Select your industry': 'ជ្រើសរើសវិស័យការងាររបស់អ្នក',
+  'Company Size *': 'ទំហំក្រុមហ៊ុន *',
+  'Select company size': 'ជ្រើសរើសទំហំក្រុមហ៊ុន',
+  'Select Company Size': 'ជ្រើសរើសទំហំក្រុមហ៊ុន',
+  'Description *': 'ការពិពណ៌នា *',
+  'Briefly describe your company (min 10 chars)...':
+      'រៀបរាប់ត្រួសៗពីក្រុមហ៊ុនរបស់អ្នក (យ៉ាងហោចណាស់ 10 តួអក្សរ)...',
+  'Contact & Location': 'ទំនាក់ទំនង & ទីតាំង',
+  'Where can candidates find you?': 'តើបេក្ខជនអាចស្វែងរកអ្នកនៅឯណា?',
+  'Contact Email *': 'អ៊ីមែលទំនាក់ទំនង *',
+  'Phone Number *': 'លេខទូរស័ព្ទ *',
+
+  'Please select a Province first': 'សូមជ្រើសរើសខេត្ត/ក្រុងជាមុនសិន',
+  'Address Detail *': 'អាសយដ្ឋានលម្អិត *',
+  'Street 123, Sangkat...': 'ផ្លូវ 123, សង្កាត់...',
+  'Customize your experience': 'កែសម្រួលបទពិសោធន៍របស់អ្នក',
+
+  'Recommended size: 500x500px': 'ទំហំដែលបានណែនាំ: 500x500px',
+
+  // ==========================
+  // Employer Profile Setup
+  // ==========================
+  'Failed to load profile. Please try again.':
+      'មិនអាចទាញយកប្រវត្តិរូបបានទេ។ សូមព្យាយាមម្តងទៀត។',
+
+  '@size: @count': '@size: @count',
+
+  // ==========================
+  // Edit Employer Profile Module
+  // ==========================
+  'Save': 'រក្សាទុក',
+
+  // ==========================
+  // Employer Home Views
+  // ==========================
+  '@count active candidates': 'បេក្ខជនសកម្មចំនួន @count',
+
+  'Overview': 'ទិដ្ឋភាពទូទៅ',
+  'Filter Dashboard': 'ត្រងទិន្នន័យ',
+
+  'This Week': 'សប្តាហ៍នេះ',
+  'This Month': 'ខែនេះ',
+  'Select Specific Month...': 'ជ្រើសរើសខែជាក់លាក់...',
+  'Custom Date Range...': 'កំណត់ចន្លោះកាលបរិច្ឆេទ...',
+
+  'No recent applicants yet': 'មិនទាន់មានបេក្ខជនដាក់ពាក្យថ្មីៗទេ',
+  'Recently': 'ថ្មីៗនេះ',
+
+  // ==========================
+  // My Jobs View Module
+  // ==========================
+  'All (@count)': 'ទាំងអស់ (@count)',
+  'Active (@count)': 'សកម្ម (@count)',
+  'Paused (@count)': 'បានផ្អាក (@count)',
+  'Draft (@count)': 'សេចក្តីព្រាង (@count)',
+
+  // ==========================
+  // My Job Action Sheet + Sub-Views
+  // ==========================
+  '@count candidate(s)': 'បេក្ខជន @count នាក់',
+  'Newest': 'ថ្មីបំផុត',
+  'Oldest': 'ចាស់បំផុត',
+  'Expiring Soon': 'ជិតផុតកំណត់',
+
+  // ==========================
+  // My Job Details Module
+  // ==========================
+  ' (Negotiable)': ' (អាចចរចាបាន)',
+
+  // ==========================
+  // Post Job Details Module
+  // ==========================
+  'Save Draft': 'រក្សាទុកជាសេចក្តីព្រាង',
+  'Tell us about the role and where it\'s based':
+      'ប្រាប់យើងអំពីតួនាទី និងទីតាំងការងារ',
+  'Company & Position': 'ក្រុមហ៊ុន & មុខតំណែង',
+  'e.g. Senior Product Designer': 'ឧ. អ្នករចនាផលិតផលជាន់ខ្ពស់',
+  'Province / State': 'ខេត្ត/ក្រុង',
+  'Select province': 'ជ្រើសរើសខេត្ត/ក្រុង',
+  'Search province...': 'ស្វែងរកខេត្ត/ក្រុង...',
+  'District / City': 'ស្រុក/ខណ្ឌ',
+  'Select district': 'ជ្រើសរើសស្រុក/ខណ្ឌ',
+  'Search district...': 'ស្វែងរកស្រុក/ខណ្ឌ...',
+
+  // ==========================
+  // Recruit Tab Module
+  // ==========================
+  '@count total posts': 'ការប្រកាសសរុប @count',
+  // ==========================
+  // Recruit Tab Inner Modules
+  // ==========================
+  'CLOSES TODAY': 'បិទថ្ងៃនេះ',
+  'CLOSING SOON': 'ជិតបិទហើយ',
+  'Closes @date': 'បិទនៅថ្ងៃ @date',
+  '1 vacancy': 'ត្រូវការ 1 នាក់',
+  '@count vacancies': 'ត្រូវការ @count នាក់',
+  'No jobs match your search': 'មិនមានការងារដែលត្រូវនឹងការស្វែងរករបស់អ្នកទេ',
+  'Try a different keyword or filter.':
+      'សាកល្បងប្រើពាក្យគន្លឹះ ឬមុខងារចម្រោះផ្សេង។',
 };

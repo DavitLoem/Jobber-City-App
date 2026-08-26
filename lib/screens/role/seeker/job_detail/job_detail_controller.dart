@@ -46,10 +46,14 @@ class JobDetailController extends GetxController {
         final file = File(result.files.single.path!);
         final sizeInBytes = await file.length();
         if (sizeInBytes > 5 * 1024 * 1024) {
+          final isDark = Get.isDarkMode; // 🟢 Dark mode check for controller
           Get.snackbar(
-            "File too large",
-            "Please select a file smaller than 5MB.",
-            backgroundColor: Colors.red.shade50,
+            "File too large".tr, // 🟢 Added .tr
+            "Please select a file smaller than 5MB.".tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? AppColors.error.withValues(alpha: 0.15)
+                : Colors.red.shade50,
+            colorText: isDark ? Colors.redAccent : Colors.red.shade700,
           );
           return;
         }
@@ -76,7 +80,7 @@ class JobDetailController extends GetxController {
         resumeUrl.value = response['data']['resume_url'] ?? '';
         resumeFilename.value =
             response['data']['resume_filename'] ??
-            'My_Resume.pdf'; // 🎯 ទាញយកឈ្មោះ CV មកដាក់ (បើគ្មានដាក់ Default)
+            'My_Resume.pdf'; // You could add .tr here if needed, but filenames shouldn't usually be translated
       }
     } catch (e) {
       debugPrint("Error fetching profile for CV check: $e");
@@ -106,6 +110,7 @@ class JobDetailController extends GetxController {
     isApplying.value = true;
     String? finalCoverLetterUrl;
     String? finalCoverLetterFilename;
+    final isDark = Get.isDarkMode; // 🟢 Get current theme mode for snackbars
 
     try {
       if (coverLetterDocPath.value.isNotEmpty) {
@@ -133,22 +138,31 @@ class JobDetailController extends GetxController {
         }
 
         Get.snackbar(
-          "Application Sent! 🎉",
-          "You have successfully applied to ${job.value!.companyName}.",
+          "Application Sent! 🎉".tr, // 🟢 Added .tr
+          "You have successfully applied to @company.".trParams({
+            'company': job.value!.companyName,
+          }), // 🟢 Added .trParams
           snackPosition: SnackPosition.TOP,
-          backgroundColor: AppColors.successBackground,
-          colorText: AppColors.success,
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : AppColors.successBackground,
+          colorText: isDark ? Colors.greenAccent : AppColors.success,
           duration: const Duration(seconds: 4),
         );
       }
     } catch (e) {
       // 🎯 បង្ហាញ Error ពេលគាត់ដាក់ពាក្យលើស ១០ ដង ឬ Error ផ្សេងៗ
       Get.snackbar(
-        "Application Failed",
-        e.toString().replaceAll("Exception: ", ""),
+        "Application Failed".tr, // 🟢 Added .tr
+        e
+            .toString()
+            .replaceAll("Exception: ", "")
+            .tr, // 🟢 Tr catches known backend errors if mapped
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
         duration: const Duration(seconds: 4),
       );
     } finally {

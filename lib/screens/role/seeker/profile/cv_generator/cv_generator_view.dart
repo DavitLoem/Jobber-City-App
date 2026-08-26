@@ -11,33 +11,40 @@ import 'widgets/cv_template_card.dart';
 part 'cv_generator_binding.dart';
 part 'cv_generator_controller.dart';
 
-/// Seeker-only screen: turns their saved profile (experience, education,
-/// skills, etc. — already filled in via the other Profile section screens)
-/// into a downloadable PDF resume, picking from the backend's template
-/// library. Entry point is the "Generate CV" item on `ProfileScreenView`.
 class CvGeneratorView extends GetView<CvGeneratorViewController> {
   const CvGeneratorView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
+          ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Generate CV',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'Generate CV'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
 
         return SingleChildScrollView(
@@ -46,18 +53,32 @@ class CvGeneratorView extends GetView<CvGeneratorViewController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (controller.currentCv.value?.hasCv == true) ...[
-                CurrentCvBanner(cv: controller.currentCv.value!, onView: controller.viewCurrentCv),
+                CurrentCvBanner(
+                  cv: controller.currentCv.value!,
+                  onView: controller.viewCurrentCv,
+                ),
                 const SizedBox(height: 24),
               ],
 
-              const Text(
-                'Choose a template',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.black87),
+              Text(
+                'Choose a template'.tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
+                ),
               ),
               const SizedBox(height: 4),
               Text(
-                'We\'ll fill it in automatically using your profile — experience, education, skills, and more.',
-                style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600, height: 1.4),
+                'We\'ll fill it in automatically using your profile — experience, education, skills, and more.'
+                    .tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.grey.shade600, // 🟢 Dynamic Subtext
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -65,7 +86,14 @@ class CvGeneratorView extends GetView<CvGeneratorViewController> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
-                    child: Text('No templates available right now.', style: TextStyle(color: Colors.grey.shade500)),
+                    child: Text(
+                      'No templates available right now.'.tr, // 🟢 Added .tr
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.darkTextHint
+                            : Colors.grey.shade500, // 🟢 Dynamic Subtext
+                      ),
+                    ),
                   ),
                 )
               else
@@ -86,18 +114,36 @@ class CvGeneratorView extends GetView<CvGeneratorViewController> {
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: isDark
+                        ? Colors.orangeAccent.withValues(alpha: 0.15)
+                        : Colors.orange.shade50, // 🟢 Dynamic BG
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.shade100),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.orangeAccent.withValues(alpha: 0.3)
+                          : Colors.orange.shade100, // 🟢 Dynamic Border
+                    ),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline_rounded, size: 18, color: Colors.orange.shade700),
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 18,
+                        color: isDark
+                            ? Colors.orangeAccent
+                            : Colors.orange.shade700, // 🟢 Dynamic Icon
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           controller.profileWarning.value,
-                          style: TextStyle(fontSize: 12.5, color: Colors.orange.shade800, height: 1.4),
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: isDark
+                                ? Colors.orangeAccent
+                                : Colors.orange.shade800, // 🟢 Dynamic Text
+                            height: 1.4,
+                          ),
                         ),
                       ),
                     ],
@@ -108,24 +154,40 @@ class CvGeneratorView extends GetView<CvGeneratorViewController> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: controller.selectedTemplateId.value.isEmpty || controller.isGenerating.value
+                  onPressed:
+                      controller.selectedTemplateId.value.isEmpty ||
+                          controller.isGenerating.value
                       ? null
                       : controller.generateCv,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: Colors.grey.shade300,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    disabledBackgroundColor: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.grey.shade300, // 🟢 Dynamic Disabled BG
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     elevation: 0,
                   ),
                   child: controller.isGenerating.value
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.4,
+                            color: Colors.white,
+                          ),
                         )
                       : Text(
-                          controller.currentCv.value?.hasCv == true ? 'Regenerate CV' : 'Generate CV',
-                          style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.bold, color: Colors.white),
+                          controller.currentCv.value?.hasCv == true
+                              ? 'Regenerate CV'
+                                    .tr // 🟢 Added .tr
+                              : 'Generate CV'.tr, // 🟢 Added .tr
+                          style: const TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                 ),
               ),

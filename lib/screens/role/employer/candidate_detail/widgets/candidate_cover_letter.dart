@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/core/constants/app_colors.dart'; // តម្រូវតាមទីតាំងជាក់ស្តែង
+import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 
 class CandidateCoverLetter extends StatelessWidget {
   final String? coverLetterText;
@@ -17,6 +18,9 @@ class CandidateCoverLetter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final hasText =
         coverLetterText != null && coverLetterText!.trim().isNotEmpty;
     final hasFile = coverLetterUrl != null && coverLetterUrl!.isNotEmpty;
@@ -24,9 +28,13 @@ class CandidateCoverLetter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Cover Letter",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Text(
+          "Cover Letter".tr,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
         ),
         const SizedBox(height: 12),
 
@@ -36,15 +44,19 @@ class CandidateCoverLetter extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+              ),
             ),
             child: Text(
-              "No cover letter provided.",
+              "No cover letter provided.".tr,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade500,
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : Colors.grey.shade500,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -57,10 +69,14 @@ class CandidateCoverLetter extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.05),
+                color: isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : AppColors.primary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.2),
+                  color: AppColors.primary.withValues(
+                    alpha: isDark ? 0.3 : 0.2,
+                  ),
                 ),
               ),
               child: Row(
@@ -68,7 +84,9 @@ class CandidateCoverLetter extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark
+                          ? AppColors.darkSurfaceElevated
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
@@ -86,36 +104,40 @@ class CandidateCoverLetter extends StatelessWidget {
                           coverLetterFilename != null &&
                                   coverLetterFilename!.isNotEmpty
                               ? coverLetterFilename!
-                              : "Attached Cover Letter",
-                          style: const TextStyle(
+                              : "Attached Cover Letter".tr,
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: isDark
+                                ? Colors.blueAccent
+                                : AppColors.primary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          "Tap to view document",
+                          "Tap to view document".tr,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.primary.withValues(alpha: 0.7),
+                            color: isDark
+                                ? Colors.blueAccent.withValues(alpha: 0.8)
+                                : AppColors.primary.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.open_in_new_rounded,
-                    color: AppColors.primary,
+                    color: isDark ? Colors.blueAccent : AppColors.primary,
                     size: 20,
                   ),
                 ],
               ),
             ),
           ),
-          if (hasText) const SizedBox(height: 12), // ដកឃ្លាបើមានអត្ថបទបន្តទៀត
+          if (hasText) const SizedBox(height: 12),
         ],
 
         // 🎯 ២. បង្ហាញអត្ថបទ (Text) បើមាន
@@ -124,16 +146,20 @@ class CandidateCoverLetter extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+              ),
             ),
             child: Text(
               coverLetterText!,
               style: TextStyle(
                 fontSize: 14,
                 height: 1.6,
-                color: Colors.grey.shade700,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade700,
               ),
             ),
           ),

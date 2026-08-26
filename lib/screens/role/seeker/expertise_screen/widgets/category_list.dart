@@ -7,33 +7,28 @@ class CategoryList extends StatelessWidget {
   final CategoryScreenViewController controller;
   const CategoryList({super.key, required this.controller});
 
-  // 🎯 មុខងារត្រៀមសម្រាប់ Dynamic Icon និង Static Icon
-  Widget _buildCategoryIcon(String? iconUrl, bool isSelected, bool maxReached) {
-    // កំណត់ពណ៌ Icon ទៅតាមស្ថានភាព
+  Widget _buildCategoryIcon(
+    String? iconUrl,
+    bool isSelected,
+    bool maxReached,
+    bool isDark,
+  ) {
     final Color iconColor = isSelected
         ? Colors.white
         : maxReached
-        ? const Color(0xFFCCCCCC)
-        : Colors.grey[600]!;
+        ? (isDark
+              ? AppColors.darkIconSecondary
+              : const Color(0xFFCCCCCC)) // 🟢 Dynamic Disabled Icon
+        : (isDark
+              ? AppColors.darkTextSecondary
+              : Colors.grey[600]!); // 🟢 Dynamic Default Icon
 
-    // លក្ខខណ្ឌត្រៀម៖ បើមាន URL ត្រឹមត្រូវ (មិនមែន example) អាចបង្ហាញជារូបភាពបាន
     final bool hasValidDynamicIcon =
         iconUrl != null &&
         iconUrl.isNotEmpty &&
         !iconUrl.contains('example.com');
 
     if (hasValidDynamicIcon) {
-      // ទៅថ្ងៃមុខ ពេលមានផ្ទាំង Admin អាចបើកកូដនេះ ដើម្បីបង្ហាញរូបភាពពិតពី Network
-      /*
-      return Image.network(
-        iconUrl,
-        width: 20,
-        height: 20,
-        color: iconColor, // ប្តូរពណ៌រូបភាពឱ្យស៊ីនឹងផ្ទៃខាងក្រោយ
-        errorBuilder: (context, error, stackTrace) => Icon(Icons.work_outline_rounded, size: 20, color: iconColor),
-      );
-      */
-
       return Icon(Icons.work_outline_rounded, size: 20, color: iconColor);
     } else {
       return Icon(Icons.work_outline_rounded, size: 20, color: iconColor);
@@ -42,6 +37,9 @@ class CategoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(
@@ -50,7 +48,16 @@ class CategoryList extends StatelessWidget {
       }
 
       if (controller.categoriesList.isEmpty) {
-        return const Center(child: Text("No expertise found."));
+        return Center(
+          child: Text(
+            "No expertise found.".tr, // 🟢 Added .tr
+            style: TextStyle(
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textTertiary,
+            ),
+          ),
+        );
       }
 
       return ListView.separated(
@@ -63,7 +70,6 @@ class CategoryList extends StatelessWidget {
 
           return Obx(() {
             final isSelected = controller.selectedCategoryIds.contains(cat.id);
-            // 🎯 បិទមិនឱ្យចុចបើវាលើសពី ៥
             final maxReached =
                 controller.selectedCategoryIds.length >= 5 && !isSelected;
 
@@ -80,23 +86,35 @@ class CategoryList extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.1)
+                      ? AppColors.primary.withValues(
+                          alpha: 0.1,
+                        ) // 🟢 Updated to withValues
                       : maxReached
-                      ? const Color(0xFFFAFAFA)
-                      : AppColors.cardBackground,
+                      ? (isDark
+                            ? AppColors.darkBackground
+                            : const Color(0xFFFAFAFA)) // 🟢 Dynamic Disabled BG
+                      : theme.cardColor, // 🟢 Dynamic Default BG
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.5)
+                        ? AppColors.primary.withValues(
+                            alpha: 0.5,
+                          ) // 🟢 Updated to withValues
                         : maxReached
-                        ? const Color(0xFFEEEEEE)
-                        : AppColors.cardBorder,
+                        ? (isDark
+                              ? AppColors.darkDivider
+                              : const Color(
+                                  0xFFEEEEEE,
+                                )) // 🟢 Dynamic Disabled Border
+                        : (isDark
+                              ? AppColors.darkCardBorder
+                              : AppColors
+                                    .cardBorder), // 🟢 Dynamic Default Border
                     width: isSelected ? 1.5 : 1.0,
                   ),
                 ),
                 child: Row(
                   children: [
-                    // Icon Box
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 42,
@@ -105,40 +123,58 @@ class CategoryList extends StatelessWidget {
                         color: isSelected
                             ? AppColors.primary
                             : maxReached
-                            ? const Color(0xFFF0F0F0)
-                            : const Color(0xFFF5F5F5),
+                            ? (isDark
+                                  ? AppColors.darkSurfaceElevated
+                                  : const Color(
+                                      0xFFF0F0F0,
+                                    )) // 🟢 Dynamic Disabled Icon BG
+                            : (isDark
+                                  ? AppColors.darkSurfaceElevated
+                                  : const Color(
+                                      0xFFF5F5F5,
+                                    )), // 🟢 Dynamic Default Icon BG
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      // 🎯 ហៅមុខងារ _buildCategoryIcon មកប្រើនៅទីនេះ
                       child: Center(
                         child: _buildCategoryIcon(
                           cat.iconUrl,
                           isSelected,
                           maxReached,
+                          isDark, // 🟢 Pass Theme State
                         ),
                       ),
                     ),
                     const SizedBox(width: 14),
 
-                    // Label Text
                     Expanded(
                       child: Text(
-                        cat.name,
+                        cat
+                            .name
+                            .tr, // 🟢 Translatable categories (if mapped locally)
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: isSelected
                               ? FontWeight.w700
                               : FontWeight.w500,
                           color: maxReached
-                              ? const Color(0xFFCCCCCC)
+                              ? (isDark
+                                    ? AppColors.darkTextHint
+                                    : const Color(
+                                        0xFFCCCCCC,
+                                      )) // 🟢 Dynamic Disabled Text
                               : isSelected
-                              ? AppColors.textPrimary
-                              : Colors.grey[800],
+                              ? (isDark
+                                    ? Colors.white
+                                    : AppColors
+                                          .textPrimary) // 🟢 Dynamic Active Text
+                              : theme
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color, // 🟢 Dynamic Default Text
                         ),
                       ),
                     ),
 
-                    // Radio Check
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
                       child: isSelected
@@ -164,8 +200,16 @@ class CategoryList extends StatelessWidget {
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: maxReached
-                                      ? const Color(0xFFEEEEEE)
-                                      : const Color(0xFFCCCCCC),
+                                      ? (isDark
+                                            ? AppColors.darkDivider
+                                            : const Color(
+                                                0xFFEEEEEE,
+                                              )) // 🟢 Dynamic Disabled Radio
+                                      : (isDark
+                                            ? AppColors.darkCardBorder
+                                            : const Color(
+                                                0xFFCCCCCC,
+                                              )), // 🟢 Dynamic Default Radio
                                   width: 1.5,
                                 ),
                               ),

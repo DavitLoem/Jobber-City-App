@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobStepperHeader extends StatelessWidget {
@@ -9,46 +10,52 @@ class JobStepperHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     final List<Map<String, dynamic>> steps = [
-      {'title': 'Basic Info', 'icon': LucideIcons.info},
-      {'title': 'Salary', 'icon': LucideIcons.banknote},
-      {'title': 'Details', 'icon': LucideIcons.fileText},
-      {'title': 'Schedule', 'icon': LucideIcons.calendar},
+      {'title': 'Basic Info'.tr, 'icon': LucideIcons.info}, // 🟢 Added .tr
+      {'title': 'Salary'.tr, 'icon': LucideIcons.banknote}, // 🟢 Added .tr
+      {'title': 'Details'.tr, 'icon': LucideIcons.fileText}, // 🟢 Added .tr
+      {'title': 'Schedule'.tr, 'icon': LucideIcons.calendar}, // 🟢 Added .tr
     ];
 
     return Container(
       padding: const EdgeInsets.only(top: 20, bottom: 12, left: 20, right: 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1)),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkBackground
+            : Colors.white, // 🟢 Dynamic Header BG
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppColors.darkDivider : const Color(0xFFEEEEEE),
+            width: 1,
+          ),
+        ), // 🟢 Dynamic Bottom Border
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        // បង្កើត Item (រង្វង់) និង Line (បន្ទាត់) ឆ្លាស់គ្នា
         children: List.generate(steps.length * 2 - 1, (index) {
-          // ── ប្រសិនបើជួរទីតាំងជាលេខសេស = បង្ហាញបន្ទាត់ភ្ជាប់ ──
           if (index % 2 != 0) {
             final stepIndex = index ~/ 2;
             final isLineCompleted = currentStep > stepIndex;
             return Expanded(
               child: Container(
-                margin: const EdgeInsets.only(
-                  top: 18,
-                ), // រំកិលចុះក្រោមឱ្យចំកណ្តាលរង្វង់
+                margin: const EdgeInsets.only(top: 18),
                 height: 2,
                 color: isLineCompleted
                     ? AppColors.primary
-                    : Colors.grey.shade200,
+                    : (isDark
+                          ? AppColors.darkDivider
+                          : Colors.grey.shade200), // 🟢 Dynamic Inactive Line
               ),
             );
           }
 
-          // ── ប្រសិនបើជួរទីតាំងជាលេខគូ = បង្ហាញរង្វង់ Icon ──
           final stepIndex = index ~/ 2;
           final isActive = currentStep == stepIndex;
           final isCompleted = currentStep > stepIndex;
 
-          // កំណត់ពណ៌ទៅតាមស្ថានភាពនៃជំហាន
           Color iconColor;
           Color circleColor;
           Color borderColor;
@@ -58,22 +65,32 @@ class JobStepperHeader extends StatelessWidget {
             circleColor = AppColors.primary;
             borderColor = AppColors.primary;
           } else if (isActive) {
-            iconColor = AppColors.primary;
-            circleColor = AppColors.primary.withValues(alpha: 0.1);
-            borderColor = AppColors.primary;
+            iconColor = isDark
+                ? Colors.blueAccent
+                : AppColors.primary; // 🟢 Dynamic Active Icon Color
+            circleColor = AppColors.primary.withValues(
+              alpha: isDark ? 0.2 : 0.1,
+            ); // 🟢 Dynamic Active Outline Tint
+            borderColor = isDark
+                ? Colors.blueAccent
+                : AppColors.primary; // 🟢 Dynamic Active Border
           } else {
-            // មិនទាន់ទៅដល់
-            iconColor = Colors.grey.shade400;
-            circleColor = Colors.white;
-            borderColor = Colors.grey.shade300;
+            iconColor = isDark
+                ? AppColors.darkIconSecondary
+                : Colors.grey.shade400; // 🟢 Dynamic Inactive Icon Color
+            circleColor = isDark
+                ? AppColors.darkInputBackground
+                : Colors.white; // 🟢 Dynamic Inactive Circle BG
+            borderColor = isDark
+                ? AppColors.darkCardBorder
+                : Colors.grey.shade300; // 🟢 Dynamic Inactive Border
           }
 
           return SizedBox(
-            width: 65, // ទំហំថេរដើម្បីកុំឱ្យអក្សររុញគ្នា
+            width: 65,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // រង្វង់ Icon
                 Container(
                   width: 38,
                   height: 38,
@@ -94,7 +111,6 @@ class JobStepperHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // អក្សរខាងក្រោម
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -106,8 +122,15 @@ class JobStepperHeader extends StatelessWidget {
                           ? FontWeight.bold
                           : FontWeight.w500,
                       color: isActive || isCompleted
-                          ? AppColors.primary
-                          : Colors.grey.shade400,
+                          ? (isDark
+                                ? Colors.blueAccent
+                                : AppColors
+                                      .primary) // 🟢 Dynamic Active Text Label
+                          : (isDark
+                                ? AppColors.darkTextSecondary
+                                : Colors
+                                      .grey
+                                      .shade400), // 🟢 Dynamic Inactive Text Label
                     ),
                   ),
                 ),

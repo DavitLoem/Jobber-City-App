@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../controllers/location_controller.dart';
@@ -9,8 +10,6 @@ import '../../../../../models/role/employer/company_model.dart';
 import '../../../../../models/role/employer/job_model.dart';
 import '../employer_profile_view.dart';
 
-// កុំភ្លេច Import Controller ផ្សេងៗដែលពាក់ព័ន្ធ (MasterData, Location, EmployerProfile...)
-
 part 'company_detail_binding.dart';
 part 'company_detail_controller.dart';
 
@@ -19,11 +18,12 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 ទាញយក Profile ពី Controller មកប្រើ
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
     final profile = controller.companyProfile;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -49,7 +49,7 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── ១. Header (Cover, Logo, ឈ្មោះ) ──
-            _buildCompanyHeader(profile),
+            _buildCompanyHeader(profile, isDark),
 
             // ── ២. About Company ──
             Padding(
@@ -57,33 +57,34 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "About Us",
+                  Text(
+                    "About Us".tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: isDark
+                          ? Colors.white
+                          : Colors.black87, // 🟢 Dynamic Text
                     ),
                   ),
                   const SizedBox(height: 12),
 
-                  // 🎯 ភ្ជាប់ Description (បើគ្មាន បង្ហាញអត្ថបទលំនាំដើម)
                   Text(
                     profile?.description != null &&
                             profile!.description.isNotEmpty
                         ? profile.description
-                        : "No description available.",
+                        : "No description available.".tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.grey.shade700,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : Colors.grey.shade700, // 🟢 Dynamic Subtext
                       height: 1.6,
                     ),
                   ),
                   const SizedBox(height: 24),
 
-                  // 🎯 ភ្ជាប់ ទីតាំងពិតប្រាកដ
                   Obx(() {
-                    // គ្រាន់តែហៅវាចោល ដើម្បីឱ្យ Obx ដឹងថាត្រូវស្តាប់តាមអថេរនេះ
                     final _ = controller.isLocationLoaded.value;
 
                     return _buildContactInfoRow(
@@ -92,16 +93,17 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                         profile?.provinceId,
                         profile?.districtId,
                       ),
+                      isDark,
                     );
                   }),
 
-                  // 🎯 ភ្ជាប់ Website (លាក់ចោលប្រសិនបើគ្មាន)
                   if (profile?.websiteUrl != null &&
                       profile!.websiteUrl!.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _buildContactInfoRow(
                       LucideIcons.globe,
                       profile.websiteUrl!,
+                      isDark,
                       isLink: true,
                     ),
                   ],
@@ -109,8 +111,11 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
               ),
             ),
 
-            const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
-
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: isDark ? AppColors.darkDivider : const Color(0xFFEEEEEE),
+            ), // 🟢 Dynamic Divider
             // ── ៣. Active Jobs (ត្រៀមសម្រាប់ API) ──
             Padding(
               padding: const EdgeInsets.all(20),
@@ -120,7 +125,7 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                     child: Padding(
                       padding: EdgeInsets.all(20),
                       child: CircularProgressIndicator(
-                        color: Color(0xFF4f7df7),
+                        color: AppColors.primary,
                       ),
                     ),
                   );
@@ -130,19 +135,25 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Active Jobs",
+                      Text(
+                        "Active Jobs".tr, // 🟢 Added .tr
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black87, // 🟢 Dynamic Text
                         ),
                       ),
                       const SizedBox(height: 20),
                       Center(
                         child: Text(
-                          "No active jobs at the moment.",
-                          style: TextStyle(color: Colors.grey.shade500),
+                          "No active jobs at the moment.".tr, // 🟢 Added .tr
+                          style: TextStyle(
+                            color: isDark
+                                ? AppColors.darkTextTertiary
+                                : Colors.grey.shade500,
+                          ), // 🟢 Dynamic Subtext
                         ),
                       ),
                     ],
@@ -154,16 +165,17 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Active Jobs",
+                        Text(
+                          "Active Jobs".tr, // 🟢 Added .tr
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: isDark
+                                ? Colors.white
+                                : Colors.black87, // 🟢 Dynamic Text
                           ),
                         ),
 
-                        // 🎯 បង្ហាញចំនួនការងារក្លែងក្លាយសិន ត្រៀមដូរទៅ length របស់ API
                         Obx(
                           () => Container(
                             padding: const EdgeInsets.symmetric(
@@ -171,13 +183,19 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8EEFF),
+                              color: isDark
+                                  ? AppColors.primary.withValues(alpha: 0.15)
+                                  : const Color(
+                                      0xFFE8EEFF,
+                                    ), // 🟢 Dynamic Label BG
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              "${controller.activeJobs.length}", // នឹងប្តូរតាម API
-                              style: const TextStyle(
-                                color: Color(0xFF4f7df7),
+                              "${controller.activeJobs.length}",
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.blueAccent
+                                    : AppColors.primary, // 🟢 Dynamic Text
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -197,6 +215,7 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                             child: _buildMockJobCard(
                               job.title,
                               "${controller.getEmploymentTypeName(job.employmentTypeId)} • ${controller.getLocationName(job.provinceId, job.districtId)}",
+                              isDark,
                             ),
                           );
                         }).toList(),
@@ -207,7 +226,7 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                         padding: EdgeInsets.symmetric(vertical: 16),
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: Color(0xFF4f7df7),
+                            color: AppColors.primary,
                             strokeWidth: 3,
                           ),
                         ),
@@ -222,8 +241,7 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
     );
   }
 
-  // 🎯 បញ្ជូន profile ចូលដើម្បីទាញរូបភាព និងឈ្មោះ
-  Widget _buildCompanyHeader(CompanyProfileModel? profile) {
+  Widget _buildCompanyHeader(CompanyProfileModel? profile, bool isDark) {
     final hasBanner =
         profile?.bannerUrl != null && profile!.bannerUrl!.isNotEmpty;
     final hasLogo = profile?.logoUrl != null && profile!.logoUrl!.isNotEmpty;
@@ -236,7 +254,6 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
           height: 220,
           width: double.infinity,
           decoration: BoxDecoration(
-            // ប្រើរូបពិតបើមាន, បើគ្មានប្រើ Gradient ពណ៌ខៀវ
             image: hasBanner
                 ? DecorationImage(
                     image: NetworkImage(profile.bannerUrl!),
@@ -258,11 +275,15 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
           margin: const EdgeInsets.only(top: 180, left: 20, right: 20),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark
+                ? AppColors.darkSurfaceElevated
+                : Colors.white, // 🟢 Dynamic Profile Box BG
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.3 : 0.05,
+                ), // 🟢 Dynamic Shadow
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -274,37 +295,45 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
               Container(
                 transform: Matrix4.translationValues(0, -50, 0),
                 padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurfaceElevated
+                      : Colors.white, // 🟢 Dynamic Border matching BG
                   shape: BoxShape.circle,
                 ),
                 child: CircleAvatar(
                   radius: 35,
-                  backgroundColor: const Color(0xFFF0F4FF),
-                  // ប្រើ Logo ពិតបើមាន, បើគ្មានប្រើ Icon
+                  backgroundColor: isDark
+                      ? AppColors.darkInputBackground
+                      : const Color(0xFFF0F4FF), // 🟢 Dynamic Avatar BG
                   backgroundImage: hasLogo
                       ? NetworkImage(profile.logoUrl!)
                       : null,
                   child: !hasLogo
-                      ? const Icon(
+                      ? Icon(
                           LucideIcons.building,
                           size: 35,
-                          color: Color(0xFF4f7df7),
+                          color: isDark
+                              ? Colors.blueAccent
+                              : AppColors.primary, // 🟢 Dynamic Icon
                         )
                       : null,
                 ),
               ),
 
-              // ឈ្មោះ និង ឧស្សាហកម្ម
               Transform.translate(
                 offset: const Offset(0, -30),
                 child: Column(
                   children: [
                     Text(
-                      profile?.companyName ?? "Unknown Company",
-                      style: const TextStyle(
+                      profile?.companyName ??
+                          "Unknown Company".tr, // 🟢 Added .tr
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? Colors.white
+                            : Colors.black87, // 🟢 Dynamic Text
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -313,7 +342,9 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
                       controller.getIndustryName(profile?.industryId),
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.grey.shade600,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : Colors.grey.shade600, // 🟢 Dynamic Text
                       ),
                     ),
                   ],
@@ -328,21 +359,31 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
 
   Widget _buildContactInfoRow(
     IconData icon,
-    String text, {
+    String text,
+    bool isDark, {
     bool isLink = false,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.grey.shade500),
+        Icon(
+          icon,
+          size: 18,
+          color: isDark ? AppColors.darkIconSecondary : Colors.grey.shade500,
+        ), // 🟢 Dynamic Icon Color
         const SizedBox(width: 12),
         Expanded(
-          // រុំ Expanded ដើម្បីឱ្យវាធ្លាក់បន្ទាត់ស្អាតបើអត្ថបទវែង
           child: Text(
             text,
             style: TextStyle(
               fontSize: 14,
-              color: isLink ? const Color(0xFF4f7df7) : Colors.grey.shade700,
+              color: isLink
+                  ? (isDark
+                        ? Colors.blueAccent
+                        : AppColors.primary) // 🟢 Dynamic Link Text
+                  : (isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade700), // 🟢 Dynamic Detail Text
               fontWeight: isLink ? FontWeight.w500 : FontWeight.normal,
             ),
           ),
@@ -351,25 +392,33 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
     );
   }
 
-  Widget _buildMockJobCard(String title, String subtitle) {
+  Widget _buildMockJobCard(String title, String subtitle, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Card BG
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ), // 🟢 Dynamic Card Border
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F4FF),
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : const Color(0xFFF0F4FF), // 🟢 Dynamic Icon Wrap BG
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
+            child: Icon(
               LucideIcons.briefcase,
-              color: Color(0xFF4f7df7),
+              color: isDark
+                  ? Colors.blueAccent
+                  : AppColors.primary, // 🟢 Dynamic Icon
               size: 20,
             ),
           ),
@@ -380,20 +429,32 @@ class CompanyDetailView extends GetView<CompanyDetailViewController> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: isDark
+                        ? Colors.white
+                        : Colors.black87, // 🟢 Dynamic Job Title
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : Colors.grey.shade500,
+                    fontSize: 13,
+                  ), // 🟢 Dynamic Job Location/Sub
                 ),
               ],
             ),
           ),
-          Icon(LucideIcons.chevronRight, color: Colors.grey.shade300, size: 20),
+          Icon(
+            LucideIcons.chevronRight,
+            color: isDark ? AppColors.darkIconSecondary : Colors.grey.shade300,
+            size: 20,
+          ), // 🟢 Dynamic Chevron
         ],
       ),
     );

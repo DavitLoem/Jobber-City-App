@@ -17,13 +17,26 @@ class ResetPassScreenView extends GetView<ResetPassScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        title: const Text(
-          "Reset Password",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
+        iconTheme: IconThemeData(
+          color: theme.textTheme.bodyLarge?.color,
+        ), // 🟢 Dynamic Icon
+        title: Text(
+          "Reset Password".tr, // 🟢 Added .tr
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
+          ),
         ),
         centerTitle: true,
+        elevation: 0,
       ),
       body: SafeArea(
         child: Padding(
@@ -33,21 +46,30 @@ class ResetPassScreenView extends GetView<ResetPassScreenViewController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(AppAssets.imageResetPass),
-              const Text(
-                "Create New Password",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              Text(
+                "Create New Password".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
+                ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                "Your new password must be different from previous used passwords.",
-                style: TextStyle(color: Colors.grey),
+              Text(
+                "Your new password must be different from previous used passwords."
+                    .tr, // 🟢 Added .tr
+                style: TextStyle(
+                  color: isDark
+                      ? Colors.grey.shade400
+                      : Colors.grey, // 🟢 Dynamic Subtext
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
 
               // New Password Field
               CustomTextfield(
-                hintText: "New Password",
+                hintText: "New Password".tr, // 🟢 Added .tr
                 controller: controller.newPasswordCtrl,
                 prefixIcon: Icons.lock,
                 isPasswordField: true,
@@ -57,7 +79,7 @@ class ResetPassScreenView extends GetView<ResetPassScreenViewController> {
 
               // Confirm Password Field
               CustomTextfield(
-                hintText: "Confirm New Password",
+                hintText: "Confirm New Password".tr, // 🟢 Added .tr
                 controller: controller.confirmPasswordCtrl,
                 prefixIcon: Icons.lock,
                 isPasswordField: true,
@@ -76,7 +98,8 @@ class ResetPassScreenView extends GetView<ResetPassScreenViewController> {
                   },
                   text: controller.isLoading.value
                       ? "Resetting..."
-                      : "Reset Password",
+                            .tr // 🟢 Added .tr
+                      : "Reset Password".tr, // 🟢 Added .tr
                 );
               }),
               const SizedBox(height: 16),

@@ -36,6 +36,8 @@ class _CategoryFooterState extends State<CategoryFooter>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Obx(() {
       final count = widget.controller.selectedCategoryIds.length;
       final hasSelection = count > 0;
@@ -47,7 +49,10 @@ class _CategoryFooterState extends State<CategoryFooter>
           children: [
             // ── Counter Chips ──
             if (hasSelection) ...[
-              CategorySelectionCounter(count: count),
+              CategorySelectionCounter(
+                count: count,
+                isDark: isDark,
+              ), // 🟢 Passed isDark
               const SizedBox(height: 14),
             ],
 
@@ -71,21 +76,28 @@ class _CategoryFooterState extends State<CategoryFooter>
                   decoration: BoxDecoration(
                     gradient: hasSelection
                         ? const LinearGradient(
-                            colors: [
-                              AppColors.primary,
-                              AppColors.primaryLight,
-                            ], // កែឱ្យត្រូវនឹង AppColors របស់អ្នក
+                            colors: [AppColors.primary, AppColors.primaryLight],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
                           )
-                        : const LinearGradient(
-                            colors: [Color(0xFFCCCCCC), Color(0xFFDDDDDD)],
+                        : LinearGradient(
+                            colors: isDark
+                                ? [
+                                    AppColors.darkSurfaceElevated,
+                                    AppColors.darkSurfaceElevated,
+                                  ]
+                                : [
+                                    const Color(0xFFCCCCCC),
+                                    const Color(0xFFDDDDDD),
+                                  ], // 🟢 Dynamic BG
                           ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: hasSelection
                         ? [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.38),
+                              color: AppColors.primary.withValues(
+                                alpha: 0.38,
+                              ), // 🟢 Updated to withValues
                               blurRadius: 18,
                               offset: const Offset(0, 8),
                             ),
@@ -108,13 +120,19 @@ class _CategoryFooterState extends State<CategoryFooter>
                               Text(
                                 hasSelection
                                     ? 'Continue'
-                                    : 'Select at least 1 field',
+                                          .tr // 🟢 Added .tr
+                                    : 'Select at least 1 field'
+                                          .tr, // 🟢 Added .tr
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                   color: hasSelection
                                       ? Colors.white
-                                      : const Color(0xFFAAAAAA),
+                                      : (isDark
+                                            ? AppColors.darkTextHint
+                                            : const Color(
+                                                0xFFAAAAAA,
+                                              )), // 🟢 Dynamic Text
                                   letterSpacing: 0.2,
                                 ),
                               ),
@@ -141,7 +159,12 @@ class _CategoryFooterState extends State<CategoryFooter>
 
 class CategorySelectionCounter extends StatelessWidget {
   final int count;
-  const CategorySelectionCounter({super.key, required this.count});
+  final bool isDark; // 🟢 Added parameter for dark mode UI
+  const CategorySelectionCounter({
+    super.key,
+    required this.count,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -156,14 +179,20 @@ class CategorySelectionCounter extends StatelessWidget {
             width: filled ? 28 : 10,
             height: 8,
             decoration: BoxDecoration(
-              color: filled ? AppColors.primary : const Color(0xFFEEEEEE),
+              color: filled
+                  ? AppColors.primary
+                  : (isDark
+                        ? AppColors.darkSurfaceElevated
+                        : const Color(0xFFEEEEEE)), // 🟢 Dynamic BG
               borderRadius: BorderRadius.circular(4),
             ),
           );
         }),
         const SizedBox(width: 10),
         Text(
-          '$count / 5 selected',
+          '@count / 5 selected'.trParams({
+            'count': count.toString(),
+          }), // 🟢 Added .trParams
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,

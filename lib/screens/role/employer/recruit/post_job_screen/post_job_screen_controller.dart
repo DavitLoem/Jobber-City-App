@@ -11,29 +11,24 @@ class PostJobScreenViewController extends GetxController {
 
   final isLoading = false.obs;
 
-  // ---- Wizard step state ----
   final currentStep = 0.obs;
   final totalSteps = 4;
   final PageController pageController = PageController();
 
-  // ---- Basic Info ----
   final titleCtrl = TextEditingController();
   final provinceCtrl = TextEditingController();
   final districtCtrl = TextEditingController();
 
-  // ---- Salary & Requirements ----
   final minSalaryCtrl = TextEditingController();
   final maxSalaryCtrl = TextEditingController();
   final headCountCtrl = TextEditingController(text: '1');
   final experienceCtrl = TextEditingController(text: '1-3 Years');
 
-  // ---- Schedule ----
   final workingDaysCtrl = TextEditingController(text: 'Mon - Fri');
   final workingHoursCtrl = TextEditingController(text: '8:00 AM - 5:00 PM');
   final emailCtrl = TextEditingController();
   final telegramCtrl = TextEditingController();
 
-  // ---- Details ----
   final descCtrl = TextEditingController();
   final reqCtrl = TextEditingController();
   final aboutCompanyCtrl = TextEditingController();
@@ -64,9 +59,11 @@ class PostJobScreenViewController extends GetxController {
 
   final companyLogoUrl = ''.obs;
 
-  // Static option sets (not fetched from API)
   final experienceOptions = <DropdownItem>[
-    DropdownItem(id: 'no_exp', name: 'No Experience'),
+    DropdownItem(
+      id: 'no_exp',
+      name: 'No Experience',
+    ), // Usually we pass .tr to UI layer
     DropdownItem(id: 'under_1', name: 'Under 1 Year'),
     DropdownItem(id: '1_3', name: '1-3 Years'),
     DropdownItem(id: '3_5', name: '3-5 Years'),
@@ -101,10 +98,6 @@ class PostJobScreenViewController extends GetxController {
     await _prefillContactEmail();
   }
 
-  // Email comes from the logged-in user (same source as Company Profile
-  // screen). The backend has no GET for company profile, so we read it from
-  // the saved company profile first, then login arguments, then the email
-  // stored at registration.
   Future<void> _prefillContactEmail() async {
     final args = Get.arguments;
     if (args != null && args is Map && args['email'] != null) {
@@ -127,19 +120,6 @@ class PostJobScreenViewController extends GetxController {
       companyLogoUrl.value = logoUrl;
     }
   }
-
-  // Lazy loaders for the picker sheets (same pattern as provinces).
-  // Future<List<MasterDataItem>> fetchCategories() =>
-  //     _masterDataServices.getCategories();
-  // Future<List<MasterDataItem>> fetchJobLevels() =>
-  //     _masterDataServices.getJobLevels();
-  // Future<List<MasterDataItem>> fetchEducationLevels() =>
-  //     _masterDataServices.getEducationLevels();
-  // Future<List<MasterDataItem>> fetchEmploymentTypes() =>
-  //     _masterDataServices.getEmploymentTypes();
-  // Future<List<MasterDataItem>> fetchWorkTypes() =>
-  //     _masterDataServices.getWorkTypes();
-  // Future<List<MasterDataItem>> fetchSkills() => _masterDataServices.getSkills();
 
   Future<void> selectClosingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -180,8 +160,8 @@ class PostJobScreenViewController extends GetxController {
         .toList();
   }
 
-  // ---- Step navigation with per-step validation ----
   bool _validateStep(int step) {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
     switch (step) {
       case 0:
         if (titleCtrl.text.trim().isEmpty ||
@@ -192,10 +172,13 @@ class PostJobScreenViewController extends GetxController {
             employmentTypeId.value.isEmpty ||
             workTypeId.value.isEmpty) {
           Get.snackbar(
-            'Notice',
-            'Please fill Job Title, Province, District, Category, Job Level, Employment Type, and Work Type.',
-            backgroundColor: Colors.orange,
-            colorText: Colors.white,
+            'Notice'.tr, // 🟢 Added .tr
+            'Please fill Job Title, Province, District, Category, Job Level, Employment Type, and Work Type.'
+                .tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? Colors.orangeAccent.withValues(alpha: 0.15)
+                : Colors.orange,
+            colorText: isDark ? Colors.orangeAccent : Colors.white,
           );
           return false;
         }
@@ -206,10 +189,13 @@ class PostJobScreenViewController extends GetxController {
             headCountCtrl.text.trim().isEmpty ||
             educationLevelId.value.isEmpty) {
           Get.snackbar(
-            'Notice',
-            'Please fill Salary Range, Number of Vacancies and Education Required.',
-            backgroundColor: Colors.orange,
-            colorText: Colors.white,
+            'Notice'.tr, // 🟢 Added .tr
+            'Please fill Salary Range, Number of Vacancies and Education Required.'
+                .tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? Colors.orangeAccent.withValues(alpha: 0.15)
+                : Colors.orange,
+            colorText: isDark ? Colors.orangeAccent : Colors.white,
           );
           return false;
         }
@@ -217,10 +203,13 @@ class PostJobScreenViewController extends GetxController {
       case 2:
         if (descCtrl.text.trim().isEmpty || reqCtrl.text.trim().isEmpty) {
           Get.snackbar(
-            'Notice',
-            'Please fill Job Description and Minimum Qualifications.',
-            backgroundColor: Colors.orange,
-            colorText: Colors.white,
+            'Notice'.tr, // 🟢 Added .tr
+            'Please fill Job Description and Minimum Qualifications.'
+                .tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? Colors.orangeAccent.withValues(alpha: 0.15)
+                : Colors.orange,
+            colorText: isDark ? Colors.orangeAccent : Colors.white,
           );
           return false;
         }
@@ -254,23 +243,28 @@ class PostJobScreenViewController extends GetxController {
   }
 
   Future<void> submitJob() async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
     if (workingDaysCtrl.text.trim().isEmpty ||
         workingHoursCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Notice',
-        'Please fill Working Days and Working Hours!',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        'Notice'.tr, // 🟢 Added .tr
+        'Please fill Working Days and Working Hours!'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange,
+        colorText: isDark ? Colors.orangeAccent : Colors.white,
       );
       return;
     }
 
     if (selectedSkillIds.isEmpty) {
       Get.snackbar(
-        'Notice',
-        'Please select at least one required skill.',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        'Notice'.tr, // 🟢 Added .tr
+        'Please select at least one required skill.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange,
+        colorText: isDark ? Colors.orangeAccent : Colors.white,
       );
       return;
     }
@@ -322,18 +316,23 @@ class PostJobScreenViewController extends GetxController {
       await _jobServices.postJob(requestData);
 
       Get.snackbar(
-        'Success',
-        'Job Posted Successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        'Success'.tr, // 🟢 Added .tr
+        'Job Posted Successfully!'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green,
+        colorText: isDark ? Colors.greenAccent : Colors.white,
       );
       Get.back(result: true);
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to post job: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to post job: $e'
+            .tr, // 🟢 Added .tr (interpolated translation handling setup needed)
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     } finally {
       isLoading.value = false;

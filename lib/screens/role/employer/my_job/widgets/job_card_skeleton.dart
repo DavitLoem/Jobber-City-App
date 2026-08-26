@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:shimmer/shimmer.dart';
 
 class JobCardSkeleton extends StatelessWidget {
@@ -6,42 +7,52 @@ class JobCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Frame BG
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade100, width: 1.5),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade100,
+          width: 1.5,
+        ), // 🟢 Dynamic Outline Border
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.02,
+            ), // 🟢 Dynamic Shadow Weight
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      // ប្រើប្រាស់ Shimmer រុំតែធាតុខាងក្នុង ដើម្បីឱ្យផ្ទៃខាងក្រោយពណ៌សរក្សាភាពដើម
       child: Shimmer.fromColors(
-        baseColor: Colors.grey.shade200,
-        highlightColor: Colors.white,
+        baseColor: isDark
+            ? Colors.grey.shade800
+            : Colors.grey.shade200, // 🟢 Dynamic Shimmer Color
+        highlightColor: isDark
+            ? Colors.grey.shade700
+            : Colors.white, // 🟢 Dynamic Shimmer Specular Sweep
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── 1. ផ្នែកខាងលើ (Logo, Title, Badge) ──
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ប្រអប់ Logo
                 Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 const SizedBox(width: 12),
-                // ប្រអប់ Title និង Department
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +61,9 @@ class JobCardSkeleton extends StatelessWidget {
                         width: double.infinity,
                         height: 16,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
+                          color: isDark
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -59,7 +72,9 @@ class JobCardSkeleton extends StatelessWidget {
                         width: 120,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
+                          color: isDark
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -67,12 +82,11 @@ class JobCardSkeleton extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // ប្រអប់ Status Badge
                 Container(
                   width: 50,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -81,14 +95,13 @@ class JobCardSkeleton extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // ── 2. ផ្នែកកណ្តាល (ទីតាំង និង ពេលវេលា) ──
             Row(
               children: [
                 Container(
                   width: 80,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -97,51 +110,54 @@ class JobCardSkeleton extends StatelessWidget {
                   width: 60,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ],
             ),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Divider(height: 1, color: Color(0xFFF3F4F6)),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Divider(
+                height: 1,
+                color: isDark ? AppColors.darkDivider : const Color(0xFFF3F4F6),
+              ), // 🟢 Dynamic Divider Alignment
             ),
 
-            // ── 3. ផ្នែកខាងក្រោម (Avatars និង អក្សរ) ──
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    // ប្រអប់ Avatars រាងមូលទ្រវែង
                     Container(
                       width: 62,
                       height: 26,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: isDark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(13),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // ប្រអប់ចំនួន Candidates
                     Container(
                       width: 80,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: isDark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                   ],
                 ),
-                // ប្រអប់ Icon ព្រួញ
                 Container(
                   width: 16,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                     shape: BoxShape.circle,
                   ),
                 ),

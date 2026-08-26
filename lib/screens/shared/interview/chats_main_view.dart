@@ -10,6 +10,9 @@ class ChatsMainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     // 🎯 ដំណោះស្រាយ៖ បញ្ចូល Controller ទៅក្នុង Memory មុនពេល Build UI
     // ប្រើ Get.put() ដើម្បីប្រាកដថាទំព័រទាំង ២ ស្គាល់ Controller របស់វា
     Get.put(InterviewListViewController());
@@ -20,32 +23,38 @@ class ChatsMainView extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppColors.lightSurfaceVariant,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor:
+              theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
           elevation: 0,
           centerTitle: false,
-          title: const Text(
-            'Communications',
+          title: Text(
+            'Communications'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20,
-              color: AppColors.textPrimary,
+              color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title Color
             ),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: AppColors.primary,
-            unselectedLabelColor: AppColors.textTertiary,
+            unselectedLabelColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textTertiary, // 🟢 Dynamic Unselected Label Color
             indicatorColor: AppColors.primary,
             indicatorWeight: 3,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            unselectedLabelStyle: TextStyle(
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+            unselectedLabelStyle: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
             tabs: [
-              Tab(text: 'Messages'),
-              Tab(text: 'Interviews'),
+              Tab(text: 'Messages'.tr), // 🟢 Added .tr
+              Tab(text: 'Interviews'.tr), // 🟢 Added .tr
             ],
           ),
         ),

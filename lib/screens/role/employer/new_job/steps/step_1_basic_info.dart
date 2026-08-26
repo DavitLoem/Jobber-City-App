@@ -15,71 +15,81 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : Colors.white, // 🟢 Dynamic Step Form BG
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+          ), // 🟢 Dynamic Border
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Basic Information",
+            Text(
+              "Basic Information".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Section Title
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              "Tell candidates what this position is about",
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+              "Tell candidates what this position is about".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade500,
+              ), // 🟢 Dynamic Subtext
             ),
             const SizedBox(height: 24),
 
-            // ── 1. Company Logo ──
-            _buildCompanyLogo(),
+            _buildCompanyLogo(isDark), // 🟢 Pass Theme Context
             const SizedBox(height: 24),
 
-            // ── 2. Job Title ──
             CustomFormTextField(
-              label: "Job Title *",
-              hint: "e.g. Senior Flutter Developer",
+              label: "Job Title *".tr, // 🟢 Added .tr
+              hint: "e.g. Senior Flutter Developer".tr, // 🟢 Added .tr
               controller: controller.titleCtrl,
             ),
             const SizedBox(height: 16),
 
-            // ── 3. Location (Province & District ក្នុងជួរតែមួយ) ──
             Row(
               children: [
                 Expanded(
                   child: CustomFormTextField(
-                    label: "Province *",
-                    hint: "Select Province",
+                    label: "Province *".tr, // 🟢 Added .tr
+                    hint: "Select Province".tr, // 🟢 Added .tr
                     controller: controller.provinceCtrl,
                     isDropdown: true,
                     onTap: () {
                       if (controller.locationDataCtrl.provinces.isEmpty) return;
 
                       CustomBottomSheetPicker.show<LocationModel>(
-                        title: "Select Province",
+                        title: "Select Province".tr, // 🟢 Added .tr
                         items: controller.locationDataCtrl.provinces,
-                        getName: (item) => item.nameEn,
+                        getName: (item) => item
+                            .nameEn, // Ideally dynamically handled by model translations if active
                         onSelected: (item) {
                           controller.provinceCtrl.text = item.nameEn;
                           controller.selectedProvinceId.value = item.id
                               .toString();
 
-                          // លុបស្រុកចាស់ចោល ពេលរើសខេត្តថ្មី
                           controller.districtCtrl.clear();
                           controller.selectedDistrictId.value = '';
 
-                          // ទាញយកស្រុកថ្មី
                           controller.locationDataCtrl.getDistricts(
                             item.id.toString(),
                           );
@@ -91,25 +101,30 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: CustomFormTextField(
-                    label: "District *",
-                    hint: "Select District",
+                    label: "District *".tr, // 🟢 Added .tr
+                    hint: "Select District".tr, // 🟢 Added .tr
                     isDropdown: true,
                     controller: controller.districtCtrl,
                     onTap: () async {
                       if (controller.selectedProvinceId.value.isEmpty) {
                         Get.snackbar(
-                          "Notice",
-                          "Please select a Province first",
+                          "Notice".tr, // 🟢 Added .tr
+                          "Please select a Province first".tr, // 🟢 Added .tr
+                          backgroundColor: isDark
+                              ? Colors.orangeAccent.withValues(alpha: 0.15)
+                              : Colors.orangeAccent,
+                          colorText: isDark
+                              ? Colors.orangeAccent
+                              : Colors.white,
                         );
                         return;
                       }
 
-                      // រង់ចាំទាញទិន្នន័យស្រុកពី Cache
                       final dists = await controller.locationDataCtrl
                           .getDistricts(controller.selectedProvinceId.value);
 
                       CustomBottomSheetPicker.show<LocationModel>(
-                        title: "Select District",
+                        title: "Select District".tr, // 🟢 Added .tr
                         items: dists,
                         getName: (item) => item.nameEn,
                         onSelected: (item) {
@@ -125,17 +140,16 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
             ),
             const SizedBox(height: 16),
 
-            // ── 4. Category ──
             CustomFormTextField(
-              label: "Category *",
-              hint: "Select job category",
+              label: "Category *".tr, // 🟢 Added .tr
+              hint: "Select job category".tr, // 🟢 Added .tr
               isDropdown: true,
               controller: controller.categoryTextCtrl,
               onTap: () {
                 if (controller.categoryDataCtrl.categories.isEmpty) return;
 
                 CustomBottomSheetPicker.show<CategoryModel>(
-                  title: "Select Category",
+                  title: "Select Category".tr, // 🟢 Added .tr
                   items: controller.categoryDataCtrl.categories,
                   getName: (item) => item.name,
                   onSelected: (item) {
@@ -147,10 +161,9 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
             ),
             const SizedBox(height: 16),
 
-            // ── 5. Job Level ──
             CustomFormTextField(
-              label: "Job Level *",
-              hint: "Select level (e.g. Senior, Junior)",
+              label: "Job Level *".tr, // 🟢 Added .tr
+              hint: "Select level (e.g. Senior, Junior)".tr, // 🟢 Added .tr
               isDropdown: true,
               controller: controller.jobLevelCtrl,
               onTap: () async {
@@ -159,7 +172,7 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
                 );
 
                 CustomBottomSheetPicker.show<MasterDataModel>(
-                  title: "Select Job Level",
+                  title: "Select Job Level".tr, // 🟢 Added .tr
                   items: levels,
                   getName: (item) => item.name,
                   onSelected: (item) {
@@ -171,18 +184,17 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
             ),
             const SizedBox(height: 16),
             CustomFormTextField(
-              label: "Work Type *",
-              hint: "e.g. On-site, Remote, Hybrid",
+              label: "Work Type *".tr, // 🟢 Added .tr
+              hint: "e.g. On-site, Remote, Hybrid".tr, // 🟢 Added .tr
               isDropdown: true,
               controller: controller.workTypeCtrl,
               onTap: () async {
-                // ទាញទិន្នន័យពី Master Data
                 final workTypes = await controller.masterDataCtrl.getMasterData(
                   endpoint: 'work-types',
                 );
 
                 CustomBottomSheetPicker.show<MasterDataModel>(
-                  title: "Select Work Type",
+                  title: "Select Work Type".tr, // 🟢 Added .tr
                   items: workTypes,
                   getName: (item) => item.name,
                   onSelected: (item) {
@@ -194,14 +206,13 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
             ),
             const SizedBox(height: 16),
 
-            // ── 6. Employment Type & Headcount ──
             Row(
               children: [
                 Expanded(
                   flex: 2,
                   child: CustomFormTextField(
-                    label: "Employment Type *",
-                    hint: "e.g. Full-time",
+                    label: "Employment Type *".tr, // 🟢 Added .tr
+                    hint: "e.g. Full-time".tr, // 🟢 Added .tr
                     isDropdown: true,
                     controller: controller.employmentTypeCtrl,
                     onTap: () async {
@@ -209,7 +220,7 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
                           .getMasterData(endpoint: 'employment-types');
 
                       CustomBottomSheetPicker.show<MasterDataModel>(
-                        title: "Select Employment Type",
+                        title: "Select Employment Type".tr, // 🟢 Added .tr
                         items: empTypes,
                         getName: (item) => item.name,
                         onSelected: (item) {
@@ -224,8 +235,8 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
                 Expanded(
                   flex: 1,
                   child: CustomFormTextField(
-                    label: "Headcount *",
-                    hint: "e.g. 2",
+                    label: "Headcount *".tr, // 🟢 Added .tr
+                    hint: "e.g. 2".tr, // 🟢 Added .tr
                     keyboardType: TextInputType.number,
                     controller: controller.headcountCtrl,
                   ),
@@ -238,8 +249,7 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
     );
   }
 
-  // ── ផ្នែករចនា Company Logo ──
-  Widget _buildCompanyLogo() {
+  Widget _buildCompanyLogo(bool isDark) {
     final profileCtrl = Get.find<EmployerProfileViewController>();
     final profile = profileCtrl.companyProfile.value;
     final hasLogo =
@@ -255,10 +265,16 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
               width: 65,
               height: 65,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: isDark
+                    ? AppColors.darkInputBackground
+                    : AppColors.primary.withValues(alpha: 0.1), // 🟢 Dynamic BG
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.2),
+                  color: isDark
+                      ? Colors.blueAccent
+                      : AppColors.primary.withValues(
+                          alpha: 0.2,
+                        ), // 🟢 Dynamic Border
                   width: 1.5,
                 ),
               ),
@@ -271,10 +287,12 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
                         height: 65,
                         fit: BoxFit.cover,
                       )
-                    : const Icon(
+                    : Icon(
                         Icons.camera_alt_rounded,
                         size: 32,
-                        color: AppColors.primary,
+                        color: isDark
+                            ? Colors.blueAccent
+                            : AppColors.primary, // 🟢 Dynamic Placeholder Icon
                       ),
               ),
             ),
@@ -284,18 +302,25 @@ class Step1BasicInfo extends GetView<NewJobViewController> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Company Logo",
+            Text(
+              "Company Logo".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Section
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              "Tap to change logo for this job",
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+              "Tap to change logo for this job".tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade500,
+              ), // 🟢 Dynamic Subtext
             ),
           ],
         ),

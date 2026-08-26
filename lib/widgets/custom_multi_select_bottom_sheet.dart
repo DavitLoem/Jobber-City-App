@@ -13,17 +13,19 @@ class CustomMultiSelectBottomSheet {
   }) {
     TextEditingController searchCtrl = TextEditingController();
     RxList<T> filteredItems = items.toList().obs;
+    final isDark = Get.isDarkMode; // 🟢 Static Theme Context Check
 
-    // 🎯 ប្រើ RxList<String> ដើម្បីផ្ទុកតែ ID បានហើយ ងាយស្រួលឆែកមើលសញ្ញាគ្រីស
     RxList<String> tempSelectedIds = initialSelectedIds.toList().obs;
 
     Get.bottomSheet(
       Container(
         height: Get.height * 0.75,
         padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkBackground
+              : Colors.white, // 🟢 Dynamic BottomSheet BG
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           children: [
@@ -31,14 +33,20 @@ class CustomMultiSelectBottomSheet {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  title,
-                  style: const TextStyle(
+                  title.tr, // 🟢 Translation fallback
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: isDark
+                        ? Colors.white
+                        : Colors.black87, // 🟢 Dynamic Text
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.grey),
+                  icon: Icon(
+                    Icons.close,
+                    color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                  ), // 🟢 Dynamic Icon
                   onPressed: () => Get.back(),
                 ),
               ],
@@ -46,11 +54,22 @@ class CustomMultiSelectBottomSheet {
             const SizedBox(height: 10),
             TextField(
               controller: searchCtrl,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ), // 🟢 Dynamic Input Text
               decoration: InputDecoration(
-                hintText: "Search skills...",
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintText: "Search...".tr, // 🟢 Generic hint mapping
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.darkTextHint : Colors.grey,
+                ), // 🟢 Dynamic Hint
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                ),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: isDark
+                    ? AppColors.darkInputBackground
+                    : Colors.grey.shade100, // 🟢 Dynamic Input BG
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -78,9 +97,17 @@ class CustomMultiSelectBottomSheet {
                     return Obx(() {
                       final isSelected = tempSelectedIds.contains(itemId);
                       return CheckboxListTile(
-                        title: Text(getName(item)),
+                        title: Text(
+                          getName(item).tr, // Optional tr depending on use case
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ), // 🟢 Dynamic List Text
+                        ),
                         value: isSelected,
-                        activeColor: AppColors.primary,
+                        activeColor: isDark
+                            ? Colors.blueAccent
+                            : AppColors.primary, // 🟢 Dynamic Active Checkbox
+                        checkColor: Colors.white,
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: EdgeInsets.zero,
                         onChanged: (bool? checked) {
@@ -110,7 +137,6 @@ class CustomMultiSelectBottomSheet {
                       ),
                     ),
                     onPressed: () {
-                      // 🎯 បំប្លែង ID ត្រឡប់ទៅជា Object វិញ មុនបញ្ជូនទៅ Step 3
                       final selectedItems = items
                           .where((e) => tempSelectedIds.contains(getId(e)))
                           .toList();
@@ -119,7 +145,9 @@ class CustomMultiSelectBottomSheet {
                     },
                     child: Obx(
                       () => Text(
-                        "Apply (${tempSelectedIds.length} selected)",
+                        "Apply (@count selected)".trParams({
+                          'count': tempSelectedIds.length.toString(),
+                        }), // 🟢 Added .trParams
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

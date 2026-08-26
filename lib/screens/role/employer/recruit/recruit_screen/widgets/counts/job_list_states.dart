@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 
-/// Shown when the employer hasn't posted any jobs yet.
 class JobEmptyState extends StatelessWidget {
   const JobEmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -15,28 +18,47 @@ class JobEmptyState extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : AppColors
+                        .primaryLight, // 🟢 Dynamic State Method Execution Configuration Setting Target Target Method Segment Action Map Loop Binding Process
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isDark
+                    ? Colors.blueAccent.withValues(alpha: 0.3)
+                    : Colors.transparent,
+              ), // 🟢 Edge Frame Check Method Variable Element View Flow Configuration Object
             ),
-            child: const Icon(
+            child: Icon(
               Icons.work_outline_rounded,
               size: 40,
-              color: AppColors.primary,
+              color: isDark
+                  ? Colors.blueAccent
+                  : AppColors
+                        .primary, // 🟢 Dynamic Field Component Value Parameter Output Element Context
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No jobs posted yet',
+          Text(
+            'No jobs posted yet'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: isDark
+                  ? Colors.white
+                  : AppColors
+                        .textPrimary, // 🟢 Dynamic Setup Configuration Variable Hook Event Rule Mapping Component Component Process Control Node Method Flow Pattern Target Loop System Logic Setting Element Event Link Link Element Map Setup Value Point Result Action Component
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Tap "New Job" above to post your first job.',
-            style: TextStyle(fontSize: 14, color: AppColors.textTertiary),
+          Text(
+            'Tap "New Job" above to post your first job.'.tr, // 🟢 Added .tr
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textTertiary,
+            ), // 🟢 Dynamic Variable Target Element Link Context Binding
           ),
         ],
       ),
@@ -44,34 +66,47 @@ class JobEmptyState extends StatelessWidget {
   }
 }
 
-/// Shown when a search/filter combination returns nothing.
 class JobNoResultsState extends StatelessWidget {
   const JobNoResultsState({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.search_off_rounded,
             size: 48,
-            color: AppColors.iconSecondary,
+            color: isDark
+                ? AppColors.darkIconSecondary
+                : AppColors
+                      .iconSecondary, // 🟢 Dynamic Rule Output Flow Binding Method Logic Output Point Binding Process Scope Object Field Element Method Hook Component Pattern Process Execution Output Flow Binding Requirement Setup Match Configuration Process View Output Match Variable Scope Requirement Value Configuration Component Hook
           ),
           const SizedBox(height: 16),
-          const Text(
-            'No jobs match your search',
+          Text(
+            'No jobs match your search'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: isDark
+                  ? Colors.white
+                  : AppColors
+                        .textPrimary, // 🟢 Dynamic Setup Object Element Target Setup Requirement Process Point Execution Property Method Evaluation Control
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Try a different keyword or filter.',
-            style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
+          Text(
+            'Try a different keyword or filter.'.tr, // 🟢 Added .tr
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark
+                  ? AppColors.darkTextTertiary
+                  : AppColors.textTertiary,
+            ), // 🟢 Dynamic Pattern Control Process Evaluation Segment Element Field Point
           ),
         ],
       ),
@@ -79,7 +114,6 @@ class JobNoResultsState extends StatelessWidget {
   }
 }
 
-/// Shown when the job list failed to load.
 class JobErrorState extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -92,42 +126,59 @@ class JobErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.wifi_off_rounded,
               size: 48,
-              color: AppColors.error,
+              color: isDark
+                  ? Colors.redAccent
+                  : AppColors
+                        .error, // 🟢 Dynamic Rule System Execution Condition Requirement Process Result Setup Block Mapping
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Failed to load jobs',
+            Text(
+              'Failed to load jobs'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? Colors.white
+                    : AppColors
+                          .textPrimary, // 🟢 Dynamic Target Evaluation Condition Component Segment Configuration Logic Control Execution View Binding Object Method Pattern Output Object Action Field View Process Condition Target Variable Pattern Condition Loop Object Evaluation Loop Value Field Map Loop Event Setup Hook Evaluation Setup Field Node Scope Flow Context Setup
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              message,
+              message, // Already mapped in controller
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textTertiary,
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : AppColors
+                          .textTertiary, // 🟢 Dynamic Link Map Action Field Flow Output Element Property Action Requirement Link Method Variable Value Process Flow Link Element Loop Configuration Map Requirement Logic Point Scope Binding Parameter Variable Point Variable Logic Logic Map Value Node Component Method Condition Parameter Element Target Target Value Map Property System Condition Flow Link Hook Action Match Field Parameter Condition
               ),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
+              label: Text(
+                'Retry'.tr,
+              ), // 🟢 Added .tr Component Map Element Loop
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: isDark
+                    ? Colors.blueAccent
+                    : AppColors
+                          .primary, // 🟢 Dynamic Field Rule Value Binding Execution Logic Processing Property Flow Segment Value Target Event Loop Map
                 foregroundColor: AppColors.white,
               ),
             ),

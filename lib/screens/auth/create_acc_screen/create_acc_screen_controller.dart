@@ -31,6 +31,8 @@ class CreateAccScreenViewController extends GetxController {
     String email = emailCtrl.text.trim();
     String password = passwordCtrl.text;
 
+    final isDark = Get.isDarkMode; // 🟢 Theme Check for Snackbars
+
     if (!formKey.currentState!.validate()) {
       return;
     }
@@ -41,9 +43,14 @@ class CreateAccScreenViewController extends GetxController {
 
     if (!hasAgreed) {
       Get.snackbar(
-        "Notice",
-        "Please agree to the Terms and Conditions",
-        backgroundColor: Colors.orangeAccent,
+        "Notice".tr, // 🟢 Added .tr
+        "Please agree to the Terms and Conditions".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orangeAccent, // 🟢 Dynamic BG
+        colorText: isDark
+            ? Colors.orangeAccent
+            : Colors.white, // 🟢 Dynamic Text
       );
       return;
     }
@@ -79,10 +86,24 @@ class CreateAccScreenViewController extends GetxController {
         },
       );
     } on ApiException catch (e) {
-      Get.snackbar("Error", e.message);
+      Get.snackbar(
+        "Error".tr, // 🟢 Added .tr
+        e.message.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.redAccent,
+        colorText: isDark ? Colors.redAccent : Colors.white,
+      );
     } catch (e, stackTrace) {
       AppLogger.e("Register Failed (System)", e, stackTrace);
-      Get.snackbar("Error", "An unexpected error occurred. Please try again.");
+      Get.snackbar(
+        "Error".tr, // 🟢 Added .tr
+        "An unexpected error occurred. Please try again.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.redAccent,
+        colorText: isDark ? Colors.redAccent : Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -90,7 +111,6 @@ class CreateAccScreenViewController extends GetxController {
 
   void registerWithGoogle() {
     String selectedRole = selectedIndex.value == 0 ? 'seeker' : 'employer';
-    // 🎯 បោះ Role ទៅ ដើម្បីប្រាប់ថាចង់ Register ជាអ្វី
     Get.find<AuthController>().loginWithGoogle(role: selectedRole);
   }
 

@@ -9,31 +9,31 @@ import '../../../../models/interview_models.dart';
 
 part 'interview_detail_controller.dart';
 
-/// Full detail view for one interview — shared by both seeker and employer,
-/// with role-aware actions (only the employer who scheduled it can
-/// reschedule; either side can join/cancel/mark complete).
 class InterviewDetailView extends GetView<InterviewDetailViewController> {
   const InterviewDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightSurfaceVariant,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
         elevation: 0,
-        title: const Text(
-          'Interview Details',
+        title: Text(
+          'Interview Details'.tr, // 🟢 Added .tr
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 17,
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title Text
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title Icon
           ),
           onPressed: () => Get.back(),
         ),
@@ -51,8 +51,12 @@ class InterviewDetailView extends GetView<InterviewDetailViewController> {
             child: Text(
               controller.errorMessage.value.isNotEmpty
                   ? controller.errorMessage.value
-                  : 'Interview not found.',
-              style: const TextStyle(color: AppColors.textTertiary),
+                  : 'Interview not found.'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextTertiary
+                    : AppColors.textTertiary,
+              ), // 🟢 Dynamic Subtext
             ),
           );
         }
@@ -62,21 +66,24 @@ class InterviewDetailView extends GetView<InterviewDetailViewController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _OtherPartyCard(interview: interview),
+              _OtherPartyCard(interview: interview, isDark: isDark),
               const SizedBox(height: 16),
-              _InfoCard(interview: interview),
+              _InfoCard(interview: interview, isDark: isDark),
               if (interview.notes != null && interview.notes!.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _NotesCard(notes: interview.notes!),
+                _NotesCard(notes: interview.notes!, isDark: isDark),
               ],
               if (interview.status == 'cancelled' &&
                   interview.cancelReason != null &&
                   interview.cancelReason!.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                _CancelReasonCard(reason: interview.cancelReason!),
+                _CancelReasonCard(
+                  reason: interview.cancelReason!,
+                  isDark: isDark,
+                ),
               ],
               const SizedBox(height: 24),
-              _ActionButtons(),
+              const _ActionButtons(),
             ],
           ),
         );
@@ -87,7 +94,9 @@ class InterviewDetailView extends GetView<InterviewDetailViewController> {
 
 class _OtherPartyCard extends StatelessWidget {
   final InterviewModel interview;
-  const _OtherPartyCard({required this.interview});
+  final bool isDark; // 🟢 Pass Theme State
+
+  const _OtherPartyCard({required this.interview, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -95,18 +104,26 @@ class _OtherPartyCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Card BG
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.6)),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkCardBorder
+              : AppColors.cardBorder.withValues(alpha: 0.6),
+        ), // 🟢 Dynamic Border
       ),
       child: Row(
         children: [
           Container(
             width: 58,
             height: 58,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryLight,
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : AppColors.primaryLight, // 🟢 Dynamic Avatar BG
             ),
             clipBehavior: Clip.hardEdge,
             child: other.avatarUrl != null && other.avatarUrl!.trim().isNotEmpty
@@ -124,18 +141,24 @@ class _OtherPartyCard extends StatelessWidget {
               children: [
                 Text(
                   other.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16.5,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: isDark
+                        ? Colors.white
+                        : AppColors.textPrimary, // 🟢 Dynamic Title
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  other.role == 'employer' ? 'Employer' : 'Candidate',
-                  style: const TextStyle(
+                  other.role == 'employer'
+                      ? 'Employer'.tr
+                      : 'Candidate'.tr, // 🟢 Added .tr
+                  style: TextStyle(
                     fontSize: 12.5,
-                    color: AppColors.textTertiary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textTertiary, // 🟢 Dynamic Subtext
                   ),
                 ),
                 if (interview.jobTitle != null &&
@@ -143,9 +166,11 @@ class _OtherPartyCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     interview.jobTitle!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
-                      color: AppColors.primary,
+                      color: isDark
+                          ? Colors.blueAccent
+                          : AppColors.primary, // 🟢 Dynamic Job Title
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -153,7 +178,7 @@ class _OtherPartyCard extends StatelessWidget {
               ],
             ),
           ),
-          _StatusPill(status: interview.status),
+          _StatusPill(status: interview.status, isDark: isDark),
         ],
       ),
     );
@@ -173,22 +198,32 @@ class _OtherPartyCard extends StatelessWidget {
 
 class _StatusPill extends StatelessWidget {
   final String status;
-  const _StatusPill({required this.status});
+  final bool isDark; // 🟢 Pass Theme State
+
+  const _StatusPill({required this.status, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final (label, color) = switch (status) {
-      'scheduled' => ('Scheduled', AppColors.primary),
-      'ongoing' => ('Live Now', AppColors.success),
-      'completed' => ('Completed', AppColors.textTertiary),
-      'cancelled' => ('Cancelled', AppColors.error),
-      'no_show' => ('No-show', AppColors.error),
-      _ => (status, AppColors.textTertiary),
+      'scheduled' => ('Scheduled'.tr, AppColors.primary), // 🟢 Added .tr
+      'ongoing' => ('Live Now'.tr, AppColors.success), // 🟢 Added .tr
+      'completed' => (
+        'Completed'.tr,
+        isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+      ), // 🟢 Added .tr & Dynamic Color
+      'cancelled' => ('Cancelled'.tr, AppColors.error), // 🟢 Added .tr
+      'no_show' => ('No-show'.tr, AppColors.error), // 🟢 Added .tr
+      _ => (
+        status.tr,
+        isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
+      ), // 🟢 Fallback Translate
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withValues(
+          alpha: isDark ? 0.15 : 0.12,
+        ), // 🟢 Visibility bump in dark mode
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -205,38 +240,52 @@ class _StatusPill extends StatelessWidget {
 
 class _InfoCard extends StatelessWidget {
   final InterviewModel interview;
-  const _InfoCard({required this.interview});
+  final bool isDark; // 🟢 Pass Theme State
+
+  const _InfoCard({required this.interview, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Card BG
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.6)),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkCardBorder
+              : AppColors.cardBorder.withValues(alpha: 0.6),
+        ), // 🟢 Dynamic Border
       ),
       child: Column(
         children: [
           _row(
             Icons.event_rounded,
-            'Date',
+            'Date'.tr, // 🟢 Added .tr
             _formatFullDate(interview.scheduledAt),
           ),
           const SizedBox(height: 14),
           _row(
             Icons.schedule_rounded,
-            'Time',
+            'Time'.tr, // 🟢 Added .tr
             _formatTime(interview.scheduledAt),
           ),
           const SizedBox(height: 14),
           _row(
             Icons.timer_outlined,
-            'Duration',
-            '${interview.durationMinutes} minutes',
+            'Duration'.tr, // 🟢 Added .tr
+            '@dur minutes'.trParams({
+              'dur': interview.durationMinutes.toString(),
+            }), // 🟢 Added .trParams
           ),
           const SizedBox(height: 14),
-          _row(Icons.videocam_outlined, 'Platform', 'Video call (Jitsi Meet)'),
+          _row(
+            Icons.videocam_outlined,
+            'Platform'.tr,
+            'Video call (Jitsi Meet)'.tr,
+          ), // 🟢 Added .tr
         ],
       ),
     );
@@ -249,7 +298,11 @@ class _InfoCard extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primaryLight.withValues(alpha: 0.5),
+            color: isDark
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : AppColors.primaryLight.withValues(
+                    alpha: 0.5,
+                  ), // 🟢 Dynamic Icon BG
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 18, color: AppColors.primary),
@@ -257,15 +310,22 @@ class _InfoCard extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: AppColors.textTertiary),
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textTertiary, // 🟢 Dynamic Label Color
+          ),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: isDark
+                ? Colors.white
+                : AppColors.textPrimary, // 🟢 Dynamic Value Color
           ),
         ),
       ],
@@ -275,7 +335,9 @@ class _InfoCard extends StatelessWidget {
 
 class _NotesCard extends StatelessWidget {
   final String notes;
-  const _NotesCard({required this.notes});
+  final bool isDark; // 🟢 Pass Theme State
+
+  const _NotesCard({required this.notes, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -283,27 +345,37 @@ class _NotesCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Card BG
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder.withValues(alpha: 0.6)),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkCardBorder
+              : AppColors.cardBorder.withValues(alpha: 0.6),
+        ), // 🟢 Dynamic Border
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Notes',
+          Text(
+            'Notes'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: isDark
+                  ? Colors.white
+                  : AppColors.textPrimary, // 🟢 Dynamic Text
             ),
           ),
           const SizedBox(height: 8),
           Text(
             notes,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13.5,
-              color: AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary, // 🟢 Dynamic Text
               height: 1.5,
             ),
           ),
@@ -315,7 +387,9 @@ class _NotesCard extends StatelessWidget {
 
 class _CancelReasonCard extends StatelessWidget {
   final String reason;
-  const _CancelReasonCard({required this.reason});
+  final bool isDark; // 🟢 Pass Theme State
+
+  const _CancelReasonCard({required this.reason, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -323,7 +397,9 @@ class _CancelReasonCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.06),
+        color: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : AppColors.error.withValues(alpha: 0.06), // 🟢 Dynamic BG
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
       ),
@@ -338,10 +414,14 @@ class _CancelReasonCard extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Cancellation reason: $reason',
-              style: const TextStyle(
+              'Cancellation reason: @reason'.trParams({
+                'reason': reason,
+              }), // 🟢 Added .trParams
+              style: TextStyle(
                 fontSize: 12.5,
-                color: AppColors.error,
+                color: isDark
+                    ? Colors.redAccent
+                    : AppColors.error, // 🟢 Dynamic Text
                 height: 1.4,
               ),
             ),
@@ -357,6 +437,9 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Obx(() {
       final interview = controller.interview.value;
       if (interview == null) return const SizedBox.shrink();
@@ -374,6 +457,9 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
                   : controller.joinInterview,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.success,
+                disabledBackgroundColor: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.grey.shade300, // 🟢 Dynamic Disabled BG
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -392,7 +478,8 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
               label: Text(
                 interview.status == 'ongoing'
                     ? 'Rejoin Interview'
-                    : 'Join Interview',
+                          .tr // 🟢 Added .tr
+                    : 'Join Interview'.tr, // 🟢 Added .tr
                 style: const TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.bold,
@@ -404,7 +491,6 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
         );
       }
 
-      // 🎯 ថែម && controller.isEmployer.value នៅទីនេះ
       if (interview.status == 'ongoing' && controller.isEmployer.value) {
         children.add(const SizedBox(height: 10));
         children.add(
@@ -416,15 +502,19 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
                   ? null
                   : controller.markCompleted,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
+                foregroundColor: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Foreground
+                side: BorderSide(
+                  color: isDark ? Colors.blueAccent : AppColors.primary,
+                ), // 🟢 Dynamic Border
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'Mark as Completed',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              child: Text(
+                'Mark as Completed'.tr, // 🟢 Added .tr
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -442,16 +532,22 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
                   ? null
                   : () => controller.showRescheduleSheet(context),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.cardBorder),
+                foregroundColor: isDark
+                    ? Colors.white
+                    : AppColors.textPrimary, // 🟢 Dynamic Foreground
+                side: BorderSide(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : AppColors.cardBorder,
+                ), // 🟢 Dynamic Border
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
               icon: const Icon(Icons.edit_calendar_outlined, size: 18),
-              label: const Text(
-                'Reschedule',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              label: Text(
+                'Reschedule'.tr, // 🟢 Added .tr
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -469,9 +565,9 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
                   ? null
                   : () => controller.showCancelSheet(context),
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text(
-                'Cancel Interview',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              child: Text(
+                'Cancel Interview'.tr, // 🟢 Added .tr
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -484,7 +580,7 @@ class _ActionButtons extends GetView<InterviewDetailViewController> {
 }
 
 String _formatFullDate(DateTime dt) {
-  final localDt = dt.toLocal(); // 🎯 បំប្លែងម៉ោងជាមុនសិន
+  final localDt = dt.toLocal();
   const months = [
     'January',
     'February',
@@ -499,13 +595,13 @@ String _formatFullDate(DateTime dt) {
     'November',
     'December',
   ];
-  return '${months[localDt.month - 1]} ${localDt.day}, ${localDt.year}';
+  return '${months[localDt.month - 1].tr} ${localDt.day}, ${localDt.year}'; // 🟢 Added .tr to Month String
 }
 
 String _formatTime(DateTime dt) {
-  final localDt = dt.toLocal(); // 🎯 បំប្លែងម៉ោងជាមុនសិន
+  final localDt = dt.toLocal();
   final hour = localDt.hour % 12 == 0 ? 12 : localDt.hour % 12;
   final minute = localDt.minute.toString().padLeft(2, '0');
-  final period = localDt.hour >= 12 ? 'PM' : 'AM';
+  final period = localDt.hour >= 12 ? 'PM'.tr : 'AM'.tr; // 🟢 Added .tr
   return '$hour:$minute $period';
 }

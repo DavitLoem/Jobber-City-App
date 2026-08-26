@@ -44,7 +44,12 @@ class HeroSection extends GetView<HomeSeekerViewController> {
           ),
           child: _buildHeroTopRow(),
         ),
-        Positioned(left: 20, right: 20, bottom: -28, child: _buildSearchBar()),
+        Positioned(
+          left: 20,
+          right: 20,
+          bottom: -28,
+          child: _buildSearchBar(context),
+        ),
       ],
     );
   }
@@ -134,7 +139,7 @@ class HeroSection extends GetView<HomeSeekerViewController> {
                 Text(
                   controller.firstName.value.isNotEmpty
                       ? "${controller.lastName.value} ${controller.firstName.value}"
-                      : "Guest",
+                      : "Guest".tr, // 🟢 Added .tr
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -152,10 +157,8 @@ class HeroSection extends GetView<HomeSeekerViewController> {
             icon: LucideIcons.bell,
             iconColor: Colors.white,
             onTap: () {
-              // លោតទៅកាន់ទំព័រ Notification
               Get.toNamed(AppRoutes.notification);
             },
-            // 🎯 កំណត់លក្ខខណ្ឌទីនេះ៖ បើមានសារមិនទាន់អាន (hasUnread == true) វានឹងបង្ហាញ Dot
             showDot: notifController.hasUnread,
           ),
         ),
@@ -181,7 +184,10 @@ class HeroSection extends GetView<HomeSeekerViewController> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.search),
       child: Hero(
@@ -189,13 +195,20 @@ class HeroSection extends GetView<HomeSeekerViewController> {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            height: 52, // កំណត់កម្ពស់ឱ្យស្មើគ្នា
+            height: 52,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark
+                  ? AppColors.darkSurfaceElevated
+                  : Colors.white, // 🟢 Dynamic BG
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+              ), // 🟢 Dynamic Border
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.3 : 0.08,
+                  ), // 🟢 Dynamic shadow
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -204,12 +217,23 @@ class HeroSection extends GetView<HomeSeekerViewController> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(Icons.search, color: AppColors.textHint, size: 22),
-                SizedBox(width: 12),
+                Icon(
+                  Icons.search,
+                  color: isDark
+                      ? AppColors.darkIconSecondary
+                      : AppColors.textHint,
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Search for a job or Company...',
-                    style: TextStyle(color: AppColors.textHint, fontSize: 14.5),
+                    'Search for a job or Company...'.tr, // 🟢 Added .tr
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.textHint,
+                      fontSize: 14.5,
+                    ),
                   ),
                 ),
               ],

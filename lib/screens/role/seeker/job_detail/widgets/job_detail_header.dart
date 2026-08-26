@@ -10,6 +10,10 @@ class JobDetailHeader extends GetView<JobDetailController> {
   @override
   Widget build(BuildContext context) {
     final topInset = MediaQuery.of(context).padding.top;
+
+    // We explicitly extract the current theme mode to style the snackbar correctly
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20, topInset + 16, 20, 70),
@@ -31,9 +35,9 @@ class JobDetailHeader extends GetView<JobDetailController> {
             icon: Icons.arrow_back_rounded,
             onTap: () => Get.back(result: controller.job.value),
           ),
-          const Text(
-            "Job Details",
-            style: TextStyle(
+          Text(
+            "Job Details".tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -43,11 +47,13 @@ class JobDetailHeader extends GetView<JobDetailController> {
             icon: Icons.ios_share_rounded,
             onTap: () {
               Get.snackbar(
-                'Share',
-                'Sharing isn\'t wired up yet',
+                'Share'.tr, // 🟢 Added .tr
+                'Sharing isn\'t wired up yet'.tr, // 🟢 Added .tr
                 snackPosition: SnackPosition.TOP,
-                backgroundColor: AppColors.primaryLight,
-                colorText: AppColors.primary,
+                backgroundColor: isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : AppColors.primaryLight, // 🟢 Dynamic Snackbar BG
+                colorText: isDark ? Colors.blueAccent : AppColors.primary,
               );
             },
           ),
@@ -66,7 +72,9 @@ class JobDetailHeader extends GetView<JobDetailController> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.18),
+          color: Colors.white.withValues(
+            alpha: 0.18,
+          ), // 🟢 Updated to withValues
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: Colors.white, size: 20),

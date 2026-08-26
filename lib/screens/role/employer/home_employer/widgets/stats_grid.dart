@@ -6,17 +6,13 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../candidates/candidates_view.dart';
 
-// 🟢 ត្រូវប្រាកដថាបាន Import Controllers ទាំងនេះ (សូមកែប្រែ Path ឱ្យត្រូវនឹង Project អ្នក)
-// import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_controller.dart';
-// import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart'; // ទីតាំង CandidatesViewController
-
 class StatItem {
   final String label;
   final String value;
   final String delta;
   final IconData icon;
   final List<Color> gradient;
-  final VoidCallback onTap; // 🟢 ១. បន្ថែមអថេរ onTap សម្រាប់ទទួលការចុច
+  final VoidCallback onTap;
 
   const StatItem({
     required this.label,
@@ -37,48 +33,44 @@ class StatsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<StatItem> dynamicStats = [
       StatItem(
-        label: "Jobs Posted",
+        label: "Jobs Posted".tr, // 🟢 Added .tr
         value: overview?.jobsPosted.toString() ?? "0",
         delta: overview?.jobsPostedTrend ?? "0",
         icon: LucideIcons.briefcase,
         gradient: const [Color(0xFF4F7DF7), Color(0xFF78A8FF)],
         onTap: () {
-          // 🟢 គោលដៅទី ១: ទៅកាន់ Tab My Jobs (Index 1)
           if (Get.isRegistered<MainScreenEmloyerController>()) {
             Get.find<MainScreenEmloyerController>().changeTab(1);
           }
         },
       ),
       StatItem(
-        label: "Total Applications",
+        label: "Total Applications".tr, // 🟢 Added .tr
         value: overview?.totalApplications.toString() ?? "0",
         delta: overview?.applicationsTrend ?? "0",
         icon: LucideIcons.users,
         gradient: const [Color(0xFF8B5CF6), Color(0xFFC4B5FD)],
         onTap: () {
-          // 🟢 គោលដៅទី ២: ទៅកាន់ Tab Candidates -> All
           _goToCandidatesTab('all');
         },
       ),
       StatItem(
-        label: "Interviews",
+        label: "Interviews".tr, // 🟢 Added .tr
         value: overview?.interviews.toString() ?? "0",
         delta: overview?.interviewsTrend ?? "0",
         icon: LucideIcons.checkCircle,
         gradient: const [Color(0xFF22C55E), Color(0xFF86EFAC)],
         onTap: () {
-          // 🟢 គោលដៅទី ៣: ទៅកាន់ Tab Candidates -> Interview
           _goToCandidatesTab('interview');
         },
       ),
       StatItem(
-        label: "Hired",
+        label: "Hired".tr, // 🟢 Added .tr
         value: overview?.hired.toString() ?? "0",
         delta: overview?.hiredTrend ?? "0",
         icon: LucideIcons.trendingUp,
         gradient: const [Color(0xFFF59E0B), Color(0xFFFCD34D)],
         onTap: () {
-          // 🟢 គោលដៅទី ៤: ទៅកាន់ Tab Candidates -> Hired / Offer
           _goToCandidatesTab('hired');
         },
       ),
@@ -98,33 +90,24 @@ class StatsGrid extends StatelessWidget {
     );
   }
 
-  // 🎯 អនុគមន៍ជំនួយសម្រាប់រត់ទៅកាន់ Candidates Tab រួចកំណត់ Status
   void _goToCandidatesTab(String targetStatus) {
-    // ១. ប្តូរ Tab ខាងក្រោម (Bottom Nav Bar) ទៅកាន់ Candidates (Index 2)
     if (Get.isRegistered<MainScreenEmloyerController>()) {
       Get.find<MainScreenEmloyerController>().changeTab(2);
     }
 
-    // ២. បញ្ជាឱ្យ Candidates Controller ប្តូរ Tab Status
     if (Get.isRegistered<CandidatesViewController>()) {
       final candidateCtrl = Get.find<CandidatesViewController>();
 
-      // ផ្តាច់ (Clear) ការ Filter តាមការងារ (Job) ដើម្បីមើលបេក្ខជនទាំងអស់
-      candidateCtrl.selectedJobId.value =
-          'all'; // 🟢 កែពី '' ទៅ 'all' តាមទម្រង់របស់ Controller
+      candidateCtrl.selectedJobId.value = 'all';
 
-      // ៣. រកទីតាំង Index របស់ Tab គោលដៅ
       int targetIndex = candidateCtrl.tabs.indexOf(targetStatus);
 
-      // ប្រសិនបើរាវរកមិនឃើញ (ការពារ Error) គឺឱ្យវារត់ទៅ 'all' (Index 0)
       if (targetIndex == -1) {
         targetIndex = 0;
       }
 
-      // ៤. បញ្ជាឱ្យ TabController រំកិលទៅ Tab នោះ
       candidateCtrl.tabController.animateTo(targetIndex);
 
-      // ៥. ហៅមុខងារទាញយកទិន្នន័យសាជាថ្មី (ព្រោះប្តូរពីការងារមួយទៅទាំងអស់)
       candidateCtrl.fetchApplicants(isRefresh: true);
       candidateCtrl.fetchStatusSummary();
     }
@@ -138,6 +121,8 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isNegative = stat.delta.contains('-');
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
 
     return Container(
       decoration: BoxDecoration(
@@ -149,18 +134,19 @@ class _StatCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.08,
+            ), // 🟢 Dynamic Shadow Opacity
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      // 🟢 ២. រុំជាមួយ Material និង InkWell ឱ្យវាមាន Ripple Effect ពេលចុច
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(22),
         child: InkWell(
-          onTap: stat.onTap, // 🟢 ហៅមុខងារ onTap ទីនេះ
+          onTap: stat.onTap,
           borderRadius: BorderRadius.circular(22),
           splashColor: Colors.white.withValues(alpha: 0.2),
           highlightColor: Colors.white.withValues(alpha: 0.1),

@@ -18,11 +18,14 @@ class ExtractionSuccessSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor, // 🟢 Dynamic Bottom Sheet BG
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -32,16 +35,32 @@ class ExtractionSuccessSheet extends StatelessWidget {
             child: Icon(Icons.check_circle, color: AppColors.success, size: 60),
           ),
           const SizedBox(height: 16),
-          const Center(
+          Center(
             child: Text(
-              'Scan Complete!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              'Scan Complete!'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color:
+                    theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title Color
+              ),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            'We found $expCount experiences, $eduCount educations, and $skillCount skills in your CV.',
-            style: const TextStyle(fontSize: 15, color: Colors.black87),
+            'We found @exp experiences, @edu educations, and @skill skills in your CV.'
+                .trParams({
+                  // 🟢 Added .trParams
+                  'exp': expCount.toString(),
+                  'edu': eduCount.toString(),
+                  'skill': skillCount.toString(),
+                }),
+            style: TextStyle(
+              fontSize: 15,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : Colors.black87, // 🟢 Dynamic Text
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -56,9 +75,9 @@ class ExtractionSuccessSheet extends StatelessWidget {
                 ),
               ),
               onPressed: onReview,
-              child: const Text(
-                'Review Data',
-                style: TextStyle(
+              child: Text(
+                'Review Data'.tr, // 🟢 Added .tr
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -70,10 +89,12 @@ class ExtractionSuccessSheet extends StatelessWidget {
           Center(
             child: TextButton(
               onPressed: () => Get.back(),
-              child: const Text(
-                'Not Now',
+              child: Text(
+                'Not Now'.tr, // 🟢 Added .tr
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: isDark
+                      ? AppColors.darkTextTertiary
+                      : Colors.grey, // 🟢 Dynamic Text
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),

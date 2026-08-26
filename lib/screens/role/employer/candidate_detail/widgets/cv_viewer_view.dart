@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -15,37 +16,42 @@ class CvViewerView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 1,
         title: Text(
-          "$candidateName's CV",
-          style: const TextStyle(
-            color: Colors.black87,
+          "@name's CV".trParams({'name': candidateName}),
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
           onPressed: () => Get.back(),
         ),
       ),
-      // 🎯 ប្រើប្រាស់ SfPdfViewer ដើម្បីទាញ និងបង្ហាញ PDF ពី Internet
       body: SfPdfViewer.network(
         pdfUrl,
         canShowScrollHead: false,
         canShowScrollStatus: false,
-        // 🎯 បន្ថែមមុខងារចាប់ Error នេះ
         onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
-          // បង្ហាញសារប្រាប់ User ពេលបើកមិនចេញ
           Get.snackbar(
-            "Cannot Load CV",
+            "Cannot Load CV".tr,
             details.error,
-            backgroundColor: Colors.red.shade50,
-            colorText: Colors.red.shade700,
+            backgroundColor: isDark
+                ? AppColors.error.withValues(alpha: 0.15)
+                : Colors.red.shade50,
+            colorText: isDark ? Colors.redAccent : Colors.red.shade700,
             snackPosition: SnackPosition.BOTTOM,
           );
         },

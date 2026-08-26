@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
 class LocationSearchBar extends StatelessWidget {
@@ -13,26 +15,42 @@ class LocationSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: LocationColors.searchBg,
+        color: isDark
+            ? AppColors.darkInputBackground
+            : LocationColors.searchBg, // 🟢 Dynamic BG
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.transparent),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkCardBorder
+              : Colors.transparent, // 🟢 Dynamic Border
+        ),
       ),
       child: TextField(
         controller: searchController,
         onChanged: onChanged,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
-          color: LocationColors.ink,
+          color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
           fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
-          hintText: 'Search province…',
-          hintStyle: const TextStyle(fontSize: 14, color: LocationColors.muted),
-          prefixIcon: const Icon(
+          hintText: 'Search province…'.tr, // 🟢 Added .tr
+          hintStyle: TextStyle(
+            fontSize: 14,
+            color: isDark
+                ? AppColors.darkTextHint
+                : LocationColors.muted, // 🟢 Dynamic Hint
+          ),
+          prefixIcon: Icon(
             Icons.search_rounded,
-            color: LocationColors.sub,
+            color: isDark
+                ? AppColors.darkIconSecondary
+                : LocationColors.sub, // 🟢 Dynamic Icon
             size: 20,
           ),
           border: OutlineInputBorder(
@@ -51,7 +69,9 @@ class LocationSearchBar extends StatelessWidget {
             ),
           ),
           filled: true,
-          fillColor: LocationColors.searchBg,
+          fillColor: isDark
+              ? AppColors.darkInputBackground
+              : LocationColors.searchBg, // 🟢 Dynamic Fill
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 14,

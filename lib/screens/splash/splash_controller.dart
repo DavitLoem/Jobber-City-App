@@ -37,7 +37,6 @@ class SplashViewController extends GetxController
     _setupAnimations();
   }
 
-  // ប្រើប្រាស់ onReady ដើម្បីចាប់ផ្តើម Animation នៅពេលដែល UI ត្រូវបាន Render ពេញលេញ
   @override
   void onReady() {
     super.onReady();
@@ -45,7 +44,6 @@ class SplashViewController extends GetxController
   }
 
   void _setupAnimations() {
-    // Background blobs
     bgCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
@@ -75,7 +73,6 @@ class SplashViewController extends GetxController
           ),
         );
 
-    // Logo
     logoCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -97,7 +94,6 @@ class SplashViewController extends GetxController
       ),
     );
 
-    // Tagline
     taglineCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -118,7 +114,6 @@ class SplashViewController extends GetxController
       curve: const Interval(0.35, 1.0, curve: Curves.easeOut),
     );
 
-    // Loader bar
     loaderCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
@@ -132,7 +127,6 @@ class SplashViewController extends GetxController
       curve: const Interval(0.1, 1.0, curve: Curves.easeInOut),
     );
 
-    // Shimmer sweep
     shimmerCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
@@ -141,26 +135,21 @@ class SplashViewController extends GetxController
   }
 
   Future<void> _startSequence() async {
-    // មិនបាច់ឆែកទេ ព្រោះវានៅដើមគេមិនទាន់មានការរង់ចាំ
     bgCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 200));
-    // 🎯 បន្ថែមការការពារទី១៖ បើ Controller ត្រូវបិទហើយ (ឧ. លោតទៅ Login បាត់) សូមបញ្ឈប់ការងារ
     if (isClosed) return;
     logoCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 700));
-    // 🎯 បន្ថែមការការពារទី២
     if (isClosed) return;
     taglineCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 400));
-    // 🎯 បន្ថែមការការពារទី៣
     if (isClosed) return;
     loaderCtrl.forward();
 
     await Future.delayed(const Duration(milliseconds: 2000));
-    // 🎯 បន្ថែមការការពារចុងក្រោយ មុននឹងហៅការឆែក Auto Login
     if (isClosed) return;
 
     _checkAutoLogin();
@@ -173,9 +162,7 @@ class SplashViewController extends GetxController
       bool onboardingCompleted = await TokenStorage.getOnboardingStatus();
       bool isProfileCompleted = await TokenStorage.getProfileCompletedStatus();
 
-      // ២. លក្ខខណ្ឌកាត់ក្តី
       if (token != null && token.isNotEmpty) {
-        // បើមាន Token (មានន័យថាគាត់ធ្លាប់ Login ឬ Verify រួច)
         if (role == 'employer') {
           if (isProfileCompleted) {
             Get.offAllNamed(AppRoutes.mainScreenEmployer);
@@ -190,16 +177,13 @@ class SplashViewController extends GetxController
           }
         }
       } else {
-        // បើគ្មាន Token ទេ (មិនទាន់ Login)
         Get.offAllNamed(AppRoutes.login);
       }
     } catch (e) {
-      // ការពារក្រែងលោមាន Error អាន Storage លោតទៅ Login ឱ្យសុវត្ថិភាពសិន
       Get.offAllNamed(AppRoutes.login);
     }
   }
 
-  // កុំភ្លេច Dispose Controllers ទាំងអស់ដើម្បីការពារការលេចធ្លាយ Memory
   @override
   void onClose() {
     bgCtrl.dispose();

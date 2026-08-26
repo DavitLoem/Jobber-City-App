@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -9,7 +11,9 @@ class CandidateInterview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // បង្ហាញកាតនេះ លុះត្រាតែ Status គាត់គឺ interview និងមានទិន្នន័យ
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (applicant.status.toLowerCase() != 'interview' ||
         applicant.interviewSchedule == null) {
       return const SizedBox.shrink();
@@ -18,44 +22,49 @@ class CandidateInterview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Interview Details",
-          style: TextStyle(
+        Text(
+          "Interview Details".tr,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF10B981),
+            color: AppColors.success,
           ),
         ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF10B981).withValues(alpha: 0.05),
+            color: AppColors.success.withValues(alpha: isDark ? 0.15 : 0.05),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: const Color(0xFF10B981).withValues(alpha: 0.3),
+              color: AppColors.success.withValues(alpha: isDark ? 0.4 : 0.3),
             ),
           ),
           child: Column(
             children: [
               _buildInterviewRow(
                 LucideIcons.calendarClock,
-                "Date & Time",
+                "Date & Time".tr,
                 _formatDate(applicant.interviewSchedule!['date']),
+                isDark,
               ),
               const SizedBox(height: 12),
               _buildInterviewRow(
                 LucideIcons.mapPin,
-                "Location / Link",
-                applicant.interviewSchedule!['location'] ?? 'TBD',
+                "Location / Link".tr,
+                applicant.interviewSchedule!['location'] ?? 'TBD'.tr,
+                isDark,
               ),
               if (applicant.interviewSchedule!['message'] != null &&
                   applicant.interviewSchedule!['message']
                       .toString()
                       .isNotEmpty) ...[
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(height: 1, color: Colors.black12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(
+                    height: 1,
+                    color: isDark ? AppColors.darkDivider : Colors.black12,
+                  ),
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,14 +72,16 @@ class CandidateInterview extends StatelessWidget {
                     Icon(
                       LucideIcons.messageSquare,
                       size: 18,
-                      color: Colors.grey.shade600,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors.grey.shade600,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         applicant.interviewSchedule!['message'],
                         style: TextStyle(
-                          color: Colors.grey.shade800,
+                          color: isDark ? Colors.white70 : Colors.grey.shade800,
                           fontSize: 14,
                         ),
                       ),
@@ -86,11 +97,20 @@ class CandidateInterview extends StatelessWidget {
     );
   }
 
-  Widget _buildInterviewRow(IconData icon, String title, String value) {
+  Widget _buildInterviewRow(
+    IconData icon,
+    String title,
+    String value,
+    bool isDark,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.grey.shade600),
+        Icon(
+          icon,
+          size: 18,
+          color: isDark ? AppColors.darkIconSecondary : Colors.grey.shade600,
+        ),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -98,14 +118,19 @@ class CandidateInterview extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.grey.shade600,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: isDark ? Colors.white : Colors.black87,
                   fontSize: 14,
                 ),
               ),
@@ -116,22 +141,20 @@ class CandidateInterview extends StatelessWidget {
     );
   }
 
-  // អនុគមន៍កាត់ម៉ោង UTC ឱ្យចេញរាងស្អាតបន្តិច
   String _formatDate(String? dateStr) {
-    if (dateStr == null || dateStr.isEmpty) return 'TBD';
+    if (dateStr == null || dateStr.isEmpty) return 'TBD'.tr;
     try {
       if (!dateStr.endsWith('Z')) dateStr += 'Z';
       final date = DateTime.parse(dateStr).toLocal();
 
-      // បំប្លែងម៉ោងទៅជាទម្រង់ 12 ម៉ោង និងរក AM/PM
       int hour12 = date.hour % 12;
       if (hour12 == 0) hour12 = 12;
-      final String amPm = date.hour >= 12 ? 'PM' : 'AM';
+      final String amPm = date.hour >= 12 ? 'PM'.tr : 'AM'.tr;
       final String minute = date.minute.toString().padLeft(2, '0');
 
       return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year} at $hour12:$minute $amPm";
     } catch (_) {
-      return dateStr?.split('T').first ?? 'TBD';
+      return dateStr?.split('T').first ?? 'TBD'.tr;
     }
   }
 }

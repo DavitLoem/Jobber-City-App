@@ -1,49 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class JobUiUtils {
   static String periodShort(String period) {
     final p = period.toLowerCase();
-    if (p.contains('year')) return 'yr';
-    if (p.contains('week')) return 'wk';
-    if (p.contains('month')) return 'mo';
-    return p.isEmpty ? 'mo' : p;
+    if (p.contains('year')) return 'yr'.tr; // 🟢 Added .tr
+    if (p.contains('week')) return 'wk'.tr; // 🟢 Added .tr
+    if (p.contains('month')) return 'mo'.tr; // 🟢 Added .tr
+    return p.isEmpty ? 'mo'.tr : p.tr; // 🟢 Added .tr
   }
 
   static Widget buildSectionHeader(String title, {VoidCallback? onSeeAll}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        GestureDetector(
-          onTap: onSeeAll,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "See All",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
+    return Builder(
+      // Wrap in Builder to access context
+      builder: (context) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title, // Translation passed from parent
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Color
               ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                size: 18,
-                color: AppColors.primary,
+            ),
+            GestureDetector(
+              onTap: onSeeAll,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "See All".tr, // 🟢 Added .tr
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -51,27 +60,42 @@ class JobUiUtils {
     required bool isSaved,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: AppColors.lightSurfaceVariant,
-          borderRadius: BorderRadius.circular(9),
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          transitionBuilder: (child, anim) =>
-              ScaleTransition(scale: anim, child: child),
-          child: Icon(
-            isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-            key: ValueKey(isSaved),
-            size: 17,
-            color: isSaved ? AppColors.primary : AppColors.textHint,
+    return Builder(
+      // Wrap in Builder to access context
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkSurfaceElevated
+                  : AppColors.lightSurfaceVariant, // 🟢 Dynamic Background
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
+              child: Icon(
+                isSaved
+                    ? Icons.bookmark_rounded
+                    : Icons.bookmark_border_rounded,
+                key: ValueKey(isSaved),
+                size: 17,
+                color: isSaved
+                    ? AppColors.primary
+                    : (isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.textHint), // 🟢 Dynamic Icon
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -80,25 +104,36 @@ class JobUiUtils {
     String companyName, {
     double size = 46,
   }) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: AppColors.lightSurfaceVariant,
-        borderRadius: BorderRadius.circular(size * 0.26),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(size * 0.26),
-        child: (logoUrl != null && logoUrl.isNotEmpty)
-            ? Image.network(
-                logoUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    _buildLogoFallback(companyName),
-              )
-            : _buildLogoFallback(companyName),
-      ),
+    return Builder(
+      // Wrap in Builder to access context
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.darkSurfaceElevated
+                : AppColors.lightSurfaceVariant, // 🟢 Dynamic Background
+            borderRadius: BorderRadius.circular(size * 0.26),
+            border: Border.all(
+              color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+            ), // 🟢 Dynamic Border
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(size * 0.26),
+            child: (logoUrl != null && logoUrl.isNotEmpty)
+                ? Image.network(
+                    logoUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildLogoFallback(companyName),
+                  )
+                : _buildLogoFallback(companyName),
+          ),
+        );
+      },
     );
   }
 
@@ -117,68 +152,100 @@ class JobUiUtils {
 
   static Widget buildTag(String text) {
     if (text.isEmpty) return const SizedBox.shrink();
-    final lower = text.toLowerCase();
-    Color bg;
-    Color fg;
+    return Builder(
+      // Wrap in Builder to access context
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    if (lower.contains('remote')) {
-      bg = AppColors.infoBackground;
-      fg = AppColors.info;
-    } else if (lower.contains('onsite') || lower.contains('on-site')) {
-      bg = AppColors.warningBackground;
-      fg = AppColors.warning;
-    } else if (lower.contains('hybrid') || lower.contains('full')) {
-      bg = AppColors.successBackground;
-      fg = AppColors.success;
-    } else if (lower.contains('part') ||
-        lower.contains('contract') ||
-        lower.contains('senior')) {
-      bg = AppColors.warningBackground;
-      fg = AppColors.warning;
-    } else if (lower.contains('junior') || lower.contains('entry')) {
-      bg = AppColors.successBackground;
-      fg = AppColors.success;
-    } else {
-      bg = AppColors.primaryLight;
-      fg = AppColors.primary;
-    }
+        final lower = text.toLowerCase();
+        Color bg;
+        Color fg;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: fg),
-      ),
+        if (lower.contains('remote')) {
+          bg = isDark
+              ? AppColors.info.withValues(alpha: 0.15)
+              : AppColors.infoBackground;
+          fg = isDark ? AppColors.info : AppColors.info;
+        } else if (lower.contains('onsite') || lower.contains('on-site')) {
+          bg = isDark
+              ? AppColors.warning.withValues(alpha: 0.15)
+              : AppColors.warningBackground;
+          fg = isDark ? Colors.orangeAccent : AppColors.warning;
+        } else if (lower.contains('hybrid') || lower.contains('full')) {
+          bg = isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : AppColors.successBackground;
+          fg = isDark ? Colors.greenAccent : AppColors.success;
+        } else if (lower.contains('part') ||
+            lower.contains('contract') ||
+            lower.contains('senior')) {
+          bg = isDark
+              ? AppColors.warning.withValues(alpha: 0.15)
+              : AppColors.warningBackground;
+          fg = isDark ? Colors.orangeAccent : AppColors.warning;
+        } else if (lower.contains('junior') || lower.contains('entry')) {
+          bg = isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : AppColors.successBackground;
+          fg = isDark ? Colors.greenAccent : AppColors.success;
+        } else {
+          bg = isDark
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : AppColors.primaryLight;
+          fg = isDark ? Colors.blueAccent : AppColors.primary;
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            text.tr, // 🟢 Added .tr
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: fg,
+            ),
+          ),
+        );
+      },
     );
   }
 
   static Widget buildInlineEmptyState(String message, {double topPadding = 0}) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.only(top: topPadding, bottom: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.search_off_rounded,
-              size: 32,
-              color: AppColors.textDisabled,
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: topPadding, bottom: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.search_off_rounded,
+                  size: 32,
+                  color: isDark
+                      ? AppColors.darkIconSecondary
+                      : AppColors.textDisabled,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  message, // Translations passed down from parent widget
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : AppColors.textTertiary,
+                    fontSize: 13.5,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              message,
-              style: const TextStyle(
-                color: AppColors.textTertiary,
-                fontSize: 13.5,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

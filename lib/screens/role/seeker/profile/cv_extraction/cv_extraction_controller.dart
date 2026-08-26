@@ -21,7 +21,7 @@ class CvExtractionViewController extends GetxController {
 
   void cancelScanning() {
     if (_cancelToken != null && !_cancelToken!.isCancelled) {
-      _cancelToken!.cancel("User cancelled the upload.");
+      _cancelToken!.cancel("User cancelled the upload.".tr); // 🟢 Added .tr
     }
     isScanning.value = false;
   }
@@ -51,25 +51,46 @@ class CvExtractionViewController extends GetxController {
     if (currentResumeUrl.value.isEmpty) return;
     final Uri url = Uri.parse(currentResumeUrl.value);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      final isDark = Get.isDarkMode; // 🟢 Theme check for Snackbars
       Get.snackbar(
-        'Error',
-        'Could not open the document.',
+        'Error'.tr, // 🟢 Added .tr
+        'Could not open the document.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     }
   }
 
   // 🎯 មុខងារលុប CV
   Future<void> deleteCurrentResume() async {
+    final isDark = Get.isDarkMode; // 🟢 Theme check for Dialog
+
     bool? confirm = await Get.defaultDialog<bool>(
-      title: "Delete Resume",
-      titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-      middleText: "Are you sure you want to remove your current resume?",
-      textConfirm: "Delete",
-      textCancel: "Cancel",
+      title: "Delete Resume".tr, // 🟢 Added .tr
+      titleStyle: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: isDark ? Colors.white : Colors.black87, // 🟢 Dynamic text color
+      ),
+      middleText: "Are you sure you want to remove your current resume?"
+          .tr, // 🟢 Added .tr
+      middleTextStyle: TextStyle(
+        color: isDark
+            ? AppColors.darkTextSecondary
+            : Colors.black87, // 🟢 Dynamic text color
+      ),
+      textConfirm: "Delete".tr, // 🟢 Added .tr
+      textCancel: "Cancel".tr, // 🟢 Added .tr
       confirmTextColor: Colors.white,
       buttonColor: Colors.redAccent,
-      cancelTextColor: Colors.black87,
+      cancelTextColor: isDark
+          ? Colors.white
+          : Colors.black87, // 🟢 Dynamic cancel color
+      backgroundColor: isDark
+          ? AppColors.darkSurfaceElevated
+          : Colors.white, // 🟢 Dynamic BG
       onConfirm: () => Get.back(result: true),
       onCancel: () => Get.back(result: false),
     );
@@ -86,14 +107,21 @@ class CvExtractionViewController extends GetxController {
       currentResumeFilename.value = '';
 
       Get.snackbar(
-        'Deleted',
-        'Your resume has been removed.',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        'Deleted'.tr, // 🟢 Added .tr
+        'Your resume has been removed.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green, // 🟢 Dynamic BG
+        colorText: isDark
+            ? Colors.greenAccent
+            : Colors.white, // 🟢 Dynamic Text
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
-      errorMessage.value = e.toString().replaceAll('Exception: ', '');
+      errorMessage.value = e
+          .toString()
+          .replaceAll('Exception: ', '')
+          .tr; // 🟢 Translate exception if mapped
     } finally {
       isScanning.value = false;
     }
@@ -126,7 +154,10 @@ class CvExtractionViewController extends GetxController {
       if (e is DioException && e.type == DioExceptionType.cancel) {
         debugPrint("Upload was cancelled by user.");
       } else {
-        errorMessage.value = e.toString().replaceAll('Exception: ', '');
+        errorMessage.value = e
+            .toString()
+            .replaceAll('Exception: ', '')
+            .tr; // 🟢 Added .tr for error propagation
       }
     } finally {
       isScanning.value = false;

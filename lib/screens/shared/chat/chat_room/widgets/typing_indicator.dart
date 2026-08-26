@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// Three softly-pulsing dots, shown above the input bar while the other
-/// party is typing — mirrors the "typing" WebSocket event from
-/// `chat_ws_router.py`.
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({super.key});
 
@@ -11,13 +8,17 @@ class TypingIndicator extends StatefulWidget {
   State<TypingIndicator> createState() => _TypingIndicatorState();
 }
 
-class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProviderStateMixin {
+class _TypingIndicatorState extends State<TypingIndicator>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
   }
 
   @override
@@ -28,11 +29,16 @@ class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.cardBorder),
+        color: theme.cardColor,
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+        ),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -55,7 +61,12 @@ class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProv
                   child: Container(
                     width: 7,
                     height: 7,
-                    decoration: const BoxDecoration(color: AppColors.textTertiary, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textTertiary,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
               );

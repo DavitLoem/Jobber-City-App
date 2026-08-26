@@ -27,14 +27,14 @@ class InterviewDetailViewController extends GetxController {
     final args = Get.arguments;
     String? id;
     if (args is InterviewModel) {
-      interview.value = args; // show cached data immediately, then refresh
+      interview.value = args;
       id = args.id;
     } else if (args is String) {
       id = args;
     }
 
     if (id == null) {
-      errorMessage.value = 'Interview not found.';
+      errorMessage.value = 'Interview not found.'.tr; // 🟢 Added .tr
       isLoading.value = false;
       return;
     }
@@ -47,7 +47,7 @@ class InterviewDetailViewController extends GetxController {
     try {
       interview.value = await _interviewService.getInterview(id);
     } catch (e) {
-      errorMessage.value = 'Could not load this interview.';
+      errorMessage.value = 'Could not load this interview.'.tr; // 🟢 Added .tr
       debugPrint('[InterviewDetail] fetch error: $e');
     } finally {
       isLoading.value = false;
@@ -59,18 +59,12 @@ class InterviewDetailViewController extends GetxController {
     if (current == null || isJoining.value) return;
     isJoining.value = true;
     try {
-      // ហៅ API ដើម្បីប្រាប់ Backend ថាយើងចូលរួម និងប្តូរ Status ទៅ ongoing
       final result = await _interviewService.joinInterview(current.id);
-
-      // 🎯 ១. បំបែកយកតែ "ឈ្មោះបន្ទប់" ចេញពី URL (ព្រោះ SDK ថ្មីទាមទារតែឈ្មោះបន្ទប់ទេ)
-      // ឧទាហរណ៍៖ បើ URL គឺ https://meet.jit.si/jobbercity-xxx វានឹងយកតែ jobbercity-xxx
       final roomNameStr = result.meetingUrl.split('/').last;
 
-      // 🎯 ២. កំណត់ Option ដោយប្រើ JitsiMeetConferenceOptions ថ្មី
       var options = JitsiMeetConferenceOptions(
         room: roomNameStr,
         serverURL: "https://meet.jit.si",
-        // SDK ថ្មីប្រើ configOverrides សម្រាប់កំណត់កាមេរ៉ា និងម៉ៃក្រូហ្វូន
         configOverrides: {
           "startWithAudioMuted": true,
           "startWithVideoMuted": true,
@@ -78,7 +72,6 @@ class InterviewDetailViewController extends GetxController {
         },
       );
 
-      // 🎯 ៣. ហៅ SDK ឱ្យបើកបន្ទប់
       final jitsiMeet = JitsiMeet();
       await jitsiMeet.join(
         options,
@@ -88,17 +81,21 @@ class InterviewDetailViewController extends GetxController {
           },
           conferenceTerminated: (url, error) {
             debugPrint("Meeting closed. Updating status...");
-            // ពេលគាត់ចុចបិទការហៅ ទាញយកទិន្នន័យម្តងទៀតដើម្បី Update Status
             _fetch(current.id);
           },
         ),
       );
     } catch (e) {
       final message = e.toString().replaceAll('Exception: ', '');
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        'Could not join interview',
-        message,
+        'Could not join interview'.tr, // 🟢 Added .tr
+        message.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       debugPrint('[InterviewDetail] join error: $e');
     } finally {
@@ -112,16 +109,26 @@ class InterviewDetailViewController extends GetxController {
     isUpdating.value = true;
     try {
       interview.value = await _interviewService.completeInterview(current.id);
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        'Interview completed',
-        'Marked as completed.',
+        'Interview completed'.tr, // 🟢 Added .tr
+        'Marked as completed.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green.shade50,
+        colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
       );
     } catch (e) {
+      final isDark = Get.isDarkMode;
       Get.snackbar(
-        'Could not update',
-        e.toString().replaceAll('Exception: ', ''),
+        'Could not update'.tr, // 🟢 Added .tr
+        e.toString().replaceAll('Exception: ', '').tr,
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       debugPrint('[InterviewDetail] complete error: $e');
     } finally {
@@ -135,6 +142,8 @@ class InterviewDetailViewController extends GetxController {
     _rescheduleDate = current.scheduledAt;
     _rescheduleTime = TimeOfDay.fromDateTime(current.scheduledAt);
 
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     Get.bottomSheet(
       StatefulBuilder(
         builder: (context, setSheetState) => Container(
@@ -144,20 +153,24 @@ class InterviewDetailViewController extends GetxController {
             top: 24,
             bottom: MediaQuery.of(context).viewInsets.bottom + 24,
           ),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.darkBackground
+                : Colors.white, // 🟢 Dynamic BG
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Reschedule Interview',
+              Text(
+                'Reschedule Interview'.tr, // 🟢 Added .tr
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: isDark
+                      ? Colors.white
+                      : AppColors.textPrimary, // 🟢 Dynamic Title
                 ),
               ),
               const SizedBox(height: 20),
@@ -165,7 +178,8 @@ class InterviewDetailViewController extends GetxController {
                 icon: Icons.event_rounded,
                 label: _rescheduleDate != null
                     ? _formatFullDate(_rescheduleDate!)
-                    : 'Select date',
+                    : 'Select date'.tr, // 🟢 Added .tr
+                isDark: isDark,
                 onTap: () async {
                   final picked = await showDatePicker(
                     context: context,
@@ -175,8 +189,9 @@ class InterviewDetailViewController extends GetxController {
                     firstDate: DateTime.now(),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
-                  if (picked != null)
+                  if (picked != null) {
                     setSheetState(() => _rescheduleDate = picked);
+                  }
                 },
               ),
               const SizedBox(height: 12),
@@ -184,14 +199,16 @@ class InterviewDetailViewController extends GetxController {
                 icon: Icons.schedule_rounded,
                 label: _rescheduleTime != null
                     ? _rescheduleTime!.format(context)
-                    : 'Select time',
+                    : 'Select time'.tr, // 🟢 Added .tr
+                isDark: isDark,
                 onTap: () async {
                   final picked = await showTimePicker(
                     context: context,
                     initialTime: _rescheduleTime ?? TimeOfDay.now(),
                   );
-                  if (picked != null)
+                  if (picked != null) {
                     setSheetState(() => _rescheduleTime = picked);
+                  }
                 },
               ),
               const SizedBox(height: 24),
@@ -206,9 +223,9 @@ class InterviewDetailViewController extends GetxController {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Confirm New Time',
-                    style: TextStyle(
+                  child: Text(
+                    'Confirm New Time'.tr, // 🟢 Added .tr
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -226,6 +243,7 @@ class InterviewDetailViewController extends GetxController {
   Widget _pickerRow({
     required IconData icon,
     required String label,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -234,7 +252,9 @@ class InterviewDetailViewController extends GetxController {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+          ), // 🟢 Dynamic Border
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -243,15 +263,19 @@ class InterviewDetailViewController extends GetxController {
             const SizedBox(width: 10),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? Colors.white
+                    : AppColors.textPrimary, // 🟢 Dynamic Text
               ),
             ),
             const Spacer(),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.darkIconSecondary
+                  : AppColors.textTertiary, // 🟢 Dynamic Icon
             ),
           ],
         ),
@@ -260,11 +284,17 @@ class InterviewDetailViewController extends GetxController {
   }
 
   Future<void> _submitReschedule(String interviewId) async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     if (_rescheduleDate == null || _rescheduleTime == null) {
       Get.snackbar(
-        'Required',
-        'Please pick both a date and a time.',
+        'Required'.tr, // 🟢 Added .tr
+        'Please pick both a date and a time.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
       );
       return;
     }
@@ -277,11 +307,14 @@ class InterviewDetailViewController extends GetxController {
     ).toUtc();
 
     if (!combined.isAfter(DateTime.now().toUtc())) {
-      // ប្រៀបធៀបជាមួយ UTC ដូចគ្នា
       Get.snackbar(
-        'Invalid time',
-        'Please choose a time in the future.',
+        'Invalid time'.tr, // 🟢 Added .tr
+        'Please choose a time in the future.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
       );
       return;
     }
@@ -294,15 +327,23 @@ class InterviewDetailViewController extends GetxController {
         scheduledAt: combined,
       );
       Get.snackbar(
-        'Interview rescheduled',
-        'The candidate has been notified.',
+        'Interview rescheduled'.tr, // 🟢 Added .tr
+        'The candidate has been notified.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green.shade50,
+        colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
       );
     } catch (e) {
       Get.snackbar(
-        'Could not reschedule',
-        e.toString().replaceAll('Exception: ', ''),
+        'Could not reschedule'.tr, // 🟢 Added .tr
+        e.toString().replaceAll('Exception: ', '').tr,
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       debugPrint('[InterviewDetail] reschedule error: $e');
     } finally {
@@ -314,6 +355,7 @@ class InterviewDetailViewController extends GetxController {
     reasonController.clear();
     final current = interview.value;
     if (current == null) return;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
     Get.bottomSheet(
       Container(
@@ -323,35 +365,50 @@ class InterviewDetailViewController extends GetxController {
           top: 24,
           bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : Colors.white, // 🟢 Dynamic BG
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Cancel Interview',
-              style: TextStyle(
+            Text(
+              'Cancel Interview'.tr, // 🟢 Added .tr
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.error,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Are you sure? This cannot be undone.',
-              style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
+            Text(
+              'Are you sure? This cannot be undone.'.tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textTertiary, // 🟢 Dynamic Text
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
               maxLines: 3,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+              ), // 🟢 Dynamic Input Text
               decoration: InputDecoration(
-                hintText: 'Reason (optional)',
+                hintText: 'Reason (optional)'.tr, // 🟢 Added .tr
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                ),
                 filled: true,
-                fillColor: AppColors.lightSurfaceVariant,
+                fillColor: isDark
+                    ? AppColors.darkInputBackground
+                    : AppColors.lightSurfaceVariant, // 🟢 Dynamic Input BG
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -364,7 +421,12 @@ class InterviewDetailViewController extends GetxController {
                 Expanded(
                   child: TextButton(
                     onPressed: () => Get.back(),
-                    child: const Text('Keep Interview'),
+                    child: Text(
+                      'Keep Interview'.tr, // 🟢 Added .tr
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : AppColors.textPrimary,
+                      ), // 🟢 Dynamic Text
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -380,9 +442,9 @@ class InterviewDetailViewController extends GetxController {
                       Get.back();
                       _submitCancel(current.id);
                     },
-                    child: const Text(
-                      'Yes, Cancel',
-                      style: TextStyle(
+                    child: Text(
+                      'Yes, Cancel'.tr, // 🟢 Added .tr
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -400,17 +462,31 @@ class InterviewDetailViewController extends GetxController {
 
   Future<void> _submitCancel(String interviewId) async {
     isUpdating.value = true;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     try {
       interview.value = await _interviewService.cancelInterview(
         interviewId,
         reason: reasonController.text,
       );
-      Get.snackbar('Interview cancelled', '', snackPosition: SnackPosition.TOP);
+      Get.snackbar(
+        'Interview cancelled'.tr, // 🟢 Added .tr
+        '',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green.shade50,
+        colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
+      );
     } catch (e) {
       Get.snackbar(
-        'Could not cancel',
-        e.toString().replaceAll('Exception: ', ''),
+        'Could not cancel'.tr, // 🟢 Added .tr
+        e.toString().replaceAll('Exception: ', '').tr,
         snackPosition: SnackPosition.TOP,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       debugPrint('[InterviewDetail] cancel error: $e');
     } finally {

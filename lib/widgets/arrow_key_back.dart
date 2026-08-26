@@ -14,6 +14,9 @@ class _ArrowKeyBackState extends State<ArrowKeyBack> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -30,14 +33,24 @@ class _ArrowKeyBackState extends State<ArrowKeyBack> {
           height: 42,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.white,
+            color: isDark
+                ? AppColors.darkSurfaceElevated
+                : AppColors.white, // 🟢 Dynamic BG
             border: Border.all(
-              color: AppColors.cardBorder.withOpacity(0.6),
+              color: isDark
+                  ? AppColors.darkCardBorder
+                  : AppColors.cardBorder.withValues(
+                      alpha: 0.6,
+                    ), // 🟢 Dynamic Border
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.textPrimary.withOpacity(0.06),
+                color: isDark
+                    ? Colors.transparent
+                    : AppColors.textPrimary.withValues(
+                        alpha: 0.06,
+                      ), // 🟢 Dynamic Shadow
                 blurRadius: 5,
                 spreadRadius: 0,
                 offset: const Offset(0, 1),
@@ -50,7 +63,9 @@ class _ArrowKeyBackState extends State<ArrowKeyBack> {
               child: Icon(
                 Icons.arrow_back_ios_new_outlined,
                 size: 18,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? Colors.white
+                    : AppColors.textPrimary, // 🟢 Dynamic Icon
               ),
             ),
           ),

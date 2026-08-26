@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // 🟢 បន្ថែម Get សម្រាប់ Navigation
+import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
-// 🟢 Import Controllers សម្រាប់បញ្ជាការប្តូរ Tab (កែ Path ឱ្យត្រូវ)
 import 'package:jobber_city/screens/role/employer/main_screen_emloyer/main_screen_emloyer_controller.dart';
 
 class QuickActionsSection extends StatelessWidget {
@@ -9,15 +9,18 @@ class QuickActionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Quick Actions",
+        Text(
+          "Quick Actions".tr, // 🟢 Added .tr
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF1E293B),
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Header
             letterSpacing: -0.3,
           ),
         ),
@@ -25,16 +28,17 @@ class QuickActionsSection extends StatelessWidget {
 
         Column(
           children: [
-            // ជួរទី ១[cite: 15]
             Row(
               children: [
                 Expanded(
                   child: _buildActionCard(
-                    title: "Post New Job",
+                    title: "Post New Job".tr, // 🟢 Added .tr
                     icon: Icons.add_rounded,
-                    iconColor: const Color(0xFF4F7DF7),
+                    iconColor: isDark
+                        ? Colors.blueAccent
+                        : const Color(0xFF4F7DF7), // 🟢 Dynamic Color
+                    isDark: isDark,
                     onTap: () {
-                      // 🟢 លោតទៅ Tab: My Jobs (Index 1)
                       if (Get.isRegistered<MainScreenEmloyerController>()) {
                         Get.find<MainScreenEmloyerController>().changeTab(1);
                       }
@@ -44,28 +48,30 @@ class QuickActionsSection extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildActionCard(
-                    title: "View Analytics",
+                    title: "View Analytics".tr, // 🟢 Added .tr
                     icon: Icons.bar_chart_rounded,
-                    iconColor: const Color(0xFF9333EA), // ពណ៌ស្វាយ
-                    onTap: () {
-                      // 🟢 អាចលោតទៅទំព័រ Report ឬបច្ចុប្បន្នគ្រាន់តែ Scroll ទៅលើ
-                    },
+                    iconColor: isDark
+                        ? const Color(0xFFA855F7)
+                        : const Color(0xFF9333EA), // 🟢 Dynamic Color
+                    isDark: isDark,
+                    onTap: () {},
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
 
-            // ជួរទី ២[cite: 15]
             Row(
               children: [
                 Expanded(
                   child: _buildActionCard(
-                    title: "Top Candidates",
+                    title: "Top Candidates".tr, // 🟢 Added .tr
                     icon: Icons.bolt_rounded,
-                    iconColor: const Color(0xFFD97706), // ពណ៌លឿងទុំ
+                    iconColor: isDark
+                        ? const Color(0xFFF59E0B)
+                        : const Color(0xFFD97706), // 🟢 Dynamic Color
+                    isDark: isDark,
                     onTap: () {
-                      // 🟢 លោតទៅ Tab: Candidates (Index 2)
                       _goToCandidatesTab('all');
                     },
                   ),
@@ -73,11 +79,13 @@ class QuickActionsSection extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildActionCard(
-                    title: "Schedule",
+                    title: "Schedule".tr, // 🟢 Added .tr
                     icon: Icons.calendar_month_rounded,
-                    iconColor: const Color(0xFF059669), // ពណ៌បៃតង
+                    iconColor: isDark
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF059669), // 🟢 Dynamic Color
+                    isDark: isDark,
                     onTap: () {
-                      // 🟢 លោតទៅ Tab: Candidates -> Interview
                       _goToCandidatesTab('interview');
                     },
                   ),
@@ -90,21 +98,27 @@ class QuickActionsSection extends StatelessWidget {
     );
   }
 
-  // ── ៣. អនុគមន៍សម្រាប់គូរប្រអប់ Action នីមួយៗ (Reusable Widget) ──
   Widget _buildActionCard({
     required String title,
     required IconData icon,
     required Color iconColor,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
-    // 🟢 ផ្លាស់ទី InkWell ចូលក្នុង Material ដើម្បីឱ្យមាន Ripple Effect ល្អជាងមុន
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Card Action BG
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+        ), // 🟢 Edge highlight for dark UI
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.02,
+            ), // 🟢 Dynamic Shadow Opacity
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -116,30 +130,32 @@ class QuickActionsSection extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          splashColor: iconColor.withValues(alpha: 0.1), // ពណ៌ពេលចុច
+          splashColor: iconColor.withValues(alpha: 0.1),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
             child: Row(
               children: [
-                // ផ្នែក Icon ដែលមានផ្ទៃពណ៌ព្រាលៗ (Tinted Background)[cite: 15]
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.1),
+                    color: iconColor.withValues(
+                      alpha: isDark ? 0.2 : 0.1,
+                    ), // 🟢 Dynamic Tint Opacity
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: iconColor, size: 20),
                 ),
                 const SizedBox(width: 12),
 
-                // ផ្នែកអក្សរចំណងជើង[cite: 15]
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E293B),
+                      color: isDark
+                          ? Colors.white
+                          : const Color(0xFF1E293B), // 🟢 Dynamic Card Name
                       height: 1.2,
                     ),
                   ),
@@ -152,7 +168,6 @@ class QuickActionsSection extends StatelessWidget {
     );
   }
 
-  // 🎯 អនុគមន៍ជំនួយសម្រាប់រត់ទៅកាន់ Candidates Tab រួចកំណត់ Status
   void _goToCandidatesTab(String targetStatus) {
     if (Get.isRegistered<MainScreenEmloyerController>()) {
       Get.find<MainScreenEmloyerController>().changeTab(2);
@@ -161,7 +176,6 @@ class QuickActionsSection extends StatelessWidget {
     if (Get.isRegistered<CandidatesViewController>()) {
       final candidateCtrl = Get.find<CandidatesViewController>();
 
-      // ផ្តាច់ (Clear) ការ Filter តាមការងារ (Job) ដើម្បីមើលបេក្ខជនទាំងអស់
       candidateCtrl.selectedJobId.value = 'all';
 
       int targetIndex = candidateCtrl.tabs.indexOf(targetStatus);

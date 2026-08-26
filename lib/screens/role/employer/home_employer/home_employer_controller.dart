@@ -10,7 +10,7 @@ class HomeEmployerViewController extends GetxController {
   final companyProfile = Rxn<CompanyProfileModel>();
   final dashboardData = Rxn<EmployerDashboardResponse>();
 
-  // ── State សម្រាប់ Filter ──
+  // ── Filter State ──
   final filterLabel = 'This Month'.obs;
   final filterValue = 'this_month'.obs;
   final isMonthFilter = false.obs;
@@ -23,7 +23,7 @@ class HomeEmployerViewController extends GetxController {
     fetchDashboardOverview();
   }
 
-  // 🎯 អនុគមន៍ទាញយកទិន្នន័យ Company
+  // 🎯 Function to fetch Company data
   Future<void> fetchCompanyProfile() async {
     try {
       isLoading.value = true;
@@ -38,7 +38,7 @@ class HomeEmployerViewController extends GetxController {
     }
   }
 
-  // 🎯 អនុគមន៍ទាញយកទិន្នន័យ Dashboard ពិតប្រាកដ
+  // 🎯 Function to fetch actual Dashboard data
   Future<void> fetchDashboardOverview() async {
     try {
       isDashboardLoading.value = true;
@@ -46,7 +46,7 @@ class HomeEmployerViewController extends GetxController {
         filter: filterValue.value,
       );
 
-      // 🟢 Update តែពេលណាដែលមានទិន្នន័យត្រលប់មកវិញប៉ុណ្ណោះ
+      // 🟢 Update only when data is returned
       if (response != null) {
         dashboardData.value = response;
       }
@@ -63,7 +63,7 @@ class HomeEmployerViewController extends GetxController {
     }
   }
 
-  // ── អនុគមន៍បញ្ជា Filter (Update ឱ្យហៅ API ពេលដូរ) ──
+  // ── Filter Control Functions (Update calls API when changed) ──
 
   void prevMonth() {
     selectedDate.value = DateTime(
@@ -71,7 +71,7 @@ class HomeEmployerViewController extends GetxController {
       selectedDate.value.month - 1,
     );
     _updateMonthLabel();
-    fetchDashboardOverview(); // 🟢 ទាញទិន្នន័យថ្មី
+    fetchDashboardOverview(); // 🟢 Fetch new data
   }
 
   void nextMonth() {
@@ -80,7 +80,7 @@ class HomeEmployerViewController extends GetxController {
       selectedDate.value.month + 1,
     );
     _updateMonthLabel();
-    fetchDashboardOverview(); // 🟢 ទាញទិន្នន័យថ្មី
+    fetchDashboardOverview(); // 🟢 Fetch new data
   }
 
   void _updateMonthLabel() {
@@ -101,7 +101,7 @@ class HomeEmployerViewController extends GetxController {
     filterLabel.value =
         "${months[selectedDate.value.month - 1]} ${selectedDate.value.year}";
 
-    // បំប្លែងទៅជា "YYYY-MM" សម្រាប់បោះទៅ Backend
+    // Convert to "YYYY-MM" to pass to Backend
     final monthStr = selectedDate.value.month.toString().padLeft(2, '0');
     filterValue.value = "${selectedDate.value.year}-$monthStr";
   }
@@ -110,7 +110,7 @@ class HomeEmployerViewController extends GetxController {
     filterLabel.value = label;
     isMonthFilter.value = false;
 
-    // បំប្លែង Label ទៅជា Key សម្រាប់ API របស់ Python
+    // Convert Label to Key for Python API
     if (label == "Today")
       filterValue.value = "today";
     else if (label == "This Week")
@@ -118,15 +118,15 @@ class HomeEmployerViewController extends GetxController {
     else if (label == "This Month")
       filterValue.value = "this_month";
     else
-      filterValue.value = label; // សម្រាប់ Custom Range "YYYY-MM-DD,YYYY-MM-DD"
+      filterValue.value = label; // For Custom Range "YYYY-MM-DD,YYYY-MM-DD"
 
-    fetchDashboardOverview(); // 🟢 ទាញទិន្នន័យថ្មី
+    fetchDashboardOverview(); // 🟢 Fetch new data
   }
 
   void setMonthFilter(DateTime date) {
     selectedDate.value = date;
     isMonthFilter.value = true;
     _updateMonthLabel();
-    fetchDashboardOverview(); // 🟢 ទាញទិន្នន័យថ្មី
+    fetchDashboardOverview(); // 🟢 Fetch new data
   }
 }

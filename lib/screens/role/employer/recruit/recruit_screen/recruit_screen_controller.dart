@@ -85,7 +85,7 @@ class RecruitScreenViewController extends GetxController {
       jobs.assignAll(data);
     } catch (e) {
       debugPrint('Error loading jobs: $e');
-      errorMessage.value = e.toString();
+      errorMessage.value = e.toString().tr; // 🟢 Catch translated errors
     } finally {
       isLoading.value = false;
     }

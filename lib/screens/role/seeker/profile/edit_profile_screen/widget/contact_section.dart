@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_controller.dart';
 import 'package:jobber_city/screens/role/seeker/profile/widget/profile_text_field.dart';
 
@@ -13,39 +14,45 @@ class ContactSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionFieldLabel(title: 'Email'),
+        SectionFieldLabel(title: 'Email'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.email_outlined,
-          hintText: 'Email',
+          hintText: 'Email'.tr, // 🟢 Added .tr
           controller: controller.emailCtrl,
           readOnly: true,
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Phone'),
+        SectionFieldLabel(title: 'Phone'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.phone_outlined,
-          hintText: 'Phone Number',
+          hintText: 'Phone Number'.tr, // 🟢 Added .tr
           controller: controller.phoneCtrl,
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Portfolio URL', isOptional: true),
+        SectionFieldLabel(
+          title: 'Portfolio URL'.tr,
+          isOptional: true,
+        ), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.public_outlined,
-          hintText: 'Portfolio URL',
+          hintText: 'Portfolio URL'.tr, // 🟢 Added .tr
           controller: controller.portfolioCtrl,
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'LinkedIn URL', isOptional: true),
+        SectionFieldLabel(
+          title: 'LinkedIn URL'.tr,
+          isOptional: true,
+        ), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.link_outlined,
-          hintText: 'LinkedIn URL',
+          hintText: 'LinkedIn URL'.tr, // 🟢 Added .tr
           controller: controller.linkedinCtrl,
         ),
       ],

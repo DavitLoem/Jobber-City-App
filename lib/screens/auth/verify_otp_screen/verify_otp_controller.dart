@@ -69,11 +69,19 @@ class VerifyOtpController extends GetxController {
 
   void verifyOtp() async {
     String otp = completeOtp;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
     //១. ពិនិត្យភាពត្រឹមត្រូវ (Validation) តាមរយៈ AuthValidator
     String? validationError = AuthValidator.validateOtp(otpCode: otp);
     if (validationError != null) {
-      Get.snackbar('Error', validationError);
+      Get.snackbar(
+        'Error'.tr, // 🟢 Added .tr
+        validationError.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
       return;
     }
 
@@ -106,7 +114,14 @@ class VerifyOtpController extends GetxController {
 
         await Get.find<AuthController>().checkLoginStatus();
 
-        Get.snackbar('Success', 'Your account has been verified successfully!');
+        Get.snackbar(
+          'Success'.tr, // 🟢 Added .tr
+          'Your account has been verified successfully!'.tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green.shade50,
+          colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
+        );
 
         if (response.user.role == 'employer') {
           if (response.user.isProfileCompleted == true) {
@@ -123,12 +138,24 @@ class VerifyOtpController extends GetxController {
         }
       }
     } on ApiException catch (e) {
-      Get.snackbar('Error', e.message);
+      Get.snackbar(
+        'Error'.tr, // 🟢 Added .tr
+        e.message.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
     } catch (e) {
       debugPrint("Verify OTP Crash Log: $e");
       Get.snackbar(
-        'Error',
-        'There is a system error. Please check your internet connection.',
+        'Error'.tr, // 🟢 Added .tr
+        'There is a system error. Please check your internet connection.'
+            .tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     } finally {
       isLoading.value = false;
@@ -137,6 +164,7 @@ class VerifyOtpController extends GetxController {
 
   void resendOtp() async {
     if (remainingSeconds.value > 0) return;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
     try {
       isLoading.value = true;
@@ -149,17 +177,34 @@ class VerifyOtpController extends GetxController {
       }
 
       Get.snackbar(
-        'Success',
-        response["message"] ?? 'OTP has been resent to your email.',
+        'Success'.tr, // 🟢 Added .tr
+        response["message"]?.toString().tr ??
+            'OTP has been resent to your email.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green.shade50,
+        colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
       );
 
       startTimer();
     } on ApiException catch (e) {
-      Get.snackbar('Error', e.message);
+      Get.snackbar(
+        'Error'.tr, // 🟢 Added .tr
+        e.message.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'There is a system error. Please check your internet connection.',
+        'Error'.tr, // 🟢 Added .tr
+        'There is a system error. Please check your internet connection.'
+            .tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     } finally {
       isLoading.value = false;

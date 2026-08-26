@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
 class CustomButton extends StatefulWidget {
@@ -43,13 +44,11 @@ class _CustomButtonState extends State<CustomButton>
   }
 
   void _onButtonPressed() {
-    // 🎯 2. បើកំពុង Loading មិនអនុញ្ញាតឱ្យមានចលនា ឬដំណើរការ Function ទេ
     if (widget.isLoading) return;
 
-    // Animate down
     _animationController.forward();
 
-    widget.onPressed!(); // 4. Call with '!' since we checked for null above
+    widget.onPressed!();
 
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) {
@@ -60,6 +59,9 @@ class _CustomButtonState extends State<CustomButton>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       width: double.infinity,
       height: 53,
@@ -68,8 +70,11 @@ class _CustomButtonState extends State<CustomButton>
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            // 🎯 3. ពេល Disable ប៊ូតុង ពណ៌អក្សរនឹងប្តូរដោយស្វ័យប្រវត្តិ
-            disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+            disabledBackgroundColor: isDark
+                ? AppColors.darkSurfaceElevated
+                : AppColors.primary.withValues(
+                    alpha: 0.6,
+                  ), // 🟢 Dynamic Disabled BG
             foregroundColor: AppColors.buttonPrimaryText,
             shadowColor: const Color.fromARGB(
               255,
@@ -77,30 +82,28 @@ class _CustomButtonState extends State<CustomButton>
               64,
               239,
             ).withValues(alpha: 0.7),
-            elevation: widget.isLoading ? 0 : 3, // ដកស្រមោលចេញពេលកំពុង Loading
+            elevation: widget.isLoading ? 0 : 3,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
           ),
-          // 🎯 4. បើ isLoading = true ដាក់ null ដើម្បី Disable ប៊ូតុង
           onPressed: widget.isLoading ? null : _onButtonPressed,
-          // 🎯 5. ផ្លាស់ប្តូរ UI ទៅតាមស្ថានភាព Loading
           child: widget.isLoading
-              ? const Row(
+              ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         color: Colors.white,
-                        strokeWidth: 2.5, // ធ្វើឱ្យរង្វង់រាងស្តើង និងស្អាត
+                        strokeWidth: 2.5,
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Text(
-                      'Processing...', // ពាក្យ Professional ជំនួសឱ្យ Loading
-                      style: TextStyle(
+                      'Processing...'.tr, // 🟢 Added .tr
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -109,7 +112,8 @@ class _CustomButtonState extends State<CustomButton>
                   ],
                 )
               : Text(
-                  widget.text,
+                  widget
+                      .text, // Normally Translated where CustomButton is instantiated
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,

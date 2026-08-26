@@ -1,13 +1,11 @@
 part of 'edit_profile_employer_view.dart';
 
 class EditProfileEmployerViewController extends GetxController {
-  // ── 1. Services ──
   final CompanyProfileService _profileService = CompanyProfileService();
 
   final masterCtrl = Get.find<MasterDataController>();
   final locationCtrl = Get.find<LocationController>();
 
-  // ── 2. Text Controllers សម្រាប់ Input Fields ──
   final companyNameCtrl = TextEditingController();
   final emailCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
@@ -15,7 +13,6 @@ class EditProfileEmployerViewController extends GetxController {
   final descCtrl = TextEditingController();
   final addressCtrl = TextEditingController();
 
-  // ── 3. Variables សម្រាប់ Dropdowns / Selections ──
   final selectedIndustryId = ''.obs;
   final selectedCompanySize = ''.obs;
   final selectedProvinceId = ''.obs;
@@ -38,11 +35,9 @@ class EditProfileEmployerViewController extends GetxController {
   }
 
   Future<void> _loadInitialData() async {
-    // ឆែកបើគ្មាន Industry ត្រូវទាញយកមកសិន
     if (masterCtrl.masterDataCache['industries'] == null) {
       await masterCtrl.getMasterData(endpoint: 'industries');
     }
-    // ឆែកបើគ្មានខេត្ត ត្រូវទាញយកមកសិន
     if (locationCtrl.provinces.isEmpty) {
       await locationCtrl.fetchProvinces();
     }
@@ -50,7 +45,6 @@ class EditProfileEmployerViewController extends GetxController {
     _prefillData();
   }
 
-  // មុខងារទាញទិន្នន័យចាស់ពី EmployerProfileViewController មកញាត់ចូលក្នុង Form
   void _prefillData() {
     if (Get.isRegistered<EmployerProfileViewController>()) {
       final existingProfile =
@@ -81,7 +75,7 @@ class EditProfileEmployerViewController extends GetxController {
   void onProvinceChanged(String? provId) {
     if (provId == null) return;
     selectedProvinceId.value = provId;
-    selectedDistrictId.value = ''; // លុបតម្លៃស្រុកចោលសិនពេលប្តូរខេត្តថ្មី
+    selectedDistrictId.value = '';
     _fetchDistricts(provId);
   }
 
@@ -97,6 +91,8 @@ class EditProfileEmployerViewController extends GetxController {
         imageQuality: 80,
       );
 
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
+
       if (image != null) {
         logoImage.value = File(image.path);
         isUploadingLogo.value = true;
@@ -106,54 +102,61 @@ class EditProfileEmployerViewController extends GetxController {
 
         if (success) {
           Get.snackbar(
-            'Success',
-            'Company logo updated successfully!',
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
+            'Success'.tr, // 🟢 Added .tr
+            'Company logo updated successfully!'.tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? AppColors.success.withValues(alpha: 0.15)
+                : Colors.green,
+            colorText: isDark ? Colors.greenAccent : Colors.white,
           );
 
-          // ប្រាប់ EmployerProfileViewController ឱ្យទាញយក Data ថ្មីដើម្បីអាប់ដេត UI ខាងក្រៅ
           if (Get.isRegistered<EmployerProfileViewController>()) {
             Get.find<EmployerProfileViewController>().fetchMyProfile();
           }
         } else {
           Get.snackbar(
-            'Failed',
-            'Could not upload logo. Please try again.',
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
+            'Failed'.tr, // 🟢 Added .tr
+            'Could not upload logo. Please try again.'.tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? AppColors.error.withValues(alpha: 0.15)
+                : Colors.red,
+            colorText: isDark ? Colors.redAccent : Colors.white,
           );
         }
       }
     } catch (e) {
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       debugPrint('Error picking image: $e');
       Get.snackbar(
-        'Error',
-        'An error occurred while uploading the image.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        'Error'.tr, // 🟢 Added .tr
+        'An error occurred while uploading the image.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     } finally {
       isUploadingLogo.value = false;
     }
   }
 
-  // មុខងារសម្រាប់ Update ទិន្នន័យទៅកាន់ API
   Future<void> updateProfile() async {
-    // ត្រួតពិនិត្យភាពត្រឹមត្រូវបឋម (Validation)
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     if (companyNameCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Missing Field',
-        'Company Name is required.',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        'Missing Field'.tr, // 🟢 Added .tr
+        'Company Name is required.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange,
+        colorText: isDark ? Colors.orangeAccent : Colors.white,
       );
       return;
     }
 
     isLoading.value = true;
     try {
-      // រៀបចំទិន្នន័យសម្រាប់បញ្ជូនទៅ (ផ្អែកលើ Request Body របស់ API)
       final requestData = CompanyProfileRequest(
         companyName: companyNameCtrl.text.trim(),
         industryId: selectedIndustryId.value,
@@ -170,33 +173,40 @@ class EditProfileEmployerViewController extends GetxController {
       final response = await _profileService.updateCompanyProfile(requestData);
 
       if (response.success) {
-        Get.back(); // បិទអេក្រង់ Edit រួចត្រឡប់ទៅ Profile វិញ
+        Get.back();
         Get.snackbar(
-          'Success',
-          'Company profile updated successfully!',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          'Success'.tr, // 🟢 Added .tr
+          'Company profile updated successfully!'.tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green,
+          colorText: isDark ? Colors.greenAccent : Colors.white,
         );
 
-        // ប្រាប់ឱ្យ EmployerProfileViewController ទាញយកទិន្នន័យថ្មីម្តងទៀត ដើម្បី Update UI
         if (Get.isRegistered<EmployerProfileViewController>()) {
           Get.find<EmployerProfileViewController>().fetchMyProfile();
         }
       } else {
         Get.snackbar(
-          'Failed',
-          response.message,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          'Failed'.tr, // 🟢 Added .tr
+          response
+              .message
+              .tr, // 🟢 Translate remote message if it exists in local dictionary
+          backgroundColor: isDark
+              ? AppColors.error.withValues(alpha: 0.15)
+              : Colors.red,
+          colorText: isDark ? Colors.redAccent : Colors.white,
         );
       }
     } catch (e) {
       debugPrint('Update Profile Error: $e');
       Get.snackbar(
-        'Error',
-        'An unexpected error occurred. Please try again.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        'Error'.tr, // 🟢 Added .tr
+        'An unexpected error occurred. Please try again.'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red,
+        colorText: isDark ? Colors.redAccent : Colors.white,
       );
     } finally {
       isLoading.value = false;

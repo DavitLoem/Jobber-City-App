@@ -11,7 +11,6 @@ class CandidatesViewController extends GetxController
   var postedJobs = <JobDropdownItemModel>[].obs;
   var selectedJobId = ''.obs;
 
-  // 🟢 ១. អថេរថ្មីៗសម្រាប់ Pagination
   var currentPage = 1.obs;
   var isLoadMore = false.obs;
   var hasMore = true.obs;
@@ -64,30 +63,32 @@ class CandidatesViewController extends GetxController
     });
 
     fetchPostedJobs();
-    fetchApplicants(isRefresh: true); // 🟢 ចាប់ផ្តើមដោយ Refresh
+    fetchApplicants(isRefresh: true);
     fetchStatusSummary();
   }
 
   Future<void> startChatWithSeeker(ApplicantModel applicant) async {
-    // ត្រួតពិនិត្យថាមាន User ID ឬអត់
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     if (applicant.seekerUserId.isEmpty) {
       Get.snackbar(
-        "Error",
-        "Cannot start chat. User ID is missing.",
+        "Error".tr, // 🟢 Added .tr
+        "Cannot start chat. User ID is missing.".tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       return;
     }
 
-    // បង្ហាញសញ្ញា Loading
     Get.dialog(
       const Center(child: CircularProgressIndicator()),
       barrierDismissible: false,
     );
 
     try {
-      // 🎯 ១. កែតម្រូវការហៅ API ឱ្យត្រូវនឹង ChatRestService ថ្មី
-      // ប្រើ Parameter: otherUserId និងចាប់យក selectedJobId ពិតប្រាកដ
       final conversation = await _chatRestService.startConversation(
         otherUserId: applicant.seekerUserId,
         jobId: (selectedJobId.value.isNotEmpty && selectedJobId.value != 'all')
@@ -95,18 +96,15 @@ class CandidatesViewController extends GetxController
             : null,
       );
 
-      // បិទ Loading វិញ
       Get.back();
 
-      // 🎯 ២. ប្រើប្រាស់ ChatThreadArgs ដែលមានសុវត្ថិភាពខ្ពស់ ជំនួសការប្រើ Map
       Get.toNamed(
-        AppRoutes
-            .chatRoom, // (ចំណាំ: សូមប្រាកដថា Route នេះត្រូវគ្នានឹង AppRoutes របស់អ្នក)
+        AppRoutes.chatRoom,
         arguments: ChatThreadArgs(
           conversationId: conversation.id,
           otherPartyName: applicant.fullName,
           otherPartyAvatarUrl: applicant.profileImageUrl,
-          otherPartyRole: 'seeker', // Employer កំពុងឆាតទៅ Seeker
+          otherPartyRole: 'seeker',
           jobId:
               (selectedJobId.value.isNotEmpty && selectedJobId.value != 'all')
               ? selectedJobId.value
@@ -115,7 +113,14 @@ class CandidatesViewController extends GetxController
       );
     } catch (e) {
       Get.back();
-      Get.snackbar("Error", "Something went wrong.");
+      Get.snackbar(
+        "Error".tr, // 🟢 Added .tr
+        "Something went wrong.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
       debugPrint("Error starting chat: $e");
     }
   }
@@ -134,27 +139,25 @@ class CandidatesViewController extends GetxController
 
   String get selectedJobDisplayName {
     if (selectedJobId.value == 'all' || selectedJobId.value.isEmpty) {
-      return 'All Jobs';
+      return 'All Jobs'.tr; // 🟢 Added .tr
     }
     final job = postedJobs.firstWhere(
       (j) => j.jobId == selectedJobId.value,
       orElse: () => JobDropdownItemModel(
         jobId: '',
-        displayName: 'Loading...',
+        displayName: 'Loading...'.tr, // 🟢 Added .tr
         status: '',
       ),
     );
     return job.displayName;
   }
 
-  // 🟢 ២. មុខងារ Refresh (ទាញពីលើចុះក្រោម)
   Future<void> refreshApplicants() async {
     currentPage.value = 1;
     hasMore.value = true;
     await fetchApplicants(isRefresh: true);
   }
 
-  // 🟢 ៣. មុខងារ Load More (អូសដល់ក្រោម)
   Future<void> loadMoreApplicants() async {
     if (isLoadMore.value || !hasMore.value) return;
 
@@ -168,13 +171,11 @@ class CandidatesViewController extends GetxController
     if (currentSort.value == newSort) return;
     currentSort.value = newSort;
 
-    // បង្ខំឱ្យ Reset ទៅទំព័រទី 1 និងទាញទិន្នន័យថ្មី
     currentPage.value = 1;
     hasMore.value = true;
     fetchApplicants(isRefresh: true);
   }
 
-  // 🟢 ៤. កែប្រែ fetchApplicants ដើម្បីគាំទ្រ Pagination
   Future<void> fetchApplicants({bool isRefresh = true}) async {
     if (selectedJobId.value.isEmpty) return;
 
@@ -195,7 +196,6 @@ class CandidatesViewController extends GetxController
         limit: limit,
       );
 
-      // ឆែកថាតើអស់ទិន្នន័យឬនៅ
       if (result.length < limit) {
         hasMore.value = false;
       } else {
@@ -209,12 +209,15 @@ class CandidatesViewController extends GetxController
       }
     } catch (e) {
       debugPrint("❌ Error in Controller: $e");
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        "Error",
-        "Failed to load candidates. Please try again.",
+        "Error".tr, // 🟢 Added .tr
+        "Failed to load candidates. Please try again.".tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     } finally {
       if (isRefresh) isLoading.value = false;
@@ -251,15 +254,19 @@ class CandidatesViewController extends GetxController
         );
 
         if (newApplicant.status != firstApplicant.status) {
+          final isDark = Get.isDarkMode; // 🟢 Theme Check
           Get.snackbar(
-            "Selection Error",
-            "You can only select candidates with the same status at a time.",
-            backgroundColor: Colors.orange.shade50,
-            colorText: Colors.orange.shade900,
+            "Selection Error".tr, // 🟢 Added .tr
+            "You can only select candidates with the same status at a time."
+                .tr, // 🟢 Added .tr
+            backgroundColor: isDark
+                ? Colors.orangeAccent.withValues(alpha: 0.15)
+                : Colors.orange.shade50,
+            colorText: isDark ? Colors.orangeAccent : Colors.orange.shade900,
             snackPosition: SnackPosition.TOP,
             icon: Icon(
               Icons.warning_amber_rounded,
-              color: Colors.orange.shade900,
+              color: isDark ? Colors.orangeAccent : Colors.orange.shade900,
             ),
           );
           return;
@@ -280,7 +287,6 @@ class CandidatesViewController extends GetxController
 
   void onSearchChanged(String query) {
     _debouncer.run(() {
-      // 🟢 ពេល Search ត្រូវ Reset ទៅទំព័រទី 1 វិញ
       currentPage.value = 1;
       hasMore.value = true;
       fetchApplicants(isRefresh: true);
@@ -289,7 +295,6 @@ class CandidatesViewController extends GetxController
 
   void changeTab(String status) {
     clearSelection();
-    // 🟢 ពេលដូរ Tab ត្រូវ Reset ទៅទំព័រទី 1 វិញ
     hasMore.value = true;
     currentPage.value = 1;
     fetchApplicants(isRefresh: true);
@@ -301,6 +306,7 @@ class CandidatesViewController extends GetxController
     String? feedback,
   }) async {
     if (selectedApplicantIds.isEmpty) return false;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
     try {
       Get.dialog(
         const Center(child: CircularProgressIndicator()),
@@ -320,10 +326,12 @@ class CandidatesViewController extends GetxController
         clearSelection();
         fetchStatusSummary();
         Get.snackbar(
-          "Success",
-          "Candidates have been updated successfully.",
-          backgroundColor: Colors.green.shade50,
-          colorText: Colors.green.shade700,
+          "Success".tr, // 🟢 Added .tr
+          "Candidates have been updated successfully.".tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green.shade50,
+          colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
         );
         return true;
       }
@@ -331,10 +339,12 @@ class CandidatesViewController extends GetxController
     } catch (e) {
       Get.back();
       Get.snackbar(
-        "Error",
-        "Could not process bulk action.",
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        "Error".tr, // 🟢 Added .tr
+        "Could not process bulk action.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       return false;
     }
@@ -346,6 +356,7 @@ class CandidatesViewController extends GetxController
     Map<String, dynamic>? interviewSchedule,
     String? feedback,
   }) async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
     try {
       Get.dialog(
         const Center(child: CircularProgressIndicator()),
@@ -366,17 +377,19 @@ class CandidatesViewController extends GetxController
           final currentStatus = applicants[existingApplicantIndex].status
               .toLowerCase();
           if (currentStatus == newStatus.toLowerCase()) {
-            fetchApplicants(isRefresh: true); // 🟢 ទាញយកសាថ្មី ព្រោះវា Update
+            fetchApplicants(isRefresh: true);
             Get.snackbar(
-              "Success",
-              "Interview schedule has been updated.",
-              backgroundColor: Colors.green.shade50,
-              colorText: Colors.green.shade700,
+              "Success".tr, // 🟢 Added .tr
+              "Interview schedule has been updated.".tr, // 🟢 Added .tr
+              backgroundColor: isDark
+                  ? AppColors.success.withValues(alpha: 0.15)
+                  : Colors.green.shade50,
+              colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
               snackPosition: SnackPosition.TOP,
               margin: const EdgeInsets.all(16),
               icon: Icon(
                 Icons.check_circle_outline,
-                color: Colors.green.shade700,
+                color: isDark ? Colors.greenAccent : Colors.green.shade700,
               ),
             );
           } else {
@@ -390,10 +403,12 @@ class CandidatesViewController extends GetxController
     } catch (e) {
       Get.back();
       Get.snackbar(
-        "Action Failed",
-        "Could not update data. Please try again.",
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        "Action Failed".tr, // 🟢 Added .tr
+        "Could not update data. Please try again.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
       return false;
     }

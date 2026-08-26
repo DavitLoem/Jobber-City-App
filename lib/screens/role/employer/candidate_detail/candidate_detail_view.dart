@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// 🟢 Import Service មកទីនេះ ដើម្បីឱ្យ Controller ស្គាល់វា
 import 'package:jobber_city/core/api/services/role/employer/applicant_employer_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/models/interview_models.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:jobber_city/screens/role/employer/candidates/candidates_view.dart';
@@ -24,29 +24,38 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : const Color(0xFFF8F9FA), // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : Colors.white, // 🟢 Dynamic AppBar BG
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Applicant Details',
+        title: Text(
+          'Applicant Details'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title Text
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.black87),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: theme.textTheme.bodyLarge?.color,
+          ), // 🟢 Dynamic Back Icon
           onPressed: () => Get.back(),
         ),
         actions: [
           Obx(() {
             final applicant = controller.applicant.value;
 
-            // លាក់ប៊ូតុងបើមិនទាន់ទាញទិន្នន័យបាន ឬអត់មានទិន្នន័យ
             if (controller.isLoadingData.value || applicant == null) {
               return const SizedBox.shrink();
             }
@@ -54,25 +63,20 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 🎯 ១. ប៊ូតុង Chat (ជួសជុល Error រួចរាល់)
                 IconButton(
                   icon: const Icon(
                     LucideIcons.messageSquare,
-                    color: Color(0xFF4F7DF7),
+                    color: AppColors.primary,
                   ),
                   onPressed: () {
-                    // ដោយសារ applicant យើងឆែក null រួចហើយ យើងអាចបោះវាបានដោយសុវត្ថិភាព
                     final candidatesController =
                         Get.find<CandidatesViewController>();
                     candidatesController.startChatWithSeeker(applicant);
                   },
                 ),
-
-                // 🎯 ២. ប៊ូតុង Interview ថ្មី
                 IconButton(
-                  icon: const Icon(LucideIcons.video, color: Color(0xFF10B981)),
+                  icon: const Icon(LucideIcons.video, color: AppColors.success),
                   onPressed: () {
-                    // 🎯 ឆែកមើលថាតើគាត់មានម៉ោងសម្ភាសន៍ចាស់ឬអត់ (ឧទាហរណ៍ពី applicant.interviewSchedule)
                     DateTime? oldDate;
                     if (applicant.interviewSchedule != null &&
                         applicant.interviewSchedule!['date'] != null) {
@@ -89,7 +93,7 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                         seekerAvatarUrl: applicant.profileImageUrl,
                         applicationId: applicant.applicationId,
                         jobTitle: applicant.jobTitle,
-                        existingDate: oldDate, // 🎯 បោះម៉ោងចាស់ទៅឱ្យ
+                        existingDate: oldDate,
                       ),
                     );
                   },
@@ -100,23 +104,30 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           }),
         ],
       ),
-      // 🟢 រុំ Body ជាមួយ Obx ដើម្បីរង់ចាំការទាញយកទិន្នន័យ
       body: Obx(() {
         if (controller.isLoadingData.value) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF4F7DF7)),
+            child: CircularProgressIndicator(color: AppColors.primary),
           );
         }
 
         final applicant = controller.applicant.value;
 
-        // បើអត់មានទិន្នន័យបង្ហាញ Error State
         if (applicant == null) {
-          return const Center(child: Text("Candidate details not found."));
+          return Center(
+            child: Text(
+              "Candidate details not found.".tr, // 🟢 Added .tr
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textTertiary,
+              ), // 🟢 Dynamic Subtext
+            ),
+          );
         }
 
         return RefreshIndicator(
-          color: const Color(0xFF4F7DF7),
+          color: AppColors.primary,
           onRefresh: controller.refreshDetail,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -127,21 +138,20 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
                 CandidateHeader(applicant: applicant),
                 const SizedBox(height: 24),
                 CandidateSkills(applicant: applicant),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Divider(
                     height: 1,
                     thickness: 1,
-                    color: Color(0xFFEEEEEE),
+                    color: isDark
+                        ? AppColors.darkDivider
+                        : const Color(0xFFEEEEEE), // 🟢 Dynamic Divider
                   ),
                 ),
                 CandidateInterview(applicant: applicant),
                 CandidateCoverLetter(
                   coverLetterText: controller.applicant.value?.coverLetter,
-                  coverLetterUrl: controller
-                      .applicant
-                      .value
-                      ?.coverLetterUrl, // ត្រូវប្រាកដថា ApplicantModel មាន Field នេះ
+                  coverLetterUrl: controller.applicant.value?.coverLetterUrl,
                   coverLetterFilename:
                       controller.applicant.value?.coverLetterFilename,
                   onTapFile: () => controller.openDocument(
@@ -155,7 +165,6 @@ class CandidateDetailView extends GetView<CandidateDetailViewController> {
           ),
         );
       }),
-      // 🟢 ការពារកុំឱ្យ Error ពេលអត់ទាន់មានទិន្នន័យនៅ Action Bar ខាងក្រោម
       bottomNavigationBar: Obx(() {
         if (controller.isLoadingData.value ||
             controller.applicant.value == null) {

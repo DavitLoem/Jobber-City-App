@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/location_screen_view.dart';
 
@@ -36,19 +37,20 @@ class _LocationContinueButtonState extends State<LocationContinueButton>
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Obx(() {
-      // 🎯 ១. ឆែកថាតើគាត់កំពុងនៅទំព័រទីប៉ុន្មាន?
       final isProvincePage = widget.controller.currentPage.value == 0;
 
-      // 🎯 ២. កំណត់លក្ខខណ្ឌ Enable Button ផ្អែកតាមទំព័រ
       final hasSelection = isProvincePage
           ? widget.controller.selectedProvinceId.value.isNotEmpty
           : widget.controller.selectedDistrictId.value.isNotEmpty;
 
-      // 🎯 ៣. កំណត់អក្សរពេល Disable ឱ្យត្រូវនឹងទំព័រ
       final disableText = isProvincePage
           ? 'Select a City to Continue'
-          : 'Select a District to Continue';
+                .tr // 🟢 Added .tr
+          : 'Select a District to Continue'.tr; // 🟢 Added .tr
 
       return Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -76,14 +78,24 @@ class _LocationContinueButtonState extends State<LocationContinueButton>
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       )
-                    : const LinearGradient(
-                        colors: [Color(0xFFCCCCCC), Color(0xFFDDDDDD)],
+                    : LinearGradient(
+                        colors: isDark
+                            ? [
+                                AppColors.darkSurfaceElevated,
+                                AppColors.darkSurfaceElevated,
+                              ]
+                            : const [
+                                Color(0xFFCCCCCC),
+                                Color(0xFFDDDDDD),
+                              ], // 🟢 Dynamic BG
                       ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: hasSelection
                     ? [
                         BoxShadow(
-                          color: LocationColors.accent.withValues(alpha: 0.38),
+                          color: LocationColors.accent.withValues(
+                            alpha: 0.38,
+                          ), // 🟢 Updated to withValues
                           blurRadius: 18,
                           offset: const Offset(0, 8),
                         ),
@@ -95,14 +107,17 @@ class _LocationContinueButtonState extends State<LocationContinueButton>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      // 🎯 ៤. ប្តូរអក្សរនៅទីនេះ
-                      hasSelection ? 'Continue' : disableText,
+                      hasSelection
+                          ? 'Continue'.tr
+                          : disableText, // 🟢 Added .tr
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: hasSelection
                             ? Colors.white
-                            : const Color(0xFFAAAAAA),
+                            : (isDark
+                                  ? AppColors.darkTextHint
+                                  : const Color(0xFFAAAAAA)), // 🟢 Dynamic Text
                         letterSpacing: 0.2,
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 import 'package:jobber_city/screens/role/seeker/profile/widget/profile_text_field.dart';
 
 import '../edit_profile_screen_controller.dart';
@@ -13,11 +14,14 @@ class CurrentPositionSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionFieldLabel(title: 'Current Position', isOptional: true),
+        SectionFieldLabel(
+          title: 'Current Position'.tr,
+          isOptional: true,
+        ), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
           prefixIcon: Icons.work_outline,
-          hintText: 'Enter your current position',
+          hintText: 'Enter your current position'.tr, // 🟢 Added .tr
           controller: controller.currentPositionCtrl,
         ),
       ],

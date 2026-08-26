@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-import 'package:jobber_city/models/role/seeker/job_feed_model.dart'; // 🎯 ប្រើប្រាស់ Model ថ្មី
+import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 
 import '../home_seeker_view.dart';
@@ -14,21 +14,20 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 226,
+      height: 235,
       child: Obx(() {
-        // 🟢 បង្ហាញ Shimmer តែពេល Load ដំបូងគេប៉ុណ្ណោះ
         if (controller.isRecommendedLoading.value &&
             controller.recommendedJobs.isEmpty) {
           return _buildRecommendedSkeleton();
         }
         if (controller.recommendedJobs.isEmpty) {
-          return JobUiUtils.buildInlineEmptyState('No recommended jobs found');
+          return JobUiUtils.buildInlineEmptyState(
+            'No recommended jobs found'.tr, // 🟢 Added .tr
+          );
         }
 
-        // 🟢 ប្រើ NotificationListener សម្រាប់ចាប់ការអូស (Scroll)
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
-            // បើអូសជិតដល់ចុងបញ្ជី (សល់ 50 pixels) ហៅ API ទាញយកបន្ត
             if (!controller.isRecommendedLoadingMore.value &&
                 scrollInfo.metrics.pixels >=
                     scrollInfo.metrics.maxScrollExtent - 50) {
@@ -38,19 +37,17 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
           },
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            // 🟢 បូក 1 តែពេលនៅមានទិន្នន័យ (hasMoreRecommended) ប៉ុណ្ណោះ
+            clipBehavior: Clip.none,
             itemCount:
                 controller.recommendedJobs.length +
                 (controller.hasMoreRecommended.value ? 1 : 0),
-            separatorBuilder: (_, _) => const SizedBox(width: 14),
+            separatorBuilder: (_, _) => const SizedBox(width: 16),
             itemBuilder: (context, index) {
-              // 🟢 បង្ហាញរង្វង់ Loading នៅចុងបញ្ជី
               if (index == controller.recommendedJobs.length) {
                 return _buildLoadingIndicator();
               }
-
               final job = controller.recommendedJobs[index];
-              return _buildRecommendedJobCard(job, index, index);
+              return _buildRecommendedJobCard(job, index, index, context);
             },
           ),
         );
@@ -62,9 +59,9 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: 3,
-      separatorBuilder: (_, _) => const SizedBox(width: 14),
+      separatorBuilder: (_, _) => const SizedBox(width: 16),
       itemBuilder: (context, index) =>
-          const ShimmerBox(width: 250, height: 226, borderRadius: 20),
+          const ShimmerBox(width: 240, height: 235, borderRadius: 24),
     );
   }
 
@@ -72,7 +69,17 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
     JobFeedModel job,
     int index,
     int staggerIndex,
+    BuildContext context,
   ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final Color cardBackground = isDark
+        ? AppColors.darkSurfaceElevated
+        : const Color(0xFF141226);
+    const Color textWhite = Colors.white;
+    final Color textSubtitle = Colors.grey.shade400;
+
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 350 + (staggerIndex * 80).clamp(0, 320)),
@@ -93,17 +100,18 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
           });
         },
         child: Container(
-          width: 250,
-          padding: const EdgeInsets.all(14),
+          width: 240,
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.cardBorder),
+            color: cardBackground,
+            borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadowLight,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : const Color(0xFF141226).withValues(alpha: 0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -111,57 +119,90 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  JobUiUtils.buildCompanyLogo(
-                    job.logoUrl,
-                    job.companyName,
-                    size: 44,
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: job.logoUrl != null && job.logoUrl!.isNotEmpty
+                          ? Image.network(job.logoUrl!, fit: BoxFit.cover)
+                          : const Icon(
+                              Icons.business_rounded,
+                              color: Colors.white,
+                            ),
+                    ),
                   ),
-                  const Spacer(),
-                  JobUiUtils.buildBookmarkButton(
-                    isSaved: job.isSaved,
+
+                  GestureDetector(
                     onTap: () => controller.toggleSaveRecommendedJob(index),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        job.isSaved
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_border_rounded,
+                        color: job.isSaved
+                            ? const Color(0xFF4F7DF7)
+                            : Colors.grey.shade400,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
+
               Text(
                 job.title,
                 style: const TextStyle(
-                  fontSize: 15.5,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: textWhite,
+                  letterSpacing: -0.2,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 4),
+
               Text(
                 job.companyName,
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: Color(0xFF4F7DF7),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
+
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_on_rounded,
-                    size: 13,
-                    color: AppColors.textTertiary,
+                    size: 14,
+                    color: textSubtitle,
                   ),
-                  const SizedBox(width: 3),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      job.location,
-                      style: const TextStyle(
+                      job.location.tr,
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: AppColors.textTertiary,
+                        color: textSubtitle,
+                        fontWeight: FontWeight.w400,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -169,15 +210,34 @@ class RecommendedJobsSection extends GetView<HomeSeekerViewController> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              JobUiUtils.buildTag(job.employmentType),
               const Spacer(),
+
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F9D58).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  job.employmentType.tr,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF4ADE80),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
               Text(
-                "\$${job.minSalary.toInt()} - \$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod)}",
+                "\$${job.minSalary.toInt()} - \$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod).tr}",
                 style: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                  color: textWhite,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

@@ -22,11 +22,10 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFailed = message.status == 'failed';
-    // 🎯 ឆែកមើលថាតើសារនេះលុបរួចឬនៅ
     final isDeleted = message.isDeletedForEveryone;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      // 🎯 ពេលចុចសង្កត់ ហៅ Bottom Sheet ចេញពី Controller
       onLongPress: () {
         if (!isDeleted) {
           Get.find<ChatRoomViewController>().showDeleteOptions(message);
@@ -42,12 +41,19 @@ class MessageBubble extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            // 🎯 បើលុបហើយ ដូរពណ៌ទៅជាប្រផេះស្រាល
             color: isDeleted
-                ? Colors.grey.shade200
+                ? (isDark
+                      ? AppColors.darkSurfaceElevated
+                      : Colors.grey.shade200)
                 : (isFailed
-                      ? AppColors.errorBackground
-                      : (isMine ? const Color(0xFF4F7DF7) : Colors.white)),
+                      ? (isDark
+                            ? AppColors.error.withValues(alpha: 0.15)
+                            : AppColors.errorBackground)
+                      : (isMine
+                            ? const Color(0xFF4F7DF7)
+                            : (isDark
+                                  ? AppColors.darkCardBorder
+                                  : Colors.white))),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(isMine ? 16 : (isFirstInGroup ? 16 : 4)),
               bottomLeft: Radius.circular(
@@ -62,7 +68,11 @@ class MessageBubble extends StatelessWidget {
             ),
             border: (isMine || isFailed || isDeleted)
                 ? null
-                : Border.all(color: Colors.grey.shade200),
+                : Border.all(
+                    color: isDark
+                        ? AppColors.darkDivider
+                        : Colors.grey.shade200,
+                  ),
             boxShadow: (isMine && !isDeleted)
                 ? [
                     BoxShadow(
@@ -73,7 +83,9 @@ class MessageBubble extends StatelessWidget {
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.2 : 0.04,
+                      ),
                       blurRadius: 2,
                       offset: const Offset(0, 1),
                     ),
@@ -86,23 +98,29 @@ class MessageBubble extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8.0, bottom: 0),
                 child: isDeleted
-                    // 🎯 បង្ហាញអក្សរ Tombstone ជំនួសអត្ថបទដើម
-                    ? const Row(
+                    ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.block, size: 14, color: Colors.black54),
-                          SizedBox(width: 4),
+                          Icon(
+                            Icons.block,
+                            size: 14,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : Colors.black54,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            "This message was deleted",
+                            "This message was deleted".tr,
                             style: TextStyle(
                               fontSize: 14,
                               fontStyle: FontStyle.italic,
-                              color: Colors.black54,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : Colors.black54,
                             ),
                           ),
                         ],
                       )
-                    // បង្ហាញអត្ថបទធម្មតា
                     : Text(
                         message.content,
                         style: TextStyle(
@@ -110,11 +128,12 @@ class MessageBubble extends StatelessWidget {
                           height: 1.35,
                           color: isFailed
                               ? AppColors.error
-                              : (isMine ? Colors.white : Colors.black87),
+                              : (isMine
+                                    ? Colors.white
+                                    : (isDark ? Colors.white : Colors.black87)),
                         ),
                       ),
               ),
-              // 🎯 ម៉ោងក៏ត្រូវលាក់ ឬ ប្តូរពណ៌ដែរ បើលុបហើយ
               if (!isDeleted)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 1.0),
@@ -127,7 +146,9 @@ class MessageBubble extends StatelessWidget {
                           fontSize: 11,
                           color: isMine
                               ? Colors.white.withValues(alpha: 0.8)
-                              : Colors.grey.shade500,
+                              : (isDark
+                                    ? AppColors.darkTextTertiary
+                                    : Colors.grey.shade500),
                         ),
                       ),
                       if (isMine) ...[

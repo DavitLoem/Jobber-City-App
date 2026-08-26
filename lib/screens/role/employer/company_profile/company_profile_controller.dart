@@ -48,7 +48,6 @@ class CompanyProfileViewController extends GetxController {
   void fetchInitialData() async {
     isFetching.value = true;
     try {
-      // 🎯 ២. ទាញយក Industries ពី Global Master Data Controller
       final inds = await masterDataCtrl.getMasterData(endpoint: 'industries');
       industriesList.assignAll(inds);
 
@@ -82,19 +81,23 @@ class CompanyProfileViewController extends GetxController {
   Future<void> saveProfile() async {
     // ── Validations ──
     if (companyNameController.text.trim().isEmpty) {
-      _notice('Company Name is required');
+      _notice('Company Name is required'.tr); // 🟢 Added .tr
       return;
     }
     if (selectedIndustryId.value.isEmpty) {
-      _notice('Please select an Industry!');
+      _notice('Please select an Industry!'.tr); // 🟢 Added .tr
       return;
     }
     if (descriptionCtrl.text.trim().length < 10) {
-      _notice('Company Description must have at least 10 characters!');
+      _notice(
+        'Company Description must have at least 10 characters!'.tr,
+      ); // 🟢 Added .tr
       return;
     }
 
     isLoading.value = true;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check for SnackBar
+
     try {
       final requestData = CompanyProfileRequest(
         companyName: companyNameController.text.trim(),
@@ -117,14 +120,12 @@ class CompanyProfileViewController extends GetxController {
 
       await _companyProfileService.createCompanyProfile(requestData);
 
-      // 🎯 ៥. ការ Upload Logo ជាទម្រង់ File (FormData)
       if (companyLogoPath.value.isNotEmpty &&
           !companyLogoPath.value.startsWith('http')) {
         File imageFile = File(companyLogoPath.value);
         await _companyProfileService.uploadCompanyLogo(imageFile);
       }
 
-      // 🎯 ៦. Update TokenStorage & State ដើម្បីឆ្លងកាត់ Middleware ទ្វារយាម
       String? token = await TokenStorage.getAccessToken();
       String? refresh = await TokenStorage.getRefreshToken();
       String? role = await TokenStorage.getUserRole();
@@ -138,30 +139,46 @@ class CompanyProfileViewController extends GetxController {
         isProfileCompleted: true,
       );
 
-      // Update State ក្នុង AuthController ភ្លាមៗ
       final authCtrl = Get.find<AuthController>();
       authCtrl.isProfileCompleted.value = true;
       authCtrl.checkLoginStatus();
 
       Get.snackbar(
-        'Success',
-        'Profile updated successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        'Success'.tr, // 🟢 Added .tr
+        'Profile updated successfully!'.tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : Colors.green,
+        colorText: isDark ? Colors.greenAccent : Colors.white,
       );
 
       await Future.delayed(const Duration(milliseconds: 1000));
 
       Get.offAllNamed(AppRoutes.mainScreenEmployer);
     } catch (e) {
-      Get.snackbar('Failed', _extractErrorMessage(e));
+      Get.snackbar(
+        'Failed'.tr, // 🟢 Added .tr
+        _extractErrorMessage(e).tr,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.redAccent,
+        colorText: isDark ? Colors.redAccent : Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
   void _notice(String message) {
-    Get.snackbar('Notice', message);
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+    Get.snackbar(
+      'Notice'.tr, // 🟢 Added .tr
+      message,
+      backgroundColor: isDark
+          ? Colors.orangeAccent.withValues(alpha: 0.15)
+          : Colors.orangeAccent,
+      colorText: isDark ? Colors.orangeAccent : Colors.white,
+    );
   }
 
   String _extractErrorMessage(Object e) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../models/notification_model.dart';
@@ -22,8 +24,10 @@ class _NotificationCardState extends State<NotificationCard> {
 
   @override
   Widget build(BuildContext context) {
-    Color iconBgColor = const Color(0xFFEEF2FF);
-    Color iconColor = const Color(0xFF4F7DF7);
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
+    Color baseColor = AppColors.primary;
     IconData iconData = LucideIcons.bell;
 
     // 🎯 ១. ទាញយក Type និង Message មកធ្វើជាអក្សរតូចទាំងអស់ ដើម្បីងាយស្រួលផ្ទៀងផ្ទាត់
@@ -31,65 +35,61 @@ class _NotificationCardState extends State<NotificationCard> {
     final String message = widget.notification.message.toLowerCase();
 
     // 🎯 ២. កំណត់លក្ខខណ្ឌដ៏ឆ្លាតវៃតាមប្រភេទ និងអត្ថន័យនៃសារ
+    // 🟢 Refactored to calculate Base Color once, allowing clean alpha adjustments for Dark Mode support
     if (type == 'new_application') {
-      // មានអ្នកដាក់ពាក្យថ្មី (Employer)
-      iconBgColor = const Color(0xFFEEF2FF); // លឿង/ខៀវខ្ចី
-      iconColor = const Color(0xFF4F7DF7);
+      baseColor = AppColors.primary;
       iconData = LucideIcons.fileText;
     } else if (type == 'interview_update') {
-      // ផ្លាស់ប្តូរថ្ងៃសម្ភាសន៍
-      iconBgColor = const Color(0xFFF3E8FF); // ស្វាយស្រាល
-      iconColor = const Color(0xFFA855F7);
+      baseColor = const Color(0xFFA855F7); // Purple
       iconData = LucideIcons.calendarClock;
     } else if (type == 'status_update') {
-      // 🎯 ឆែកមើលពាក្យគន្លឹះក្នុង Message សម្រាប់ Status នីមួយៗ
       if (message.contains('interview')) {
-        iconBgColor = const Color(0xFFF3E8FF); // ស្វាយស្រាល
-        iconColor = const Color(0xFFA855F7);
+        baseColor = const Color(0xFFA855F7);
         iconData = LucideIcons.users;
       } else if (message.contains('hired') || message.contains('accepted')) {
-        iconBgColor = const Color(0xFFF0FDF4); // បៃតងស្រាល
-        iconColor = const Color(0xFF16A34A);
+        baseColor = AppColors.success;
         iconData = LucideIcons.award;
       } else if (message.contains('rejected') ||
           message.contains('unsuccessful')) {
-        iconBgColor = const Color(0xFFFEF2F2); // ក្រហមស្រាល
-        iconColor = const Color(0xFFDC2626);
+        baseColor = AppColors.error;
         iconData = LucideIcons.xCircle;
       } else if (message.contains('shortlisted')) {
-        iconBgColor = const Color(0xFFFFF7ED); // ទឹកក្រូចស្រាល
-        iconColor = const Color(0xFFEA580C);
+        baseColor = const Color(0xFFEA580C); // Orange
         iconData = LucideIcons.bookmark;
       } else if (message.contains('reviewed')) {
-        iconBgColor = const Color(0xFFF0F9FF); // ខៀវស្រាល
-        iconColor = const Color(0xFF0284C7);
+        baseColor = const Color(0xFF0284C7); // Light Blue
         iconData = LucideIcons.eye;
       } else {
-        // Default Pending ឬ Status ផ្សេងៗ
-        iconBgColor = const Color(0xFFF8FAFC); // ប្រផេះស្រាល
-        iconColor = const Color(0xFF64748B);
+        baseColor = const Color(0xFF64748B); // Slate
         iconData = LucideIcons.refreshCcw;
       }
     } else if (type == 'system_alert') {
-      iconBgColor = const Color(0xFFFEF2F2);
-      iconColor = const Color(0xFFDC2626);
+      baseColor = AppColors.error;
       iconData = LucideIcons.alertTriangle;
     }
+
+    // 🟢 Derive the background block and icon color automatically based on Theme
+    final Color iconBgColor = baseColor.withValues(alpha: isDark ? 0.2 : 0.1);
+    final Color iconColor = baseColor;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          16,
-        ), // 🟢 ធ្វើឱ្យកោងល្មមស្អាត (Minimal)
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Card BG
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: isDark
+              ? AppColors.darkCardBorder
+              : Colors.grey.shade200, // 🟢 Dynamic Border
           width: 1.0,
-        ), // 🟢 ស៊ុមស្តើងជាងមុនបន្តិច
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.2 : 0.02,
+            ), // 🟢 Dynamic Shadow
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -102,7 +102,6 @@ class _NotificationCardState extends State<NotificationCard> {
           borderRadius: BorderRadius.circular(16),
           onTap: widget.onTap,
           child: Padding(
-            // 🎯 កែប្រែ Padding ឱ្យហាប់ណែនល្អ ពេលវាកំពុងបិទ (បន្ថយ vertical ពី 16 មក 14)
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +110,7 @@ class _NotificationCardState extends State<NotificationCard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      width: 46, // 🎯 បង្រួម Icon បន្តិចឱ្យស៊ីនឹងកម្ពស់អក្សរ
+                      width: 46,
                       height: 46,
                       decoration: BoxDecoration(
                         color: iconBgColor,
@@ -127,11 +126,16 @@ class _NotificationCardState extends State<NotificationCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            widget.notification.title,
-                            style: const TextStyle(
+                            widget
+                                .notification
+                                .title
+                                .tr, // 🟢 Apply translations if Title maps match backend definitions
+                            style: TextStyle(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF1E293B), // ពណ៌ខ្មៅស្រាល (Slate)
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E293B), // 🟢 Dynamic Title
                               letterSpacing: -0.2,
                             ),
                             maxLines: 1,
@@ -142,7 +146,11 @@ class _NotificationCardState extends State<NotificationCard> {
                             _formatDateTime(widget.notification.createdAt),
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey.shade500,
+                              color: isDark
+                                  ? AppColors.darkTextTertiary
+                                  : Colors
+                                        .grey
+                                        .shade500, // 🟢 Dynamic Date String
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -158,12 +166,12 @@ class _NotificationCardState extends State<NotificationCard> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4F7DF7),
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          "New",
-                          style: TextStyle(
+                        child: Text(
+                          "New".tr, // 🟢 Added .tr
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -171,7 +179,6 @@ class _NotificationCardState extends State<NotificationCard> {
                         ),
                       ),
 
-                    // 🟢 ព្រួញត្រូវបានរៀបចំផ្ទៃចុចឱ្យសមរម្យ ការពារការចុចខុស
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -190,26 +197,34 @@ class _NotificationCardState extends State<NotificationCard> {
                               ? LucideIcons.chevronUp
                               : LucideIcons.chevronDown,
                           size: 18,
-                          color: Colors.grey.shade400,
+                          color: isDark
+                              ? AppColors.darkIconSecondary
+                              : Colors.grey.shade400, // 🟢 Dynamic Chevron
                         ),
                       ),
                     ),
                   ],
                 ),
 
-                // 🎯 ពេលបិទ គឺលាក់បាត់ឈឹង, ពេលបើក គឺរុញចុះក្រោមយ៉ាងរលូន
                 AnimatedSize(
                   duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut, // ធ្វើឱ្យចលនាបិទបើកមានភាពទន់ភ្លន់
+                  curve: Curves.easeInOut,
                   alignment: Alignment.topCenter,
                   child: _isExpanded
                       ? Padding(
                           padding: const EdgeInsets.only(top: 14),
                           child: Text(
-                            widget.notification.message,
+                            widget
+                                .notification
+                                .message
+                                .tr, // 🟢 Apply translations if messages match backend enums
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : Colors
+                                        .grey
+                                        .shade600, // 🟢 Dynamic Message text
                               height: 1.5,
                             ),
                           ),
@@ -224,7 +239,6 @@ class _NotificationCardState extends State<NotificationCard> {
     );
   }
 
-  // 🟢 អនុគមន៍បំប្លែងម៉ោង (Timezone Fix ដូចមុន)
   String _formatDateTime(DateTime? date) {
     if (date == null) return '';
 
@@ -257,11 +271,12 @@ class _NotificationCardState extends State<NotificationCard> {
       'Dec',
     ];
     final day = localDate.day.toString().padLeft(2, '0');
-    final month = months[localDate.month - 1];
+    final month =
+        months[localDate.month - 1].tr; // 🟢 Added .tr to Month String
     final year = localDate.year;
 
     int hourInt = localDate.hour;
-    final ampm = hourInt >= 12 ? 'PM' : 'AM';
+    final ampm = hourInt >= 12 ? 'PM'.tr : 'AM'.tr; // 🟢 Added .tr
     if (hourInt > 12) hourInt -= 12;
     if (hourInt == 0) hourInt = 12;
 

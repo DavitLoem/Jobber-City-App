@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 
-/// A polished, animated text field with:
-/// - Smooth border/background color transitions on focus
-/// - A subtle scale "pop" when focused
-/// - An animated icon swap for the password visibility toggle
-/// - A shake animation when validation fails
-///
-/// Drop-in replacement for the original CustomTextfield — same
-/// constructor signature, so no call sites need to change.
 class CustomTextfield extends StatefulWidget {
   const CustomTextfield({
     super.key,
@@ -24,7 +17,7 @@ class CustomTextfield extends StatefulWidget {
     this.textInputAction,
     this.labelText,
     this.autovalidateMode,
-    this.maxLines = 1, // Added maxLines parameter here
+    this.maxLines = 1,
     this.showPasswordStrength = false,
   });
 
@@ -39,14 +32,10 @@ class CustomTextfield extends StatefulWidget {
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
-  final int maxLines; // Added maxLines variable
+  final int maxLines;
 
-  /// Optional floating label. If null, [hintText] is used as a plain hint.
   final String? labelText;
   final AutovalidateMode? autovalidateMode;
-
-  /// When true (and [isPasswordField] is true), shows a segmented strength
-  /// bar + label ("Weak" / "Fair" / "Strong" / "Very Strong") below the field.
   final bool showPasswordStrength;
 
   @override
@@ -62,7 +51,6 @@ class _CustomTextfieldState extends State<CustomTextfield>
   bool _isFocused = false;
   late bool _obscureText;
 
-  // Focus scale/border animation.
   late final AnimationController _focusController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 180),
@@ -72,7 +60,6 @@ class _CustomTextfieldState extends State<CustomTextfield>
     end: 1.01,
   ).animate(CurvedAnimation(parent: _focusController, curve: Curves.easeOut));
 
-  // Shake animation, triggered on validation error.
   late final AnimationController _shakeController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 420),
@@ -101,7 +88,6 @@ class _CustomTextfieldState extends State<CustomTextfield>
     setState(() {});
   }
 
-  /// Returns a score from 0 (empty) to 4 (very strong).
   int get _passwordStrengthScore {
     final text = widget.controller.text;
     if (text.isEmpty) return 0;
@@ -117,7 +103,6 @@ class _CustomTextfieldState extends State<CustomTextfield>
       score++;
     }
 
-    // Clamp into 4 buckets: 1 = Weak, 2 = Fair, 3 = Good/Strong, 4 = Very Strong
     if (score <= 1) return 1;
     if (score == 2) return 2;
     if (score <= 4) return 3;
@@ -129,28 +114,28 @@ class _CustomTextfieldState extends State<CustomTextfield>
       case 0:
         return '';
       case 1:
-        return 'Weak';
+        return 'Weak'.tr; // 🟢 Added .tr
       case 2:
-        return 'Fair';
+        return 'Fair'.tr; // 🟢 Added .tr
       case 3:
-        return 'Strong';
+        return 'Strong'.tr; // 🟢 Added .tr
       default:
-        return 'Very Strong';
+        return 'Very Strong'.tr; // 🟢 Added .tr
     }
   }
 
-  Color get _passwordStrengthColor {
+  Color _passwordStrengthColor(bool isDark) {
     switch (_passwordStrengthScore) {
       case 1:
         return Colors.redAccent;
       case 2:
         return Colors.orangeAccent;
       case 3:
-        return AppColors.inputFocusedBorder;
+        return isDark ? Colors.blueAccent : AppColors.inputFocusedBorder;
       case 4:
         return Colors.green;
       default:
-        return AppColors.line;
+        return isDark ? AppColors.darkDivider : AppColors.line;
     }
   }
 
@@ -160,7 +145,6 @@ class _CustomTextfieldState extends State<CustomTextfield>
       _focusController.forward();
     } else {
       _focusController.reverse();
-      // Re-validate on blur so the shake can react to a fresh error.
       _fieldKey.currentState?.validate();
     }
   }
@@ -184,30 +168,33 @@ class _CustomTextfieldState extends State<CustomTextfield>
     super.dispose();
   }
 
-  Color get _borderColor =>
-      _isFocused ? AppColors.inputFocusedBorder : Colors.transparent;
+  Color _borderColor(bool isDark) => _isFocused
+      ? (isDark ? Colors.blueAccent : AppColors.inputFocusedBorder)
+      : Colors.transparent;
 
-  Color get _iconColor =>
-      _isFocused ? AppColors.inputFocusedBorder : AppColors.inputIconText;
+  Color _iconColor(bool isDark) => _isFocused
+      ? (isDark ? Colors.blueAccent : AppColors.inputFocusedBorder)
+      : (isDark ? AppColors.darkIconSecondary : AppColors.inputIconText);
 
-  Widget _buildStrengthIndicator() {
+  Widget _buildStrengthIndicator(bool isDark) {
     final score = _passwordStrengthScore;
-    final color = _passwordStrengthColor;
+    final color = _passwordStrengthColor(isDark);
 
-    // 🎯 ប្រើ AnimatedSize ដើម្បីបិទបាំងចន្លោះ (Space) ទាំងស្រុងនៅពេលគ្មានអក្សរ
     return AnimatedSize(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
       alignment: Alignment.topCenter,
       child: score == 0
-          ? const SizedBox.shrink() // 🎯 ប្រសិនបើគ្មានអក្សរ គឺមិនទាមទារ Space ទេ
+          ? const SizedBox.shrink()
           : Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Password strength: $_passwordStrengthLabel',
+                    'Password strength: @status'.trParams({
+                      'status': _passwordStrengthLabel,
+                    }), // 🟢 Added .trParams
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -223,7 +210,12 @@ class _CustomTextfieldState extends State<CustomTextfield>
                           margin: EdgeInsets.only(right: index == 3 ? 0 : 6),
                           height: 4,
                           decoration: BoxDecoration(
-                            color: filled ? color : AppColors.line,
+                            color: filled
+                                ? color
+                                : (isDark
+                                      ? AppColors.darkDivider
+                                      : AppColors
+                                            .line), // 🟢 Dynamic Empty Bar Color
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -238,6 +230,9 @@ class _CustomTextfieldState extends State<CustomTextfield>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     final field = AnimatedBuilder(
       animation: Listenable.merge([_focusController, _shakeController]),
       builder: (context, child) {
@@ -255,32 +250,34 @@ class _CustomTextfieldState extends State<CustomTextfield>
         onTap: widget.onTap,
         keyboardType: widget.keyboardType,
         textInputAction: widget.textInputAction,
-
-        // Pass the maxLines down here. If it's a password field, force to 1 line to avoid UI bugs.
         maxLines: widget.isPasswordField ? 1 : widget.maxLines,
-
         autovalidateMode:
             widget.autovalidateMode ?? AutovalidateMode.onUserInteraction,
         validator: (value) {
           final error = widget.validator?.call(value);
-          // Defer to avoid calling setState during build/validate.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _maybeShake(error);
           });
           return error;
         },
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
-          color: AppColors.inputText,
+          color: isDark
+              ? Colors.white
+              : AppColors.inputText, // 🟢 Dynamic Input Text
         ),
         decoration: InputDecoration(
           filled: true,
           fillColor: _isFocused
-              ? AppColors.inputFocusedBackground
-              : AppColors.inputBackground,
+              ? (isDark
+                    ? AppColors.darkSurfaceElevated
+                    : AppColors.inputFocusedBackground) // 🟢 Dynamic Focused BG
+              : (isDark
+                    ? AppColors.darkInputBackground
+                    : AppColors.inputBackground), // 🟢 Dynamic Unfocused BG
           contentPadding: const EdgeInsets.symmetric(vertical: 14.0),
-          labelText: widget.labelText,
+          labelText: widget.labelText?.tr, // 🟢 Added .tr Fallback
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide.none,
@@ -291,7 +288,7 @@ class _CustomTextfieldState extends State<CustomTextfield>
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: _borderColor, width: 1.5),
+            borderSide: BorderSide(color: _borderColor(isDark), width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -309,7 +306,7 @@ class _CustomTextfieldState extends State<CustomTextfield>
                     child: Icon(
                       widget.prefixIcon,
                       key: ValueKey(_isFocused),
-                      color: _iconColor,
+                      color: _iconColor(isDark),
                     ),
                   ),
                 )
@@ -328,7 +325,7 @@ class _CustomTextfieldState extends State<CustomTextfield>
                           ? Icons.visibility_off_rounded
                           : Icons.visibility_rounded,
                       key: ValueKey(_obscureText),
-                      color: _iconColor,
+                      color: _iconColor(isDark),
                     ),
                   ),
                   onPressed: () {
@@ -343,16 +340,20 @@ class _CustomTextfieldState extends State<CustomTextfield>
                     child: Icon(
                       widget.suffixIcon,
                       key: ValueKey(_isFocused),
-                      color: _iconColor,
+                      color: _iconColor(isDark),
                     ),
                   ),
                 )
               : null,
-          hintText: widget.hintText,
+          hintText: widget.hintText.tr, // 🟢 Added .tr
           hintStyle: TextStyle(
             color: _isFocused
-                ? AppColors.inputFocusedBorder
-                : AppColors.inputIconText,
+                ? (isDark
+                      ? Colors.blueAccent
+                      : AppColors.inputFocusedBorder) // 🟢 Dynamic Active Hint
+                : (isDark
+                      ? AppColors.darkTextHint
+                      : AppColors.inputIconText), // 🟢 Dynamic Inactive Hint
             fontSize: 16,
             fontWeight: FontWeight.w400,
           ),
@@ -366,7 +367,7 @@ class _CustomTextfieldState extends State<CustomTextfield>
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [field, _buildStrengthIndicator()],
+      children: [field, _buildStrengthIndicator(isDark)],
     );
   }
 }

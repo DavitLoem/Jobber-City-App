@@ -23,8 +23,10 @@ class JobDetailView extends GetView<JobDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Get Theme context
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: Stack(
         children: [
           SingleChildScrollView(

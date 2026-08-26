@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/location_services.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Included AppColors for dark mode
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/routes/app_routes.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
@@ -22,8 +23,11 @@ class LocationScreenView extends GetView<LocationScreenController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: LocationColors.scaffoldBg,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +36,8 @@ class LocationScreenView extends GetView<LocationScreenController> {
               () => LocationHeader(
                 title: controller.currentPage.value == 0
                     ? 'Your City'
-                    : 'Your District',
+                          .tr // 🟢 Added .tr
+                    : 'Your District'.tr, // 🟢 Added .tr
                 onBackPressed: controller.goBack,
                 showBackButton: controller.currentPage.value != 0,
               ),
@@ -59,8 +64,10 @@ class LocationScreenView extends GetView<LocationScreenController> {
                         height: 50,
                         decoration: BoxDecoration(
                           color: controller.isGettingCurrentLocation.value
-                              ? LocationColors.muted
-                              : LocationColors.accent,
+                              ? (isDark
+                                    ? AppColors.darkSurfaceElevated
+                                    : LocationColors.muted) // 🟢 Dynamic BG
+                              : AppColors.primary,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: controller.isGettingCurrentLocation.value
@@ -95,8 +102,8 @@ class LocationScreenView extends GetView<LocationScreenController> {
                 onPageChanged: (index) => controller.currentPage.value = index,
                 children: [
                   // 🔹 ទំព័រទី ១៖ បញ្ជីខេត្ត
-                  _buildProvincePage(),
-                  _buildDistrictPage(),
+                  _buildProvincePage(isDark),
+                  _buildDistrictPage(isDark),
                 ],
               ),
             ),
@@ -107,11 +114,13 @@ class LocationScreenView extends GetView<LocationScreenController> {
     );
   }
 
-  Widget _buildProvincePage() {
+  Widget _buildProvincePage(bool isDark) {
     return Obx(() {
       if (controller.isProvinceLoading.value) {
         return const Center(
-          child: CircularProgressIndicator(color: LocationColors.accent),
+          child: CircularProgressIndicator(
+            color: AppColors.primary,
+          ), // 🟢 Dynamic Loader Color
         );
       }
 
@@ -121,6 +130,7 @@ class LocationScreenView extends GetView<LocationScreenController> {
       if (error.isNotEmpty) {
         return _buildErrorState(
           error,
+          isDark,
           onRetry: () => controller.fetchProvinces(),
         );
       }
@@ -147,7 +157,7 @@ class LocationScreenView extends GetView<LocationScreenController> {
     });
   }
 
-  Widget _buildDistrictPage() {
+  Widget _buildDistrictPage(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -171,7 +181,9 @@ class LocationScreenView extends GetView<LocationScreenController> {
           child: Obx(() {
             if (controller.isDistrictLoading.value) {
               return const Center(
-                child: CircularProgressIndicator(color: LocationColors.accent),
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                ), // 🟢 Dynamic Loader Color
               );
             }
 
@@ -181,6 +193,7 @@ class LocationScreenView extends GetView<LocationScreenController> {
             if (error.isNotEmpty) {
               return _buildErrorState(
                 error,
+                isDark,
                 onRetry: () {
                   controller.fetchDistricts(
                     controller.selectedProvinceId.value,
@@ -214,7 +227,11 @@ class LocationScreenView extends GetView<LocationScreenController> {
     );
   }
 
-  Widget _buildErrorState(String error, {required VoidCallback onRetry}) {
+  Widget _buildErrorState(
+    String error,
+    bool isDark, {
+    required VoidCallback onRetry,
+  }) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -222,15 +239,19 @@ class LocationScreenView extends GetView<LocationScreenController> {
           Icon(
             Icons.error_outline_rounded,
             size: 48,
-            color: LocationColors.border,
+            color: isDark
+                ? AppColors.darkIconSecondary
+                : LocationColors.border, // 🟢 Dynamic Error Icon Color
           ),
           const SizedBox(height: 12),
           Text(
             error,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: LocationColors.sub,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : LocationColors.sub, // 🟢 Dynamic Error Text Color
             ),
             textAlign: TextAlign.center,
           ),
@@ -238,14 +259,14 @@ class LocationScreenView extends GetView<LocationScreenController> {
           ElevatedButton(
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
-              backgroundColor: LocationColors.accent,
+              backgroundColor: AppColors.primary, // 🟢 Dynamic Primary Button
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Retry'),
+            child: Text('Retry'.tr), // 🟢 Added .tr
           ),
         ],
       ),

@@ -14,7 +14,6 @@ class InterviewListViewController extends GetxController {
     fetchInterviews();
   }
 
-  // ignore: library_private_types_in_public_api
   void setFilter(_InterviewFilter value) => filter.value = value;
 
   List<InterviewModel> get visibleInterviews {
@@ -43,7 +42,8 @@ class InterviewListViewController extends GetxController {
       interviews.assignAll(result);
     } catch (e) {
       errorMessage.value =
-          'Could not load your interviews. Pull down to try again.';
+          'Could not load your interviews. Pull down to try again.'
+              .tr; // 🟢 Added .tr
       debugPrint('[InterviewList] fetch error: $e');
     } finally {
       isLoading.value = false;
@@ -52,6 +52,6 @@ class InterviewListViewController extends GetxController {
 
   Future<void> openInterview(InterviewModel interview) async {
     await Get.toNamed(AppRoutes.interviewDetail, arguments: interview);
-    fetchInterviews(); // resync in case it was joined/cancelled/rescheduled while open
+    fetchInterviews();
   }
 }

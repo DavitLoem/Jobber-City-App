@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jobber_city/controllers/location_controller.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added for Snackbar coloring
 import 'package:jobber_city/models/location_model.dart';
 
 import '../../../../../core/api/services/role/seeker/seeker_profile_services.dart';
@@ -100,12 +101,11 @@ class EditProfileScreenViewController extends GetxController {
           selectedProvinceId.value = data.addressProvinceId;
           await locationController.fetchProvinces();
 
-          // ស្វែងរកឈ្មោះខេត្តយកមកបង្ហាញលើប្រអប់ Text
           try {
             final matchedProvince = locationController.provinces.firstWhere(
               (p) => p.id.toString() == data.addressProvinceId,
             );
-            provinceCtrl.text = matchedProvince.nameEn; // បង្ហាញឈ្មោះខេត្ត
+            provinceCtrl.text = matchedProvince.nameEn;
           } catch (e) {
             debugPrint("Province not found in list: $e");
           }
@@ -113,34 +113,37 @@ class EditProfileScreenViewController extends GetxController {
           if (data.addressDistrictId.isNotEmpty) {
             selectedDistrictId.value = data.addressDistrictId;
 
-            // 🎯 ចាប់យក List ស្រុកដែល return មកពីមុខងារ getDistricts
             final fetchedDistricts = await locationController.getDistricts(
               data.addressProvinceId,
             );
 
-            // ស្វែងរកឈ្មោះស្រុកយកមកបង្ហាញលើប្រអប់ Text
             try {
               final matchedDistrict = fetchedDistricts.firstWhere(
                 (d) => d.id.toString() == data.addressDistrictId,
               );
-              districtCtrl.text = matchedDistrict.nameEn; // បង្ហាញឈ្មោះស្រុក
+              districtCtrl.text = matchedDistrict.nameEn;
             } catch (e) {
               debugPrint("District not found in list: $e");
             }
           }
         }
 
-        // ចាត់ចែង Expertise Category
         if (data.expertiseCategoryIds.isNotEmpty) {
           selectedCategoryIds.assignAll(data.expertiseCategoryIds);
         }
       }
     } catch (e) {
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        "Error",
-        "Cannot fetch Profile: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Error".tr, // 🟢 Added .tr
+        "Cannot fetch Profile: @error".trParams({
+          'error': e.toString(),
+        }), // 🟢 Added .trParams
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isLoading.value = false;
@@ -149,14 +152,22 @@ class EditProfileScreenViewController extends GetxController {
 
   // ── ៤. មុខងារបញ្ជូនទិន្នន័យទៅ Update ──
   Future<void> updateProfile() async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     if (!isFormValid.value) {
-      Get.snackbar("Notice", "Please fill in all required fields!");
+      Get.snackbar(
+        "Notice".tr, // 🟢 Added .tr
+        "Please fill in all required fields!".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+      );
       return;
     }
 
     isSaving.value = true;
     try {
-      // វេចខ្ចប់ទិន្នន័យដោយប្រើ Request Model ថ្មី
       final requestData = SeekerCoreUpdateRequest(
         firstName: firstNameCtrl.text.trim(),
         lastName: lastNameCtrl.text.trim(),
@@ -174,15 +185,15 @@ class EditProfileScreenViewController extends GetxController {
         village: villageCtrl.text.trim(),
         street: streetCtrl.text.trim(),
         houseNo: houseNoCtrl.text.trim(),
-        biography: '', // បើមាន UI អាចថែម Controller ទីនេះ
+        biography: '',
         expectedSalaryMin: 0,
         expectedSalaryMax: 0,
-        jobTypePreferences: [], // ដាក់ Default សិនបើអត់ទាន់មាន UI
+        jobTypePreferences: [],
         expertiseCategoryIds: selectedCategoryIds.toList(),
         skills: [],
         portfolioUrl: portfolioCtrl.text.trim(),
         linkedinUrl: linkedinCtrl.text.trim(),
-        onboardingCompleted: true, // កំណត់ True ដើម្បីបញ្ចប់វគ្គ Onboarding
+        onboardingCompleted: true,
       );
 
       final success = await _profileService.updateCoreProfile(requestData);
@@ -190,18 +201,24 @@ class EditProfileScreenViewController extends GetxController {
       if (success) {
         Get.back(result: currentPositionCtrl.text.trim());
         Get.snackbar(
-          'Success',
-          'Profile updated successfully!',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          'Success'.tr, // 🟢 Added .tr
+          'Profile updated successfully!'.tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green.shade50,
+          colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
         );
       }
     } catch (e) {
       Get.snackbar(
-        "Error",
-        "Update failed: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Error".tr, // 🟢 Added .tr
+        "Update failed: @error".trParams({
+          'error': e.toString(),
+        }), // 🟢 Added .trParams
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     } finally {
       isSaving.value = false;
@@ -215,7 +232,6 @@ class EditProfileScreenViewController extends GetxController {
     return locationController.provinces;
   }
 
-  // មុខងារទាញយកបញ្ជីស្រុក ផ្អែកលើខេត្តដែលបានជ្រើសរើស
   Future<List<LocationModel>> fetchDistrictOptions() async {
     if (selectedProvinceId.value.isEmpty) return [];
     return await locationController.getDistricts(selectedProvinceId.value);
@@ -223,47 +239,54 @@ class EditProfileScreenViewController extends GetxController {
 
   // ── មុខងារជ្រើសរើស និង Upload រូបភាព (Profile Image) ──
   Future<void> pickProfileImage() async {
-    // ១. ជ្រើសរើសរូបភាពពី Gallery
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
     if (pickedFile != null) {
       try {
         isSaving.value = true;
 
         Get.snackbar(
-          'Uploading...',
-          'Please wait while your profile picture is being updated.',
+          'Uploading...'.tr, // 🟢 Added .tr
+          'Please wait while your profile picture is being updated.'
+              .tr, // 🟢 Added .tr
           showProgressIndicator: true,
           snackPosition: SnackPosition.TOP,
+          backgroundColor: isDark
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : AppColors.primaryLight,
+          colorText: isDark ? Colors.blueAccent : AppColors.primary,
         );
 
         final response = await _profileService.profileImage(pickedFile.path);
 
-        // ទាញយក URL ថ្មីពី Response របស់ API ដើម្បី Update UI
         if (response['success'] == true && response['data'] != null) {
           final newImageUrl = response['data']['profile_image_url'] ?? '';
 
           if (newImageUrl.isNotEmpty) {
-            // Update អថេរ ដើម្បីឱ្យ Obx នៅលើ Header ប្តូររូបភាពភ្លាមៗ
             profileImageUrl.value = newImageUrl;
           }
         }
 
         Get.closeAllSnackbars();
         Get.snackbar(
-          'Success',
-          'Profile picture updated successfully!',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          'Success'.tr, // 🟢 Added .tr
+          'Profile picture updated successfully!'.tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green.shade50,
+          colorText: isDark ? Colors.greenAccent : Colors.green.shade700,
           snackPosition: SnackPosition.TOP,
         );
       } catch (e) {
         Get.closeAllSnackbars();
         Get.snackbar(
-          'Upload Failed',
+          'Upload Failed'.tr, // 🟢 Added .tr
           e.toString(),
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          backgroundColor: isDark
+              ? AppColors.error.withValues(alpha: 0.15)
+              : Colors.red.shade50,
+          colorText: isDark ? Colors.redAccent : Colors.red.shade700,
           snackPosition: SnackPosition.TOP,
         );
       } finally {
@@ -310,7 +333,6 @@ class EditProfileScreenViewController extends GetxController {
       lastDate: DateTime.now(),
     ).then((date) {
       if (date != null) {
-        // 🎯 កែទម្រង់ទៅជា YYYY-MM-DD សម្រាប់ API
         final formattedDate =
             "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
         dateOfBirthCtrl.text = formattedDate;

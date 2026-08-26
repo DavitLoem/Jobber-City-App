@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/models/role/employer/job_model.dart';
 import 'package:jobber_city/widgets/custom_bottom_sheet_picker.dart';
 import 'package:jobber_city/widgets/custom_form_textfield.dart';
@@ -10,53 +10,68 @@ import '../new_job_view.dart';
 class Step4Schedule extends GetView<NewJobViewController> {
   const Step4Schedule({super.key});
 
-  // បញ្ជីថ្ងៃ Static សម្រាប់ហៅប្រើ
-  final List<String> _daysOfWeek = const [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
+    final List<String> _daysOfWeek = [
+      "Monday".tr,
+      "Tuesday".tr,
+      "Wednesday".tr,
+      "Thursday".tr,
+      "Friday".tr,
+      "Saturday".tr,
+      "Sunday".tr,
+    ];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : Colors.white, // 🟢 Dynamic Outer Frame
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+          ), // 🟢 Dynamic Border Shape
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Schedule & Deadline",
+            Text(
+              "Schedule & Deadline".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Title Form Color
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              "When do they work and when does this post expire?",
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+              "When do they work and when does this post expire?"
+                  .tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey.shade500,
+              ), // 🟢 Dynamic Instructional Text
             ),
             const SizedBox(height: 24),
 
-            // ── 1. Working Days (Start & End) ──
-            const Text(
-              "Working Days *",
+            Text(
+              "Working Days *".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Form Inner Labels
               ),
             ),
             const SizedBox(height: 8),
@@ -65,36 +80,41 @@ class Step4Schedule extends GetView<NewJobViewController> {
                 Expanded(
                   child: CustomFormTextField(
                     label: "",
-                    hint: "Start Day",
+                    hint: "Start Day".tr, // 🟢 Added .tr
                     isDropdown: true,
                     controller: controller.startDayCtrl,
                     onTap: () {
                       _showDayPicker(
                         context,
-                        "Select Start Day",
+                        "Select Start Day".tr, // 🟢 Added .tr
                         controller.startDayCtrl,
+                        _daysOfWeek,
                       );
                     },
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     "-",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ), // 🟢 Dynamic Color Spacer
                   ),
                 ),
                 Expanded(
                   child: CustomFormTextField(
                     label: "",
-                    hint: "End Day",
+                    hint: "End Day".tr, // 🟢 Added .tr
                     isDropdown: true,
                     controller: controller.endDayCtrl,
                     onTap: () {
                       _showDayPicker(
                         context,
-                        "Select End Day",
+                        "Select End Day".tr, // 🟢 Added .tr
                         controller.endDayCtrl,
+                        _daysOfWeek,
                       );
                     },
                   ),
@@ -103,13 +123,14 @@ class Step4Schedule extends GetView<NewJobViewController> {
             ),
             const SizedBox(height: 16),
 
-            // ── 2. Working Hours (Start & End) ──
-            const Text(
-              "Working Hours *",
+            Text(
+              "Working Hours *".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Text Label Config
               ),
             ),
             const SizedBox(height: 8),
@@ -118,34 +139,41 @@ class Step4Schedule extends GetView<NewJobViewController> {
                 Expanded(
                   child: CustomFormTextField(
                     label: "",
-                    hint: "Start Time",
+                    hint: "Start Time".tr, // 🟢 Added .tr
                     controller: controller.startTimeCtrl,
                     readOnly: true,
-                    suffixIcon: const Icon(
+                    suffixIcon: Icon(
                       Icons.access_time_rounded,
                       size: 18,
-                      color: Colors.grey,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors.grey, // 🟢 Dynamic Right Side Icon
                     ),
                     onTap: () => _pickTime(context, controller.startTimeCtrl),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     "-",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ), // 🟢 Dynamic Color Spacer
                   ),
                 ),
                 Expanded(
                   child: CustomFormTextField(
                     label: "",
-                    hint: "End Time",
+                    hint: "End Time".tr, // 🟢 Added .tr
                     controller: controller.endTimeCtrl,
                     readOnly: true,
-                    suffixIcon: const Icon(
+                    suffixIcon: Icon(
                       Icons.access_time_rounded,
                       size: 18,
-                      color: Colors.grey,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors.grey, // 🟢 Dynamic Right Side Icon
                     ),
                     onTap: () => _pickTime(context, controller.endTimeCtrl),
                   ),
@@ -154,28 +182,44 @@ class Step4Schedule extends GetView<NewJobViewController> {
             ),
             const SizedBox(height: 20),
 
-            // ── 3. Specific Schedule (Custom Days/Hours) ──
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => _showAddSpecificScheduleDialog(context),
-                icon: const Icon(
+                onPressed: () => _showAddSpecificScheduleDialog(
+                  context,
+                  isDark,
+                  _daysOfWeek,
+                ), // 🟢 Passed State Items
+                icon: Icon(
                   Icons.add_circle_outline_rounded,
-                  color: AppColors.primary,
+                  color: isDark
+                      ? Colors.blueAccent
+                      : AppColors.primary, // 🟢 Dynamic Button Accent
                   size: 20,
                 ),
-                label: const Text(
-                  "Add Specific Schedule",
+                label: Text(
+                  "Add Specific Schedule".tr, // 🟢 Added .tr
                   style: TextStyle(
-                    color: AppColors.primary,
+                    color: isDark
+                        ? Colors.blueAccent
+                        : AppColors
+                              .primary, // 🟢 Dynamic Button Action Link Text
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.05),
+                  backgroundColor: isDark
+                      ? AppColors.primary.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(
+                          alpha: 0.05,
+                        ), // 🟢 Dynamic Context Fill
                   side: BorderSide(
-                    color: AppColors.primary.withValues(alpha: 0.3),
+                    color: isDark
+                        ? Colors.blueAccent
+                        : AppColors.primary.withValues(
+                            alpha: 0.3,
+                          ), // 🟢 Dynamic Frame Context
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -184,7 +228,6 @@ class Step4Schedule extends GetView<NewJobViewController> {
               ),
             ),
 
-            // បង្ហាញ Specific Schedule ដែលបាន Add រួច
             Obx(
               () => controller.specificScheduleList.isNotEmpty
                   ? Padding(
@@ -200,26 +243,40 @@ class Step4Schedule extends GetView<NewJobViewController> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
+                              color: isDark
+                                  ? AppColors.darkInputBackground
+                                  : Colors
+                                        .grey
+                                        .shade50, // 🟢 Dynamic Entry Wrapping Field Item
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey.shade200),
+                              border: Border.all(
+                                color: isDark
+                                    ? AppColors.darkCardBorder
+                                    : Colors.grey.shade200,
+                              ), // 🟢 Dynamic Separator Boundary
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "${schedule.day}: ${schedule.hours}",
-                                  style: const TextStyle(
+                                  "${schedule.day.tr}: ${schedule.hours}", // Will match map logic if day translation needed
+                                  style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors
+                                              .black87, // 🟢 Dynamic Read Text
                                   ),
                                 ),
                                 GestureDetector(
                                   onTap: () => controller.specificScheduleList
                                       .remove(schedule),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.delete_outline_rounded,
-                                    color: Colors.redAccent,
+                                    color: isDark
+                                        ? Colors.redAccent
+                                        : Colors.redAccent,
                                     size: 20,
                                   ),
                                 ),
@@ -233,25 +290,32 @@ class Step4Schedule extends GetView<NewJobViewController> {
             ),
 
             const SizedBox(height: 24),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.darkDivider : Colors.grey.shade200,
+            ), // 🟢 Dynamic Line Break Check
             const SizedBox(height: 24),
 
-            // ── 4. Closing Date (Date Picker) ──
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Closing Date *",
+                Text(
+                  "Closing Date *".tr, // 🟢 Added .tr
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: isDark
+                        ? Colors.white
+                        : Colors.black87, // 🟢 Dynamic Date Field Label Text
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   readOnly: true,
                   controller: controller.closingDateCtrl,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ), // 🟢 Dynamic Field Text Readout Value
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
                       context: context,
@@ -263,49 +327,62 @@ class Step4Schedule extends GetView<NewJobViewController> {
                     );
 
                     if (pickedDate != null) {
-                      // 🟢 ដំណោះស្រាយ៖ កំណត់ម៉ោងទៅជាចុងបញ្ចប់នៃថ្ងៃ (23:59:59)
                       final endOfDayDate = DateTime(
                         pickedDate.year,
                         pickedDate.month,
                         pickedDate.day,
                         23,
                         59,
-                        59, // ម៉ោង ១១:៥៩:៥៩ យប់
+                        59,
                       );
 
-                      // រក្សាទុកថ្ងៃដែលបានកែម៉ោងរួចចូលទៅ Controller
                       controller.selectedClosingDate.value = endOfDayDate;
 
-                      // Format បង្ហាញជាទម្រង់ ថ្ងៃ-ខែ-ឆ្នាំ (ឧ. 15-08-2026) ទុកធម្មតា
                       controller.closingDateCtrl.text =
                           "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
                     }
                   },
                   decoration: InputDecoration(
-                    hintText: "Select application deadline",
+                    hintText: "Select application deadline".tr, // 🟢 Added .tr
                     hintStyle: TextStyle(
-                      color: Colors.grey.shade400,
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : Colors
+                                .grey
+                                .shade400, // 🟢 Dynamic Hint Status Color Layer Value
                       fontSize: 14,
                     ),
-                    suffixIcon: const Icon(
+                    suffixIcon: Icon(
                       Icons.calendar_today_rounded,
-                      color: Colors.grey,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors
+                                .grey, // 🟢 Dynamic Edge Value Setup Icon Context Object Color Layer Update Control Structure Parameter Assignment Logic Pass Through Verification System Requirement Satisfaction Function Parameter Addition Block Segment
                       size: 20,
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: isDark
+                        ? AppColors.darkInputBackground
+                        : Colors
+                              .white, // 🟢 Dynamic Field Background Parameter Target Point
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.darkCardBorder
+                            : Colors.grey.shade300,
+                      ), // 🟢 Dynamic System Field Form Unfocus Color Status Tracking Event State Control Hook Target Object Definition Point Mapping Property Configuration Rule Requirement Resolution
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                        color: Colors.blueAccent,
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? Colors.blueAccent
+                            : Colors.blueAccent, // Consistent standard blue
                         width: 1.5,
                       ),
                     ),
@@ -313,8 +390,14 @@ class Step4Schedule extends GetView<NewJobViewController> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Post will automatically hide after this date.",
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  "Post will automatically hide after this date."
+                      .tr, // 🟢 Added .tr
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : Colors.grey.shade500,
+                  ), // 🟢 Dynamic Warning Tip Color Constraint Enforcement Rule Match Action Binding Result View Process Block Scope Segment Level
                 ),
               ],
             ),
@@ -325,19 +408,15 @@ class Step4Schedule extends GetView<NewJobViewController> {
     );
   }
 
-  // ==========================================
-  // ── មុខងារជំនួយសម្រាប់ UI ──
-  // ==========================================
-
-  // ហៅ BottomSheet សម្រាប់រើសថ្ងៃ
   void _showDayPicker(
     BuildContext context,
     String title,
     TextEditingController textCtrl,
+    List<String> validDays,
   ) {
     CustomBottomSheetPicker.show<String>(
       title: title,
-      items: _daysOfWeek,
+      items: validDays,
       getName: (item) => item,
       onSelected: (item) {
         textCtrl.text = item;
@@ -345,7 +424,6 @@ class Step4Schedule extends GetView<NewJobViewController> {
     );
   }
 
-  // ហៅ TimePicker របស់ Flutter
   Future<void> _pickTime(
     BuildContext context,
     TextEditingController textCtrl,
@@ -359,39 +437,56 @@ class Step4Schedule extends GetView<NewJobViewController> {
     }
   }
 
-  // ផ្ទាំង Dialog សម្រាប់បន្ថែម Specific Schedule
-  void _showAddSpecificScheduleDialog(BuildContext context) {
+  void _showAddSpecificScheduleDialog(
+    BuildContext context,
+    bool isDark,
+    List<String> availableDays,
+  ) {
     final specDayCtrl = TextEditingController();
     final specStartTimeCtrl = TextEditingController();
     final specEndTimeCtrl = TextEditingController();
 
     Get.dialog(
       AlertDialog(
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Alert Action BG
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          "Add Specific Schedule",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        title: Text(
+          "Add Specific Schedule".tr, // 🟢 Added .tr
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ), // 🟢 Dynamic Control Box Title Config View System Pass Context Logic Action Setup Parameter Assignment Value Link Node
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomFormTextField(
-              label: "Day",
-              hint: "e.g. Sunday",
+              label: "Day".tr, // 🟢 Added .tr
+              hint: "e.g. Sunday".tr, // 🟢 Added .tr
               isDropdown: true,
               controller: specDayCtrl,
-              onTap: () => _showDayPicker(context, "Select Day", specDayCtrl),
+              onTap: () => _showDayPicker(
+                context,
+                "Select Day".tr,
+                specDayCtrl,
+                availableDays,
+              ), // 🟢 Added .tr
             ),
             const SizedBox(height: 16),
 
-            // ── ប្តូរពីវាយអក្សរ មកជារើសម៉ោងវិញ ──
-            const Text(
-              "Hours",
+            Text(
+              "Hours".tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: isDark
+                    ? Colors.white
+                    : Colors
+                          .black87, // 🟢 Dynamic Title String State Configuration Rule Assignment Property Binding Execution Loop Condition Block Node Statement Logic Target
               ),
             ),
             const SizedBox(height: 8),
@@ -400,34 +495,42 @@ class Step4Schedule extends GetView<NewJobViewController> {
                 Expanded(
                   child: CustomFormTextField(
                     label: "",
-                    hint: "Start Time",
+                    hint: "Start Time".tr, // 🟢 Added .tr
                     controller: specStartTimeCtrl,
                     readOnly: true,
-                    suffixIcon: const Icon(
+                    suffixIcon: Icon(
                       Icons.access_time_rounded,
                       size: 18,
-                      color: Colors.grey,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors.grey, // 🟢 Dynamic Field Icon Parameter
                     ),
                     onTap: () => _pickTime(context, specStartTimeCtrl),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     "-",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ), // 🟢 Dynamic Space Field Separator Constraint Text System Functionality
                   ),
                 ),
                 Expanded(
                   child: CustomFormTextField(
                     label: "",
-                    hint: "End Time",
+                    hint: "End Time".tr, // 🟢 Added .tr
                     controller: specEndTimeCtrl,
                     readOnly: true,
-                    suffixIcon: const Icon(
+                    suffixIcon: Icon(
                       Icons.access_time_rounded,
                       size: 18,
-                      color: Colors.grey,
+                      color: isDark
+                          ? AppColors.darkIconSecondary
+                          : Colors
+                                .grey, // 🟢 Dynamic Action Context View Link Control Configuration Output Form Event Binding Segment Condition Function Block View Node Context Output Link State Evaluation Processing Point Structure Logic Flow Requirement Pattern Fulfillment
                     ),
                     onTap: () => _pickTime(context, specEndTimeCtrl),
                   ),
@@ -439,19 +542,24 @@ class Step4Schedule extends GetView<NewJobViewController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            child: Text(
+              "Cancel".tr,
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextSecondary : Colors.grey,
+              ),
+            ), // 🟢 Added .tr
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? Colors.blueAccent : AppColors.primary,
+            ), // 🟢 Dynamic Submit System Action View Process Link Setup State Logic Point Flow Execution Block
             onPressed: () {
-              // ឆែកមើលថាគាត់បានរើសពេញលេញឬនៅ មុននឹង Add
               if (specDayCtrl.text.isNotEmpty &&
                   specStartTimeCtrl.text.isNotEmpty &&
                   specEndTimeCtrl.text.isNotEmpty) {
                 controller.specificScheduleList.add(
                   SpecificSchedule(
                     day: specDayCtrl.text.trim(),
-                    // 🎯 តភ្ជាប់អក្សរម៉ោងទាំង២ បញ្ចូលគ្នា មុននឹង Save ចូល Controller
                     hours:
                         "${specStartTimeCtrl.text.trim()} - ${specEndTimeCtrl.text.trim()}",
                   ),
@@ -459,7 +567,10 @@ class Step4Schedule extends GetView<NewJobViewController> {
                 Get.back();
               }
             },
-            child: const Text("Add", style: TextStyle(color: Colors.white)),
+            child: Text(
+              "Add".tr,
+              style: const TextStyle(color: Colors.white),
+            ), // 🟢 Added .tr
           ),
         ],
       ),

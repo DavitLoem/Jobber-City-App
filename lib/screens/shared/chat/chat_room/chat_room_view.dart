@@ -24,18 +24,19 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightSurfaceVariant,
-      appBar: _buildAppBar(context),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
+      appBar: _buildAppBar(context, theme, isDark),
       body: Obx(() {
-        // ១. បង្ហាញ Loading ពេលកំពុងបង្កើតបន្ទប់ឆាត
         if (controller.isSettingUp.value) {
           return const Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           );
         }
 
-        // ២. បង្ហាញ Error ពេលចូលអត់បាន
         if (controller.setupError.value.isNotEmpty) {
           return Center(
             child: Padding(
@@ -52,6 +53,9 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
                   Text(
                     controller.setupError.value,
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: theme.textTheme.bodyLarge?.color,
+                    ), // 🟢 Dynamic Text
                   ),
                 ],
               ),
@@ -59,12 +63,10 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
           );
         }
 
-        // ៣. បង្ហាញ Chat Room ពេញលេញ
         return Column(
           children: [
-            Expanded(child: _buildMessageList()),
+            Expanded(child: _buildMessageList(theme, isDark)),
 
-            // 🎯 សញ្ញា Typing Indicator
             Obx(() {
               if (!controller.isOtherPartyTyping.value) {
                 return const SizedBox.shrink();
@@ -78,7 +80,6 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
               );
             }),
 
-            // 🎯 Widget វាយអក្សរដ៏ស្រស់ស្អាត
             ChatInputBar(
               controller: controller.textController,
               onChanged: controller.onTextChanged,
@@ -90,7 +91,7 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
     );
   }
 
-  Widget _buildMessageList() {
+  Widget _buildMessageList(ThemeData theme, bool isDark) {
     return Obx(() {
       if (controller.isLoadingHistory.value && controller.messages.isEmpty) {
         return const Center(
@@ -108,8 +109,10 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
                 Container(
                   width: 72,
                   height: 72,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryLight,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.primary.withValues(alpha: 0.15)
+                        : AppColors.primaryLight, // 🟢 Dynamic BG
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -120,10 +123,13 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Say hello to ${controller.args.otherPartyName.split(' ').first} 👋',
-                  style: const TextStyle(
+                  'Say hello to @name 👋'.trParams({
+                    // 🟢 Added .trParams
+                    'name': controller.args.otherPartyName.split(' ').first,
+                  }),
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                   ),
                 ),
               ],
@@ -134,7 +140,7 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
 
       return ListView.builder(
         controller: controller.scrollController,
-        reverse: true, // index 0 គឺនៅខាងក្រោមគេបង្អស់ (សារថ្មីបំផុត)
+        reverse: true,
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         itemCount:
             controller.messages.length +
@@ -155,25 +161,20 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
           final message = controller.messages[index];
           final isMine = message.senderId == controller.currentUserId;
 
-          // previous = សារចាស់ជាង (នៅខាងលើ) | next = សារថ្មីជាង (នៅខាងក្រោម)
           final previous = index < controller.messages.length - 1
               ? controller.messages[index + 1]
               : null;
           final next = index > 0 ? controller.messages[index - 1] : null;
 
-          // 🎯 Logic ចាត់ក្រុមដូច Telegram
-          // វាជាសារដំបូងនៃក្រុម (First in group) លុះត្រាតែគ្មានសារចាស់ជាងនេះ ឬសារចាស់ជារបស់អ្នកផ្សេង ឬឆ្លងថ្ងៃ
           final isFirstInGroup =
               previous == null ||
               previous.senderId != message.senderId ||
               !_isSameDay(previous.createdAt, message.createdAt);
-          // វាជាសារចុងក្រោយនៃក្រុម (Last in group) លុះត្រាតែគ្មានសារថ្មីជាងនេះ ឬសារថ្មីជារបស់អ្នកផ្សេង ឬឆ្លងថ្ងៃ
           final isLastInGroup =
               next == null ||
               next.senderId != message.senderId ||
               !_isSameDay(next.createdAt, message.createdAt);
 
-          // បង្ហាញថ្ងៃខែ នៅពីលើសារដំបូងនៃថ្ងៃនីមួយៗ
           final showDateHeader =
               previous == null ||
               !_isSameDay(previous.createdAt, message.createdAt);
@@ -181,12 +182,16 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (showDateHeader) _DateHeader(date: message.createdAt),
+              if (showDateHeader)
+                _DateHeader(
+                  date: message.createdAt,
+                  isDark: isDark,
+                ), // 🟢 Passed Theme State
               MessageBubble(
                 message: message,
                 isMine: isMine,
-                isFirstInGroup: isFirstInGroup, // 🎯 បោះទិន្នន័យនេះទៅ Bubble
-                isLastInGroup: isLastInGroup, // 🎯 បោះទិន្នន័យនេះទៅ Bubble
+                isFirstInGroup: isFirstInGroup,
+                isLastInGroup: isLastInGroup,
               ),
             ],
           );
@@ -195,13 +200,20 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
     });
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+  ) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       elevation: 0,
       titleSpacing: 0,
       leading: IconButton(
-        icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
+        icon: Icon(
+          LucideIcons.arrowLeft,
+          color: theme.textTheme.bodyLarge?.color,
+        ), // 🟢 Dynamic Icon
         onPressed: () => Get.back(),
       ),
       title: Row(
@@ -209,9 +221,11 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
           Container(
             width: 40,
             height: 40,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryLight,
+              color: isDark
+                  ? AppColors.darkSurfaceElevated
+                  : AppColors.primaryLight, // 🟢 Dynamic BG
             ),
             clipBehavior: Clip.hardEdge,
             child:
@@ -234,18 +248,20 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
                   controller.args.otherPartyName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15.5,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
                   ),
                 ),
-                // 🎯 ប្រើ Role ដើម្បីបង្ហាញជំនួសការប្រើ Live ព្រោះ Controller ថ្មីប្រើ WsService
                 Text(
-                  controller.args.otherPartyRole.capitalizeFirst ?? 'User',
-                  style: const TextStyle(
+                  (controller.args.otherPartyRole.capitalizeFirst ?? 'User')
+                      .tr, // 🟢 Added .tr
+                  style: TextStyle(
                     fontSize: 11.5,
-                    color: AppColors.textTertiary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textTertiary, // 🟢 Dynamic Subtext
                   ),
                 ),
               ],
@@ -254,7 +270,6 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
         ],
       ),
       actions: [
-        // ឆែកមើលបើ otherPartyRole គឺ seeker មានន័យថាយើងកំពុងប្រើ App ក្នុងនាម Employer
         if (controller.args.otherPartyRole == 'seeker')
           IconButton(
             icon: const Icon(
@@ -263,13 +278,10 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
               size: 28,
             ),
             onPressed: () {
-              // ហៅទៅអេក្រង់ Schedule Interview ជាមួយទិន្នន័យស្រាប់ៗ[cite: 15]
               Get.toNamed(
                 AppRoutes.scheduleInterview,
                 arguments: ScheduleInterviewArgs(
-                  seekerUserId:
-                      controller.currentUserId ??
-                      '', // ជំនួសដោយ Seeker ID ពិតប្រាកដពី Chat args
+                  seekerUserId: controller.currentUserId ?? '',
                   seekerName: controller.args.otherPartyName,
                   seekerAvatarUrl: controller.args.otherPartyAvatarUrl,
                 ),
@@ -295,13 +307,10 @@ class ChatRoomView extends GetView<ChatRoomViewController> {
   }
 }
 
-// ===============================================
-// WIDGETS ជំនួយសម្រាប់ Date Header
-// ===============================================
-
 class _DateHeader extends StatelessWidget {
   final DateTime date;
-  const _DateHeader({required this.date});
+  final bool isDark; // 🟢 Added isDark
+  const _DateHeader({required this.date, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +320,11 @@ class _DateHeader extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.15),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.15)
+                : Colors.black.withValues(
+                    alpha: 0.15,
+                  ), // 🟢 Overlay adjustments for dark mode
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -333,10 +346,10 @@ bool _isSameDay(DateTime a, DateTime b) =>
 
 String _formatDateHeader(DateTime date) {
   final now = DateTime.now();
-  if (_isSameDay(date, now)) return 'Today';
+  if (_isSameDay(date, now)) return 'Today'.tr; // 🟢 Added .tr
 
   final yesterday = now.subtract(const Duration(days: 1));
-  if (_isSameDay(date, yesterday)) return 'Yesterday';
+  if (_isSameDay(date, yesterday)) return 'Yesterday'.tr; // 🟢 Added .tr
 
   const months = [
     'Jan',
@@ -352,5 +365,5 @@ String _formatDateHeader(DateTime date) {
     'Nov',
     'Dec',
   ];
-  return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  return '${months[date.month - 1].tr} ${date.day}, ${date.year}'; // 🟢 Added .tr to Month String
 }

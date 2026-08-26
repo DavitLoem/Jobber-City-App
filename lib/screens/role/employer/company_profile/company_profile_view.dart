@@ -33,7 +33,6 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
     return Get.isPlatformDarkMode;
   }
 
-  // មុខងារបង្ហាញ BottomSheet សម្រាប់ជ្រើសរើសទិន្នន័យ (រក្សាទុកដូចដើម)
   void _showPicker<T>({
     required BuildContext context,
     required String title,
@@ -43,29 +42,45 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
   }) {
     TextEditingController searchCtrl = TextEditingController();
     RxList<T> filteredItems = items.toList().obs;
+    final isDark = _isDark; // 🟢 Theme Check
 
     Get.bottomSheet(
       Container(
         height: Get.height * 0.65,
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkBackground
+              : Colors.white, // 🟢 Dynamic BG
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
           children: [
             Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              title.tr, // 🟢 Added .tr
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
             ),
             const SizedBox(height: 15),
             TextField(
               controller: searchCtrl,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
-                hintText: "Search...",
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintText: "Search...".tr, // 🟢 Added .tr
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.darkTextHint : Colors.grey,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                ),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: isDark
+                    ? AppColors.darkInputBackground
+                    : Colors.grey.shade100, // 🟢 Dynamic Search Box BG
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -89,7 +104,14 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   itemBuilder: (context, index) {
                     final item = filteredItems[index];
                     return ListTile(
-                      title: Text(getName(item)),
+                      title: Text(
+                        getName(
+                          item,
+                        ).tr, // Optional tr depending on the item data
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
                       onTap: () {
                         onSelected(item);
                         Get.back();
@@ -108,28 +130,36 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic Scaffold BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          "Company Profile",
+        title: Text(
+          "Company Profile".tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: Colors.grey.shade200, height: 1),
+          child: Container(
+            color: isDark ? AppColors.darkDivider : Colors.grey.shade200,
+            height: 1,
+          ), // 🟢 Dynamic Divider
         ),
       ),
       body: Obx(() {
         if (controller.isFetching.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
 
         return SingleChildScrollView(
@@ -137,33 +167,33 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeaderSection(),
+              _buildHeaderSection(isDark), // 🟢 Passed Theme State
               const SizedBox(height: 30),
 
               // ── ផ្នែកទី១: Basic Information ──
               ProfileSectionCard(
-                title: "Company Identity",
-                subtitle: "Tell us about your business",
+                title: "Company Identity".tr, // 🟢 Added .tr
+                subtitle: "Tell us about your business".tr, // 🟢 Added .tr
                 children: [
                   CustomFormTextField(
-                    label: "Company Name *",
-                    hint: "e.g. Jobber City Co., Ltd.",
+                    label: "Company Name *".tr, // 🟢 Added .tr
+                    hint: "e.g. Jobber City Co., Ltd.".tr, // 🟢 Added .tr
                     controller: controller.companyNameController,
                   ),
                   const SizedBox(height: 16),
                   CustomFormTextField(
-                    label: "Industry *",
-                    hint: "Select your industry",
+                    label: "Industry *".tr, // 🟢 Added .tr
+                    hint: "Select your industry".tr, // 🟢 Added .tr
                     isDropdown: true,
                     controller: controller.industryCtrl,
                     onTap: () {
                       if (controller.industriesList.isEmpty) {
-                        Get.snackbar("Notice", "Industries are loading.");
+                        Get.snackbar("Notice".tr, "Industries are loading.".tr);
                         return;
                       }
                       _showPicker<MasterDataModel>(
                         context: context,
-                        title: "Select Industry",
+                        title: "Select Industry".tr, // 🟢 Added .tr
                         items: controller.industriesList
                             .cast<MasterDataModel>(),
                         getName: (item) => item.name,
@@ -176,13 +206,13 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                   const SizedBox(height: 16),
                   CustomFormTextField(
-                    label: "Company Size *",
-                    hint: "Select company size",
+                    label: "Company Size *".tr, // 🟢 Added .tr
+                    hint: "Select company size".tr, // 🟢 Added .tr
                     isDropdown: true,
                     controller: controller.companySizeCtrl,
                     onTap: () => _showPicker<String>(
                       context: context,
-                      title: "Select Company Size",
+                      title: "Select Company Size".tr, // 🟢 Added .tr
                       items: controller.companySizes,
                       getName: (item) => item,
                       onSelected: (item) {
@@ -193,8 +223,9 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                   const SizedBox(height: 16),
                   CustomFormTextField(
-                    label: "Description *",
-                    hint: "Briefly describe your company (min 10 chars)...",
+                    label: "Description *".tr, // 🟢 Added .tr
+                    hint: "Briefly describe your company (min 10 chars)..."
+                        .tr, // 🟢 Added .tr
                     maxLines: 4,
                     controller: controller.descriptionCtrl,
                   ),
@@ -204,25 +235,25 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
 
               // ── ផ្នែកទី២: Contact & Location ──
               ProfileSectionCard(
-                title: "Contact & Location",
-                subtitle: "Where can candidates find you?",
+                title: "Contact & Location".tr, // 🟢 Added .tr
+                subtitle: "Where can candidates find you?".tr, // 🟢 Added .tr
                 children: [
                   CustomFormTextField(
-                    label: "Contact Email *",
+                    label: "Contact Email *".tr, // 🟢 Added .tr
                     hint: "hr@company.com",
                     keyboardType: TextInputType.emailAddress,
                     controller: controller.contactEmailController,
                   ),
                   const SizedBox(height: 16),
                   CustomFormTextField(
-                    label: "Phone Number *",
+                    label: "Phone Number *".tr, // 🟢 Added .tr
                     hint: "+855 12 345 678",
                     keyboardType: TextInputType.phone,
                     controller: controller.contactPhoneController,
                   ),
                   const SizedBox(height: 16),
                   CustomFormTextField(
-                    label: "Website (Optional)",
+                    label: "Website (Optional)".tr, // 🟢 Added .tr
                     hint: "https://www.company.com",
                     controller: controller.websiteUrlController,
                   ),
@@ -231,13 +262,13 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                     children: [
                       Expanded(
                         child: CustomFormTextField(
-                          label: "Province *",
-                          hint: "Select Province",
+                          label: "Province *".tr, // 🟢 Added .tr
+                          hint: "Select Province".tr, // 🟢 Added .tr
                           isDropdown: true,
                           controller: controller.provinceCtrl,
                           onTap: () => _showPicker<LocationModel>(
                             context: context,
-                            title: "Select Province",
+                            title: "Select Province".tr, // 🟢 Added .tr
                             items: controller.locationCtrl.provinces,
                             getName: (item) => item.nameEn,
                             onSelected: (item) {
@@ -256,21 +287,22 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: CustomFormTextField(
-                          label: "District *",
-                          hint: "Select District",
+                          label: "District *".tr, // 🟢 Added .tr
+                          hint: "Select District".tr, // 🟢 Added .tr
                           isDropdown: true,
                           controller: controller.districtCtrl,
                           onTap: () {
                             if (controller.selectedProvinceId.value.isEmpty) {
                               Get.snackbar(
-                                "Notice",
-                                "Please select a Province first",
+                                "Notice".tr, // 🟢 Added .tr
+                                "Please select a Province first"
+                                    .tr, // 🟢 Added .tr
                               );
                               return;
                             }
                             _showPicker<LocationModel>(
                               context: context,
-                              title: "Select District",
+                              title: "Select District".tr, // 🟢 Added .tr
                               items: controller.districtsList
                                   .cast<LocationModel>(),
                               getName: (item) => item.nameEn,
@@ -287,8 +319,8 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                   const SizedBox(height: 16),
                   CustomFormTextField(
-                    label: "Address Detail *",
-                    hint: "Street 123, Sangkat...",
+                    label: "Address Detail *".tr, // 🟢 Added .tr
+                    hint: "Street 123, Sangkat...".tr, // 🟢 Added .tr
                     maxLines: 2,
                     controller: controller.addressDetailController,
                   ),
@@ -298,31 +330,48 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
 
               // ── ផ្នែកទី៣: Settings ──
               ProfileSectionCard(
-                title: "Settings".tr,
-                subtitle: "Customize your experience",
+                title: "Settings".tr, // 🟢 Added .tr
+                subtitle: "Customize your experience".tr, // 🟢 Added .tr
                 children: [
                   ListTile(
                     leading: const Icon(
                       Icons.remove_red_eye_outlined,
                       color: AppColors.primary,
                     ),
-                    title: Text("Appearance".tr),
-                    trailing: const Icon(Icons.chevron_right),
+                    title: Text(
+                      "Appearance".tr,
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                    ),
                     onTap: () => _showAppearanceBottomSheet(),
                   ),
-                  const Divider(height: 1),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? AppColors.darkDivider
+                        : Colors.grey.shade200,
+                  ),
                   ListTile(
                     leading: const Icon(
                       Icons.g_translate_rounded,
                       color: AppColors.primary,
                     ),
-                    title: Text("Language".tr),
-                    trailing: const Icon(Icons.chevron_right),
+                    title: Text(
+                      "Language".tr,
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                    ),
                     onTap: () => _showLanguageBottomSheet(),
                   ),
                 ],
               ),
-              const SizedBox(height: 100), // Space សម្រាប់ប៊ូតុងខាងក្រោម
+              const SizedBox(height: 100),
             ],
           ),
         );
@@ -331,8 +380,14 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
       bottomSheet: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+          color: isDark
+              ? AppColors.darkBackground
+              : Colors.white, // 🟢 Dynamic Bottom Sheet BG
+          border: Border(
+            top: BorderSide(
+              color: isDark ? AppColors.darkDivider : Colors.grey.shade200,
+            ),
+          ),
         ),
         child: SafeArea(
           child: SizedBox(
@@ -342,6 +397,9 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
               () => ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
+                  disabledBackgroundColor: isDark
+                      ? AppColors.darkSurfaceElevated
+                      : Colors.grey.shade300,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -359,9 +417,9 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        "Save Profile",
-                        style: TextStyle(
+                    : Text(
+                        "Save Profile".tr, // 🟢 Added .tr
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -376,7 +434,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
   }
 
   // ── ផ្នែករចនាការ Upload Logo ──
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(bool isDark) {
     return Center(
       child: Column(
         children: [
@@ -389,15 +447,21 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   width: 95,
                   height: 95,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark
+                        ? AppColors.darkInputBackground
+                        : Colors.white, // 🟢 Dynamic BG
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: AppColors.primary.withValues(
+                        alpha: isDark ? 0.4 : 0.2,
+                      ),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.08),
+                        color: AppColors.primary.withValues(
+                          alpha: isDark ? 0.2 : 0.08,
+                        ),
                         blurRadius: 15,
                         offset: const Offset(0, 5),
                       ),
@@ -424,7 +488,10 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkBackground : Colors.white,
+                      width: 2,
+                    ), // 🟢 Dynamic Icon Border
                   ),
                   child: const Icon(
                     Icons.camera_alt_rounded,
@@ -436,9 +503,9 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            "Upload Company Logo",
-            style: TextStyle(
+          Text(
+            "Upload Company Logo".tr, // 🟢 Added .tr
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               color: AppColors.primary,
               fontSize: 14,
@@ -446,8 +513,11 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
           ),
           const SizedBox(height: 4),
           Text(
-            "Recommended size: 500x500px",
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+            "Recommended size: 500x500px".tr, // 🟢 Added .tr
+            style: TextStyle(
+              color: isDark ? AppColors.darkTextTertiary : Colors.grey.shade500,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
@@ -674,7 +744,7 @@ class CompanyProfileView extends GetView<CompanyProfileViewController> {
                   ),
                   _buildLanguageOption(
                     title: 'ភាសាខ្មែរ',
-                    flagEmoji: '🇰ជ',
+                    flagEmoji: '🇰🇭', // Fixed flag emoji
                     accentColor: const Color(0xFFEB5757),
                     locale: const Locale('km', 'KH'),
                     isDark: isDark,

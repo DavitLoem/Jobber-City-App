@@ -18,14 +18,20 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDynamicFilters(categoryController),
+        _buildDynamicFilters(categoryController, context),
         const SizedBox(height: 16),
-        _buildJobRecentList(),
+        _buildJobRecentList(context),
       ],
     );
   }
 
-  Widget _buildDynamicFilters(CategoryController categoryCtrl) {
+  Widget _buildDynamicFilters(
+    CategoryController categoryCtrl,
+    BuildContext context,
+  ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       height: 40,
       child: Obx(() {
@@ -37,12 +43,8 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
           );
         }
 
-        // 🎯 ដំណោះស្រាយ៖ ទាញតម្លៃមកទុកខាងក្រៅ ListView ដើម្បីឱ្យ Obx អាចចាប់ការផ្លាស់ប្តូរបាន
         final currentSelectedId = controller.selectedCategoryId.value;
-
-        // បន្ថែមជម្រើស "All" នៅខាងដើមបញ្ជី
         final allItem = {'id': '', 'name': 'All'};
-        // សន្មតថា CategoryModel របស់អ្នកមាន Field: id និង name
         final items = [
           allItem,
           ...categoryCtrl.categories.map((c) => {'id': c.id, 'name': c.name}),
@@ -54,8 +56,6 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
           separatorBuilder: (_, _) => const SizedBox(width: 10),
           itemBuilder: (context, index) {
             final item = items[index];
-
-            // 🎯 ប្រើប្រាស់អថេរដែលទាញមកទុកខាងលើ
             final isSelected = currentSelectedId == item['id'];
 
             return GestureDetector(
@@ -64,12 +64,16 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.white,
+                  color: isSelected
+                      ? AppColors.primary
+                      : theme.cardColor, // 🟢 Dynamic BG
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isSelected
                         ? AppColors.primary
-                        : AppColors.cardBorder,
+                        : (isDark
+                              ? AppColors.darkCardBorder
+                              : AppColors.cardBorder),
                   ),
                   boxShadow: isSelected
                       ? [
@@ -83,9 +87,11 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  item['name']!,
+                  item['name']!.tr, // 🟢 Translated
                   style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.primary,
+                    color: isSelected
+                        ? Colors.white
+                        : theme.textTheme.bodyLarge?.color,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -98,9 +104,8 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
     );
   }
 
-  Widget _buildJobRecentList() {
+  Widget _buildJobRecentList(BuildContext context) {
     return Obx(() {
-      // បង្ហាញ Shimmer តែនៅពេល Load លើកដំបូង (ទំព័រ ១)
       if (controller.isRecentLoading.value && controller.recentJobs.isEmpty) {
         return Column(
           children: List.generate(
@@ -117,12 +122,11 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
         );
       }
 
-      // 🎯 មិនចាំបាច់មាន _filteredRecentJobs ទៀតទេ ព្រោះ Backend ជាអ្នក Filter ឱ្យរួចរាល់
       final jobs = controller.recentJobs;
 
       if (jobs.isEmpty) {
         return JobUiUtils.buildInlineEmptyState(
-          'No jobs found for this category',
+          'No jobs found for this category'.tr, // 🟢 Translated
           topPadding: 20,
         );
       }
@@ -146,13 +150,21 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
             return const SizedBox.shrink();
           }
           final job = jobs[index];
-          return _buildRecentJobCard(job, index, index);
+          return _buildRecentJobCard(job, index, index, context);
         },
       );
     });
   }
 
-  Widget _buildRecentJobCard(JobFeedModel job, int index, int staggerIndex) {
+  Widget _buildRecentJobCard(
+    JobFeedModel job,
+    int index,
+    int staggerIndex,
+    BuildContext context,
+  ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 300 + (staggerIndex * 60).clamp(0, 300)),
@@ -175,12 +187,14 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor, // 🟢 Dynamic BG
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.cardBorder),
+            border: Border.all(
+              color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadowLight,
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -204,10 +218,10 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
                       children: [
                         Text(
                           job.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -235,35 +249,39 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_on_rounded,
                     size: 13,
-                    color: AppColors.textTertiary,
+                    color: isDark
+                        ? AppColors.darkTextTertiary
+                        : AppColors.textTertiary,
                   ),
                   const SizedBox(width: 3),
                   Expanded(
                     child: Text(
-                      job.location,
-                      style: const TextStyle(
+                      job.location.tr,
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: AppColors.textTertiary,
+                        color: isDark
+                            ? AppColors.darkTextTertiary
+                            : AppColors.textTertiary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.north_east_rounded,
                     size: 13,
-                    color: AppColors.success,
+                    color: isDark ? Colors.greenAccent : AppColors.success,
                   ),
                   const SizedBox(width: 3),
                   Text(
-                    "\$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod)}",
-                    style: const TextStyle(
+                    "\$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod).tr}",
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.success,
+                      color: isDark ? Colors.greenAccent : AppColors.success,
                     ),
                   ),
                 ],
@@ -291,19 +309,19 @@ class RecentJobsSection extends GetView<HomeSeekerViewController> {
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "Apply Now",
-                          style: TextStyle(
+                          "Apply Now".tr,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(width: 4),
-                        Icon(
+                        const SizedBox(width: 4),
+                        const Icon(
                           Icons.arrow_forward_rounded,
                           color: Colors.white,
                           size: 14,

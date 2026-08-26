@@ -26,21 +26,26 @@ class CvGeneratorViewController extends GetxController {
       templates.assignAll(results[0] as List<CvTemplateModel>);
       currentCv.value = results[1] as CurrentCvModel;
 
-      // Default the picker to whichever template they already used, so
-      // "Regenerate" doesn't silently switch templates on them; otherwise
-      // just default to the first one available.
       final existingTemplateId = currentCv.value?.templateId;
-      if (existingTemplateId != null && templates.any((t) => t.id == existingTemplateId)) {
+      if (existingTemplateId != null &&
+          templates.any((t) => t.id == existingTemplateId)) {
         selectedTemplateId.value = existingTemplateId;
       } else if (templates.isNotEmpty) {
         selectedTemplateId.value = templates.first.id;
       }
     } catch (e) {
       debugPrint('[CvGenerator] load error: $e');
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        'Could not load CV templates',
-        'Please check your connection and try again.',
+        'Could not load CV templates'.tr, // 🟢 Added .tr
+        'Please check your connection and try again.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50, // 🟢 Dynamic BG
+        colorText: isDark
+            ? Colors.redAccent
+            : Colors.red.shade700, // 🟢 Dynamic Text
       );
     } finally {
       isLoading.value = false;
@@ -52,6 +57,8 @@ class CvGeneratorViewController extends GetxController {
     isGenerating.value = true;
     profileWarning.value = '';
 
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
+
     try {
       final result = await _cvService.generateCv(selectedTemplateId.value);
       currentCv.value = CurrentCvModel(
@@ -61,11 +68,15 @@ class CvGeneratorViewController extends GetxController {
       );
 
       Get.snackbar(
-        'CV Generated 🎉',
-        'Your CV is ready to view and share.',
+        'CV Generated 🎉'.tr, // 🟢 Added .tr
+        'Your CV is ready to view and share.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.TOP,
-        backgroundColor: AppColors.primaryLight,
-        colorText: AppColors.primary,
+        backgroundColor: isDark
+            ? AppColors.primary.withValues(alpha: 0.15)
+            : AppColors.primaryLight, // 🟢 Dynamic BG
+        colorText: isDark
+            ? Colors.blueAccent
+            : AppColors.primary, // 🟢 Dynamic Text
         duration: const Duration(seconds: 3),
       );
 
@@ -73,17 +84,19 @@ class CvGeneratorViewController extends GetxController {
     } catch (e) {
       final message = e.toString().replaceAll('Exception: ', '');
       if (message.toLowerCase().contains('complete your profile')) {
-        // Backend refused because the profile is too empty to build a CV
-        // from — surface this as a persistent, actionable notice instead
-        // of a snackbar that disappears before they can act on it.
-        profileWarning.value = message;
+        profileWarning.value =
+            message.tr; // 🟢 Pass translation if mapped from backend
       } else {
         Get.snackbar(
-          'Could not generate CV',
-          message,
+          'Could not generate CV'.tr, // 🟢 Added .tr
+          message.tr, // 🟢 Translate exception message
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade50,
-          colorText: Colors.red.shade700,
+          backgroundColor: isDark
+              ? AppColors.error.withValues(alpha: 0.15)
+              : Colors.red.shade50, // 🟢 Dynamic BG
+          colorText: isDark
+              ? Colors.redAccent
+              : Colors.red.shade700, // 🟢 Dynamic Text
         );
       }
       debugPrint('[CvGenerator] generate error: $e');

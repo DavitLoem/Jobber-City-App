@@ -53,13 +53,17 @@ class SaveJobScreenViewController extends GetxController {
       }
     } catch (e) {
       debugPrint('🔥 Error fetching saved jobs: $e');
-      // 🎯 បន្ថែម Snackbar ដើម្បីដឹងថា Error មកពី API ខុស ឬ Model ខុស
+      final isDark = Get.isDarkMode; // 🟢 Theme Check
       Get.snackbar(
-        'Fetch Failed',
-        e.toString(),
+        'Fetch Failed'.tr, // 🟢 Added .tr
+        e.toString().tr,
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50, // 🟢 Dynamic BG
+        colorText: isDark
+            ? Colors.redAccent
+            : Colors.red.shade700, // 🟢 Dynamic Text
         duration: const Duration(seconds: 6),
       );
     } finally {
@@ -75,7 +79,7 @@ class SaveJobScreenViewController extends GetxController {
         .where((type) => type.isNotEmpty)
         .toSet()
         .toList();
-    return ['All', ...types];
+    return ['All'.tr, ...types]; // 🟢 Added .tr
   }
 
   List<JobFeedModel> get filteredJobs {
@@ -92,8 +96,9 @@ class SaveJobScreenViewController extends GetxController {
     if (index == -1) return;
 
     final removedJob = savedJobs[index];
+    final isDark = Get.isDarkMode; // 🟢 Get Theme State for Snackbars
 
-    // Optimistic UI Update (លុបពីលើអេក្រង់មុន ដើម្បីឲ្យលឿន មុនពេល API ដើរចប់)
+    // Optimistic UI Update
     savedJobs.removeAt(index);
 
     try {
@@ -101,10 +106,14 @@ class SaveJobScreenViewController extends GetxController {
       await _bookmarkService.toggleBookmark(id);
 
       Get.snackbar(
-        'Removed from Saved',
-        '"${removedJob.title}" was removed.',
+        'Removed from Saved'.tr, // 🟢 Added .tr
+        '"@title" was removed.'.trParams({
+          'title': removedJob.title,
+        }), // 🟢 Added .trParams
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.textPrimary,
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceElevated
+            : AppColors.textPrimary, // 🟢 Dynamic BG
         colorText: Colors.white,
         duration: const Duration(seconds: 4),
         margin: const EdgeInsets.all(16),
@@ -120,28 +129,33 @@ class SaveJobScreenViewController extends GetxController {
               // ហៅ API ដើម្បី Save ម្តងទៀត (Undo)
               await _bookmarkService.toggleBookmark(id);
             } catch (e) {
-              // បើ Undo បរាជ័យ ត្រូវដកចេញវិញ
               savedJobs.removeWhere((j) => j.id == id);
               Get.snackbar(
-                'Error',
-                'Failed to undo action.',
-                backgroundColor: Colors.red.shade50,
-                colorText: Colors.red.shade700,
+                'Error'.tr, // 🟢 Added .tr
+                'Failed to undo action.'.tr, // 🟢 Added .tr
+                backgroundColor: isDark
+                    ? AppColors.error.withValues(alpha: 0.15)
+                    : Colors.red.shade50,
+                colorText: isDark ? Colors.redAccent : Colors.red.shade700,
               );
             }
           },
-          child: const Text('UNDO', style: TextStyle(color: AppColors.accent)),
+          child: Text(
+            'UNDO'.tr,
+            style: const TextStyle(color: AppColors.accent),
+          ), // 🟢 Added .tr
         ),
       );
     } catch (e) {
-      // ប្រសិនបើ API Unsave បរាជ័យ ត្រូវទាញទិន្នន័យត្រលប់ចូល UI វិញ
       savedJobs.insert(index.clamp(0, savedJobs.length), removedJob);
       Get.snackbar(
-        'Error',
-        'Failed to remove job.',
+        'Error'.tr, // 🟢 Added .tr
+        'Failed to remove job.'.tr, // 🟢 Added .tr
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     }
   }

@@ -1053,4 +1053,544 @@ const Map<String, String> enUS = {
   'Try searching with different keywords or filters.':
       'Try searching with different keywords or filters.',
   'Failed to load jobs': 'Failed to load jobs',
+
+  // ==========================
+  // Job Detail Sub-Components
+  // ==========================
+  'Cover Letter (Optional)': 'Cover Letter (Optional)',
+
+  'Upload Cover Letter (PDF, Word)': 'Upload Cover Letter (PDF, Word)',
+
+  // ==========================
+  // Saved Jobs Screen
+  // ==========================
+  '@count job saved': '@count job saved',
+  '@count jobs saved': '@count jobs saved',
+  // ==========================
+  // Search Controller Default Values
+  // ==========================
+  'Remote': 'Remote',
+  'Part-time': 'Part-time',
+  'Marketing': 'Marketing',
+
+  // ==========================
+  // CV Extraction Widgets
+  // ==========================
+  'We found @exp experiences, @edu educations, and @skill skills in your CV.':
+      'We found @exp experiences, @edu educations, and @skill skills in your CV.',
+
+  // ==========================
+  // CV Generator Screen
+  // ==========================
+  'Could not load CV templates': 'Could not load CV templates',
+  'Please check your connection and try again.':
+      'Please check your connection and try again.',
+  'CV Generated 🎉': 'CV Generated 🎉',
+  'Your CV is ready to view and share.': 'Your CV is ready to view and share.',
+  'Could not generate CV': 'Could not generate CV',
+  'Choose a template': 'Choose a template',
+  'We\'ll fill it in automatically using your profile — experience, education, skills, and more.':
+      'We\'ll fill it in automatically using your profile — experience, education, skills, and more.',
+  'No templates available right now.': 'No templates available right now.',
+  'Regenerate CV': 'Regenerate CV',
+  'My CV': 'My CV',
+  'Open in browser / download': 'Open in browser / download',
+
+  // ==========================
+  // CV Generator Widgets
+  // ==========================
+  'You already have a CV': 'You already have a CV',
+  '@template template': '@template template',
+  '@template template · Generated @date':
+      '@template template · Generated @date',
+  // ==========================
+  // CV Review Screen
+  // ==========================
+  'Success': 'Success',
+
+  // ==========================
+  // Edit Profile Core
+  // ==========================
+  'Cannot fetch Profile: @error': 'Cannot fetch Profile: @error',
+
+  'Profile updated successfully!': 'Profile updated successfully!',
+  'Update failed: @error': 'Update failed: @error',
+
+  // ==========================
+  // Splash Screen Messages
+  // ==========================
+  'Loading…': 'Loading…',
+  'Getting things ready…': 'Getting things ready…',
+  'Almost there…': 'Almost there…',
+  'Your Career Starts Here': 'Your Career Starts Here',
+
+  // ==========================
+  // Chat Room View
+  // ==========================
+  'Invalid Arguments': 'Invalid Arguments',
+  'Could not open conversation.': 'Could not open conversation.',
+  'Message Options': 'Message Options',
+  'Delete for me': 'Delete for me',
+  'Delete for everyone': 'Delete for everyone',
+  'Delete for Everyone?': 'Delete for Everyone?',
+  'Delete for Me?': 'Delete for Me?',
+  'This message will be deleted for all participants in this chat.':
+      'This message will be deleted for all participants in this chat.',
+  'This message will be deleted for you only. Other participants will still see it.':
+      'This message will be deleted for you only. Other participants will still see it.',
+
+  'Could not delete message. Please try again.':
+      'Could not delete message. Please try again.',
+  'Say hello to @name 👋': 'Say hello to @name 👋',
+  'User': 'User',
+
+  'Jan': 'Jan',
+  'Feb': 'Feb',
+  'Mar': 'Mar',
+  'Apr': 'Apr',
+  'May': 'May',
+  'Jun': 'Jun',
+  'Jul': 'Jul',
+  'Aug': 'Aug',
+  'Sep': 'Sep',
+  'Oct': 'Oct',
+  'Nov': 'Nov',
+  'Dec': 'Dec',
+
+  // ==========================
+  // Chat Input & Bubbles
+  // ==========================
+  'Type a message…': 'Type a message…',
+  'This message was deleted': 'This message was deleted',
+
+  // ==========================
+  // Conversation List Screen
+  // ==========================
+  'Could not load your conversations. Pull down to try again.':
+      'Could not load your conversations. Pull down to try again.',
+  'New Chat': 'New Chat',
+  'Search messages...': 'Search messages...',
+  'Say hello 👋': 'Say hello 👋',
+  'No messages found': 'No messages found',
+  'No conversations yet': 'No conversations yet',
+  'Try searching with a different name.':
+      'Try searching with a different name.',
+  'When you message someone, it will show up here.':
+      'When you message someone, it will show up here.',
+  'Try Again': 'Try Again',
+  'AM': 'AM',
+  'PM': 'PM',
+  'Mon': 'Mon',
+  'Tue': 'Tue',
+  'Wed': 'Wed',
+  'Thu': 'Thu',
+  'Fri': 'Fri',
+  'Sat': 'Sat',
+  'Sun': 'Sun',
+
+  // ==========================
+  // Chats Main View
+  // ==========================
+  'Communications': 'Communications',
+  'Messages': 'Messages',
+  // ==========================
+  // Interview Detail Screen
+  // ==========================
+  'Interview not found.': 'Interview not found.',
+  'Could not load this interview.': 'Could not load this interview.',
+  'Could not join interview': 'Could not join interview',
+  'Interview completed': 'Interview completed',
+  'Marked as completed.': 'Marked as completed.',
+  'Could not update': 'Could not update',
+  'Reschedule Interview': 'Reschedule Interview',
+  'Select time': 'Select time',
+  'Confirm New Time': 'Confirm New Time',
+  'Please pick both a date and a time.': 'Please pick both a date and a time.',
+  'Invalid time': 'Invalid time',
+  'Please choose a time in the future.': 'Please choose a time in the future.',
+  'Interview rescheduled': 'Interview rescheduled',
+  'The candidate has been notified.': 'The candidate has been notified.',
+  'Could not reschedule': 'Could not reschedule',
+  'Cancel Interview': 'Cancel Interview',
+  'Are you sure? This cannot be undone.':
+      'Are you sure? This cannot be undone.',
+  'Reason (optional)': 'Reason (optional)',
+  'Keep Interview': 'Keep Interview',
+  'Yes, Cancel': 'Yes, Cancel',
+  'Interview cancelled': 'Interview cancelled',
+  'Could not cancel': 'Could not cancel',
+  'Interview Details': 'Interview Details',
+  'Employer': 'Employer',
+  'Candidate': 'Candidate',
+  'Scheduled': 'Scheduled',
+  'Live Now': 'Live Now',
+  'Completed': 'Completed',
+  'Cancelled': 'Cancelled',
+  'No-show': 'No-show',
+  'Date': 'Date',
+  'Time': 'Time',
+  'Duration': 'Duration',
+  '@dur minutes': '@dur minutes',
+  'Platform': 'Platform',
+  'Video call (Jitsi Meet)': 'Video call (Jitsi Meet)',
+  'Notes': 'Notes',
+  'Cancellation reason: @reason': 'Cancellation reason: @reason',
+  'Rejoin Interview': 'Rejoin Interview',
+  'Join Interview': 'Join Interview',
+  'Mark as Completed': 'Mark as Completed',
+  'Reschedule': 'Reschedule',
+  'January': 'January',
+  'February': 'February',
+  'March': 'March',
+  'April': 'April',
+  'June': 'June',
+  'July': 'July',
+  'August': 'August',
+  'September': 'September',
+  'October': 'October',
+  'November': 'November',
+  'December': 'December',
+
+  // ==========================
+  // Interview List Screen
+  // ==========================
+  'Could not load your interviews. Pull down to try again.':
+      'Could not load your interviews. Pull down to try again.',
+  'Upcoming': 'Upcoming',
+  'Past': 'Past',
+  '@dur min': '@dur min',
+  'Live': 'Live',
+
+  'No upcoming interviews': 'No upcoming interviews',
+  'No past interviews': 'No past interviews',
+  'Scheduled video interviews will show up here.':
+      'Scheduled video interviews will show up here.',
+  'Completed and cancelled interviews will show up here.':
+      'Completed and cancelled interviews will show up here.',
+
+  // ==========================
+  // Schedule Interview Module
+  // ==========================
+  'Missing candidate information.': 'Missing candidate information.',
+  'Please select both a date and a time.':
+      'Please select both a date and a time.',
+  'Please choose a date and time in the future.':
+      'Please choose a date and time in the future.',
+  'Interview Scheduled 🎉': 'Interview Scheduled 🎉',
+  '@name has been notified.': '@name has been notified.',
+  'Could not schedule interview': 'Could not schedule interview',
+  'Interview Date': 'Interview Date',
+  'Select a date': 'Select a date',
+  'Interview Time': 'Interview Time',
+  'Select a time': 'Select a time',
+  '@mins min': '@mins min',
+  'Notes (Optional)': 'Notes (Optional)',
+  'E.g., Please prepare a short portfolio walkthrough.':
+      'E.g., Please prepare a short portfolio walkthrough.',
+  'A private video call link will be generated automatically — no extra app needed on either side.':
+      'A private video call link will be generated automatically — no extra app needed on either side.',
+  'For: @job': 'For: @job',
+
+  // ==========================
+  // Notifications View
+  // ==========================
+  'No notifications yet': 'No notifications yet',
+  'We\'ll let you know when something happens.':
+      'We\'ll let you know when something happens.',
+
+  // ==========================
+  // Login Screen
+  // ==========================
+  'Logging in...': 'Logging in...',
+  'Login': 'Login',
+  'Continue with Google': 'Continue with Google',
+  'Don\'t have an account?': 'Don\'t have an account?',
+  'Sign up': 'Sign up',
+  'Or': 'Or',
+  'Remember me': 'Remember me',
+  'Forgot Password?': 'Forgot Password?',
+  'Password': 'Password',
+  'Welcome Back': 'Welcome Back',
+  'Sign in to continue to your account': 'Sign in to continue to your account',
+
+  // ==========================
+  // Create Account Screen
+  // ==========================
+  'Please agree to the Terms and Conditions':
+      'Please agree to the Terms and Conditions',
+  'Create Account': 'Create Account',
+  'Fill in your details to get started': 'Fill in your details to get started',
+
+  'I agree to the ': 'I agree to the ',
+  ' and ': ' and ',
+  'Register as Employer': 'Register as Employer',
+  'Register as Job Seeker': 'Register as Job Seeker',
+  'Continue as Employer with Google': 'Continue as Employer with Google',
+  'Continue as Seeker with Google': 'Continue as Seeker with Google',
+  'Already have an account? ': 'Already have an account? ',
+  'Sign In': 'Sign In',
+
+  // ==========================
+  // Forgot Password Screen
+  // ==========================
+  'Forgot Password': 'Forgot Password',
+  'Enter Email Address': 'Enter Email Address',
+  'Enter the email address associated with your account and we\'ll send you a verification code to reset your password.':
+      'Enter the email address associated with your account and we\'ll send you a verification code to reset your password.',
+  'Send Verification Code': 'Send Verification Code',
+  'Verification code has been sent to your email.':
+      'Verification code has been sent to your email.',
+  'Something wrong. Please check your connection':
+      'Something wrong. Please check your connection',
+
+  // ==========================
+  // Reset Password Screen
+  // ==========================
+  'Passwords do not match.': 'Passwords do not match.',
+
+  'Password reset successfully.': 'Password reset successfully.',
+  'Something went wrong. Please try again.':
+      'Something went wrong. Please try again.',
+  'Reset Password': 'Reset Password',
+  'Create New Password': 'Create New Password',
+  'Your new password must be different from previous used passwords.':
+      'Your new password must be different from previous used passwords.',
+  'Resetting...': 'Resetting...',
+
+  // ==========================
+  // OTP Verification Screen
+  // ==========================
+  'Your account has been verified successfully!':
+      'Your account has been verified successfully!',
+  'There is a system error. Please check your internet connection.':
+      'There is a system error. Please check your internet connection.',
+  'OTP has been resent to your email.': 'OTP has been resent to your email.',
+  'OTP Code Verification': 'OTP Code Verification',
+  'Check Your Email': 'Check Your Email',
+  'We have sent an OTP code to ': 'We have sent an OTP code to ',
+  'your email': 'your email',
+  'Didn\'t receive code? ': 'Didn\'t receive code? ',
+  'Resend OTP': 'Resend OTP',
+  'Resend in @secs': 'Resend in @secs',
+  'Verifying...': 'Verifying...',
+  'Verify & Proceed': 'Verify & Proceed',
+
+  // ==========================
+  // Auth Widgets
+  // ==========================
+  'Seeker': 'Seeker',
+
+  // ==========================
+  // Generic Widgets
+  // ==========================
+  'Confirm': 'Confirm',
+  'Search...': 'Search...',
+  'Processing...': 'Processing...',
+
+  // ==========================
+  // Custom Widgets & Utilities
+  // ==========================
+  'Apply (@count selected)': 'Apply (@count selected)',
+  'Password strength: @status': 'Password strength: @status',
+  'Weak': 'Weak',
+  'Fair': 'Fair',
+  'Strong': 'Strong',
+  'Very Strong': 'Very Strong',
+
+  // ==========================
+  // Candidate Detail Module
+  // ==========================
+  'Candidate details not found.': 'Candidate details not found.',
+  'Could not load applicant details': 'Could not load applicant details',
+
+  'No document attached.': 'No document attached.',
+
+  // ==========================
+  // Candidate Sub-Widgets
+  // ==========================
+  'Hire Candidate': 'Hire Candidate',
+
+  'No cover letter provided.': 'No cover letter provided.',
+  'Attached Cover Letter': 'Attached Cover Letter',
+  'Tap to view document': 'Tap to view document',
+  'Applied for: @jobTitle': 'Applied for: @jobTitle',
+
+  'Date & Time': 'Date & Time',
+  'TBD': 'TBD',
+
+  '@exp Yrs Exp': '@exp Yrs Exp',
+
+  'Document Viewer': 'Document Viewer',
+
+  // ==========================
+  // Candidates View
+  // ==========================
+  'Cannot start chat. User ID is missing.':
+      'Cannot start chat. User ID is missing.',
+  'Something went wrong.': 'Something went wrong.',
+
+  'Selection Error': 'Selection Error',
+  'You can only select candidates with the same status at a time.':
+      'You can only select candidates with the same status at a time.',
+
+  'Candidates have been updated successfully.':
+      'Candidates have been updated successfully.',
+  'Could not process bulk action.': 'Could not process bulk action.',
+  'Interview schedule has been updated.':
+      'Interview schedule has been updated.',
+
+  'Could not update data. Please try again.':
+      'Could not update data. Please try again.',
+
+  'Cancel Selection': 'Cancel Selection',
+
+  'Take Action (@count)': 'Take Action (@count)',
+
+  // ==========================
+  // Candidate Sub-Components
+  // ==========================
+  'Take Action (@count selected)': 'Take Action (@count selected)',
+  'Move to Shortlisted': 'Move to Shortlisted',
+  'Hire Candidates': 'Hire Candidates',
+  'Reject Candidates': 'Reject Candidates',
+  'Are you sure you want to @action @count candidate(s)? This action cannot be undone.':
+      'Are you sure you want to @action @count candidate(s)? This action cannot be undone.',
+
+  'Search candidates, skills...': 'Search candidates, skills...',
+  'Newest Applied': 'Newest Applied',
+  'Name (A-Z)': 'Name (A-Z)',
+  'Nearest Interview': 'Nearest Interview',
+  'Empty': 'Empty',
+  'No candidates to export.': 'No candidates to export.',
+  'Export Candidates': 'Export Candidates',
+  'Export as PDF': 'Export as PDF',
+  'Best for printing interview scorecards':
+      'Best for printing interview scorecards',
+  'Export as Excel': 'Export as Excel',
+  'Best for filtering and data analysis':
+      'Best for filtering and data analysis',
+  'No candidates found.': 'No candidates found.',
+  'Failed to generate report.': 'Failed to generate report.',
+  'Edit Interview Schedule': 'Edit Interview Schedule',
+  'Updating schedule for @name': 'Updating schedule for @name',
+  'Update Message (Optional)': 'Update Message (Optional)',
+  'E.g., We have changed the location to...':
+      'E.g., We have changed the location to...',
+  'Please provide a location': 'Please provide a location',
+
+  'Select Job Post': 'Select Job Post',
+
+  // ==========================
+  // Company Profile Setup
+  // ==========================
+  'Company Name is required': 'Company Name is required',
+  'Please select an Industry!': 'Please select an Industry!',
+  'Company Description must have at least 10 characters!':
+      'Company Description must have at least 10 characters!',
+
+  'Company Identity': 'Company Identity',
+  'Tell us about your business': 'Tell us about your business',
+  'e.g. Jobber City Co., Ltd.': 'e.g. Jobber City Co., Ltd.',
+  'Industry *': 'Industry *',
+  'Select your industry': 'Select your industry',
+  'Company Size *': 'Company Size *',
+  'Select company size': 'Select company size',
+  'Select Company Size': 'Select Company Size',
+  'Description *': 'Description *',
+  'Briefly describe your company (min 10 chars)...':
+      'Briefly describe your company (min 10 chars)...',
+  'Contact & Location': 'Contact & Location',
+  'Where can candidates find you?': 'Where can candidates find you?',
+  'Contact Email *': 'Contact Email *',
+  'Phone Number *': 'Phone Number *',
+
+  'Please select a Province first': 'Please select a Province first',
+  'Address Detail *': 'Address Detail *',
+  'Street 123, Sangkat...': 'Street 123, Sangkat...',
+
+  'Customize your experience': 'Customize your experience',
+
+  'Recommended size: 500x500px': 'Recommended size: 500x500px',
+
+  // ==========================
+  // Employer Profile Setup
+  // ==========================
+  'Failed to load profile. Please try again.':
+      'Failed to load profile. Please try again.',
+
+  '@size: @count': '@size: @count',
+
+  // ==========================
+  // Edit Employer Profile Module
+  // ==========================
+  'Save': 'Save',
+
+  // ==========================
+  // Employer Home Views
+  // ==========================
+  '@count active candidates': '@count active candidates',
+
+  'Overview': 'Overview',
+  'Filter Dashboard': 'Filter Dashboard',
+
+  'This Week': 'This Week',
+  'This Month': 'This Month',
+  'Select Specific Month...': 'Select Specific Month...',
+  'Custom Date Range...': 'Custom Date Range...',
+
+  'No recent applicants yet': 'No recent applicants yet',
+  'Recently': 'Recently',
+
+  // ==========================
+  // My Jobs View Module
+  // ==========================
+  'All (@count)': 'All (@count)',
+  'Active (@count)': 'Active (@count)',
+  'Paused (@count)': 'Paused (@count)',
+  'Draft (@count)': 'Draft (@count)',
+
+  // ==========================
+  // My Job Action Sheet + Sub-Views
+  // ==========================
+  '@count candidate(s)': '@count candidate(s)',
+
+  'Newest': 'Newest',
+  'Oldest': 'Oldest',
+  'Expiring Soon': 'Expiring Soon',
+
+  // ==========================
+  // My Job Details Module
+  // ==========================
+  ' (Negotiable)': ' (Negotiable)',
+
+  // ==========================
+  // Post Job Details Module
+  // ==========================
+  'Save Draft': 'Save Draft',
+  'Tell us about the role and where it\'s based':
+      'Tell us about the role and where it\'s based',
+  'Company & Position': 'Company & Position',
+  'e.g. Senior Product Designer': 'e.g. Senior Product Designer',
+  'Province / State': 'Province / State',
+  'Select province': 'Select province',
+  'Search province...': 'Search province...',
+  'District / City': 'District / City',
+  'Select district': 'Select district',
+
+  'Search district...': 'Search district...',
+
+  // ==========================
+  // Recruit Tab Module
+  // ==========================
+  '@count total posts': '@count total posts',
+  // ==========================
+  // Recruit Tab Inner Modules
+  // ==========================
+  'CLOSES TODAY': 'CLOSES TODAY',
+  'CLOSING SOON': 'CLOSING SOON',
+  'Closes @date': 'Closes @date',
+  '1 vacancy': '1 vacancy',
+  '@count vacancies': '@count vacancies',
+  'No jobs match your search': 'No jobs match your search',
+  'Try a different keyword or filter.': 'Try a different keyword or filter.',
 };

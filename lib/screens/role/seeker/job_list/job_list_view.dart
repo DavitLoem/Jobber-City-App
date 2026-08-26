@@ -18,24 +18,25 @@ class JobListView extends GetView<JobListViewController> {
 
   @override
   Widget build(BuildContext context) {
-    // 🎯 ទាញយក Category Controller មកប្រើ
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final categoryCtrl = Get.put(CategoryController());
 
-    // ឆែកមើលបើទទេ ហៅ API ទាញយក Category ម្តងទៀត
     if (categoryCtrl.categories.isEmpty) {
       categoryCtrl.fetchCategories();
     }
 
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
             size: 20,
           ),
           onPressed: () => Get.back(),
@@ -43,8 +44,8 @@ class JobListView extends GetView<JobListViewController> {
         title: Obx(
           () => Text(
             controller.pageTitle.value,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -57,22 +58,19 @@ class JobListView extends GetView<JobListViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🎯 ១. បង្ហាញ Category Filter តែនៅពេលវាជា Recent Jobs ប៉ុណ្ណោះ
             Obx(() {
               if (controller.listType.value == 'recent') {
                 return Padding(
                   padding: const EdgeInsets.only(top: 16, bottom: 8),
-                  child: _buildCategoryFilter(categoryCtrl),
+                  child: _buildCategoryFilter(categoryCtrl, theme, isDark),
                 );
               }
               return const SizedBox.shrink();
             }),
 
-            // 🎯 ២. ផ្នែកបញ្ជីការងារ (Infinite Scroll)
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
-                  // អូសដល់ក្រោមសល់ 100 pixels ទាញយកបន្ត
                   if (!controller.isLoadingMore.value &&
                       scrollInfo.metrics.pixels >=
                           scrollInfo.metrics.maxScrollExtent - 100) {
@@ -80,7 +78,7 @@ class JobListView extends GetView<JobListViewController> {
                   }
                   return false;
                 },
-                child: Obx(() => _buildJobContent()),
+                child: Obx(() => _buildJobContent(theme, isDark)),
               ),
             ),
           ],
@@ -89,12 +87,14 @@ class JobListView extends GetView<JobListViewController> {
     );
   }
 
-  // ─── ផ្នែក UI សម្រាប់ Category Filter ───
-  Widget _buildCategoryFilter(CategoryController categoryCtrl) {
+  Widget _buildCategoryFilter(
+    CategoryController categoryCtrl,
+    ThemeData theme,
+    bool isDark,
+  ) {
     return SizedBox(
       height: 38,
       child: Obx(() {
-        // បង្ហាញ Shimmer ពេលកំពុង Load Categories
         if (categoryCtrl.isLoading.value && categoryCtrl.categories.isEmpty) {
           return const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -108,7 +108,6 @@ class JobListView extends GetView<JobListViewController> {
 
         final currentSelectedId = controller.selectedCategoryId.value;
 
-        // បន្ថែមជម្រើស "All" នៅខាងដើមបញ្ជី[cite: 4]
         final allItem = {'id': '', 'name': 'All'};
         final items = [
           allItem,
@@ -130,17 +129,23 @@ class JobListView extends GetView<JobListViewController> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.white,
+                  color: isSelected
+                      ? AppColors.primary
+                      : theme.cardColor, // 🟢 Dynamic BG
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isSelected
                         ? AppColors.primary
-                        : AppColors.cardBorder,
+                        : (isDark
+                              ? AppColors.darkCardBorder
+                              : AppColors.cardBorder), // 🟢 Dynamic Border
                   ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.25),
+                            color: AppColors.primary.withValues(
+                              alpha: 0.25,
+                            ), // 🟢 Updated to withValues
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -149,9 +154,11 @@ class JobListView extends GetView<JobListViewController> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  item['name']!,
+                  item['name']!.tr, // 🟢 Added .tr
                   style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.primary,
+                    color: isSelected
+                        ? Colors.white
+                        : theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -164,9 +171,7 @@ class JobListView extends GetView<JobListViewController> {
     );
   }
 
-  // ─── ផ្នែក UI សម្រាប់បញ្ជីការងារ ───
-  Widget _buildJobContent() {
-    // ករណីកំពុង Load ដំបូង
+  Widget _buildJobContent(ThemeData theme, bool isDark) {
     if (controller.isLoading.value && controller.jobs.isEmpty) {
       return ListView.separated(
         padding: const EdgeInsets.all(20),
@@ -180,17 +185,15 @@ class JobListView extends GetView<JobListViewController> {
       );
     }
 
-    // ករណីគ្មានទិន្នន័យ
     if (controller.jobs.isEmpty) {
       return ListView(
         children: [
           SizedBox(height: Get.height * 0.2),
-          JobUiUtils.buildInlineEmptyState('No jobs found'),
+          JobUiUtils.buildInlineEmptyState('No jobs found'.tr), // 🟢 Added .tr
         ],
       );
     }
 
-    // ករណីមានទិន្នន័យ
     return ListView.separated(
       padding: const EdgeInsets.all(20),
       physics: const AlwaysScrollableScrollPhysics(
@@ -200,7 +203,6 @@ class JobListView extends GetView<JobListViewController> {
           controller.jobs.length + (controller.hasMoreData.value ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: 14),
       itemBuilder: (context, index) {
-        // រង្វង់ Loading នៅចុងបញ្ជី
         if (index == controller.jobs.length) {
           return const Center(
             child: Padding(
@@ -213,6 +215,8 @@ class JobListView extends GetView<JobListViewController> {
         final job = controller.jobs[index];
         return JobCardVertical(
           job: job,
+          isDark: isDark, // 🟢 Pass Theme State Down
+          theme: theme, // 🟢 Pass Theme Context Down
           onTap: () {
             Get.toNamed(AppRoutes.jobDetail, arguments: job)?.then((
               updatedJob,

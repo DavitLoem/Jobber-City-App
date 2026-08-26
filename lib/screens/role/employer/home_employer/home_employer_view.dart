@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/role/employer/company_profile_services.dart';
-import 'package:jobber_city/core/api/services/role/employer/employer_dashboard_service.dart'; // 🟢 ត្រូវ Import
+import 'package:jobber_city/core/api/services/role/employer/employer_dashboard_service.dart'; // 🟢 Must Import
 import 'package:jobber_city/models/role/employer/company_model.dart';
-import 'package:jobber_city/models/role/employer/employer_dashboard_model.dart'; // 🟢 ត្រូវ Import
+import 'package:jobber_city/models/role/employer/employer_dashboard_model.dart'; // 🟢 Must Import
 
 import 'widgets/applicant_pipeline_card.dart';
 import 'widgets/home_header.dart';
@@ -20,12 +20,19 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(
+        context,
+      ).scaffoldBackgroundColor, // Added to inherit dark/light theme background
       body: SafeArea(
         child: RefreshIndicator(
-          color: const Color(0xFF4f7df7), // ពណ៌របស់រង្វង់វិលពេលទាញ
-          backgroundColor: Colors.white,
+          color: const Color(
+            0xFF4f7df7,
+          ), // Color of the loading indicator when pulled
+          backgroundColor: Theme.of(
+            context,
+          ).cardColor, // Updated from Colors.white for dark mode support
           onRefresh: () async {
-            // 🟢 ២. ហៅមុខងារទាញយកទិន្នន័យសាជាថ្មីពេលអ្នកប្រើប្រាស់ទាញទម្លាក់
+            // 🟢 2. Call the function to fetch data again when the user pulls down
             await Future.wait([
               controller.fetchCompanyProfile(),
               controller.fetchDashboardOverview(),
@@ -39,7 +46,7 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
                 const HomeHeader(),
                 const SizedBox(height: 16),
 
-                // 🟢 រុំជាមួយ Obx ដើម្បីរង់ចាំទិន្នន័យពី API
+                // 🟢 Wrap with Obx to wait for API data
                 Obx(() {
                   if (controller.isDashboardLoading.value) {
                     return const Padding(
@@ -55,18 +62,26 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
                   final dashboardData = controller.dashboardData.value;
 
                   if (dashboardData == null) {
-                    return const Center(
-                      child: Text("No dashboard data found."),
+                    return Center(
+                      child: Text(
+                        "No dashboard data found.",
+                        style: TextStyle(
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.color, // Prevents text from turning invisible in dark mode
+                        ),
+                      ),
                     );
                   }
 
                   return Column(
                     children: [
-                      // បោះទិន្នន័យ overview ទៅឱ្យ StatsGrid
+                      // Pass overview data to StatsGrid
                       StatsGrid(overview: dashboardData.overview),
                       const SizedBox(height: 16),
 
-                      // បោះទិន្នន័យ pipeline ទៅឱ្យ Pipeline Card
+                      // Pass pipeline data to Pipeline Card
                       ApplicantPipelineCard(
                         screening: dashboardData.pipeline.screening,
                         review: dashboardData.pipeline.review,
@@ -75,7 +90,7 @@ class HomeEmployerView extends GetView<HomeEmployerViewController> {
                       ),
                       const SizedBox(height: 16),
 
-                      // ពេលអ្នកអាប់ដេត RecentApplicantsSection កុំភ្លេចបោះ `dashboardData.recentApplicants` ឱ្យវា
+                      // When updating RecentApplicantsSection, don't forget to pass `dashboardData.recentApplicants` to it
                       RecentApplicantsSection(
                         applicants: dashboardData.recentApplicants,
                       ),

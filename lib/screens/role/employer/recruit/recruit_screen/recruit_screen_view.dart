@@ -19,8 +19,11 @@ class RecruitScreenView extends GetView<RecruitScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightSurfaceVariant,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
         child: Column(
           children: [
@@ -35,6 +38,7 @@ class RecruitScreenView extends GetView<RecruitScreenViewController> {
                 onChanged: (v) => controller.searchQuery.value = v,
                 sortAscending: controller.sortAscending.value,
                 onSortTap: controller.toggleSortOrder,
+                // Note: Ensure JobSearchBar supports dark mode internally
               ),
             ),
             Obx(
@@ -44,10 +48,11 @@ class RecruitScreenView extends GetView<RecruitScreenViewController> {
                 counts: controller.statusCounts
                   ..['All'] = controller.jobs.length,
                 onSelect: controller.setFilter,
+                // Note: Ensure JobFilterChipBar utilizes .tr to localize 'Active', 'Paused', etc.
               ),
             ),
             const SizedBox(height: 4),
-            Expanded(child: _buildJobList()),
+            Expanded(child: _buildJobList(isDark)), // 🟢 Passed Theme State
           ],
         ),
       ),
@@ -61,7 +66,7 @@ class RecruitScreenView extends GetView<RecruitScreenViewController> {
     }
   }
 
-  Widget _buildJobList() {
+  Widget _buildJobList(bool isDark) {
     return Obx(() {
       if (controller.isLoading.value && controller.jobs.isEmpty) {
         return const Center(
@@ -71,7 +76,7 @@ class RecruitScreenView extends GetView<RecruitScreenViewController> {
 
       if (controller.errorMessage.value.isNotEmpty && controller.jobs.isEmpty) {
         return JobErrorState(
-          message: controller.errorMessage.value,
+          message: controller.errorMessage.value.tr, // 🟢 Added .tr mapping
           onRetry: controller.fetchJobs,
         );
       }
@@ -89,6 +94,9 @@ class RecruitScreenView extends GetView<RecruitScreenViewController> {
       return RefreshIndicator(
         onRefresh: controller.refreshJobs,
         color: AppColors.primary,
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Refresh Overlay Component
         child: ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
           itemCount: list.length,

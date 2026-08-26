@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/core/utils/excel_export_helper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../core/utils/pdf_export_helper.dart';
-import '../candidates_view.dart'; // Import controller របស់អ្នក
+import '../candidates_view.dart';
 
 class CandidateSearchBar extends GetView<CandidatesViewController> {
   final TextEditingController searchCtrl;
@@ -20,31 +21,46 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
-          // ── ប្រអប់ Search ──
           Expanded(
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark
+                    ? AppColors.darkInputBackground
+                    : Colors.white, // 🟢 Dynamic BG
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.darkCardBorder
+                      : Colors.grey.shade200,
+                ),
               ),
               child: TextField(
                 controller: searchCtrl,
                 onChanged: onChanged,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                ), // 🟢 Dynamic Input Text
                 decoration: InputDecoration(
-                  hintText: "Search candidates, skills...",
+                  hintText: "Search candidates, skills...".tr, // 🟢 Added .tr
                   hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: isDark
+                        ? AppColors.darkTextHint
+                        : Colors.grey.shade400, // 🟢 Dynamic Hint Text
                     fontSize: 14,
                   ),
                   prefixIcon: Icon(
                     LucideIcons.search,
-                    color: Colors.grey.shade400,
+                    color: isDark
+                        ? AppColors.darkIconSecondary
+                        : Colors.grey.shade400,
                     size: 20,
                   ),
                   border: InputBorder.none,
@@ -53,7 +69,9 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
                       ? IconButton(
                           icon: Icon(
                             LucideIcons.xCircle,
-                            color: Colors.grey.shade400,
+                            color: isDark
+                                ? AppColors.darkIconSecondary
+                                : Colors.grey.shade400,
                             size: 18,
                           ),
                           onPressed: () {
@@ -69,14 +87,17 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
 
           const SizedBox(width: 12),
 
-          // ── 🟢 ប៊ូតុង Sort Option (Popup Menu) ──
           Container(
             height: 48,
             width: 48,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark
+                  ? AppColors.darkSurfaceElevated
+                  : Colors.white, // 🟢 Dynamic Popup Base
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(
+                color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+              ),
             ),
             child: Obx(() {
               final String currentVal = controller.currentSort.value;
@@ -84,13 +105,22 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
               return PopupMenuButton<String>(
                 icon: Icon(
                   LucideIcons.arrowUpDown,
-                  color: Colors.grey.shade700,
+                  color: isDark
+                      ? AppColors.darkIconSecondary
+                      : Colors.grey.shade700,
                   size: 20,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: isDark
+                        ? AppColors.darkCardBorder
+                        : Colors.transparent,
+                  ),
                 ),
-                color: Colors.white,
+                color: isDark
+                    ? AppColors.darkSurfaceElevated
+                    : Colors.white, // 🟢 Dynamic Menu List BG
                 elevation: 4,
                 position: PopupMenuPosition.under,
                 onSelected: (String value) {
@@ -99,21 +129,24 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
                 itemBuilder: (BuildContext context) => [
                   _buildPopupItem(
                     'newest',
-                    'Newest Applied',
+                    'Newest Applied'.tr, // 🟢 Added .tr
                     LucideIcons.clock,
                     currentVal,
+                    isDark,
                   ),
                   _buildPopupItem(
                     'name_asc',
-                    'Name (A-Z)',
+                    'Name (A-Z)'.tr, // 🟢 Added .tr
                     LucideIcons.aArrowDown,
                     currentVal,
+                    isDark,
                   ),
                   _buildPopupItem(
                     'interview_asc',
-                    'Nearest Interview',
+                    'Nearest Interview'.tr, // 🟢 Added .tr
                     LucideIcons.calendarClock,
                     currentVal,
+                    isDark,
                   ),
                 ],
               );
@@ -121,28 +154,31 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
           ),
           const SizedBox(width: 8),
 
-          // ── 🟢 ប៊ូតុង Export PDF (បាន Update ថ្មី) ──
-          // ── 🟢 ប៊ូតុង Export (បាន Update ឱ្យមានជម្រើសរើស) ──
           InkWell(
             onTap: () {
               if (controller.selectedJobId.value.isEmpty) return;
               if (controller.applicants.isEmpty) {
                 Get.snackbar(
-                  "Empty",
-                  "No candidates to export.",
-                  backgroundColor: Colors.orange.shade50,
-                  colorText: Colors.orange.shade900,
+                  "Empty".tr, // 🟢 Added .tr
+                  "No candidates to export.".tr, // 🟢 Added .tr
+                  backgroundColor: isDark
+                      ? Colors.orangeAccent.withValues(alpha: 0.15)
+                      : Colors.orange.shade50,
+                  colorText: isDark
+                      ? Colors.orangeAccent
+                      : Colors.orange.shade900,
                 );
                 return;
               }
 
-              // លោតផ្ទាំង Bottom Sheet ឱ្យ HR ជ្រើសរើសប្រភេទ File
               Get.bottomSheet(
                 Container(
                   padding: const EdgeInsets.all(24),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkBackground
+                        : Colors.white, // 🟢 Dynamic Export Sheet BG
+                    borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(20),
                     ),
                   ),
@@ -150,59 +186,89 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Export Candidates",
+                      Text(
+                        "Export Candidates".tr, // 🟢 Added .tr
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // ជម្រើស PDF
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.red.shade50,
+                            color: isDark
+                                ? AppColors.error.withValues(alpha: 0.15)
+                                : Colors.red.shade50,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             LucideIcons.fileText,
-                            color: Colors.redAccent,
+                            color: isDark ? Colors.redAccent : Colors.redAccent,
                           ),
                         ),
-                        title: const Text("Export as PDF"),
-                        subtitle: const Text(
-                          "Best for printing interview scorecards",
+                        title: Text(
+                          "Export as PDF".tr,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ), // 🟢 Added .tr
+                        subtitle: Text(
+                          "Best for printing interview scorecards"
+                              .tr, // 🟢 Added .tr
+                          style: TextStyle(
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : Colors.grey,
+                          ),
                         ),
                         onTap: () {
-                          Get.back(); // បិទ Bottom Sheet
-                          _processExport(controller, 'pdf'); // ហៅអនុគមន៍ទាញយក
+                          Get.back();
+                          _processExport(controller, 'pdf', isDark);
                         },
                       ),
-                      const Divider(height: 1),
-                      // ជម្រើស Excel
+                      Divider(
+                        height: 1,
+                        color: isDark
+                            ? AppColors.darkDivider
+                            : Colors.grey.shade200,
+                      ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade50,
+                            color: isDark
+                                ? AppColors.success.withValues(alpha: 0.15)
+                                : Colors.green.shade50,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             LucideIcons.table,
-                            color: Colors.green,
+                            color: isDark ? Colors.greenAccent : Colors.green,
                           ),
                         ),
-                        title: const Text("Export as Excel"),
-                        subtitle: const Text(
-                          "Best for filtering and data analysis",
+                        title: Text(
+                          "Export as Excel".tr,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ), // 🟢 Added .tr
+                        subtitle: Text(
+                          "Best for filtering and data analysis"
+                              .tr, // 🟢 Added .tr
+                          style: TextStyle(
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : Colors.grey,
+                          ),
                         ),
                         onTap: () {
-                          Get.back(); // បិទ Bottom Sheet
-                          _processExport(controller, 'excel'); // ហៅអនុគមន៍ទាញយក
+                          Get.back();
+                          _processExport(controller, 'excel', isDark);
                         },
                       ),
                     ],
@@ -214,7 +280,7 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
               height: 48,
               width: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF4f7df7),
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -229,12 +295,12 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
     );
   }
 
-  // អនុគមន៍ជំនួយគូរ Menu Item ឱ្យស្អាត
   PopupMenuItem<String> _buildPopupItem(
     String value,
     String text,
     IconData icon,
     String currentVal,
+    bool isDark,
   ) {
     final bool isSelected = value == currentVal;
     return PopupMenuItem<String>(
@@ -244,13 +310,19 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
           Icon(
             icon,
             size: 18,
-            color: isSelected ? const Color(0xFF4f7df7) : Colors.grey.shade600,
+            color: isSelected
+                ? (isDark ? Colors.blueAccent : AppColors.primary)
+                : (isDark ? AppColors.darkIconSecondary : Colors.grey.shade600),
           ),
           const SizedBox(width: 12),
           Text(
             text,
             style: TextStyle(
-              color: isSelected ? const Color(0xFF4f7df7) : Colors.black87,
+              color: isSelected
+                  ? (isDark ? Colors.blueAccent : AppColors.primary)
+                  : (isDark
+                        ? Colors.white
+                        : Colors.black87), // 🟢 Dynamic Item Label
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -259,10 +331,10 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
     );
   }
 
-  // 🟢 អនុគមន៍ជំនួយសម្រាប់ហៅ API តែម្តង តែអាច Export ចេញជា ២ ទម្រង់ខុសគ្នា
   Future<void> _processExport(
     CandidatesViewController controller,
     String type,
+    bool isDark,
   ) async {
     final activeStatus = controller.tabs[controller.tabController.index];
     final jobTitle = controller.selectedJobDisplayName;
@@ -281,19 +353,20 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
         isExport: true,
       );
 
-      Get.back(); // បិទ Loading Dialog
+      Get.back();
 
       if (exportData.isEmpty) {
         Get.snackbar(
-          "Empty",
-          "No candidates found.",
-          backgroundColor: Colors.orange.shade50,
-          colorText: Colors.orange.shade900,
+          "Empty".tr, // 🟢 Added .tr
+          "No candidates found.".tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? Colors.orangeAccent.withValues(alpha: 0.15)
+              : Colors.orange.shade50,
+          colorText: isDark ? Colors.orangeAccent : Colors.orange.shade900,
         );
         return;
       }
 
-      // បែងចែកប្រភេទ File ទៅកាន់ Helper រៀងៗខ្លួន
       if (type == 'pdf') {
         await PdfExportHelper.generateAndPreviewCandidatesPdf(
           applicants: exportData,
@@ -301,9 +374,7 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
           jobTitle: jobTitle,
         );
       } else if (type == 'excel') {
-        // កុំភ្លេច Import ExcelExportHelper នៅខាងលើផង
         await ExcelExportHelper.generateAndDownloadCandidatesExcel(
-          // 🟢 ហៅឈ្មោះថ្មីនេះ
           applicants: exportData,
           status: activeStatus,
           jobTitle: jobTitle,
@@ -312,10 +383,12 @@ class CandidateSearchBar extends GetView<CandidatesViewController> {
     } catch (e) {
       Get.back();
       Get.snackbar(
-        "Error",
-        "Failed to generate report.",
-        backgroundColor: Colors.red.shade50,
-        colorText: Colors.red.shade700,
+        "Error".tr, // 🟢 Added .tr
+        "Failed to generate report.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
       );
     }
   }

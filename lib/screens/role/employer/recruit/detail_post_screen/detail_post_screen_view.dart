@@ -14,33 +14,42 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground, // 🟢 Dynamic BG
       body: SafeArea(
         child: Obx(() {
           final job = controller.job.value;
           if (job == null) {
             return Center(
               child: Text(
-                'No job data available',
-                style: TextStyle(color: AppColors.textSecondary),
+                'No job data available'.tr, // 🟢 Added .tr
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
+                ), // 🟢 Dynamic Subtext
               ),
             );
           }
-          return _buildDetail(context, job);
+          return _buildDetail(context, job, isDark);
         }),
       ),
     );
   }
 
-  Widget _buildDetail(BuildContext context, EmployerJobModel job) {
+  Widget _buildDetail(BuildContext context, EmployerJobModel job, bool isDark) {
     final salaryLabel = job.minSalary == job.maxSalary
         ? '\$${job.minSalary}'
         : '\$${job.minSalary} - \$${job.maxSalary}';
 
     return Column(
       children: [
-        _buildHeader(),
+        _buildHeader(isDark),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 90),
@@ -49,78 +58,106 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
               children: [
                 const SizedBox(height: 8),
                 _buildSectionCard(
-                  title: 'Job Information',
+                  title: 'Job Information'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
-                    _detailRow(Icons.work_outline, 'Job Title', job.title),
+                    _detailRow(
+                      Icons.work_outline,
+                      'Job Title'.tr,
+                      job.title,
+                      isDark,
+                    ),
                     _detailRow(
                       Icons.label_outline,
-                      'Status',
+                      'Status'.tr, // 🟢 Added .tr
                       job.status.isEmpty
                           ? 'Draft'
-                          : job.status[0].toUpperCase() +
-                                job.status.substring(1),
+                                .tr // 🟢 Added .tr
+                          : (job.status[0].toUpperCase() +
+                                    job.status.substring(1))
+                                .tr, // 🟢 Added .tr wrapper
+                      isDark,
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Compensation',
+                  title: 'Compensation'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
-                    _detailRow(Icons.attach_money, 'Salary', salaryLabel),
+                    _detailRow(
+                      Icons.attach_money,
+                      'Salary'.tr,
+                      salaryLabel,
+                      isDark,
+                    ),
                     if (job.salaryPeriod.isNotEmpty)
                       _detailRow(
                         Icons.calendar_today,
-                        'Salary Period',
-                        job.salaryPeriod,
+                        'Salary Period'.tr, // 🟢 Added .tr
+                        job.salaryPeriod.tr, // 🟢 Map known strings
+                        isDark,
                       ),
                     _detailRow(
                       Icons.gavel,
-                      'Negotiable',
-                      job.isNegotiable ? 'Yes' : 'No',
+                      'Negotiable'.tr, // 🟢 Added .tr
+                      job.isNegotiable ? 'Yes'.tr : 'No'.tr, // 🟢 Added .tr
+                      isDark,
                     ),
                     _detailRow(
                       Icons.people_outline,
-                      'Vacancies',
+                      'Vacancies'.tr, // 🟢 Added .tr
                       '${job.headcount}',
+                      isDark,
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Requirements & Skills',
+                  title: 'Requirements & Skills'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
                     if (job.experience.isNotEmpty)
                       _detailRow(
                         Icons.trending_up,
-                        'Experience',
-                        job.experience,
+                        'Experience'.tr, // 🟢 Added .tr
+                        job.experience.tr,
+                        isDark,
                       ),
                     if (controller.skillNames.isNotEmpty)
                       ...controller.skillNames.map(
-                        (skillName) =>
-                            _detailRow(Icons.star_outline, '', skillName),
+                        (skillName) => _detailRow(
+                          Icons.star_outline,
+                          '',
+                          skillName,
+                          isDark,
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Schedule',
+                  title: 'Schedule'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
                     _detailRow(
                       Icons.calendar_view_day,
-                      'Working Days',
-                      job.workingDays,
+                      'Working Days'.tr, // 🟢 Added .tr
+                      job.workingDays.tr,
+                      isDark,
                     ),
                     _detailRow(
                       Icons.access_time,
-                      'Working Hours',
-                      job.workingHours,
+                      'Working Hours'.tr, // 🟢 Added .tr
+                      job.workingHours.tr,
+                      isDark,
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Benefits',
+                  title: 'Benefits'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children:
                       job.benefits
                           .where((b) => b.toLowerCase() != 'not specified')
@@ -129,99 +166,117 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
                       ? job.benefits
                             .where((b) => b.toLowerCase() != 'not specified')
                             .map(
-                              (b) =>
-                                  _detailRow(Icons.check_circle_outline, '', b),
+                              (b) => _detailRow(
+                                Icons.check_circle_outline,
+                                '',
+                                b,
+                                isDark,
+                              ),
                             )
                             .toList()
                       : [
                           _detailRow(
                             Icons.check_circle_outline,
                             '',
-                            'Not specified',
+                            'Not specified'.tr, // 🟢 Added .tr
+                            isDark,
                           ),
                         ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Timeline',
+                  title: 'Timeline'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
                     _detailRow(
                       Icons.schedule,
-                      'Posted On',
+                      'Posted On'.tr, // 🟢 Added .tr
                       _formatDate(job.createdAt),
+                      isDark,
                     ),
                     if (job.closingDate.isNotEmpty)
                       _detailRow(
                         Icons.event_busy,
-                        'Closing Date',
+                        'Closing Date'.tr, // 🟢 Added .tr
                         _formatDate(job.closingDate),
+                        isDark,
                       ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Category & Type',
+                  title: 'Category & Type'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
                     _detailRow(
                       Icons.category_outlined,
-                      'Category',
+                      'Category'.tr, // 🟢 Added .tr
                       controller.categoryName.value.isEmpty
                           ? '-'
-                          : controller.categoryName.value,
+                          : controller.categoryName.value.tr,
+                      isDark,
                     ),
                     _detailRow(
                       Icons.workspace_premium_outlined,
-                      'Job Level',
+                      'Job Level'.tr, // 🟢 Added .tr
                       controller.jobLevelName.value.isEmpty
                           ? '-'
-                          : controller.jobLevelName.value,
+                          : controller.jobLevelName.value.tr,
+                      isDark,
                     ),
                     _detailRow(
                       Icons.location_city_outlined,
-                      'Work Type',
+                      'Work Type'.tr, // 🟢 Added .tr
                       controller.workTypeName.value.isEmpty
                           ? '-'
-                          : controller.workTypeName.value,
+                          : controller.workTypeName.value.tr,
+                      isDark,
                     ),
                     _detailRow(
                       Icons.business_center_outlined,
-                      'Employment Type',
+                      'Employment Type'.tr, // 🟢 Added .tr
                       controller.employmentTypeName.value.isEmpty
                           ? '-'
-                          : controller.employmentTypeName.value,
+                          : controller.employmentTypeName.value.tr,
+                      isDark,
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Education',
+                  title: 'Education'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
                     _detailRow(
                       Icons.school_outlined,
-                      'Education Level',
+                      'Education Level'.tr, // 🟢 Added .tr
                       controller.educationLevelName.value.isEmpty
                           ? '-'
-                          : controller.educationLevelName.value,
+                          : controller.educationLevelName.value.tr,
+                      isDark,
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _buildSectionCard(
-                  title: 'Location',
+                  title: 'Location'.tr, // 🟢 Added .tr
+                  isDark: isDark,
                   children: [
                     _detailRow(
                       Icons.location_on_outlined,
-                      'Province',
+                      'Province'.tr, // 🟢 Added .tr
                       controller.provinceName.value.isEmpty
                           ? '-'
-                          : controller.provinceName.value,
+                          : controller.provinceName.value.tr,
+                      isDark,
                     ),
                     _detailRow(
                       Icons.place_outlined,
-                      'District',
+                      'District'.tr, // 🟢 Added .tr
                       controller.districtName.value.isEmpty
                           ? '-'
-                          : controller.districtName.value,
+                          : controller.districtName.value.tr,
+                      isDark,
                     ),
                   ],
                 ),
@@ -233,14 +288,18 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isDark) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: isDark
+            ? AppColors.darkBackground
+            : AppColors.white, // 🟢 Dynamic BG
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowLight,
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ), // 🟢 Dynamic Shadow
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -252,11 +311,13 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              'Job Details',
+              'Job Details'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? Colors.white
+                    : AppColors.textPrimary, // 🟢 Dynamic Title
               ),
             ),
           ),
@@ -268,16 +329,23 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
   Widget _buildSectionCard({
     required String title,
     required List<Widget> children,
+    required bool isDark,
   }) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : AppColors.white, // 🟢 Dynamic Card BG
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+        ), // 🟢 Dynamic Card Border
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowLight,
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ), // 🟢 Dynamic Shadow
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -293,7 +361,9 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: isDark
+                    ? Colors.white
+                    : AppColors.textPrimary, // 🟢 Dynamic Subtitle
               ),
             ),
             const SizedBox(height: 12),
@@ -304,13 +374,19 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
     );
   }
 
-  Widget _detailRow(IconData icon, String label, String value) {
+  Widget _detailRow(IconData icon, String label, String value, bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.iconSecondary),
+          Icon(
+            icon,
+            size: 18,
+            color: isDark
+                ? AppColors.darkIconSecondary
+                : AppColors.iconSecondary,
+          ), // 🟢 Dynamic Icon
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -319,11 +395,19 @@ class DetailPostScreenView extends GetView<DetailPostScreenViewController> {
                 if (label.isNotEmpty)
                   Text(
                     label,
-                    style: TextStyle(fontSize: 12, color: AppColors.textHint),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.textHint,
+                    ), // 🟢 Dynamic Row Label
                   ),
                 Text(
                   value.isNotEmpty ? value : '-',
-                  style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  ), // 🟢 Dynamic Row Value
                 ),
               ],
             ),

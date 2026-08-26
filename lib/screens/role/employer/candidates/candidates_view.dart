@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/api/services/chat/chat_rest_service.dart';
 import 'package:jobber_city/core/api/services/role/employer/applicant_employer_service.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/core/utils/debouncer.dart';
 import 'package:jobber_city/models/chat_model.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
@@ -23,43 +24,50 @@ class CandidatesView extends GetView<CandidatesViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        centerTitle: false, // រុញទៅឆ្វេងបែប Modern Dashboard
-        title: const Text(
-          'Candidates',
+        centerTitle: false,
+        title: Text(
+          'Candidates'.tr, // 🟢 Added .tr
           style: TextStyle(
-            color: Color(0xFF1A1D1E), // ពណ៌ខ្មៅដិតបែប Premium
-            fontWeight: FontWeight.w900, // អក្សរក្រាស់
-            fontSize: 24, // ទំហំធំជាងមុន
-            letterSpacing: -0.5, // បង្រួមចន្លោះអក្សរបន្តិចឱ្យមើលទៅរលោង
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
+            fontWeight: FontWeight.w900,
+            fontSize: 24,
+            letterSpacing: -0.5,
           ),
         ),
         actions: [
           Obx(() {
-            // ករណីកំពុង Select បង្ហាញប៊ូតុង Cancel
             if (controller.isSelectionMode) {
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: IconButton(
-                  icon: const Icon(LucideIcons.x, color: Colors.black87),
-                  tooltip: "Cancel Selection",
+                  icon: Icon(
+                    LucideIcons.x,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ), // 🟢 Dynamic Icon
+                  tooltip: "Cancel Selection".tr, // 🟢 Added .tr
                   onPressed: () {
                     controller.clearSelection();
                   },
                 ),
               );
             }
-            // 🟢 ករណីធម្មតា បង្ហាញ Icon ផ្សេងៗ (ឧទាហរណ៍: Notification) ដើម្បីឱ្យមានតុល្យភាព
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: IconButton(
-                icon: const Icon(LucideIcons.bell, color: Colors.black54),
-                tooltip: "Notifications",
+                icon: Icon(
+                  LucideIcons.bell,
+                  color: isDark ? AppColors.darkIconSecondary : Colors.black54,
+                ), // 🟢 Dynamic Icon
+                tooltip: "Notifications".tr, // 🟢 Added .tr
                 onPressed: () {},
               ),
             );
@@ -73,10 +81,14 @@ class CandidatesView extends GetView<CandidatesViewController> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark
+                ? AppColors.darkSurfaceElevated
+                : Colors.white, // 🟢 Dynamic BG
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(
+                  alpha: isDark ? 0.3 : 0.05,
+                ), // 🟢 Dynamic Shadow
                 offset: const Offset(0, -4),
                 blurRadius: 10,
               ),
@@ -86,7 +98,7 @@ class CandidatesView extends GetView<CandidatesViewController> {
             child: ElevatedButton.icon(
               onPressed: () => _showBulkActionBottomSheet(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4f7df7),
+                backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -94,7 +106,9 @@ class CandidatesView extends GetView<CandidatesViewController> {
               ),
               icon: const Icon(LucideIcons.zap, color: Colors.white),
               label: Text(
-                "Take Action (${controller.selectedApplicantIds.length})",
+                "Take Action (@count)".trParams({
+                  'count': controller.selectedApplicantIds.length.toString(),
+                }), // 🟢 Added .trParams
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -122,25 +136,37 @@ class CandidatesView extends GetView<CandidatesViewController> {
           ),
 
           Container(
-            color: Colors.white,
+            color: isDark
+                ? AppColors.darkSurfaceElevated
+                : Colors.white, // 🟢 Dynamic TabBar Area BG
             child: Obx(() {
               final summary = controller.statusSummary.value;
 
               return TabBar(
                 controller: controller.tabController,
                 isScrollable: true,
-                labelColor: const Color(0xFF4f7df7),
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: const Color(0xFF4f7df7),
+                labelColor: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Active Label
+                unselectedLabelColor: isDark
+                    ? AppColors.darkTextSecondary
+                    : Colors.grey, // 🟢 Dynamic Inactive Label
+                indicatorColor: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Indicator
                 indicatorWeight: 3,
                 labelStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                 ),
-                dividerColor: Colors.grey.shade200,
+                dividerColor: isDark
+                    ? AppColors.darkDivider
+                    : Colors.grey.shade200, // 🟢 Dynamic Divider
                 tabAlignment: TabAlignment.start,
                 tabs: controller.tabs.map((tabStatus) {
-                  final displayName = _getTabDisplayName(tabStatus);
+                  final displayName = _getTabDisplayName(
+                    tabStatus,
+                  ).tr; // 🟢 Translation fallback
 
                   int count = 0;
                   switch (tabStatus) {

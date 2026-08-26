@@ -7,9 +7,6 @@ import 'package:jobber_city/core/api/services/role/seeker/job_feed_service.dart'
 import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
 import 'package:jobber_city/screens/role/seeker/search_button/widgets/job_filter_bottom_sheet.dart';
 
-// អ្នកត្រូវ Import BottomSheet របស់អ្នកនៅទីនេះនៅពេលអ្នកបង្កើតវារួច
-// import 'package:jobber_city/views/widgets/job_filter_bottom_sheet.dart';
-
 class SearchButtonViewController extends GetxController {
   final JobFeedService _jobFeedService = JobFeedService();
   final TextEditingController searchController = TextEditingController();
@@ -23,8 +20,15 @@ class SearchButtonViewController extends GetxController {
   int _currentPage = 1;
   var hasMoreData = true.obs;
 
-  var recentSearches = <String>['UI/UX Designer', 'Flutter Developer'].obs;
-  var popularSearches = <String>['Remote', 'Part-time', 'Marketing'].obs;
+  var recentSearches = <String>[
+    'UI/UX Designer',
+    'Flutter Developer',
+  ].obs; // Usually user-generated, translation not always needed
+  var popularSearches = <String>[
+    'Remote'.tr,
+    'Part-time'.tr,
+    'Marketing'.tr,
+  ].obs; // 🟢 Added .tr
 
   // ── 🟢 ផ្នែកគ្រប់គ្រង State របស់ Filter ទាំង ៦ ──
   var selectedCategoryId = RxnString();

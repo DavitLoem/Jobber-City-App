@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
@@ -16,6 +17,9 @@ class LocationHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       child: Column(
@@ -30,14 +34,21 @@ class LocationHeader extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.cardBackground, // ជំនួស _Tok.surfaceEl
+                      color: isDark
+                          ? AppColors.darkSurfaceElevated
+                          : AppColors.cardBackground, // 🟢 Dynamic Button BG
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.darkCardBorder
+                            : AppColors.cardBorder,
+                      ), // 🟢 Dynamic Border
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_ios_new_rounded,
                       size: 16,
-                      color: AppColors.textPrimary, // ជំនួស _Tok.ink
+                      color:
+                          theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
                     ),
                   ),
                 ),
@@ -45,11 +56,11 @@ class LocationHeader extends StatelessWidget {
               ],
 
               Text(
-                title,
+                title, // 🟢 Passed from View, already translated
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
-                  color: LocationColors.ink,
+                  color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
                   letterSpacing: -0.6,
                   height: 1.1,
                 ),
@@ -58,11 +69,13 @@ class LocationHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Select your province to find jobs near you',
+          Text(
+            'Select your province to find jobs near you'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 14,
-              color: LocationColors.sub,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : LocationColors.sub, // 🟢 Dynamic Text
               fontWeight: FontWeight.w400,
             ),
           ),

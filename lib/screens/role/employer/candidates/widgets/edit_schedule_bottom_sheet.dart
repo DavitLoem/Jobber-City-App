@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -29,7 +30,6 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
     _prefillExistingData();
   }
 
-  // 🎯 អនុគមន៍សម្រាប់ទាញទិន្នន័យចាស់មកបំពេញក្នុង Form
   void _prefillExistingData() {
     final schedule = widget.applicant.interviewSchedule;
     if (schedule != null) {
@@ -57,10 +57,15 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkBackground
+            : Colors.white, // 🟢 Dynamic BottomSheet BG
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -69,35 +74,47 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Edit Interview Schedule",
-                    style: TextStyle(
+                  Text(
+                    "Edit Interview Schedule".tr, // 🟢 Added .tr
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF10B981),
+                      color: AppColors.success,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(LucideIcons.x, color: Colors.grey),
+                    icon: Icon(
+                      LucideIcons.x,
+                      color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                    ),
                     onPressed: () => Get.back(),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                "Updating schedule for ${widget.applicant.fullName}",
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                "Updating schedule for @name".trParams({
+                  'name': widget.applicant.fullName,
+                }), // 🟢 Added .trParams
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.grey.shade600,
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 20),
 
-              // ── 1. Date & Time ──
-              const Text(
-                "Interview Date & Time",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              Text(
+                "Interview Date & Time".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const SizedBox(height: 8),
               InkWell(
@@ -107,14 +124,11 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
                     initialDate:
                         _selectedDate ??
                         DateTime.now().add(const Duration(days: 1)),
-                    firstDate: DateTime.now().subtract(
-                      const Duration(days: 1),
-                    ), // អនុញ្ញាតឱ្យរើសថ្ងៃចាស់បន្តិចបាន
+                    firstDate: DateTime.now().subtract(const Duration(days: 1)),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (date != null) {
                     final time = await showTimePicker(
-                      // ignore: use_build_context_synchronously
                       context: context,
                       initialTime:
                           _selectedTime ?? const TimeOfDay(hour: 9, minute: 0),
@@ -133,7 +147,14 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
+                    color: isDark
+                        ? AppColors.darkInputBackground
+                        : Colors.white, // 🟢 Dynamic Field Area
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade300,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -142,18 +163,23 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
                       Text(
                         _selectedDate == null || _selectedTime == null
                             ? "Select Date & Time"
+                                  .tr // 🟢 Added .tr
                             : "${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year} at ${_selectedTime!.format(context)}",
                         style: TextStyle(
                           color: _selectedDate == null
-                              ? Colors.grey.shade600
-                              : Colors.black87,
+                              ? (isDark
+                                    ? AppColors.darkTextHint
+                                    : Colors.grey.shade600)
+                              : (isDark ? Colors.white : Colors.black87),
                           fontSize: 15,
                         ),
                       ),
                       Icon(
                         LucideIcons.calendar,
                         size: 18,
-                        color: Colors.grey.shade500,
+                        color: isDark
+                            ? AppColors.darkIconSecondary
+                            : Colors.grey.shade500,
                       ),
                     ],
                   ),
@@ -161,31 +187,52 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
               ),
               const SizedBox(height: 16),
 
-              // ── 2. Location / Link ──
-              const Text(
-                "Location / Link",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              Text(
+                "Location / Link".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _locationController,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                ), // 🟢 Dynamic Text
                 decoration: InputDecoration(
-                  hintText: "E.g., Floor 5, Jobber City HQ or Zoom Link",
+                  hintText: "E.g., Floor 5, Jobber City HQ or Zoom Link"
+                      .tr, // 🟢 Added .tr
                   hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: isDark
+                        ? AppColors.darkTextHint
+                        : Colors.grey.shade400,
                     fontSize: 14,
                   ),
+                  filled: true,
+                  fillColor: isDark
+                      ? AppColors.darkInputBackground
+                      : Colors.white, // 🟢 Dynamic BG
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade300,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade300,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFF10B981)),
+                    borderSide: const BorderSide(color: AppColors.success),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -195,32 +242,53 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
               ),
               const SizedBox(height: 16),
 
-              // ── 3. Message ──
-              const Text(
-                "Update Message (Optional)",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              Text(
+                "Update Message (Optional)".tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _messageController,
                 maxLines: 3,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                ), // 🟢 Dynamic Text
                 decoration: InputDecoration(
-                  hintText: "E.g., We have changed the location to...",
+                  hintText: "E.g., We have changed the location to..."
+                      .tr, // 🟢 Added .tr
                   hintStyle: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: isDark
+                        ? AppColors.darkTextHint
+                        : Colors.grey.shade400,
                     fontSize: 14,
                   ),
+                  filled: true,
+                  fillColor: isDark
+                      ? AppColors.darkInputBackground
+                      : Colors.white, // 🟢 Dynamic BG
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade300,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? AppColors.darkCardBorder
+                          : Colors.grey.shade300,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFF10B981)),
+                    borderSide: const BorderSide(color: AppColors.success),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -230,16 +298,17 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
               ),
               const SizedBox(height: 24),
 
-              // ── Action Buttons ──
               Row(
                 children: [
                   Expanded(
                     child: TextButton(
                       onPressed: () => Get.back(),
                       child: Text(
-                        "Cancel",
+                        "Cancel".tr, // 🟢 Added .tr
                         style: TextStyle(
-                          color: Colors.grey.shade600,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : Colors.grey.shade600,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
@@ -253,19 +322,28 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
                       onPressed: () {
                         if (_selectedDate == null || _selectedTime == null) {
                           Get.snackbar(
-                            "Required",
-                            "Please select both date and time",
-                            backgroundColor: Colors.red.shade50,
-                            colorText: Colors.red.shade700,
+                            "Required".tr, // 🟢 Added .tr
+                            "Please select both date and time"
+                                .tr, // 🟢 Added .tr
+                            backgroundColor: isDark
+                                ? AppColors.error.withValues(alpha: 0.15)
+                                : Colors.red.shade50,
+                            colorText: isDark
+                                ? Colors.redAccent
+                                : Colors.red.shade700,
                           );
                           return;
                         }
                         if (_locationController.text.trim().isEmpty) {
                           Get.snackbar(
-                            "Required",
-                            "Please provide a location",
-                            backgroundColor: Colors.red.shade50,
-                            colorText: Colors.red.shade700,
+                            "Required".tr, // 🟢 Added .tr
+                            "Please provide a location".tr, // 🟢 Added .tr
+                            backgroundColor: isDark
+                                ? AppColors.error.withValues(alpha: 0.15)
+                                : Colors.red.shade50,
+                            colorText: isDark
+                                ? Colors.redAccent
+                                : Colors.red.shade700,
                           );
                           return;
                         }
@@ -278,9 +356,8 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
                           _selectedTime!.minute,
                         );
 
-                        Get.back(); // បិទ Bottom Sheet
+                        Get.back();
 
-                        // 🎯 ហៅអនុគមន៍ update (មិនមែន bulk ទេ ព្រោះកែតែម្នាក់)
                         controller.updateApplicantStatus(
                           widget.applicant.applicationId,
                           'interview',
@@ -294,15 +371,15 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
+                        backgroundColor: AppColors.success,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text(
-                        "Save Changes",
-                        style: TextStyle(
+                      child: Text(
+                        "Save Changes".tr, // 🟢 Added .tr
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,

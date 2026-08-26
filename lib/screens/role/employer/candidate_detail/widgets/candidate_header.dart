@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/employer/applicant_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -10,12 +11,17 @@ class CandidateHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Center(
       child: Column(
         children: [
           CircleAvatar(
             radius: 45,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: isDark
+                ? AppColors.darkInputBackground
+                : Colors.grey.shade200,
             backgroundImage:
                 applicant.profileImageUrl != null &&
                     applicant.profileImageUrl!.isNotEmpty
@@ -24,24 +30,28 @@ class CandidateHeader extends StatelessWidget {
             child:
                 applicant.profileImageUrl == null ||
                     applicant.profileImageUrl!.isEmpty
-                ? const Icon(LucideIcons.user, size: 40, color: Colors.grey)
+                ? Icon(
+                    LucideIcons.user,
+                    size: 40,
+                    color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+                  )
                 : null,
           ),
           const SizedBox(height: 16),
           Text(
             applicant.fullName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: theme.textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            "Applied for: ${applicant.jobTitle}",
+            "Applied for: @jobTitle".trParams({'jobTitle': applicant.jobTitle}),
             style: TextStyle(
               fontSize: 15,
-              color: AppColors.primary,
+              color: isDark ? Colors.blueAccent : AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added for .tr
 import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/models/role/seeker/job_feed_model.dart';
 import 'package:jobber_city/screens/role/seeker/home_seeker/widgets/job_ui_utils.dart';
@@ -7,12 +8,16 @@ class JobCardVertical extends StatelessWidget {
   final JobFeedModel job;
   final VoidCallback onTap;
   final VoidCallback onBookmarkTap;
+  final bool isDark; // 🟢 Added
+  final ThemeData theme; // 🟢 Added
 
   const JobCardVertical({
     super.key,
     required this.job,
     required this.onTap,
     required this.onBookmarkTap,
+    required this.isDark,
+    required this.theme,
   });
 
   @override
@@ -22,12 +27,14 @@ class JobCardVertical extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor, // 🟢 Dynamic BG
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(
+              color: isDark ? AppColors.darkCardBorder : AppColors.cardBorder,
+          ), // 🟢 Dynamic Border
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowLight,
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), // 🟢 Dynamic Shadow
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -36,7 +43,6 @@ class JobCardVertical extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── ជួរទី១៖ ឡូហ្គោ ឈ្មោះការងារ ឈ្មោះក្រុមហ៊ុន និងប៊ូតុង Save ──
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -52,10 +58,10 @@ class JobCardVertical extends StatelessWidget {
                     children: [
                       Text(
                         job.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -76,51 +82,49 @@ class JobCardVertical extends StatelessWidget {
                 ),
                 JobUiUtils.buildBookmarkButton(
                   isSaved: job.isSaved,
-                  onTap: onBookmarkTap, // 🎯 ហៅអនុគមន៍ដែលបោះចូលមក
+                  onTap: onBookmarkTap, 
                 ),
               ],
             ),
             const SizedBox(height: 12),
 
-            // ── ជួរទី២៖ ទីតាំង និង ប្រាក់ខែ ──
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.location_on_rounded,
                   size: 13,
-                  color: AppColors.textTertiary,
+                  color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary, // 🟢 Dynamic Location Icon
                 ),
                 const SizedBox(width: 3),
                 Expanded(
                   child: Text(
-                    job.location,
-                    style: const TextStyle(
+                    job.location.tr, // 🟢 Added .tr
+                    style: TextStyle(
                       fontSize: 12.5,
-                      color: AppColors.textTertiary,
+                      color: isDark ? AppColors.darkTextTertiary : AppColors.textTertiary, // 🟢 Dynamic Location Text
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.north_east_rounded,
                   size: 13,
-                  color: AppColors.success,
+                  color: isDark ? Colors.greenAccent : AppColors.success, // 🟢 Dynamic Tag Icon
                 ),
                 const SizedBox(width: 3),
                 Text(
-                  "\$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod)}",
-                  style: const TextStyle(
+                  "\$${job.maxSalary.toInt()}/${JobUiUtils.periodShort(job.salaryPeriod).tr}", // 🟢 Added .tr
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.success,
+                    color: isDark ? Colors.greenAccent : AppColors.success, // 🟢 Dynamic Tag Text
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 14),
 
-            // ── ជួរទី៣៖ Tags (ប្រភេទការងារ) និង ប៊ូតុង Apply ──
             Row(
               children: [
                 Expanded(
@@ -143,19 +147,19 @@ class JobCardVertical extends StatelessWidget {
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Apply Now",
-                        style: TextStyle(
+                        "Apply Now".tr, // 🟢 Added .tr
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      SizedBox(width: 4),
-                      Icon(
+                      const SizedBox(width: 4),
+                      const Icon(
                         Icons.arrow_forward_rounded,
                         color: Colors.white,
                         size: 14,

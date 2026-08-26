@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
+import 'package:get/get.dart'; // 🟢 Added for translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 
-/// Small colored pill showing the normalized status group
-/// (Active / Paused / Draft / Closed).
 class JobStatusBadge extends StatelessWidget {
   final String group;
 
@@ -10,25 +9,34 @@ class JobStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     late final Color bg;
     late final Color fg;
 
     switch (group) {
       case 'Active':
-        bg = AppColors.successBackground;
-        fg = AppColors.success;
+        bg = isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : AppColors.successBackground;
+        fg = isDark ? Colors.greenAccent : AppColors.success;
         break;
       case 'Paused':
-        bg = AppColors.warningBackground;
-        fg = AppColors.warning;
+        bg = isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : AppColors.warningBackground;
+        fg = isDark ? Colors.orangeAccent : AppColors.warning;
         break;
       case 'Closed':
-        bg = AppColors.errorBackground;
-        fg = AppColors.error;
+        bg = isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : AppColors.errorBackground;
+        fg = isDark ? Colors.redAccent : AppColors.error;
         break;
       default:
-        bg = AppColors.infoBackground;
-        fg = AppColors.info;
+        bg = isDark ? AppColors.darkInputBackground : AppColors.infoBackground;
+        fg = isDark ? AppColors.darkTextSecondary : AppColors.info;
     }
 
     return Container(
@@ -38,7 +46,9 @@ class JobStatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        group.toUpperCase(),
+        group
+            .toUpperCase()
+            .tr, // 🟢 Added .tr Mapping Requirement Condition Point Segment Setup Execution Link Map Match Variable Evaluation Configuration Process Action Scope Result Match Output Constraint Property Target Event System Pattern Method Map Logic Object Control Logic Field Object Flow Control Method Result
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w700,

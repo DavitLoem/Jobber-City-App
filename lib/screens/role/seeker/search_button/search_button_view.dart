@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jobber_city/core/constants/app_colors.dart';
 import 'package:jobber_city/screens/role/seeker/search_button/widgets/active_filter_chips.dart';
 
 import 'search_button_controller.dart';
@@ -14,9 +13,10 @@ class SearchButtonView extends GetView<SearchButtonViewController> {
   @override
   Widget build(BuildContext context) {
     final topInset = MediaQuery.of(context).padding.top;
+    final theme = Theme.of(context); // 🟢 Grab global theme context
 
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
         bottom: false,
         child: Column(

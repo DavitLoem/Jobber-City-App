@@ -8,29 +8,32 @@ import 'package:jobber_city/routes/app_routes.dart';
 part 'schedule_interview_binding.dart';
 part 'schedule_interview_controller.dart';
 
-/// Employer-only screen for scheduling a video interview with a seeker.
-/// Reached from `CandidateDetailView`'s "Schedule Video Interview" action,
-/// with the seeker's identity pre-filled via [ScheduleInterviewArgs].
 class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
   const ScheduleInterviewView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic AppBar BG
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
           ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Schedule Interview',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'Schedule Interview'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -39,15 +42,18 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _CandidateCard(args: controller.args),
+            _CandidateCard(
+              args: controller.args,
+              isDark: isDark,
+            ), // 🟢 Passed Theme state
             const SizedBox(height: 28),
 
-            const Text(
-              'Interview Date',
+            Text(
+              'Interview Date'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: Colors.black87,
+                color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
               ),
             ),
             const SizedBox(height: 8),
@@ -56,7 +62,8 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
                 icon: Icons.event_rounded,
                 value: controller.selectedDate.value != null
                     ? _formatDate(controller.selectedDate.value!)
-                    : 'Select a date',
+                    : 'Select a date'.tr, // 🟢 Added .tr
+                isDark: isDark,
                 onTap: () async {
                   final picked = await showDatePicker(
                     context: context,
@@ -72,12 +79,12 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
             ),
 
             const SizedBox(height: 16),
-            const Text(
-              'Interview Time',
+            Text(
+              'Interview Time'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: Colors.black87,
+                color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
               ),
             ),
             const SizedBox(height: 8),
@@ -86,7 +93,8 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
                 icon: Icons.schedule_rounded,
                 value: controller.selectedTime.value != null
                     ? controller.selectedTime.value!.format(context)
-                    : 'Select a time',
+                    : 'Select a time'.tr, // 🟢 Added .tr
+                isDark: isDark,
                 onTap: () async {
                   final picked = await showTimePicker(
                     context: context,
@@ -99,12 +107,12 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
             ),
 
             const SizedBox(height: 16),
-            const Text(
-              'Duration',
+            Text(
+              'Duration'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: Colors.black87,
+                color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
               ),
             ),
             const SizedBox(height: 8),
@@ -114,19 +122,33 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
                 children: [15, 30, 45, 60].map((mins) {
                   final isSelected = controller.durationMinutes.value == mins;
                   return ChoiceChip(
-                    label: Text('$mins min'),
+                    label: Text(
+                      '@mins min'.trParams({'mins': mins.toString()}),
+                    ), // 🟢 Added .trParams
                     selected: isSelected,
                     onSelected: (_) => controller.durationMinutes.value = mins,
-                    selectedColor: AppColors.primaryLight,
+                    selectedColor: isDark
+                        ? AppColors.primary.withValues(alpha: 0.15)
+                        : AppColors.primaryLight, // 🟢 Dynamic Selection Color
                     labelStyle: TextStyle(
-                      color: isSelected ? AppColors.primary : Colors.black54,
+                      color: isSelected
+                          ? (isDark
+                                ? Colors.blueAccent
+                                : AppColors.primary) // 🟢 Dynamic Selected Text
+                          : (isDark
+                                ? AppColors.darkTextSecondary
+                                : Colors.black54), // 🟢 Dynamic Unselected Text
                       fontWeight: FontWeight.w600,
                     ),
-                    backgroundColor: Colors.grey.shade50,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.grey.shade50, // 🟢 Dynamic Unselected BG
                     side: BorderSide(
                       color: isSelected
                           ? AppColors.primary
-                          : Colors.grey.shade200,
+                          : (isDark
+                                ? AppColors.darkCardBorder
+                                : Colors.grey.shade200), // 🟢 Dynamic Border
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -137,29 +159,50 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
             ),
 
             const SizedBox(height: 16),
-            const Text(
-              'Notes (Optional)',
+            Text(
+              'Notes (Optional)'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: Colors.black87,
+                color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Text
               ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: controller.notesController,
               maxLines: 3,
+              style: TextStyle(
+                color: theme.textTheme.bodyLarge?.color,
+              ), // 🟢 Dynamic Input Text
               decoration: InputDecoration(
-                hintText: 'E.g., Please prepare a short portfolio walkthrough.',
+                hintText: 'E.g., Please prepare a short portfolio walkthrough.'
+                    .tr, // 🟢 Added .tr
+                hintStyle: TextStyle(
+                  color: isDark ? AppColors.darkTextHint : AppColors.textHint,
+                ), // 🟢 Dynamic Hint Text
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: isDark
+                    ? AppColors.darkInputBackground
+                    : Colors.grey.shade50, // 🟢 Dynamic Input Field BG
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? AppColors.darkCardBorder
+                        : Colors.grey.shade200,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(
+                    color: isDark
+                        ? AppColors.darkCardBorder
+                        : Colors.grey.shade200,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primary),
                 ),
               ),
             ),
@@ -168,7 +211,11 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primaryLight.withValues(alpha: 0.5),
+                color: isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : AppColors.primaryLight.withValues(
+                        alpha: 0.5,
+                      ), // 🟢 Dynamic Box BG
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -181,10 +228,13 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'A private video call link will be generated automatically — no extra app needed on either side.',
+                      'A private video call link will be generated automatically — no extra app needed on either side.'
+                          .tr, // 🟢 Added .tr
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade700,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : Colors.grey.shade700, // 🟢 Dynamic Subtext
                         height: 1.4,
                       ),
                     ),
@@ -204,7 +254,9 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
                       : controller.submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: Colors.grey.shade300,
+                    disabledBackgroundColor: isDark
+                        ? AppColors.darkSurfaceElevated
+                        : Colors.grey.shade300, // 🟢 Dynamic Disabled BG
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -219,9 +271,9 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Schedule Interview',
-                          style: TextStyle(
+                      : Text(
+                          'Schedule Interview'.tr, // 🟢 Added .tr
+                          style: const TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -239,19 +291,27 @@ class ScheduleInterviewView extends GetView<ScheduleInterviewViewController> {
 
 class _CandidateCard extends StatelessWidget {
   final ScheduleInterviewArgs args;
-  const _CandidateCard({required this.args});
+  final bool isDark; // 🟢 Added Theme Flag
+
+  const _CandidateCard({required this.args, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic Candidate Card BG
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+        ), // 🟢 Dynamic Border
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.3 : 0.02,
+            ), // 🟢 Dynamic Shadow
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -261,8 +321,9 @@ class _CandidateCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 26,
-            backgroundColor: Colors.grey.shade200,
-            // 🎯 បន្ថែម .trim() នៅទីនេះ
+            backgroundColor: isDark
+                ? AppColors.darkInputBackground
+                : Colors.grey.shade200, // 🟢 Dynamic Avatar BG
             backgroundImage:
                 args.seekerAvatarUrl != null &&
                     args.seekerAvatarUrl!.trim().isNotEmpty
@@ -289,19 +350,25 @@ class _CandidateCard extends StatelessWidget {
               children: [
                 Text(
                   args.seekerName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15.5,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: isDark
+                        ? Colors.white
+                        : Colors.black87, // 🟢 Dynamic Text
                   ),
                 ),
                 if (args.jobTitle != null && args.jobTitle!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
-                    'For: ${args.jobTitle}',
+                    'For: @job'.trParams({
+                      'job': args.jobTitle!,
+                    }), // 🟢 Added .trParams
                     style: TextStyle(
                       fontSize: 12.5,
-                      color: Colors.grey.shade600,
+                      color: isDark
+                          ? AppColors.darkTextTertiary
+                          : Colors.grey.shade600, // 🟢 Dynamic Subtext
                     ),
                   ),
                 ],
@@ -317,10 +384,13 @@ class _CandidateCard extends StatelessWidget {
 class _PickerField extends StatelessWidget {
   final IconData icon;
   final String value;
+  final bool isDark; // 🟢 Added Theme Flag
   final VoidCallback onTap;
+
   const _PickerField({
     required this.icon,
     required this.value,
+    required this.isDark,
     required this.onTap,
   });
 
@@ -332,7 +402,9 @@ class _PickerField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(
+            color: isDark ? AppColors.darkCardBorder : Colors.grey.shade300,
+          ), // 🟢 Dynamic Border
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -341,10 +413,18 @@ class _PickerField extends StatelessWidget {
             const SizedBox(width: 10),
             Text(
               value,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark
+                    ? Colors.white
+                    : Colors.black87, // 🟢 Dynamic Value Text
+              ),
             ),
             const Spacer(),
-            const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: isDark ? AppColors.darkIconSecondary : Colors.grey,
+            ), // 🟢 Dynamic Chevron
           ],
         ),
       ),
@@ -367,5 +447,5 @@ String _formatDate(DateTime dt) {
     'Nov',
     'Dec',
   ];
-  return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
+  return '${months[dt.month - 1].tr} ${dt.day}, ${dt.year}'; // 🟢 Added .tr to Month String
 }

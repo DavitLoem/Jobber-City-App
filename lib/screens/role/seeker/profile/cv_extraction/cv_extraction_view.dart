@@ -23,43 +23,51 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     // ស្តាប់រាល់ពេលមាន Error
     ever(controller.errorMessage, (String error) {
       if (error.isNotEmpty) {
+        final currentDark =
+            Get.isDarkMode; // 🟢 Theme check for Snackbars inside ever
         Get.snackbar(
-          'Upload Failed',
-          error,
+          'Upload Failed'.tr, // 🟢 Added .tr
+          error, // 🟢 Usually already mapped with .tr in the controller
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent,
-          colorText: Colors.white,
+          backgroundColor: currentDark
+              ? AppColors.error.withValues(alpha: 0.15)
+              : Colors.redAccent, // 🟢 Dynamic BG
+          colorText: currentDark
+              ? Colors.redAccent
+              : Colors.white, // 🟢 Dynamic Text
           margin: const EdgeInsets.all(16),
-          icon: const Icon(Icons.error_outline, color: Colors.white),
+          icon: Icon(
+            Icons.error_outline,
+            color: currentDark ? Colors.redAccent : Colors.white,
+          ),
         );
       }
     });
 
-    // ស្តាប់រាល់ពេលការទាញយកទិន្នន័យជោគជ័យ
-    // ever(controller.extractionResult, (result) {
-    //   if (result != null && result.parsedData != null) {
-    //     _showSuccessBottomSheet(result.parsedData!);
-    //   }
-    // });
-
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black87,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Icon
           ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'Upload Resume',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          'Upload Resume'.tr, // 🟢 Added .tr
+          style: TextStyle(
+            color: theme.textTheme.bodyLarge?.color,
+            fontWeight: FontWeight.bold,
+          ), // 🟢 Dynamic Text
         ),
         centerTitle: true,
       ),
@@ -80,21 +88,33 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                       onDelete: () => controller.deleteCurrentResume(),
                     ),
                     const SizedBox(height: 40),
-                    const Row(
+                    Row(
                       children: [
-                        Expanded(child: Divider()),
+                        Divider(
+                          color: isDark
+                              ? AppColors.darkDivider
+                              : Colors.grey.shade300,
+                        ), // 🟢 Dynamic Divider
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            "OR UPLOAD NEW",
+                            "OR UPLOAD NEW".tr, // 🟢 Added .tr
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: isDark
+                                  ? AppColors.darkTextHint
+                                  : Colors.grey, // 🟢 Dynamic Text
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Expanded(child: Divider()),
+                        Expanded(
+                          child: Divider(
+                            color: isDark
+                                ? AppColors.darkDivider
+                                : Colors.grey.shade300,
+                          ), // 🟢 Dynamic Divider
+                        ),
                       ],
                     ),
                     const SizedBox(height: 40),
@@ -107,7 +127,11 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight.withValues(alpha: 0.5),
+                      color: isDark
+                          ? AppColors.primary.withValues(alpha: 0.15)
+                          : AppColors.primaryLight.withValues(
+                              alpha: 0.5,
+                            ), // 🟢 Dynamic Icon BG
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -118,12 +142,13 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                   ),
                   const SizedBox(height: 32),
 
-                  const Text(
-                    "Smart CV Parsing",
+                  Text(
+                    "Smart CV Parsing".tr, // 🟢 Added .tr
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color:
+                          theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -131,11 +156,15 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                   Text(
                     controller.currentResumeUrl.value.isNotEmpty
                         ? "Upload a new PDF to replace your current resume and automatically update your profile data."
-                        : "Upload your PDF resume and let our AI automatically extract your experience, education, and skills to save you time.",
+                              .tr // 🟢 Added .tr
+                        : "Upload your PDF resume and let our AI automatically extract your experience, education, and skills to save you time."
+                              .tr, // 🟢 Added .tr
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.grey.shade600,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : Colors.grey.shade600, // 🟢 Dynamic Subtitle
                       height: 1.5,
                     ),
                   ),
@@ -151,7 +180,9 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                           : () => controller.pickAndProcessCv(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        disabledBackgroundColor: Colors.grey.shade300,
+                        disabledBackgroundColor: isDark
+                            ? AppColors.darkSurfaceElevated
+                            : Colors.grey.shade300, // 🟢 Dynamic Disabled BG
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -161,7 +192,8 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
                       label: Text(
                         controller.currentResumeUrl.value.isNotEmpty
                             ? "Replace PDF File"
-                            : "Select PDF File",
+                                  .tr // 🟢 Added .tr
+                            : "Select PDF File".tr, // 🟢 Added .tr
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -176,10 +208,7 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
 
             // 🎯 ហៅ ScanningOverlay មកប្រើ
             if (controller.isScanning.value)
-              ScanningOverlay(
-                onCancel: () =>
-                    controller.cancelScanning(), // 🎯 បន្ថែមបន្ទាត់នេះ
-              ),
+              ScanningOverlay(onCancel: () => controller.cancelScanning()),
           ],
         );
       }),
@@ -193,7 +222,6 @@ class CvExtractionView extends GetView<CvExtractionViewController> {
     int skillCount = parsedData.skills.length;
 
     Get.bottomSheet(
-      // 🎯 ហៅ ExtractionSuccessSheet មកប្រើ
       ExtractionSuccessSheet(
         expCount: expCount,
         eduCount: eduCount,

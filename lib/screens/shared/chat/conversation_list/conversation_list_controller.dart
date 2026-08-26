@@ -56,7 +56,8 @@ class ConversationListViewController extends GetxController {
       conversations.assignAll(result);
     } catch (e) {
       errorMessage.value =
-          'Could not load your conversations. Pull down to try again.';
+          'Could not load your conversations. Pull down to try again.'
+              .tr; // 🟢 Added .tr
       debugPrint('[ChatList] fetch error: $e');
     } finally {
       isLoading.value = false;
@@ -81,7 +82,8 @@ class ConversationListViewController extends GetxController {
       final isFromMe = newMsg.senderId == currentUserId;
       final previewText = newMsg.messageType == 'text'
           ? newMsg.content
-          : '[${newMsg.messageType[0].toUpperCase()}${newMsg.messageType.substring(1)}]';
+          : '[${newMsg.messageType[0].toUpperCase()}${newMsg.messageType.substring(1)}]'
+                .tr; // 🟢 Translate media types if needed
 
       final updatedConvo = convo.copyWith(
         lastMessage: previewText,

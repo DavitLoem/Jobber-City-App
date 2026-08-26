@@ -28,7 +28,7 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = _isDark;
+    final isDark = _isDark; // 🟢 Dynamic Theme Check
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
@@ -60,7 +60,9 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
                 Icon(
                   LucideIcons.alertCircle,
                   size: 48,
-                  color: Colors.red.shade300,
+                  color: isDark
+                      ? Colors.redAccent
+                      : Colors.red.shade300, // 🟢 Dynamic Error Icon
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -68,7 +70,7 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
                   style: TextStyle(
                     color: isDark
                         ? AppColors.darkTextSecondary
-                        : Colors.grey.shade700,
+                        : Colors.grey.shade700, // 🟢 Dynamic Subtext
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -174,12 +176,20 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: OutlinedButton.icon(
-                  onPressed: () => _showLogoutDialog(context),
-                  icon: const Icon(LucideIcons.logOut, color: Colors.redAccent),
+                  onPressed: () =>
+                      _showLogoutDialog(context, isDark), // 🟢 Pass Theme State
+                  icon: Icon(
+                    LucideIcons.logOut,
+                    color: isDark
+                        ? Colors.redAccent
+                        : Colors.redAccent.shade700,
+                  ),
                   label: Text(
                     "Log Out".tr, // 🟢 Added .tr
-                    style: const TextStyle(
-                      color: Colors.redAccent,
+                    style: TextStyle(
+                      color: isDark
+                          ? Colors.redAccent
+                          : Colors.redAccent.shade700,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -187,7 +197,9 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                     side: BorderSide(
-                      color: Colors.redAccent.shade100,
+                      color: isDark
+                          ? AppColors.error.withValues(alpha: 0.5)
+                          : Colors.redAccent.shade100, // 🟢 Dynamic Border
                       width: 1.5,
                     ),
                     shape: RoundedRectangleBorder(
@@ -206,7 +218,8 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
 
   Widget _buildProfileHeader(ThemeData theme, bool isDark) {
     final profile = controller.companyProfile.value;
-    final companyName = profile?.companyName ?? 'Company Name'.tr;
+    final companyName =
+        profile?.companyName ?? 'Company Name'.tr; // 🟢 Added .tr
     final hasLogo = profile?.logoUrl != null && profile!.logoUrl!.isNotEmpty;
 
     final industryName = controller.getIndustryName(profile?.industryId);
@@ -251,16 +264,18 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
                     radius: 40,
                     backgroundColor: isDark
                         ? AppColors.darkSurfaceElevated
-                        : const Color(0xFFF0F4FF),
+                        : const Color(0xFFF0F4FF), // 🟢 Dynamic Avatar BG
                     backgroundImage: hasLogo
                         ? NetworkImage(profile.logoUrl!)
                         : null,
                     child: hasLogo
                         ? null
-                        : const Icon(
+                        : Icon(
                             LucideIcons.building,
                             size: 40,
-                            color: AppColors.primary,
+                            color: isDark
+                                ? Colors.blueAccent
+                                : AppColors.primary,
                           ),
                   ),
                 ),
@@ -296,20 +311,19 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
               fontSize: 14,
               color: isDark
                   ? AppColors.darkTextSecondary
-                  : Colors.grey.shade600,
+                  : Colors.grey.shade600, // 🟢 Dynamic Text
             ),
           ),
           Text(
             "@size: @count".trParams({
-              // 🟢 Added .trParams
-              'size': 'Company Size'.tr,
-              'count': profile?.companySize ?? 'N/A'.tr,
+              'size': 'Company Size'.tr, // 🟢 Added .tr
+              'count': profile?.companySize ?? 'N/A'.tr, // 🟢 Added .tr
             }),
             style: TextStyle(
               fontSize: 14,
               color: isDark
                   ? AppColors.darkTextSecondary
-                  : Colors.grey.shade600,
+                  : Colors.grey.shade600, // 🟢 Dynamic Text
             ),
           ),
           const SizedBox(height: 16),
@@ -318,8 +332,12 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
               Get.toNamed(AppRoutes.editProfileEmployer);
             },
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
+              foregroundColor: isDark
+                  ? Colors.blueAccent
+                  : AppColors.primary, // 🟢 Dynamic Foreground
+              side: BorderSide(
+                color: isDark ? Colors.blueAccent : AppColors.primary,
+              ), // 🟢 Dynamic Border
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -358,16 +376,20 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: theme.cardColor, // 🟢 Dynamic Card BG
+          color: isDark
+              ? AppColors.darkSurfaceElevated
+              : Colors.white, // 🟢 Dynamic Card BG
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? AppColors.darkCardBorder : Colors.transparent,
+            color: isDark
+                ? AppColors.darkCardBorder
+                : Colors.transparent, // 🟢 Dynamic Border
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(
                 alpha: isDark ? 0.2 : 0.05,
-              ), // 🟢 Updated opacity
+              ), // 🟢 Dynamic Shadow
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -377,10 +399,12 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
           children: [
             Text(
               count,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                color: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Count Text
               ),
             ),
             const SizedBox(height: 4),
@@ -390,7 +414,7 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
                 fontSize: 12,
                 color: isDark
                     ? AppColors.darkTextSecondary
-                    : Colors.grey.shade600,
+                    : Colors.grey.shade600, // 🟢 Dynamic Title Text
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -416,7 +440,9 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.darkTextHint : Colors.grey.shade500,
+              color: isDark
+                  ? AppColors.darkTextHint
+                  : Colors.grey.shade500, // 🟢 Dynamic Text
               letterSpacing: 1.2,
             ),
           ),
@@ -424,16 +450,20 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: theme.cardColor, // 🟢 Dynamic Card BG
+            color: isDark
+                ? AppColors.darkSurfaceElevated
+                : Colors.white, // 🟢 Dynamic Card BG
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? AppColors.darkCardBorder : Colors.grey.shade100,
+              color: isDark
+                  ? AppColors.darkCardBorder
+                  : Colors.grey.shade100, // 🟢 Dynamic Border
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(
                   alpha: isDark ? 0.2 : 0.02,
-                ), // 🟢 Updated opacity
+                ), // 🟢 Dynamic Shadow
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -459,11 +489,15 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: isDark
-              ? AppColors.darkSurfaceElevated
-              : const Color(0xFFF0F4FF),
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : const Color(0xFFF0F4FF), // 🟢 Dynamic BG
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, size: 20, color: AppColors.primary),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isDark ? Colors.blueAccent : AppColors.primary,
+        ), // 🟢 Dynamic Icon
       ),
       title: Text(
         title,
@@ -482,7 +516,7 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
               style: TextStyle(
                 color: isDark
                     ? AppColors.darkTextSecondary
-                    : Colors.grey.shade500,
+                    : Colors.grey.shade500, // 🟢 Dynamic Subtext
                 fontSize: 14,
               ),
             ),
@@ -490,16 +524,14 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
           Icon(
             LucideIcons.chevronRight,
             size: 20,
-            color: isDark ? AppColors.darkIconSecondary : Colors.grey.shade400,
+            color: isDark
+                ? AppColors.darkIconSecondary
+                : Colors.grey.shade400, // 🟢 Dynamic Chevron
           ),
         ],
       ),
     );
   }
-
-  // ===============================================
-  // 🟢 Settings Bottom Sheets (Appearance & Language)
-  // ===============================================
 
   void _showAppearanceBottomSheet(BuildContext context) {
     Get.bottomSheet(
@@ -824,120 +856,115 @@ class EmployerProfileView extends GetView<EmployerProfileViewController> {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, bool isDark) {
     Get.dialog(
-      Obx(() {
-        final isDark = _isDark;
-        final bgColor = Theme.of(context).cardColor;
-        final textColor = isDark ? Colors.white : Colors.black87;
-        final subTextColor = isDark
-            ? AppColors.darkTextSecondary
-            : Colors.black54;
-        final borderColor = isDark
-            ? AppColors.darkCardBorder
-            : AppColors.cardBorder;
-
-        return Dialog(
-          backgroundColor: bgColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.logout_rounded,
-                    size: 32,
-                    color: AppColors.error,
-                  ),
+      Dialog(
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceElevated
+            : Colors.white, // 🟢 Dynamic BG
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Log Out'.tr,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  size: 32,
+                  color: AppColors.error,
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Are you sure you want to log out from this account?'.tr,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: subTextColor,
-                    height: 1.4,
-                  ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Log Out'.tr, // 🟢 Added .tr
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark
+                      ? Colors.white
+                      : Colors.black87, // 🟢 Dynamic Text
                 ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Get.back(),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: borderColor),
-                          ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Are you sure you want to log out from this account?'
+                    .tr, // 🟢 Added .tr
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : Colors.black54, // 🟢 Dynamic Subtext
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Get.back(),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: isDark
+                                ? AppColors.darkCardBorder
+                                : AppColors.cardBorder,
+                          ), // 🟢 Dynamic Border
                         ),
-                        child: Text(
-                          'Cancel'.tr,
-                          style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      child: Text(
+                        'Cancel'.tr, // 🟢 Added .tr
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black87, // 🟢 Dynamic Text
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.back();
-                          Get.find<AuthController>().logout();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.error,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                        Get.find<AuthController>().logout();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          'Log Out'.tr,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Log Out'.tr, // 🟢 Added .tr
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 }
-
-// ==========================================
-// ── Mockup UI Classes ──
-// ==========================================
 
 enum _MockupStyle { light, dark, system }
 

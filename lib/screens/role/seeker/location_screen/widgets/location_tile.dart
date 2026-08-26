@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // 🟢 Added Get for Translations
+import 'package:jobber_city/core/constants/app_colors.dart'; // 🟢 Added AppColors
 import 'package:jobber_city/models/location_model.dart';
 import 'package:jobber_city/screens/role/seeker/location_screen/colors/location_colors.dart';
 
@@ -16,6 +18,9 @@ class LocationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -23,11 +28,17 @@ class LocationTile extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 3),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? LocationColors.tileBgHover : Colors.transparent,
+          color: isSelected
+              ? (isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : LocationColors.tileBgHover)
+              : Colors.transparent, // 🟢 Dynamic Hover BG
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
-                ? LocationColors.accent.withValues(alpha: 0.25)
+                ? LocationColors.accent.withValues(
+                    alpha: 0.25,
+                  ) // 🟢 Updated to withValues
                 : Colors.transparent,
             width: 1.2,
           ),
@@ -44,7 +55,10 @@ class LocationTile extends StatelessWidget {
                 border: Border.all(
                   color: isSelected
                       ? LocationColors.accent
-                      : LocationColors.muted,
+                      : (isDark
+                            ? AppColors.darkCardBorder
+                            : LocationColors
+                                  .muted), // 🟢 Dynamic Checkbox Border
                   width: 2,
                 ),
               ),
@@ -59,13 +73,22 @@ class LocationTile extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                location.nameEn,
+                location
+                    .nameEn
+                    .tr, // 🟢 Ensure API location names evaluate translation
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
                   color: isSelected
-                      ? LocationColors.ink
-                      : LocationColors.ink.withValues(alpha: 0.85),
+                      ? theme
+                            .textTheme
+                            .bodyLarge
+                            ?.color // 🟢 Dynamic Selected Text
+                      : (isDark
+                            ? AppColors.darkTextSecondary
+                            : LocationColors.ink.withValues(
+                                alpha: 0.85,
+                              )), // 🟢 Dynamic Unselected Text
                 ),
               ),
             ),

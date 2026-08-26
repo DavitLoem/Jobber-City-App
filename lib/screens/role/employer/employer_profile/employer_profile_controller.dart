@@ -3,14 +3,13 @@ part of 'employer_profile_view.dart';
 class EmployerProfileViewController extends GetxController {
   final CompanyProfileService _profileService = CompanyProfileService();
 
-  // 🎯 ចាក់បញ្ចូល Controller ទាំង ២
   final masterDataCtrl = Get.find<MasterDataController>();
   final locationCtrl = Get.find<LocationController>();
 
   ThemeController get themeController => Get.find<ThemeController>();
 
   final isLoading = true.obs;
-  final isFetching = false.obs; // សម្រាប់ Initial Data
+  final isFetching = false.obs;
   final companyProfile = Rxn<CompanyProfileModel>();
   final errorMessage = ''.obs;
 
@@ -22,15 +21,13 @@ class EmployerProfileViewController extends GetxController {
     _loadAllData();
   }
 
-  // 🎯 ហៅមុខងារទាំង ២ បន្តបន្ទាប់គ្នា
   Future<void> _loadAllData() async {
     isLoading.value = true;
     await fetchInitialData();
     await fetchMyProfile();
-    isLoading.value = false; // បិទ Loading ពេលទាញចប់ទាំង ២
+    isLoading.value = false;
   }
 
-  // 🎯 កូដរបស់អ្នកដែលបានសរសេរ
   Future<void> fetchInitialData() async {
     isFetching.value = true;
     try {
@@ -63,9 +60,6 @@ class EmployerProfileViewController extends GetxController {
     }
   }
 
-  // ==========================================
-  // ── មុខងារទាញយកឈ្មោះពី ID (ដាក់ក្នុង Controller) ──
-  // ==========================================
   String getIndustryName(String? id) {
     if (id == null || id.isEmpty) return 'Unknown Industry'.tr; // 🟢 Added .tr
     try {

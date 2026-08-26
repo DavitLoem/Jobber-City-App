@@ -12,32 +12,43 @@ class CandidateResume extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Resume / CV",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Text(
+          "Resume / CV".tr,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: theme.textTheme.bodyLarge?.color,
+          ),
         ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(
+              color: isDark ? AppColors.darkCardBorder : Colors.grey.shade200,
+            ),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: isDark
+                      ? AppColors.error.withValues(alpha: 0.15)
+                      : Colors.red.shade50,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   LucideIcons.fileText,
-                  color: Colors.red.shade600,
+                  color: isDark ? Colors.redAccent : Colors.red.shade600,
                   size: 24,
                 ),
               ),
@@ -51,17 +62,20 @@ class CandidateResume extends StatelessWidget {
                               applicant.resumeFilename!.isNotEmpty
                           ? applicant.resumeFilename!
                           : "Applicant_Resume.pdf",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      "PDF Document",
+                      "PDF Document".tr,
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        color: isDark
+                            ? AppColors.darkTextTertiary
+                            : Colors.grey.shade500,
                         fontSize: 12,
                       ),
                     ),
@@ -82,15 +96,17 @@ class CandidateResume extends StatelessWidget {
                       }
                     : null,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
+                  foregroundColor: isDark ? Colors.white : AppColors.primary,
                   side: BorderSide(
-                    color: AppColors.primary.withValues(alpha: 0.5),
+                    color: isDark
+                        ? AppColors.darkCardBorder
+                        : AppColors.primary.withValues(alpha: 0.5),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text("View"),
+                child: Text("View".tr),
               ),
             ],
           ),

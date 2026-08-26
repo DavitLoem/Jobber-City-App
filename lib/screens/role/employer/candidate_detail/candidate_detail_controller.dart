@@ -1,7 +1,6 @@
 part of 'candidate_detail_view.dart';
 
 class CandidateDetailViewController extends GetxController {
-  // 🟢 ១. ប្តូរពី late ទៅជា Rxn (Nullable) និងបន្ថែម State សម្រាប់ Loading
   final applicant = Rxn<ApplicantModel>();
   var isLoadingData = false.obs;
 
@@ -14,7 +13,6 @@ class CandidateDetailViewController extends GetxController {
 
   var selectedInterviewDate = Rxn<DateTime>();
 
-  // 🟢 ២. ទាញយក Service មកប្រើប្រាស់
   final ApplicantEmployerService _service = ApplicantEmployerService();
 
   @override
@@ -26,7 +24,6 @@ class CandidateDetailViewController extends GetxController {
       }
 
       final arg = Get.arguments;
-      // 🟢 ៣. ឆែកលក្ខខណ្ឌ៖ បើជា Object យកប្រើតែម្តង, បើជា String(ID) ហៅ API
       if (arg is ApplicantModel) {
         applicant.value = arg;
       } else if (arg is String) {
@@ -38,13 +35,11 @@ class CandidateDetailViewController extends GetxController {
   }
 
   Future<void> refreshDetail() async {
-    // ស្វែងរក ID បច្ចុប្បន្ន (អាចពី Object ដែលមានស្រាប់ ឬពី Arguments)
     final currentId =
         applicant.value?.applicationId ??
         (Get.arguments is String ? Get.arguments as String : null);
 
     if (currentId != null) {
-      // មិនបាច់កំណត់ isLoadingData = true ទេ ព្រោះ RefreshIndicator មានរង្វង់វិលរបស់វារួចហើយ
       try {
         final result = await _service.getApplicationDetail(currentId);
         if (result != null) {
@@ -56,8 +51,8 @@ class CandidateDetailViewController extends GetxController {
     }
   }
 
-  // 🟢 ៤. មុខងារទាញយកទិន្នន័យពី API ពេលចុចពីកាត Recent Applicant
   Future<void> fetchCandidateDetail(String applicationId) async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
     try {
       isLoadingData.value = true;
       final result = await _service.getApplicationDetail(applicationId);
@@ -66,23 +61,29 @@ class CandidateDetailViewController extends GetxController {
       }
     } catch (e) {
       debugPrint("❌ Error fetching detail: $e");
-      Get.snackbar("Error", "Could not load applicant details");
+      Get.snackbar(
+        "Error".tr, // 🟢 Added .tr
+        "Could not load applicant details".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? AppColors.error.withValues(alpha: 0.15)
+            : Colors.red.shade50,
+        colorText: isDark ? Colors.redAccent : Colors.red.shade700,
+      );
     } finally {
       isLoadingData.value = false;
     }
   }
 
-  // 🎯 មុខងារប្តូរ Status
   Future<void> changeApplicantStatus(
     String newStatus, {
     Map<String, dynamic>? interviewSchedule,
     String? feedback,
   }) async {
-    if (applicant.value == null) return; // 🟢 ការពារ Error បើគ្មានទិន្នន័យ
+    if (applicant.value == null) return;
 
     isUpdating.value = true;
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
 
-    // 🟢 ប្រើប្រាស់ applicant.value!
     final success = await _listController.updateApplicantStatus(
       applicant.value!.applicationId,
       newStatus,
@@ -97,11 +98,15 @@ class CandidateDetailViewController extends GetxController {
 
       Future.delayed(const Duration(milliseconds: 400), () {
         Get.snackbar(
-          "Success",
-          "Candidate has been moved to ${newStatus.capitalizeFirst}.",
+          "Success".tr, // 🟢 Added .tr
+          "Candidate has been moved to @status.".trParams({
+            'status': newStatus.capitalizeFirst ?? newStatus,
+          }), // 🟢 Added .trParams
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green.shade50,
-          colorText: Colors.green.shade800,
+          backgroundColor: isDark
+              ? AppColors.success.withValues(alpha: 0.15)
+              : Colors.green.shade50,
+          colorText: isDark ? Colors.greenAccent : Colors.green.shade800,
           duration: const Duration(seconds: 3),
           margin: const EdgeInsets.all(16),
         );
@@ -109,9 +114,8 @@ class CandidateDetailViewController extends GetxController {
     }
   }
 
-  // 🎯 អនុគមន៍សម្រាប់ទាញយកឈ្មោះ CV ចេញពី URL
   String getCvFileName(String? url) {
-    if (url == null || url.isEmpty) return "No CV Attached";
+    if (url == null || url.isEmpty) return "No CV Attached".tr; // 🟢 Added .tr
     try {
       String cleanUrl = url.split('?').first;
       String fileName = cleanUrl.split('/').last;
@@ -122,13 +126,22 @@ class CandidateDetailViewController extends GetxController {
   }
 
   Future<void> openDocument(String? url) async {
+    final isDark = Get.isDarkMode; // 🟢 Theme Check
     if (url == null || url.isEmpty) {
-      Get.snackbar("Notice", "No document attached.");
+      Get.snackbar(
+        "Notice".tr, // 🟢 Added .tr
+        "No document attached.".tr, // 🟢 Added .tr
+        backgroundColor: isDark
+            ? Colors.orangeAccent.withValues(alpha: 0.15)
+            : Colors.orange.shade50,
+        colorText: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+      );
       return;
     }
 
-    // 🎯 ប្រើប្រាស់ Screen ថ្មីដើម្បីបង្ហាញ Cover Letter ដោយផ្ទាល់
-    Get.to(() => DocumentViewerScreen(documentUrl: url, title: "Cover Letter"));
+    Get.to(
+      () => DocumentViewerScreen(documentUrl: url, title: "Cover Letter".tr),
+    ); // 🟢 Added .tr
   }
 
   @override

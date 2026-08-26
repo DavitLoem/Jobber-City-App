@@ -1,4 +1,3 @@
-// ── ហ្វាល់ edit_profile_screen_view.dart ──
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
@@ -8,7 +7,6 @@ import 'package:jobber_city/widgets/custom_button.dart';
 import 'widget/address_section.dart';
 import 'widget/contact_section.dart';
 import 'widget/current_position_section.dart';
-// Import ផ្នែកដែលទើបតែបំបែក
 import 'widget/edit_profile_header.dart';
 import 'widget/personal_info_section.dart';
 
@@ -17,8 +15,11 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Get global theme context
+    final isDark = theme.brightness == Brightness.dark; // 🟢 Get current mode
+
     return Scaffold(
-      backgroundColor: AppColors.inputBackground,
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
@@ -45,7 +46,9 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                       _Section(
                         index: 0,
                         icon: Icons.badge_outlined,
-                        label: 'Personal Information',
+                        label: 'Personal Information'.tr, // 🟢 Added .tr
+                        isDark: isDark, // 🟢 Passed Theme State
+                        theme: theme, // 🟢 Passed Theme Context
                         child: PersonalInfoSection(controller: controller),
                       ),
                       const SizedBox(height: 20),
@@ -54,7 +57,9 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                       _Section(
                         index: 1,
                         icon: Icons.contact_mail_outlined,
-                        label: 'Contact',
+                        label: 'Contact'.tr, // 🟢 Added .tr
+                        isDark: isDark,
+                        theme: theme,
                         child: ContactSection(controller: controller),
                       ),
                       const SizedBox(height: 20),
@@ -63,7 +68,9 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                       _Section(
                         index: 2,
                         icon: Icons.work_outline_rounded,
-                        label: 'Current Position',
+                        label: 'Current Position'.tr, // 🟢 Added .tr
+                        isDark: isDark,
+                        theme: theme,
                         child: CurrentPositionSection(controller: controller),
                       ),
                       const SizedBox(height: 20),
@@ -72,7 +79,9 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
                       _Section(
                         index: 3,
                         icon: Icons.location_on_outlined,
-                        label: 'Address',
+                        label: 'Address'.tr, // 🟢 Added .tr
+                        isDark: isDark,
+                        theme: theme,
                         child: AddressSection(controller: controller),
                       ),
                       const SizedBox(height: 28),
@@ -87,10 +96,19 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
         decoration: BoxDecoration(
-          color: AppColors.inputBackground,
+          color: theme.scaffoldBackgroundColor, // 🟢 Dynamic Bottom Nav BG
+          border: Border(
+            top: BorderSide(
+              color: isDark
+                  ? AppColors.darkDivider
+                  : Colors.transparent, // 🟢 Better edge styling in dark mode
+            ),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withValues(
+                alpha: isDark ? 0.3 : 0.04,
+              ), // 🟢 Dynamic Shadow
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -103,7 +121,9 @@ class EditProfileScreenView extends GetView<EditProfileScreenViewController> {
               height: 52,
               child: CustomButton(
                 // ប្តូរអក្សរពេលកំពុង Save
-                text: controller.isSaving.value ? 'Saving...' : 'Save Profile',
+                text: controller.isSaving.value
+                    ? 'Saving...'.tr
+                    : 'Save Profile'.tr, // 🟢 Added .tr
                 // បិទប៊ូតុងកុំឱ្យចុចត្រួតគ្នាពេលកំពុង Save
                 onPressed: controller.isSaving.value
                     ? null
@@ -124,12 +144,16 @@ class _Section extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.child,
+    required this.isDark, // 🟢 Added
+    required this.theme, // 🟢 Added
   });
 
   final int index;
   final IconData icon;
   final String label;
   final Widget child;
+  final bool isDark;
+  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -155,17 +179,27 @@ class _Section extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
+                  color: isDark
+                      ? AppColors.primary.withValues(alpha: 0.15)
+                      : AppColors.primaryLight, // 🟢 Dynamic BG
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, size: 15, color: AppColors.primary),
+                child: Icon(
+                  icon,
+                  size: 15,
+                  color: isDark
+                      ? Colors.blueAccent
+                      : AppColors.primary, // 🟢 Dynamic Icon
+                ),
               ),
               const SizedBox(width: 8),
               Text(
                 label.toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textHint,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textHint, // 🟢 Dynamic Text
                   fontSize: 13,
                   letterSpacing: 0.5,
                 ),
@@ -175,9 +209,14 @@ class _Section extends StatelessWidget {
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor, // 🟢 Dynamic Content Box BG
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.cardBorder, width: 1),
+              border: Border.all(
+                color: isDark
+                    ? AppColors.darkCardBorder
+                    : AppColors.cardBorder, // 🟢 Dynamic Content Box Border
+                width: 1,
+              ),
             ),
             padding: const EdgeInsets.all(16),
             child: child,

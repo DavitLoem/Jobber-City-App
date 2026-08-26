@@ -21,7 +21,11 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🟢 Theme Check
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor, // 🟢 Dynamic BG
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -36,11 +40,11 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildHeader(),
+                  _buildHeader(theme, isDark),
                   const SizedBox(height: 32),
                   _buildLoginForm(),
                   const SizedBox(height: 5),
-                  _buildForgotPassword(),
+                  _buildForgotPassword(isDark),
                   const SizedBox(height: 20),
                   Obx(() {
                     return CustomButton(
@@ -52,21 +56,22 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                       },
                       text: controller.isLoading.value
                           ? "Logging in..."
-                          : "Login",
+                                .tr // 🟢 Added .tr
+                          : "Login".tr, // 🟢 Added .tr
                     );
                   }),
                   const SizedBox(height: 25),
-                  _buildDivider(),
+                  _buildDivider(isDark),
                   const SizedBox(height: 25),
                   SocialLogin(
                     onPressed: () {
                       controller.loginWithGoogle();
                     },
-                    text: 'Continue with Google',
+                    text: 'Continue with Google'.tr, // 🟢 Added .tr
                     iconPath: AppAssets.google,
                   ),
                   const SizedBox(height: 20),
-                  _buildSignUpLink(),
+                  _buildSignUpLink(isDark),
                 ],
               ),
             ),
@@ -76,17 +81,19 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildSignUpLink() {
+  Widget _buildSignUpLink(bool isDark) {
     return SizedBox(
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Don\'t have an account?',
+            'Don\'t have an account?'.tr, // 🟢 Added .tr
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary, // 🟢 Dynamic Text
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -96,13 +103,17 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               Get.offNamed(AppRoutes.createAccount);
             },
             child: Text(
-              'Sign up',
+              'Sign up'.tr, // 🟢 Added .tr
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.primary,
+                color: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Accent
                 fontWeight: FontWeight.w500,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.primary,
+                decorationColor: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Accent
                 decorationThickness: 1.5,
               ),
             ),
@@ -112,39 +123,49 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 8,
       children: [
-        Expanded(child: Divider(thickness: 1.4, color: AppColors.line)),
+        Expanded(
+          child: Divider(
+            thickness: 1.4,
+            color: isDark ? AppColors.darkDivider : AppColors.line,
+          ),
+        ), // 🟢 Dynamic Divider
         Text(
-          'Or',
+          'Or'.tr, // 🟢 Added .tr
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.normal,
-            color: AppColors.textSecondary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary, // 🟢 Dynamic Text
           ),
         ),
-        Expanded(child: Divider(thickness: 1.4, color: AppColors.line)),
+        Expanded(
+          child: Divider(
+            thickness: 1.4,
+            color: isDark ? AppColors.darkDivider : AppColors.line,
+          ),
+        ), // 🟢 Dynamic Divider
       ],
     );
   }
 
-  Widget _buildForgotPassword() {
+  Widget _buildForgotPassword(bool isDark) {
     return SizedBox(
       width: double.infinity,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // នៅក្នុង login_screen_view.dart
           Expanded(
             child: Obx(
               () => CustomAnimatedCheckbox(
                 value: controller.rememberMe.value,
-                // ប្រើ () => ដើម្បីបញ្ជូនទៅជា VoidCallback ដែល CustomAnimatedCheckbox ត្រូវការ
                 onTap: () => controller.toggleRememberMe(),
-                label: 'Remember me',
+                label: 'Remember me'.tr, // 🟢 Added .tr
               ),
             ),
           ),
@@ -153,12 +174,16 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               Get.toNamed(AppRoutes.forgotPassword);
             },
             child: Text(
-              'Forgot Password?',
+              'Forgot Password?'.tr, // 🟢 Added .tr
               style: TextStyle(
-                color: AppColors.primary,
+                color: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Accent
                 fontWeight: FontWeight.w600,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.primary,
+                decorationColor: isDark
+                    ? Colors.blueAccent
+                    : AppColors.primary, // 🟢 Dynamic Accent
                 decorationThickness: 2,
               ),
             ),
@@ -172,18 +197,17 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     return Column(
       children: [
         CustomTextfield(
-          // Use the controller's hashCode to force a new widget if the controller changes
           key: ValueKey('email_field_${controller.hashCode}'),
           controller: controller.emailCtrl,
-          hintText: 'Email',
+          hintText: 'Email'.tr, // 🟢 Added .tr
           prefixIcon: Icons.email,
           validator: AuthValidator.validateEmail,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         CustomTextfield(
           key: ValueKey('password_field_${controller.hashCode}'),
           controller: controller.passwordCtrl,
-          hintText: 'Password',
+          hintText: 'Password'.tr, // 🟢 Added .tr
           prefixIcon: Icons.lock,
           isPasswordField: true,
           validator: AuthValidator.validateLoginPassword,
@@ -192,24 +216,30 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme, bool isDark) {
     return Column(
       children: [
         const Logo(size: 110),
         const SizedBox(height: 20),
         Text(
-          'Welcome Back',
+          'Welcome Back'.tr, // 🟢 Added .tr
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: theme.textTheme.bodyLarge?.color, // 🟢 Dynamic Title
           ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 5),
         Text(
-          'Sign in to continue to your account',
+          'Sign in to continue to your account'.tr, // 🟢 Added .tr
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+          style: TextStyle(
+            fontSize: 16,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary, // 🟢 Dynamic Subtitle
+          ),
         ),
       ],
     );

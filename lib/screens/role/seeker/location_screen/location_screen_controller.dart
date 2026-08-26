@@ -41,12 +41,13 @@ class LocationScreenController extends GetxController {
       provincesList.assignAll(data);
 
       if (data.isEmpty) {
-        provinceError.value = 'No provinces found';
+        provinceError.value = 'No provinces found'.tr; // 🟢 Added .tr
       }
     } catch (e) {
       debugPrint('Error fetching provinces: $e');
       provinceError.value =
-          'Failed to load provinces. Please check your connection.';
+          'Failed to load provinces. Please check your connection.'
+              .tr; // 🟢 Added .tr
       provincesList.clear();
     } finally {
       isProvinceLoading.value = false;
@@ -82,12 +83,13 @@ class LocationScreenController extends GetxController {
       districtsList.assignAll(data);
 
       if (data.isEmpty) {
-        districtError.value = 'No districts found';
+        districtError.value = 'No districts found'.tr; // 🟢 Added .tr
       }
     } catch (e) {
       debugPrint('Error fetching districts: $e');
       districtError.value =
-          'Failed to load districts. Please check your connection.';
+          'Failed to load districts. Please check your connection.'
+              .tr; // 🟢 Added .tr
       districtsList.clear();
     } finally {
       isDistrictLoading.value = false;
@@ -99,10 +101,8 @@ class LocationScreenController extends GetxController {
   }
 
   void filterLocations(String query) {
-    // បើគាត់កំពុងវាយអក្សរជាប់ៗគ្នា យើងលុប Timer ចាស់ចោល
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-    // បង្កើត Timer ថ្មី រង់ចាំ ៥០០ មិល្លីវិនាទី បន្ទាប់ពីគាត់ឈប់វាយអក្សរ ទើបបាញ់ API
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (selectedProvinceId.value.isEmpty) {
         fetchProvinces(query: query);
@@ -122,7 +122,15 @@ class LocationScreenController extends GetxController {
       }
     } else {
       if (selectedDistrictId.value.isEmpty) {
-        Get.snackbar('Action Required', 'Please select a district.');
+        final isDark = Get.isDarkMode; // 🟢 Dark Mode Check
+        Get.snackbar(
+          'Action Required'.tr, // 🟢 Added .tr
+          'Please select a district.'.tr, // 🟢 Added .tr
+          backgroundColor: isDark
+              ? Colors.orangeAccent.withValues(alpha: 0.15)
+              : AppColors.warningBackground,
+          colorText: isDark ? Colors.orangeAccent : AppColors.warning,
+        );
         return;
       }
 
@@ -161,42 +169,47 @@ class LocationScreenController extends GetxController {
       isGettingCurrentLocation.value = true;
       currentLocationError.value = '';
 
-      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         currentLocationError.value =
-            'Location services are disabled. Please enable them.';
+            'Location services are disabled. Please enable them.'
+                .tr; // 🟢 Added .tr
         return;
       }
 
-      // Check for location permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          currentLocationError.value = 'Location permissions are denied.';
+          currentLocationError.value =
+              'Location permissions are denied.'.tr; // 🟢 Added .tr
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         currentLocationError.value =
-            'Location permissions are permanently denied.';
+            'Location permissions are permanently denied.'.tr; // 🟢 Added .tr
         return;
       }
 
-      // Get current position
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // For now, just show success message
-      // In a real implementation, you would reverse geocode the coordinates
-      // to get the province/district and auto-select them
+      final isDark = Get.isDarkMode; // 🟢 Dark Mode Check
       Get.snackbar(
-        'Location Found',
-        'Lat: ${position.latitude.toStringAsFixed(4)}, Lng: ${position.longitude.toStringAsFixed(4)}',
+        'Location Found'.tr, // 🟢 Added .tr
+        'Lat: @lat, Lng: @lng'.trParams({
+          // 🟢 Added .trParams
+          'lat': position.latitude.toStringAsFixed(4),
+          'lng': position.longitude.toStringAsFixed(4),
+        }),
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: isDark
+            ? AppColors.success.withValues(alpha: 0.15)
+            : AppColors.successBackground,
+        colorText: isDark ? Colors.greenAccent : AppColors.success,
       );
 
       debugPrint(
@@ -205,7 +218,8 @@ class LocationScreenController extends GetxController {
     } catch (e) {
       debugPrint('Error getting current location: $e');
       currentLocationError.value =
-          'Failed to get current location. Please try again.';
+          'Failed to get current location. Please try again.'
+              .tr; // 🟢 Added .tr
     } finally {
       isGettingCurrentLocation.value = false;
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // 🟢 ត្រូវមាន Get សម្រាប់ Obx
+import 'package:get/get.dart';
 import 'package:jobber_city/core/constants/app_colors.dart';
-// 🟢 Import Controller ដែលយើងមាន
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/edit_profile_screen_controller.dart';
 import 'package:jobber_city/screens/role/seeker/profile/edit_profile_screen/widget/city_select_field.dart';
 import 'package:jobber_city/screens/role/seeker/profile/widget/profile_text_field.dart';
@@ -9,13 +8,15 @@ import 'package:jobber_city/screens/role/seeker/profile/widget/profile_text_fiel
 import 'section_field_label.dart';
 
 class PersonalInfoSection extends StatelessWidget {
-  // 🎯 បញ្ចូល Controller
   final EditProfileScreenViewController controller;
 
   const PersonalInfoSection({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark; // 🟢 Theme Check
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -26,10 +27,10 @@ class PersonalInfoSection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionFieldLabel(title: 'First Name'),
+                  SectionFieldLabel(title: 'First Name'.tr), // 🟢 Added .tr
                   const SizedBox(height: 6),
                   ProfileTextField(
-                    hintText: 'First Name',
+                    hintText: 'First Name'.tr, // 🟢 Added .tr
                     prefixIcon: Icons.person_outline,
                     controller: controller.firstNameCtrl,
                   ),
@@ -41,12 +42,12 @@ class PersonalInfoSection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionFieldLabel(title: 'Last Name'),
+                  SectionFieldLabel(title: 'Last Name'.tr), // 🟢 Added .tr
                   const SizedBox(height: 6),
                   ProfileTextField(
-                    hintText: 'Last Name',
+                    hintText: 'Last Name'.tr, // 🟢 Added .tr
                     prefixIcon: Icons.person_outline,
-                    controller: controller.lastNameCtrl, // 🎯
+                    controller: controller.lastNameCtrl,
                   ),
                 ],
               ),
@@ -55,73 +56,81 @@ class PersonalInfoSection extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Date of Birth'),
+        SectionFieldLabel(title: 'Date of Birth'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         ProfileTextField(
-          hintText: 'YYYY-MM-DD', // ដូរ Hint ឱ្យស្របតាមទម្រង់ API
+          hintText: 'YYYY-MM-DD'.tr, // 🟢 Added .tr
           prefixIcon: Icons.date_range_outlined,
           readOnly: true,
-          controller: controller.dateOfBirthCtrl, // 🎯
-          onTap: controller.selectDate, // 🎯 ហៅមុខងាររើសកាលបរិច្ឆេទ
+          controller: controller.dateOfBirthCtrl,
+          onTap: controller.selectDate,
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Gender'),
+        SectionFieldLabel(title: 'Gender'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         Row(
           children: [
-            _buildGenderChip('Male', Icons.male_rounded),
+            _buildGenderChip(
+              'Male'.tr,
+              Icons.male_rounded,
+              isDark,
+            ), // 🟢 Added .tr
             const SizedBox(width: 10),
-            _buildGenderChip('Female', Icons.female_rounded),
+            _buildGenderChip(
+              'Female'.tr,
+              Icons.female_rounded,
+              isDark,
+            ), // 🟢 Added .tr
             const SizedBox(width: 10),
-            _buildGenderChip('Other', Icons.person_outline_rounded),
+            _buildGenderChip(
+              'Other'.tr,
+              Icons.person_outline_rounded,
+              isDark,
+            ), // 🟢 Added .tr
           ],
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Marital Status'),
+        SectionFieldLabel(title: 'Marital Status'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         Wrap(
           spacing: 10,
           runSpacing: 10,
           children: [
-            _buildMaritalChip('Single'),
-            _buildMaritalChip('Married'),
-            _buildMaritalChip('Divorced'),
-            _buildMaritalChip('Widowed'),
+            _buildMaritalChip('Single'.tr, isDark), // 🟢 Added .tr
+            _buildMaritalChip('Married'.tr, isDark), // 🟢 Added .tr
+            _buildMaritalChip('Divorced'.tr, isDark), // 🟢 Added .tr
+            _buildMaritalChip('Widowed'.tr, isDark), // 🟢 Added .tr
           ],
         ),
         const SizedBox(height: 20),
 
-        const SectionFieldLabel(title: 'Nationality'),
+        SectionFieldLabel(title: 'Nationality'.tr), // 🟢 Added .tr
         const SizedBox(height: 6),
         CitySelectField<String>(
-          controller: controller.nationalityCtrl, // 🎯
-          fetchOptions: () async =>
-              controller.nationalities, // 🎯 ទាញ List ពី Controller
-          labelOf: (n) => n,
-          hintText: 'Select Nationality',
-          sheetTitle: 'Select Nationality',
+          controller: controller.nationalityCtrl,
+          fetchOptions: () async => controller.nationalities,
+          labelOf: (n) => n.tr, // 🟢 Translate nationalities
+          hintText: 'Select Nationality'.tr, // 🟢 Added .tr
+          sheetTitle: 'Select Nationality'.tr, // 🟢 Added .tr
           prefixIcon: Icons.flag_outlined,
           onSelected: (n) {
-            controller.nationalityCtrl.text = n; // 🎯 អាប់ដេតតម្លៃពេលរើសរួច
+            controller.nationalityCtrl.text = n.tr;
           },
         ),
       ],
     );
   }
 
-  // ── 🎯 កែប្រែ Chip ឲ្យដំណើរការបែប Dynamic (មានចុច និងលោតពណ៌) ──
-
-  Widget _buildGenderChip(String name, IconData icon) {
+  Widget _buildGenderChip(String name, IconData icon, bool isDark) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          // ចាប់យកតម្លៃដាក់ចូលអថេរ .obs របស់ GetX
+          // Send internal EN name or mapped key to controller, assuming backend handles standard terms
           controller.selectedGender.value = name;
         },
         child: Obx(() {
-          // ឆែកមើលថាតើវាត្រូវបាន Select ដែរឬទេ
           final isSelected =
               controller.selectedGender.value.toLowerCase() ==
               name.toLowerCase();
@@ -132,7 +141,12 @@ class PersonalInfoSection extends StatelessWidget {
             height: 46,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: isSelected ? AppColors.primary : AppColors.inputBackground,
+              color: isSelected
+                  ? AppColors.primary
+                  : (isDark
+                        ? AppColors.darkInputBackground
+                        : AppColors
+                              .inputBackground), // 🟢 Dynamic Unselected BG
               border: Border.all(
                 color: isSelected ? AppColors.primary : Colors.transparent,
               ),
@@ -143,13 +157,21 @@ class PersonalInfoSection extends StatelessWidget {
                 Icon(
                   icon,
                   size: 16,
-                  color: isSelected ? Colors.white : AppColors.inputIconText,
+                  color: isSelected
+                      ? Colors.white
+                      : (isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.inputIconText), // 🟢 Dynamic Icon
                 ),
                 const SizedBox(height: 2),
                 Text(
                   name,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.inputIconText,
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.inputIconText), // 🟢 Dynamic Text
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -162,8 +184,7 @@ class PersonalInfoSection extends StatelessWidget {
     );
   }
 
-  Widget _buildMaritalChip(String name) {
-    // គណនាប្រវែង Chip ឱ្យស្មើគ្នា
+  Widget _buildMaritalChip(String name, bool isDark) {
     final chipWidth = (Get.width - 40 - 32 - 30) / 4;
 
     return GestureDetector(
@@ -181,7 +202,11 @@ class PersonalInfoSection extends StatelessWidget {
           width: chipWidth,
           padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : AppColors.inputBackground,
+            color: isSelected
+                ? AppColors.primary
+                : (isDark
+                      ? AppColors.darkInputBackground
+                      : AppColors.inputBackground), // 🟢 Dynamic BG
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isSelected ? AppColors.primary : Colors.transparent,
@@ -194,7 +219,11 @@ class PersonalInfoSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : AppColors.inputIconText,
+                color: isSelected
+                    ? Colors.white
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.inputIconText), // 🟢 Dynamic Text
               ),
             ),
           ),
